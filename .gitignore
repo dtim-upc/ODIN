@@ -20,3 +20,5 @@ api/lib/NextiaBS-1.0-SNAPSHOT-uber.jar
 *.jar
 *.rdf
 api/dbFiles/ttl/integrated
+*.lck
+*.bak_002d
