@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <description>Object/Relational Mapping for classes</description>
+
+    <!--> TO IGNORE ANY ANNOTATION
+    <persistence-unit-metadata>
+        <xml-mapping-metadata-complete/>
+    </persistence-unit-metadata><-->
+
+    <!--> MAPPING PROJECT CLASS<-->
+    <entity class="edu.upc.essi.dtim.odin.project.Project" name="Project">
+        <table name="Project">
+            <unique-constraint>
+                <column-name>PROJECTID</column-name>
+            </unique-constraint>
+        </table>
+
+        <attributes>
+            <id name="projectId">
+                <generated-value strategy="AUTO"/>
+            </id>
+
+            <basic name="projectName">
+                <column nullable="false" name="PROJECT_NAME"/>
+            </basic>
+            <basic name="projectDescription">
+                <column name="PROJECT_DESCRIPTION" length="5000"/>
+            </basic>
+            <basic name="projectPrivacy">
+                <column name="PROJECT_PRIVACY"/>
+            </basic>
+            <basic name="projectColor">
+                <column name="PROJECT_COLOR"/>
+            </basic>
+            <basic name="createdBy">
+                <column name="CREATED_BY"/>
+            </basic>
+            <one-to-many orphan-removal="true" name="datasets" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                <join-column name="PROJECTID"/>
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+
+            <one-to-one name="integratedGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-one>
+            <!--> element-collections, transient and other properties here <-->
+        </attributes>
+
+    </entity>
+
+    <!--> MAPPING CLASS GRAPH<-->
+    <entity class="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
+        <table name="GRAPH">
+            <unique-constraint>
+                <column-name>graphName</column-name>
+            </unique-constraint>
+        </table>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="graphName"><generated-value strategy="AUTO"/></id>
+            <basic name="graphicalSchema">
+                <column name="GRAPHICALSCHEMA"/>
+            </basic>
+            <transient name="graph"/>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl">
+        <table name="LOCALGRAPH"/>
+        <attributes>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
+        <table name="INTEGRATEDGRAPH"/>
+        <attributes>
+            <transient name="globalGraph"/>
+        </attributes>
+    </entity>
+
+    <!--> MAPPING DATASET CLASS<-->
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+        <table name="Dataset">
+            <unique-constraint>
+                <column-name>datasetId</column-name>
+            </unique-constraint>
+        </table>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="datasetId">
+                <generated-value strategy="AUTO"/>
+            </id>
+            <basic name="datasetName"/>
+            <basic name="datasetDescription"/>
+            <basic name="created_at">
+                <temporal>TIMESTAMP</temporal>
+            </basic>
+
+            <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
+                <cascade><cascade-all/></cascade>
+            </one-to-one>
+        </attributes>
+    </entity>
+
+    <entity name="CsvDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset">
+        <table name="CsvDataset"/>
+        <attributes>
+            <basic name="path"/>
+        </attributes>
+    </entity>
+
+    <entity name="JsonDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset">
+        <table name="JsonDataset"/>
+        <attributes>
+            <basic name="path"/>
+        </attributes>
+    </entity>
+
+
+
+</entity-mappings>

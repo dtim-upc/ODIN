@@ -1,0 +1,147 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.5.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.graalvm.buildtools.native' version '0.9.20'
+
+	id 'org.sonarqube' version '4.0.0.2929'
+	id 'jacoco'
+}
+
+group = 'edu.upc.essi.dtim.odin'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+	/*flatDir {
+		dirs 'C:\\Users\\victo\\Documents\\GitHub\\NextiaCore\\build\\libs'
+	}*/
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	/////////////////////////////////////// ORM DEPENDENCIES ///////////////////////////////////////
+	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
+	implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.2.2.Final'
+
+	// https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api
+	implementation 'org.eclipse.persistence:javax.persistence:2.0.0'
+
+	// https://mvnrepository.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa
+	implementation group: 'org.eclipse.persistence', name: 'org.eclipse.persistence.jpa', version: '2.5.0'
+
+	// https://mvnrepository.com/artifact/com.h2database/h2
+	runtimeOnly group: 'com.h2database', name: 'h2', version: '2.1.214'
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////// JENA DEPENDENCIES ///////////////////////////////////////
+	implementation group: 'org.apache.jena', name: 'apache-jena-libs', version: '4.1.0', ext: 'pom'
+	implementation group: 'org.apache.jena', name: 'jena-querybuilder', version: '4.1.0'
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////// NextiaCore //////////////////////////////////////////
+	implementation fileTree(dir: 'lib', include: ['NextiaCore.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaCore.jar']))
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////// NextiaDI //////////////////////////////////////////
+	implementation fileTree(dir: 'lib', include: ['nextiadi.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['nextiadi.jar']))
+
+	//implementation 'edu.upc.essi.dtim:nextiadi:0.1.0-SNAPSHOT'
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////// NextiaGraphy //////////////////////////////////////////
+	// https://mvnrepository.com/artifact/com.google.code.gson/gson
+	implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.9'
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////// OLD BOOTSTRAPPING LIB //////////////////////////////////////////
+	implementation fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar']))
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+}
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		csv.required = true
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+	dependsOn test
+}
+
+task generateDocs(type: Javadoc) {
+	source = sourceSets.main.allJava
+	destinationDir = file("${buildDir}/docs")
+	options.links("https://docs.oracle.com/javase/8/docs/api/")
+	failOnError false
+}
+
+sonarqube {
+	properties {
+		property "sonar.projectKey", "dtim-upc_newODIN"
+		property "sonar.organization", "dtim"
+		property "sonar.host.url", "https://sonarcloud.io"
+		property 'sonar.core.codeCoveragePlugin', 'jacoco'
+		property "sonar.exclusions", "/src/main/java/edu/upc/essi/dtim/odin/NextiaGraphy/**"
+	}
+}
+tasks['sonarqube'].dependsOn test
+
+
+//para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
+def nextiaCoreJarPath = 'ruta\\NextiaCore\\build\\libs\\nextiacore-0.0.2-SNAPSHOT-uber.jar'
+def nextiaDIJarPath ='ruta\\NextiaDI\\source\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar'
+task importExternalJar {
+	doLast {
+		configurations.compileClasspath.files.find { it.name == 'nextiacore-0.0.2-SNAPSHOT-uber.jar' }?.delete()
+		configurations.compileClasspath.files.find { it.name == 'NextiaCore.jar' }?.delete()
+
+		copy {
+			from nextiaCoreJarPath
+			into "..\\api\\lib"
+			rename { 'NextiaCore.jar' }
+		}
+
+		configurations.compileClasspath.files.find { it.name == 'nextiadi-0.1.0-SNAPSHOT-uber.jar' }?.delete()
+		configurations.compileClasspath.files.find { it.name == 'nextiadi.jar' }?.delete()
+
+		copy {
+			from nextiaDIJarPath
+			into "..\\api\\lib"
+			rename { 'nextiadi.jar' }
+		}
+	}
+}
+
+compileJava.dependsOn importExternalJar
+
+
