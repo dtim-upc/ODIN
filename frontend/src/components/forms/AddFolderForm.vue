@@ -44,7 +44,7 @@ const notify = useNotify();
 
 // Inicializamos project con los datos recibidos a través de las props
 const project = reactive({
-  projectId:props.projectData ? props.projectData.projectId : "",
+  projectId:props.projectData ? props.projectData.projectId : null,
   projectName: props.projectData ? props.projectData.projectName : "",
   projectDescription: props.projectData ? props.projectData.projectDescription : "",
   projectPrivacy: props.projectData ? props.projectData.projectPrivacy : "private",
@@ -55,7 +55,7 @@ const optionsPrivacy = ["private", "public"];
 const optionsColor = ["#dbe2e7", "#4e68f5"];
 
 const onReset = () => {
-  project.projectId="";
+  project.projectId=null;
   project.projectName = "";
   project.projectDescription = "";
   project.projectPrivacy = "private";

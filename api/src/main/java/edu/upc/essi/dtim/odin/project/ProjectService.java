@@ -212,9 +212,13 @@ public class ProjectService {
                 || !project.getProjectPrivacy().equals(originalProject.getProjectPrivacy())
         ) {
             // At least one attribute has changed
+            originalProject.setProjectName(project.getProjectName());
+            originalProject.setProjectDescription(project.getProjectDescription());
+            originalProject.setProjectColor(project.getProjectColor());
+            originalProject.setProjectPrivacy(project.getProjectPrivacy());
 
             // Perform the database update operation to save the changes
-            ormProject.save(project);
+            ormProject.save(originalProject);
 
             return true;
         }
