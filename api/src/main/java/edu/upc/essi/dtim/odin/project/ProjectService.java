@@ -15,6 +15,7 @@ import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -218,7 +219,7 @@ public class ProjectService {
             originalProject.setProjectPrivacy(project.getProjectPrivacy());
 
             // Perform the database update operation to save the changes
-            ormProject.save(originalProject);
+            saveProject(originalProject);
 
             return true;
         }
@@ -227,5 +228,31 @@ public class ProjectService {
         return false;
     }
 
+    public Project cloneProject(Project projectToClone) {
+        projectToClone.setProjectId(null);
+
+        // Get the datasets from the original project
+        List<Dataset> datasetsToClone = projectToClone.getDatasets();
+
+        if (datasetsToClone != null && !datasetsToClone.isEmpty()) {
+            // Create a new list to store the cloned datasets
+            List<Dataset> clonedDatasets = new ArrayList<>();
+
+            for (Dataset datasetToClone : datasetsToClone) {
+                datasetToClone.setDatasetId(null);
+                datasetToClone.getLocalGraph().setGraphName(null);
+
+                // Add the cloned dataset to the list of cloned datasets
+                clonedDatasets.add(datasetToClone);
+            }
+
+            // Set the list of cloned datasets to the cloned project
+            projectToClone.setDatasets(clonedDatasets);
+        }
+
+        if(projectToClone.getIntegratedGraph() != null)projectToClone.getIntegratedGraph().setGraphName(null);
+
+        return saveProject(projectToClone);
+    }
 }
 

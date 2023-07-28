@@ -108,4 +108,22 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/cloneProject/{id}")
+    public ResponseEntity<Project> cloneProject(@PathVariable("id") String id) {
+        logger.info("CLONE request received for editing project with ID: {}", id);
+
+        // Call the projectService to delete the project and get the result
+        Project projectToClone = projectService.findById(id);
+
+        Project projectClone = projectService.cloneProject(projectToClone);
+
+        // Check if the project was deleted successfully
+        if (projectClone.getProjectId() != id) {
+            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
+            return new ResponseEntity<>(projectClone, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.NOT_MODIFIED);
+        }
+    }
 }

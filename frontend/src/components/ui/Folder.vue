@@ -34,7 +34,7 @@
                               </q-item-section>
                             </q-item>
 
-                            <q-item clickable v-close-popup @click="onItemClick">
+                            <q-item clickable v-close-popup @click="cloneProject(props.row.projectId)">
                                 <q-item-section avatar style="min-width: 30px; padding:0">
                                     <q-icon color="primary" name="folder_copy" />
                                 </q-item-section>
@@ -161,6 +161,17 @@ const deleteItem = (id) => {
 const openEditDialog = (project) => {
   selectedProject.value = project; // Make a copy of the project data to avoid reactivity issues
   showEditDialog.value = true;
+};
+
+const cloneProject = (id) => {
+  // Perform clone logic here
+  projectsStore.cloneProject(id, success);
+};
+
+const emit = defineEmits(["submitSuccess", "cancelForm"]);
+const success = () => {
+  form.value.resetValidation();
+  emit("submitSuccess");
 };
 </script>
 
