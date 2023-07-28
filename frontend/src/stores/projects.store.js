@@ -43,7 +43,7 @@ export const useProjectsStore = defineStore('projects',{
         const notify = useNotify();
 
         console.log("create project store...")
-        project.createdBy = "Julio Berne"//authStore.user.username
+        project.createdBy = "Dios todo poderoso"//authStore.user.username
         console.log("send project: ", project)
         projectAPI.createProject(project, authStore.user.accessToken).then((response) => {
           if (response.status === 201) {
@@ -114,8 +114,27 @@ export const useProjectsStore = defineStore('projects',{
               notify.negative("Something went wrong on the server while editing the project.");
             }
           });
+      },
+      cloneProject(id, successCallback) {
+        const authStore = useAuthStore();
+        const notify = useNotify();
+
+        projectAPI.cloneProject(id, authStore.user.accessToken)
+          .then((response) => {
+            if (response.status === 201) {
+              notify.positive(`Project ${id} successfully cloned`);
+              this.projects.push(response.data)
+              successCallback();
+            } else {
+              notify.negative("Cannot clone project. Something went wrong on the server.");
+            }
+          })
+          .catch((error) => {
+            console.log("Error is: " + error);
+            if (error.response) {
+              notify.negative("Something went wrong on the server while cloning the project.");
+            }
+          });
       }
     }
-
-
-    })
+})
