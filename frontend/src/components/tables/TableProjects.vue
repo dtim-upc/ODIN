@@ -83,27 +83,15 @@
     </template>
   </q-table>
 
-  <!-- <SelectAlignments :show_dialog="show_dialog" :ds-a="selectedDS[0]" :ds-b="selectedDS[1]"  @close-dialog="show_dialog=false" @add-alignment="addRow"/> -->
-  <!-- <q-dialog v-model="show_dialog" full-height full-width>
-
-
-  </q-dialog> -->
-
   <q-dialog v-model="showDialog" >
-
         <q-card flat bordered class="my-card" style="min-width: 30vw;">
             <q-card-section>
                 <div class="text-h6">New project</div>
             </q-card-section>
-
             <q-card-section class="q-pt-none">
                  <AddFolderForm @submit-success="showDialog=false" @cancel-form="showDialog=false"></AddFolderForm>
             </q-card-section>
-
-
     </q-card>
-
-
   </q-dialog>
 
 </template>

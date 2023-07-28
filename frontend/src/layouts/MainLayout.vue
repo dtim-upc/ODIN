@@ -7,7 +7,7 @@
 
           <q-item style="max-width: 200px; padding-top: 0px" >
             <q-item-section avatar v-if="miniState" >
-          
+
               <ODIN_short class="logoODIN" style="width:38px"></ODIN_short>
               <!-- <q-icon name="img:/assets/ODIN_short.svg" size="lg" color="primary"/>   -->
             </q-item-section>
@@ -29,7 +29,7 @@
                           <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                             Projects
                           </q-tooltip>
-                        </q-btn> 
+                        </q-btn>
             </q-item-section>
             <q-item-section>
                   Projects
@@ -42,7 +42,7 @@
                           <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                             Home
                           </q-tooltip>
-                        </q-btn> 
+                        </q-btn>
             </q-item-section>
             <q-item-section>
                   Home
@@ -50,14 +50,14 @@
           </q-item>
                     <!-- <q-item manual-focus>
                       <q-item-section avatar>
-                 
+
                         <q-btn  flat padding="xs" icon="o_hub" to="/viewTripleStore" :color="$route.name === 'viewTripleStore' ? 'primary600': 'neutral500' " :class="{ activebg: $route.name === 'viewTripleStore' }">
                           <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                             View triple store
                           </q-tooltip>
-                        </q-btn> 
+                        </q-btn>
                       </q-item-section>
-  
+
                     </q-item> -->
 
           <!-- <q-item manual-focus>
@@ -66,9 +66,9 @@
                 <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                   Data sources
                 </q-tooltip>
-              </q-btn> 
+              </q-btn>
             </q-item-section>
-          
+
           </q-item> -->
 
 
@@ -80,12 +80,12 @@
                 <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                   Schema
                 </q-tooltip>
-              </q-btn> 
+              </q-btn>
             </q-item-section>
             <q-item-section>
               Schema
             </q-item-section>
-          
+
           </q-item>
 
 
@@ -97,7 +97,7 @@
                 <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                   Data sources
                 </q-tooltip>
-              </q-btn> 
+              </q-btn>
             </q-item-section>
             <q-item-section>
               Data sources
@@ -112,7 +112,7 @@
                 <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
                   Query
                 </q-tooltip>
-              </q-btn> 
+              </q-btn>
             </q-item-section>
             <q-item-section>
               Query
@@ -120,12 +120,12 @@
           </q-item>
 
           <div class="fixed-bottom">
-            
+
           <q-item manual-focus>
             <q-item-section avatar>
                 <q-btn class="q-mr-xs" flat round @click="authStore.setDark()" :icon="$q.dark.isActive ? 'nights_stay' : 'wb_sunny'"/>
             </q-item-section>
-            
+
           </q-item>
 
           <q-item manual-focus>
@@ -185,11 +185,11 @@ const authStore = useAuthStore()
   }
 }
 .body--dark {
- 
+
   .activebg{
     background-color: $neutral100d;
   }
- 
+
 }
 /* a.router-link-exact-active{
   background-color: #f0f0ff;

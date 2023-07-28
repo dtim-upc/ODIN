@@ -201,5 +201,27 @@ public class ProjectService {
         Project project = ormProject.findById(Project.class, id);
         return project.getDatasets();
     }
+
+    public boolean editProject(Project project) {
+        Project originalProject = ormProject.findById(Project.class, project.getProjectId());
+
+        // Check if any attribute has changed
+        if (!project.getProjectName().equals(originalProject.getProjectName())
+                || !project.getProjectDescription().equals(originalProject.getProjectDescription())
+                || !project.getProjectColor().equals(originalProject.getProjectColor())
+                || !project.getProjectPrivacy().equals(originalProject.getProjectPrivacy())
+        ) {
+            // At least one attribute has changed
+
+            // Perform the database update operation to save the changes
+            ormProject.save(project);
+
+            return true;
+        }
+
+        // No changes detected, return false
+        return false;
+    }
+
 }
 
