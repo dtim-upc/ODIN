@@ -87,6 +87,33 @@ export const useProjectsStore = defineStore('projects',{
               notify.negative("Something went wrong on the server while deleting a project.");
             }
           });
+      },
+      editProject(project, successCallback) {
+        const authStore = useAuthStore();
+        const notify = useNotify();
+
+        projectAPI.editProject(project, authStore.user.accessToken)
+          .then((response) => {
+            if (response.status === 200) {
+              const index = this.projects.findIndex(p => p.projectId === project.projectId);
+              if (index !== -1) {
+                // Update the project in the projects array
+                this.projects[index] = project;
+                notify.positive(`Project ${project.projectId} successfully edited`);
+                successCallback();
+              } else {
+                notify.negative("Project not found in the list.");
+              }
+            } else {
+              notify.negative("Cannot edit project. Something went wrong on the server.");
+            }
+          })
+          .catch((error) => {
+            console.log("Error is: " + error);
+            if (error.response) {
+              notify.negative("Something went wrong on the server while editing the project.");
+            }
+          });
       }
     }
 

@@ -25,6 +25,15 @@
                                 </q-item-section>
                             </q-item>
 
+                            <q-item clickable v-close-popup @click="openEditDialog(props.row)">
+                              <q-item-section avatar style="min-width: 30px;padding:0">
+                                <q-icon color="primary" name="edit" />
+                              </q-item-section>
+                              <q-item-section>
+                                <q-item-label>Edit</q-item-label>
+                              </q-item-section>
+                            </q-item>
+
                             <q-item clickable v-close-popup @click="onItemClick">
                                 <q-item-section avatar style="min-width: 30px; padding:0">
                                     <q-icon color="primary" name="folder_copy" />
@@ -72,7 +81,20 @@
 
     </div>
 
-
+    <q-dialog v-model="showEditDialog" >
+      <q-card flat bordered class="my-card" style="min-width: 30vw;">
+        <q-card-section>
+          <div class="text-h6">Edit project</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <AddFolderForm
+            @submit-success="showEditDialog=false"
+            @cancel-form="showEditDialog=false"
+            :projectData="selectedProject"
+          ></AddFolderForm>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 </template>
 
 
@@ -85,6 +107,10 @@ import { useDataSourceStore } from 'src/stores/datasources.store.js'
 import dataSourcesAPI from "src/api/dataSourcesAPI";
 import projectAPI from "src/api/projectAPI";
 import {useProjectsStore} from "stores/projects.store";
+import AddFolderForm from 'components/forms/AddFolderForm.vue';
+
+const showEditDialog = ref(false);
+const selectedProject = ref(null);
 
 const props = defineProps({
     row: {type:Object},
@@ -107,6 +133,9 @@ const openFolder = (project) => {
 const onItemClick = (project, event) => {
   const option = event.currentTarget.innerText;
   switch (option) {
+    case 'Edit':
+      openEditDialog(project);
+      break;
     case 'Delete':
       deleteItem(project.projectId);
       break;
@@ -129,9 +158,13 @@ const deleteItem = (id) => {
     });
 };
 
-
-
+const openEditDialog = (project) => {
+  selectedProject.value = project; // Make a copy of the project data to avoid reactivity issues
+  showEditDialog.value = true;
+};
 </script>
+
+
 
 <style lang="scss">
 $folderColor: #70a1ff;

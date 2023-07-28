@@ -10,4 +10,6 @@ export default {
     createProject(data, token) { return odinApi.post('/projects', data /*headers(token)*/) },
     getProjectByID(id, token) { return odinApi.get('/projects/'+id /*, headers(token) */) },
     deleteProjectByID(id, token) { return odinApi.delete('/deleteProject/'+id /*, headers(token) */) },
+    editProject(project, successCallback) {return odinApi.post('/editProject',project)
+    }
 }

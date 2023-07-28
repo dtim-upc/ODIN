@@ -90,4 +90,22 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/editProject")
+    public ResponseEntity<Boolean> editProject(@RequestBody Project project) {
+        logger.info("EDIT request received for editing project with ID: {}", project.getProjectId());
+        logger.info("EDIT request received for editing project with ID: {}", project.getProjectName());
+
+        // Call the projectService to delete the project and get the result
+        boolean edited = projectService.editProject(project);
+
+        // Check if the project was deleted successfully
+        if (edited) {
+            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
+            return ResponseEntity.ok(true);
+        } else {
+            // Return a ResponseEntity with HTTP status 404 (Not Found)
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
