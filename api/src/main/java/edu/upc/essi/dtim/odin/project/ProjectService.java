@@ -227,5 +227,11 @@ public class ProjectService {
         return false;
     }
 
+    public Project cloneProject(Project projectToClone) {
+        projectToClone.setProjectId(null);
+        projectToClone.getDatasets();
+
+        return ormProject.save(projectToClone);
+    }
 }
 
