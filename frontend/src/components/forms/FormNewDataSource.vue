@@ -3,13 +3,28 @@
  <!--  -->
    <q-card style="width: 400px; max-width: 80vw">
      <q-card-section>
-       <div class="text-h6">Create new data source</div>
+       <div class="text-h6">Create new dataset</div>
      </q-card-section>
 
      <q-card-section>
 
         <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-          <q-input filled v-model="newDatasource.datasetName" label="Introduce a data source name" lazy-rules
+          <q-select filled
+            v-model="newDatasource.repository"
+            :options="repositories"
+            label="Repository"
+            class="q-mt-none"
+            emit-value
+            map-options
+                    option-value="name"
+          option-label="name"
+
+          @input="onRepositoryChange"
+          />
+
+          <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
+          <q-input v-if="newDatasource.repository === 'Nuevo repositorio'" filled v-model="newRepositoryName" label="Introduce a new repository name" lazy-rules :rules="[(val) => (val && val.length > 0) || 'Please type a name']" />
+          <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
           <q-select v-model="DataSourceType" :options="options" label="Type" class="q-mt-none"/>
 
@@ -44,6 +59,7 @@ import {useNotify} from 'src/use/useNotify.js'
 import { useRoute, useRouter } from "vue-router";
 import { useDataSourceStore } from 'src/stores/datasources.store.js'
 import { useIntegrationStore } from 'src/stores/integration.store.js'
+import projectAPI from "../../api/projectAPI";
 
 
 // -------------------------------------------------------------
@@ -93,9 +109,15 @@ const options = [
       "SQLDatabase", "Upload file"
 ];
 
+const repositories = [
+  { name: "1" },
+  { name: "2" },
+  { name: "Nuevo repositorio" }, // Add an option for "Nuevo repositorio"
+];
 
 
   const newDatasource = reactive({
+    repository:'',
     datasetName: '',
     datasetDescription : '',
   })
@@ -112,6 +134,7 @@ const options = [
       data.append("attach_file", uploadedFile.value);
       data.append("datasetName", newDatasource.datasetName);
       data.append("datasetDescription", newDatasource.datasetDescription);
+      data.append("repository", newDatasource.repository);
 
       integrationStore.addDataSource(route.params.id, data, successCallback)
     }
