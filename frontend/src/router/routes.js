@@ -16,7 +16,7 @@ const routes = [
     children: [
       { path: 'home', name:'home', component: () => import('pages/datasources/HomeDashboard.vue') },
       { path: 'schema', name:'schema',  component: () => import('pages/datasources/Schema.vue') },
-
+      { path: 'repositories', name:'repositories',  component: () => import('pages/datasources/Repositories.vue') },
       { path: 'datasources', name:'datasources',  component: () => import('pages/datasources/DataSources.vue') },
       { path: 'viewTriples/:datasourceID', name:'viewTriples',  component: () => import('pages/datasources/ViewTriples.vue') },
 

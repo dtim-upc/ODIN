@@ -163,7 +163,7 @@ const views = {
     "integration": ['Name', 'Type'],
     "datasources": ['Name', 'Type', '#Wrappers', 'View_triples', 'View_Source_Graph', 'actions']
 }
-const title = "Data Sources";
+const title = "Datasets";
 const search = ref("")
 const visibleColumns = views[props.view]
 const addDataSource = ref(false)

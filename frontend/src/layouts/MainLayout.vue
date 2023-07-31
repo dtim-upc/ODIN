@@ -48,29 +48,6 @@
                   Home
             </q-item-section>
           </q-item>
-                    <!-- <q-item manual-focus>
-                      <q-item-section avatar>
-
-                        <q-btn  flat padding="xs" icon="o_hub" to="/viewTripleStore" :color="$route.name === 'viewTripleStore' ? 'primary600': 'neutral500' " :class="{ activebg: $route.name === 'viewTripleStore' }">
-                          <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                            View triple store
-                          </q-tooltip>
-                        </q-btn>
-                      </q-item-section>
-
-                    </q-item> -->
-
-          <!-- <q-item manual-focus>
-            <q-item-section avatar>
-              <q-btn flat padding="xs" icon="o_bubble_chart" to="/dataSources" :color="$route.name === 'dataSources' ? 'primary600': 'neutral500' " :class="{ activebg: $route.name === 'dataSources' }">
-                <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                  Data sources
-                </q-tooltip>
-              </q-btn>
-            </q-item-section>
-
-          </q-item> -->
-
 
           <q-item manual-focus>
             <q-item-section avatar>
@@ -85,9 +62,20 @@
             <q-item-section>
               Schema
             </q-item-section>
-
           </q-item>
 
+          <q-item manual-focus>
+            <q-item-section avatar>
+              <q-btn flat padding="xs" icon="mdi-database" :to="{name:'repositories'}" :color=" ['repositories', 'dsIntegration'].includes($route.name) ? 'primary600': 'neutral500' " :class="{ activebg:  ['repositories', 'dsIntegration'].includes($route.name) }">
+                <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
+                  Repositories
+                </q-tooltip>
+              </q-btn>
+            </q-item-section>
+            <q-item-section>
+              Repositories
+            </q-item-section>
+          </q-item>
 
           <q-item manual-focus>
             <q-item-section avatar>
@@ -95,12 +83,12 @@
               <!-- <q-icon size="sm" name="o_bubble_chart "/> -->
               <q-btn flat padding="xs" icon="o_layers" :to="{name:'datasources'}" :color=" ['datasources', 'dsIntegration'].includes($route.name) ? 'primary600': 'neutral500' " :class="{ activebg:  ['datasources', 'dsIntegration'].includes($route.name) }">
                 <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                  Data sources
+                  Datasets
                 </q-tooltip>
               </q-btn>
             </q-item-section>
             <q-item-section>
-              Data sources
+              Datasets
             </q-item-section>
           </q-item>
 
