@@ -89,6 +89,20 @@
           <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate data sources with the project, please add at least two sources.</span>
         </div>
       </template>
+
+      <!-- New slot for expandable content -->
+      <template v-slot:body-cell="props">
+        <q-td :props="props">
+          <!-- Use q-expansion-item to make rows expandable with localGraph -->
+          <q-expansion-item :label="'Show additional information'">
+            <!-- Content to be displayed when the row is expanded -->
+            <div>
+              <p><b>Graph Name:</b> {{ props.row.localGraph.graphName }}</p>
+              <p><b>Graphical Schema:</b> {{ props.row.localGraph.graphicalSchema }}</p>
+            </div>
+          </q-expansion-item>
+        </q-td>
+      </template>
     </q-table>
 
     <!-- <q-dialog v-model="addDataSource" >
