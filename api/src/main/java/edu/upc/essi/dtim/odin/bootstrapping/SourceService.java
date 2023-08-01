@@ -1,11 +1,11 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
@@ -14,6 +14,7 @@ import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class SourceService {
     /**
      * The ORMStoreInterface dependency for storing datasets.
      */
-    private final ORMStoreInterface ormDataset;
+    private final ORMStoreInterface ormDataResource;
     /**
      * Constructs a new instance of SourceService.
      *
@@ -57,7 +58,7 @@ public class SourceService {
         this.appConfig = appConfig;
         this.projectService = projectService;
         try {
-            this.ormDataset = ORMStoreFactory.getInstance();
+            this.ormDataResource = ORMStoreFactory.getInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -208,7 +209,7 @@ public class SourceService {
      * @return The saved Dataset object.
      */
     public DataResource saveDataset(DataResource dataset) {
-        return ormDataset.save(dataset);
+        return ormDataResource.save(dataset);
     }
 
     /**
@@ -217,7 +218,7 @@ public class SourceService {
      * @return A list of Dataset objects.
      */
     public List<Dataset> getDatasets() {
-        return ormDataset.getAll(Dataset.class);
+        return ormDataResource.getAll(Dataset.class);
     }
 
     /**
@@ -227,7 +228,7 @@ public class SourceService {
      * @return A boolean indicating whether the deletion was successful.
      */
     public boolean deleteDatasource(String id) {
-        return ormDataset.deleteOne(Dataset.class, id);
+        return ormDataResource.deleteOne(Dataset.class, id);
     }
 
     /**
@@ -258,6 +259,33 @@ public class SourceService {
         localGraph.setGraphicalSchema(graph.getGraphicalSchema());
         savedDataset.setLocalGraph(localGraph);
         return (Dataset) saveDataset(savedDataset);
+    }
+
+    public DataRepository findRepositoryById(String repositoryId) {
+        return ormDataResource.findById(DataRepository.class, repositoryId);
+    }
+
+    public DataRepository createRepository(String repositoryName) {
+        DataResource dataRepository = new DataRepository();
+        ((DataRepository) dataRepository).setRepositoryName(repositoryName);
+        return (DataRepository) ormDataResource.save(dataRepository);
+    }
+
+    public DataRepository addDatasetToRepository(String datasetId, String repositoryId) {
+        System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF "+repositoryId);
+        DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
+        Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
+
+        if(dataRepository != null)
+            ((DataRepository) dataRepository).getDatasets().add(dataset);
+
+        return (DataRepository) ormDataResource.save(dataRepository);
+    }
+
+    public void addRepositoryToProject(String projectId, String repositoryId) {
+        DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
+
+        projectService.addRepositoryToProject(projectId, repositoryId);
     }
 }
 

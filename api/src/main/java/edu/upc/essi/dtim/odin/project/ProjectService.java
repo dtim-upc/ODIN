@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.project;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
@@ -141,6 +142,7 @@ public class ProjectService {
      * @return The found project, or null if not found.
      */
     public Project findById(String projectId) {
+        System.out.println(projectId+" ++++++++++++++++++++++++++++++++projectId");
         Project project = ormProject.findById(Project.class, projectId);
 
         //debemos cargar también el contenido de las triplas de la relación con el grafo
@@ -253,6 +255,23 @@ public class ProjectService {
         if(projectToClone.getIntegratedGraph() != null)projectToClone.getIntegratedGraph().setGraphName(null);
 
         return saveProject(projectToClone);
+    }
+
+    public void addRepositoryToProject(String projectId, String repositoryId) {
+        // Retrieve the project with the given ID
+        Project project = findById(projectId);
+
+        // If the project is not found, throw an exception
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found");
+        }
+
+        DataResource dataResource = ormProject.findById(DataRepository.class, repositoryId);
+
+        // Add the URI of the local graph to the project's list of local graph IDs
+        project.getDataResources().add(dataResource);
+
+        saveProject(project);
     }
 }
 

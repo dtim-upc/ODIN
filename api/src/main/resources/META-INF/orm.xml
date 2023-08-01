@@ -106,6 +106,8 @@
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
         <table name="DataRepository"/>
         <attributes>
+            <basic name="repositoryName"/>
+
             <one-to-many name="datasets" mapped-by="repository" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
                 <cascade><cascade-all/></cascade>
             </one-to-many>

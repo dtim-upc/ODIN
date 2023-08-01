@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
@@ -46,6 +47,8 @@ public class SourceController {
      */
     @PostMapping(value="/project/{id}")//, consumes = {"multipart/form-data"})
     public ResponseEntity<Object> bootstrap(@PathVariable("id") String projectId,
+                                            @RequestParam String repositoryId,
+                                            @RequestParam String repositoryName,
                                             @RequestPart String datasetName,
                                             @RequestPart(required = false) String datasetDescription,
                                             @RequestPart MultipartFile attach_file) {
@@ -78,8 +81,27 @@ public class SourceController {
             // Save graph into database
             boolean isSaved = sourceService.saveGraphToDatabase(graph);
 
+            //Find/create repository
+            DataRepository repository;
+            if(repositoryId.equals(null)) {
+                repository = sourceService.findRepositoryById(repositoryId);
+                System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId);
+            }
+            else {
+                repository = sourceService.createRepository(repositoryName);
+                System.out.println(repository.getId()+"++++++++++++++++++++++++++++++++++++++++++++++");
+            }
+            System.out.println(repository.getId()+" repoId++++++++++++++++++++++++++++++++++++++++++++++");
+            System.out.println(datasetWithGraph.getId()+" datasetId++++++++++++++++++++++++++++++++++++++++++++++");
+
+            repository = sourceService.addDatasetToRepository(
+                    datasetWithGraph.getId(),
+                    repository.getId());
+
             //Create the relation with project adding the datasetId
             sourceService.addDatasetIdToProject(projectId, datasetWithGraph);
+
+            sourceService.addRepositoryToProject(projectId, repository.getId());
 
             // Return success message
             return new ResponseEntity<>(datasetWithGraph, HttpStatus.OK);

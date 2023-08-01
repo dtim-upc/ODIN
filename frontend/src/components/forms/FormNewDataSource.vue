@@ -23,7 +23,9 @@
           />
 
           <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
-          <q-input v-if="newDatasource.repository === 'Nuevo repositorio'" filled v-model="newRepositoryName" label="Introduce a new repository name" lazy-rules :rules="[(val) => (val && val.length > 0) || 'Please type a name']" />
+          <q-input v-if="newDatasource.repositoryName === 'Nuevo repositorio'"
+                   filled v-model="newRepositoryName" label="Introduce a new repository name"
+                   lazy-rules :rules="[(val) => (val && val.length > 0) || 'Please type a name']" />
           <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
           <q-select v-model="DataSourceType" :options="options" label="Type" class="q-mt-none"/>
@@ -117,7 +119,8 @@ const repositories = [
 
 
   const newDatasource = reactive({
-    repository:'',
+    repositoryId: null,
+    repositoryName:'',
     datasetName: '',
     datasetDescription : '',
   })
@@ -134,7 +137,8 @@ const repositories = [
       data.append("attach_file", uploadedFile.value);
       data.append("datasetName", newDatasource.datasetName);
       data.append("datasetDescription", newDatasource.datasetDescription);
-      data.append("repository", newDatasource.repository);
+      data.append("repositoryName", newDatasource.repositoryName);
+      data.append("repositoryId", newDatasource.repositoryId);
 
       integrationStore.addDataSource(route.params.id, data, successCallback)
     }
