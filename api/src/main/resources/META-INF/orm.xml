@@ -121,6 +121,12 @@
     <entity name="RelationalDBRepository" class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalDBRepository">
         <table name="RelationalDBRepository"/>
         <attributes>
+            <basic name="username">
+            </basic>
+            <basic name="password">
+            </basic>
+            <basic name="port">
+            </basic>
         </attributes>
     </entity>
 
