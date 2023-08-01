@@ -257,7 +257,7 @@ public class SourceService {
         localGraph.setGraphName(graph.getGraphName());
         localGraph.setGraphicalSchema(graph.getGraphicalSchema());
         savedDataset.setLocalGraph(localGraph);
-        return saveDataset(savedDataset);
+        return (Dataset) saveDataset(savedDataset);
     }
 }
 

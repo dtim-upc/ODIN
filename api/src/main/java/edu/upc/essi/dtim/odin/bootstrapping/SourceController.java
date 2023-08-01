@@ -71,7 +71,7 @@ public class SourceController {
             graph.setGraphicalSchema(visualSchema);
 
             //Create the relation with dataset adding the graph generated to generate an id
-            Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
+            Dataset datasetWithGraph = sourceService.setLocalGraphToDataset((Dataset) savedDataset, graph);
             graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
             graph.write("..\\api\\dbFiles\\ttl\\bootstrap.ttl");
 
@@ -131,7 +131,7 @@ public class SourceController {
             DataResource savedDataset = sourceService.saveDataset(dataset);
 
             //Create the relation with project adding the datasetId
-            sourceService.addDatasetIdToProject(projectId, savedDataset);
+            sourceService.addDatasetIdToProject(projectId, (Dataset) savedDataset);
 
             return new ResponseEntity<>(savedDataset, HttpStatus.OK);
         } catch (UnsupportedOperationException e) {
