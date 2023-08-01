@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
@@ -141,7 +142,7 @@ public class SourceService {
      * @param dataset The Dataset object to transform.
      * @return A GraphModelPair object containing the transformed Graph and the corresponding Model.
      */
-    public Graph transformToGraph(Dataset dataset) {
+    public Graph transformToGraph(DataResource dataset) {
         try {
             bsModuleInterface bsInterface = new bsModuleImpl();
             return bsInterface.convertDatasetToGraph(dataset);
@@ -206,7 +207,7 @@ public class SourceService {
      * @param dataset The Dataset object to save.
      * @return The saved Dataset object.
      */
-    public Dataset saveDataset(Dataset dataset) {
+    public DataResource saveDataset(DataResource dataset) {
         return ormDataset.save(dataset);
     }
 

@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
@@ -18,7 +19,7 @@ import java.io.IOException;
 public class bsModuleImpl implements bsModuleInterface{
 
     @Override
-    public Graph convertDatasetToGraph(Dataset dataset) {
+    public Graph convertDatasetToGraph(DataResource dataset) {
         Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
 
         //bloque de código deprecado
@@ -47,19 +48,19 @@ public class bsModuleImpl implements bsModuleInterface{
         return bootstrapG;
     }
 
-    Model convertDatasetToModel(Dataset dataset) {
+    Model convertDatasetToModel(DataResource dataset) {
         Model bootstrapM = ModelFactory.createDefaultModel();
         if (dataset.getClass().equals(CsvDataset.class)) {
             CSVBootstrap bootstrap = new CSVBootstrap();
             try {
-                bootstrapM = bootstrap.bootstrapSchema(dataset.getDatasetName(), dataset.getDatasetName(), ((CsvDataset) dataset).getPath());
+                bootstrapM = bootstrap.bootstrapSchema(((Dataset) dataset).getDatasetName(), ((Dataset) dataset).getDatasetName(), ((CsvDataset) dataset).getPath());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else if (dataset.getClass().equals(JsonDataset.class)) {
             JSONBootstrapSWJ j = new JSONBootstrapSWJ();
             try {
-                bootstrapM = j.bootstrapSchema(dataset.getDatasetName(), dataset.getDatasetName(), ((JsonDataset) dataset).getPath());
+                bootstrapM = j.bootstrapSchema(((Dataset) dataset).getDatasetName(), ((Dataset) dataset).getDatasetName(), ((JsonDataset) dataset).getPath());
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }

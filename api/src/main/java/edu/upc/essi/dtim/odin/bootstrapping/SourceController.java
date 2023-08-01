@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
@@ -60,7 +61,7 @@ public class SourceController {
             Dataset datasource = sourceService.extractData(filePath, datasetName, datasetDescription);
 
             //Saving dataset to assign an id
-            Dataset savedDataset = sourceService.saveDataset(datasource);
+            DataResource savedDataset = sourceService.saveDataset(datasource);
 
             // Transform datasource into graph
             Graph graph = sourceService.transformToGraph(savedDataset);
@@ -101,14 +102,14 @@ public class SourceController {
      * @return A ResponseEntity object containing the saved dataset or an error message.
      */
     @PostMapping("/project/{projectId}/datasources")
-    public ResponseEntity<Dataset> savingDatasetObject(
+    public ResponseEntity<DataResource> savingDatasetObject(
             @RequestParam("datasetName") String datasetName,
             @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
             @RequestParam("datasetPath") String path,
             @PathVariable String projectId) {
         try {
             logger.info("POST A DATASOURCE RECEIVED: {}",projectId);
-            Dataset dataset;
+            DataResource dataset;
 
             String extension = "";
             int dotIndex = path.lastIndexOf('.');
@@ -127,7 +128,7 @@ public class SourceController {
                     throw new UnsupportedOperationException("Dataset type not supported: " + extension);
             }
 
-            Dataset savedDataset = sourceService.saveDataset(dataset);
+            DataResource savedDataset = sourceService.saveDataset(dataset);
 
             //Create the relation with project adding the datasetId
             sourceService.addDatasetIdToProject(projectId, savedDataset);
