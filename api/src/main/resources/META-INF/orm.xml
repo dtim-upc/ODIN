@@ -46,6 +46,13 @@
                 </cascade>
             </one-to-many>
 
+            <one-to-many orphan-removal="true" name="dataResources" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.DataResource">
+                <join-column name="PROJECTID"/>
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+
             <one-to-one name="integratedGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
                 <cascade>
                     <cascade-all/>
@@ -87,22 +94,48 @@
     </entity>
 
     <!--> MAPPING DATASET CLASS<-->
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
-        <table name="Dataset">
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.DataResource">
+        <table name="DataResource">
             <unique-constraint>
-                <column-name>datasetId</column-name>
+                <column-name>id</column-name>
             </unique-constraint>
         </table>
         <inheritance strategy="JOINED"/>
         <attributes>
-            <id name="datasetId">
+            <id name="id">
                 <generated-value strategy="AUTO"/>
             </id>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+        <table name="DataRepository">
+        </table>
+        <attributes>
+            <basic name="datarepoDemo"></basic>
+        </attributes>
+    </entity>
+
+    <entity name="RelationalDBRepository" class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalDBRepository">
+        <table name="RelationalDBRepository"/>
+        <attributes>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+        <table name="Dataset">
+        </table>
+        <inheritance strategy="JOINED"/>
+        <attributes>
             <basic name="datasetName"/>
             <basic name="datasetDescription"/>
             <basic name="created_at">
                 <temporal>TIMESTAMP</temporal>
             </basic>
+
+            <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+                <cascade><cascade-all/></cascade>
+            </many-to-one>
 
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
                 <cascade><cascade-all/></cascade>

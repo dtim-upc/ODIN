@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.project;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
@@ -92,20 +93,20 @@ public class ProjectService {
             throw new IllegalArgumentException("Project not found");
         }
 
-        List<Dataset> datasetsOfProjectToUpload = project.getDatasets();
+        List<DataResource> dataresourcesOfProjectToUpload = project.getDataResources();
         boolean datasetFound = false;
-        for (Dataset datasetInProject : datasetsOfProjectToUpload) {
-            if (datasetId.equals(datasetInProject.getDatasetId())) {
+        for (DataResource datasetInProject : dataresourcesOfProjectToUpload) {
+            if (datasetId.equals(datasetInProject.getId())) {
                 datasetFound = true;
-                datasetsOfProjectToUpload.remove(datasetInProject);
-                project.setDatasets(datasetsOfProjectToUpload);
+                dataresourcesOfProjectToUpload.remove(datasetInProject);
+
+                project.setDataResources(dataresourcesOfProjectToUpload);
                 break; // Rompemos el bucle después de eliminar el objeto
             }
         }
         if(!datasetFound) {
             throw new IllegalArgumentException("Dataset not found");
         }
-
         saveProject(project);
     }
 
@@ -179,13 +180,13 @@ public class ProjectService {
      * Checks if a project contains a dataset with the given ID.
      *
      * @param projectId The ID of the project to check.
-     * @param datasetId The ID of the dataset to check.
+     * @param dataresourceId The ID of the dataset to check.
      * @return true if the project contains the dataset, false otherwise.
      */
-    public boolean projectContains(String projectId, String datasetId) {
+    public boolean projectContains(String projectId, String dataresourceId) {
         Project project = ormProject.findById(Project.class, projectId);
-        for (Dataset datasetInProject : project.getDatasets()) {
-            if (datasetId.equals(datasetInProject.getDatasetId())) {
+        for (DataResource datasetInProject : project.getDatasets()) {
+            if (dataresourceId.equals(datasetInProject.getId())) {
                 return true;
             }
         }
@@ -239,7 +240,6 @@ public class ProjectService {
             List<Dataset> clonedDatasets = new ArrayList<>();
 
             for (Dataset datasetToClone : datasetsToClone) {
-                datasetToClone.setDatasetId(null);
                 datasetToClone.getLocalGraph().setGraphName(null);
 
                 // Add the cloned dataset to the list of cloned datasets

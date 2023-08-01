@@ -52,14 +52,14 @@ public class bsModuleImpl implements bsModuleInterface{
         if (dataset.getClass().equals(CsvDataset.class)) {
             CSVBootstrap bootstrap = new CSVBootstrap();
             try {
-                bootstrapM = bootstrap.bootstrapSchema(dataset.getDatasetId(), dataset.getDatasetName(), ((CsvDataset) dataset).getPath());
+                bootstrapM = bootstrap.bootstrapSchema(dataset.getDatasetName(), dataset.getDatasetName(), ((CsvDataset) dataset).getPath());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else if (dataset.getClass().equals(JsonDataset.class)) {
             JSONBootstrapSWJ j = new JSONBootstrapSWJ();
             try {
-                bootstrapM = j.bootstrapSchema(dataset.getDatasetName(), dataset.getDatasetId(), ((JsonDataset) dataset).getPath());
+                bootstrapM = j.bootstrapSchema(dataset.getDatasetName(), dataset.getDatasetName(), ((JsonDataset) dataset).getPath());
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }

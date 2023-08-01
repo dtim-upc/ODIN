@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.IntegratedGraph;
@@ -18,6 +19,17 @@ public class Project {
     private String projectColor;
     private String createdBy;
     private List<Dataset> datasets;
+
+    public List<DataResource> getDataResources() {
+        return dataResources;
+    }
+
+    public void setDataResources(List<DataResource> dataResources) {
+        this.dataResources = dataResources;
+    }
+
+    private List<DataResource> dataResources;
+
     private IntegratedGraphJenaImpl integratedGraph;
 
     public String getProjectId() {
