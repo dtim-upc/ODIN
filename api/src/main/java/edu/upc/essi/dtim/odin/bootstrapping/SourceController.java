@@ -223,6 +223,23 @@ public class SourceController {
         }
     }
 
+    @GetMapping("/project/{id}/repositories")
+    public ResponseEntity<Object> getRepositoriesFromProject(@PathVariable String id) {
+        try {
+            logger.info("GET ALL repositories FROM PROJECT {}" , id);
+            List<DataRepository> repositories = sourceService.getRepositoriesOfProject(id);
+
+            if (repositories.isEmpty()) {
+                return new ResponseEntity<>("There are no datasets yet",HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(repositories, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      * Retrieves all datasources.
      *

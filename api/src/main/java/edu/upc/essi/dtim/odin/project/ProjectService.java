@@ -270,5 +270,10 @@ public class ProjectService {
 
         saveProject(project);
     }
+
+    public List<DataRepository> getRepositoriesOfProject(String id) {
+        Project project = ormProject.findById(Project.class, id);
+        return project.getRepositories();
+    }
 }
 

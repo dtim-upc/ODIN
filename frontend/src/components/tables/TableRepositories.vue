@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <!-- style="min-height: 70vh;margin-top:15px" -->
     <!-- @selection="validateSelection2" -->
-    <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.datasources" :columns="columns" :filter="search"
+    <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.project.repositories" :columns="columns" :filter="search"
              :class="{ 'no-shadow': no_shadow }" row-key="id"
              no-data-label="I didn't find anything for you. Consider creating a new data source."
              no-results-label="The filter didn't uncover any results" :visible-columns="visibleColumns">
@@ -125,8 +125,8 @@
           <q-expansion-item :label="'Show additional information'">
             <!-- Content to be displayed when the row is expanded -->
             <div>
-              <p><b>Graph Name:</b> {{ props.row.localGraph.graphName }}</p>
-              <p><b>Graphical Schema:</b> {{ props.row.localGraph.graphicalSchema }}</p>
+              <p><b>Dataset Id:</b> {{ props.row.datasets.id }}</p>
+              <p><b>Dataset Name:</b> {{ props.row.datasets.datasetName }}</p>
             </div>
           </q-expansion-item>
         </q-td>
@@ -177,15 +177,8 @@ onBeforeMount(() => {
 })
 // select, name, tag, size, type -> owner, members -> delete, view local schema
 const columns = [
-  {name: "datasetId", label: "Id", align: "center", field: "datasetId", sortable: true,},
-  {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
-  {name: "datasetType", label: "Type", align: "center", field: "datasetType", sortable: true,},
-  // {name: "#Wrappers", label: "#Wrappers", align: "center", field: "wrappers", sortable: true,},
-  {name: "View_triples", label: "View triples", align: "center", field: "View_triples", sortable: false,},
-  {
-    name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph",
-    sortable: false,
-  },
+  {name: "id", label: "Id", align: "center", field: "id", sortable: true,},
+  {name: "repositoryName", label: "Name", align: "center", field: "repositoryName", sortable: true,},
   {name: "actions", label: "actions", align: "center", field: "actions", sortable: false,},
 ];
 
@@ -202,8 +195,8 @@ onMounted(() => {
   storeDS.getDatasources(projectId)
 })
 const views = {
-  "integration": ['Name', 'Type'],
-  "datasources": ['Name', 'Type', '#Wrappers', 'View_triples', 'View_Source_Graph', 'actions']
+  "integration": ['Id','Name', 'Type'],
+  "repositories": ['id','repositoryName',  'actions']
 }
 const title = "Repositories";
 const search = ref("")

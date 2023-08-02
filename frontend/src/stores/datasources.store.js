@@ -15,15 +15,12 @@ export const useDataSourceStore = defineStore('datasource', {
   state: () => ({
     project: {},
     datasources: [],
-    repositories: []
   }),
 
   getters: {
-
     getDatasourcesNumber(state) {
       return state.datasources.length
     },
-
     getGlobalSchema(state) {
       if (state.project.integratedGraph.globalGraph.graphicalSchema)
         return state.project.integratedGraph.globalGraph.graphicalSchema
@@ -112,6 +109,41 @@ export const useDataSourceStore = defineStore('datasource', {
       console.log("Pinia getting data sources...")
       const res = await api.getAll(projectId, authStore.user.accessToken).then(response => {
 
+        console.log("ds received", response.data)
+
+        if (response.data === "") { // when no datasources, api answer ""
+          this.datasources = []
+          notify.positive("There are no data sources yet. Add sources to see them.")
+        } else if (response.status === 204) {
+          this.datasources = []
+          notify.positive("There are no data sources yet. Add sources to see them.")
+        } else {
+          this.datasources = response.data
+        }
+
+        console.log(this.datasources)
+      }).catch(err => {
+        console.log("error retrieving data sources")
+        console.log(err)
+        if (err.response && err.response.status === 401) {
+          // Handle unauthorized error
+          // Notify the user or perform any other necessary actions
+          notify.negative("Unauthorized access.")
+        } else if (err.response && err.response.status === 404) {
+          this.datasources = []
+          notify.negative("Datasources not found.")
+        } else {
+          notify.negative("Cannot connect to the server.")
+        }
+      });
+
+    },
+
+    async getRepositories(projectId) {
+      const notify = useNotify()
+      const authStore = useAuthStore()
+      console.log("Pinia getting repositories...")
+      const res = await api.getAll(projectId, authStore.user.accessToken).then(response => {
         console.log("ds received", response.data)
 
         if (response.data === "") { // when no datasources, api answer ""

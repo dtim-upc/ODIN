@@ -33,6 +33,9 @@ export default {
   getAll(projectID, token) {
     return odinApi.get('/project/' + projectID + '/datasources'/*, {headers: { Authorization: `Bearer ${token}` }} */)
   },
+  getRepositories(projectID, token) {
+    return odinApi.get('/project/' + projectID + '/repositories'/*, {headers: { Authorization: `Bearer ${token}` }} */)
+  },
   deleteDatasource(projectID, id, token) {
     return odinApi.delete('/project/' + projectID + '/datasource/' + id/*, {headers: { Authorization: `Bearer ${token}` }}*/)
   },

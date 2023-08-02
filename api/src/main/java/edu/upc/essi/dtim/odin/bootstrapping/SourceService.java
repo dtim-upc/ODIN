@@ -267,7 +267,7 @@ public class SourceService {
 
     public DataRepository createRepository(String repositoryName) {
         DataResource dataRepository = new DataRepository();
-        ((DataRepository) dataRepository).setRepositoryName(repositoryName);
+        ((DataRepository) dataRepository).setRepositoryName("repositoryName");
         return (DataRepository) ormDataResource.save(dataRepository);
     }
 
@@ -286,6 +286,10 @@ public class SourceService {
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
 
         projectService.addRepositoryToProject(projectId, repositoryId);
+    }
+
+    public List<DataRepository> getRepositoriesOfProject(String id) {
+        return projectService.getRepositoriesOfProject(id);
     }
 }
 
