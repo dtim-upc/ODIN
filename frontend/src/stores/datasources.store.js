@@ -15,6 +15,7 @@ export const useDataSourceStore = defineStore('datasource', {
   state: () => ({
     project: {},
     datasources: [],
+    repositories: []
   }),
 
   getters: {
@@ -143,20 +144,20 @@ export const useDataSourceStore = defineStore('datasource', {
       const notify = useNotify()
       const authStore = useAuthStore()
       console.log("Pinia getting repositories...")
-      const res = await api.getAll(projectId, authStore.user.accessToken).then(response => {
+      const res = await api.getRepositories(projectId, authStore.user.accessToken).then(response => {
         console.log("ds received", response.data)
 
         if (response.data === "") { // when no datasources, api answer ""
-          this.datasources = []
-          notify.positive("There are no data sources yet. Add sources to see them.")
+          this.repositories = []
+          notify.positive("There are no repositories yet. Add sources to see them.")
         } else if (response.status === 204) {
-          this.datasources = []
-          notify.positive("There are no data sources yet. Add sources to see them.")
+          this.repositories = []
+          notify.positive("There are no repositories yet. Add sources to see them.")
         } else {
-          this.datasources = response.data
+          this.repositories = response.data
         }
 
-        console.log(this.datasources)
+        console.log(this.repositories)
       }).catch(err => {
         console.log("error retrieving data sources")
         console.log(err)
@@ -165,13 +166,12 @@ export const useDataSourceStore = defineStore('datasource', {
           // Notify the user or perform any other necessary actions
           notify.negative("Unauthorized access.")
         } else if (err.response && err.response.status === 404) {
-          this.datasources = []
-          notify.negative("Datasources not found.")
+          this.repositories = []
+          notify.negative("Repositories not found.")
         } else {
           notify.negative("Cannot connect to the server.")
         }
       });
-
     },
 
     finishPreview() {

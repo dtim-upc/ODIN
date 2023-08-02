@@ -163,7 +163,7 @@ onBeforeMount(() => {
 })
 // select, name, tag, size, type -> owner, members -> delete, view local schema
 const columns = [
-  {name: "datasetId", label: "Id", align: "center", field: "datasetId", sortable: true,},
+  {name: "id", label: "Id", align: "center", field: "id", sortable: true,},
   {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
   {name: "datasetType", label: "Type", align: "center", field: "datasetType", sortable: true,},
   // {name: "#Wrappers", label: "#Wrappers", align: "center", field: "wrappers", sortable: true,},
@@ -189,7 +189,7 @@ onMounted(() => {
 })
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['Name', 'Type', '#Wrappers', 'View_triples', 'View_Source_Graph', 'actions']
+  "datasources": ['ID','Name', 'Type', '#Wrappers', 'View_triples', 'View_Source_Graph', 'actions']
 }
 const title = "Datasets";
 const search = ref("")

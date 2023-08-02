@@ -38,16 +38,7 @@
         </q-btn>
       </template>
 
-      <template v-slot:body-cell-status="props">
-        <q-td :props="props">
-          <q-chip text-color="white" color="accent" v-if="props.row.graphicalGraph === ''">
-            Missing Data Sources
-          </q-chip>
-          <q-chip text-color="white" color="blue" v-else> Completed</q-chip>
-        </q-td>
-      </template>
-
-      <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
+      <template v-if="view === 'repositories'" v-slot:body-cell-actions="props">
         <q-td :props="props">
           <!-- <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" -->
           <!-- icon="remove_red_eye"></q-btn> -->
@@ -93,29 +84,35 @@
 
       <!-- New slot for expandable content -->
       <template v-slot:body-cell="props">
-        <q-td :props="props">
+        <q-td :props="props" v-if="props.col.name !== 'expand' && props.col.name !== 'actions'">
+          <!-- Render the content for ID and Repository Name columns -->
+          {{ props.row[props.col.name] }}
+        </q-td>
+        
+        <q-td :props="props" v-if="props.col.name === 'expand'">
           <!-- Use q-expansion-item to make rows expandable with datasets -->
-          <q-expansion-item :label="'Show datasets'">
-            <!-- Content to be displayed when the row is expanded -->
-            <div>
-              <ul>
-                <li v-for="dataset in props.row.datasets" :key="dataset.id">
-                  <p><b>Dataset Id:</b> {{ dataset.id }}</p>
-                  <p><b>Dataset Name:</b> {{ dataset.datasetName }}</p>
-                </li>
-              </ul>
-            </div>
-          </q-expansion-item>
+          <template v-if="props.row.datasets && props.row.datasets.length > 0">
+            <q-expansion-item :label="'Show datasets'">
+              <!-- Content to be displayed when the row is expanded -->
+              <div>
+                <ul>
+                  <li v-for="dataset in props.row.datasets" :key="dataset.id">
+                    <p><b>Dataset Id:</b> {{ dataset.id }}</p>
+                    <p><b>Dataset Name:</b> {{ dataset.datasetName }}</p>
+                  </li>
+                </ul>
+              </div>
+            </q-expansion-item>
+          </template>
         </q-td>
       </template>
+
     </q-table>
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
 
-
   </div>
 </template>
-
 
 <script setup>
 import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} from "vue";
@@ -129,7 +126,7 @@ import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 */
 const props = defineProps({
   no_shadow: {type: Boolean, default: false},
-  view: {type: String, default: "datasources"},
+  view: {type: String, default: "repositories"},
 });
 const gridEnable = ref(false)
 
@@ -152,7 +149,7 @@ const visibleColumns = ["id", "repositoryName", "actions", "expand"]; // Columns
 const addDataSource = ref(false)
 
 const rows = computed(() => {
-  return storeDS.project.repositories.map((repo) => {
+  return storeDS.repositories.map((repo) => {
     return {
       ...repo,
       datasets: repo.datasets, // Obtener la lista de Datasets asociados
@@ -164,7 +161,7 @@ const columns = [
   { name: "id", label: "ID", align: "center", field: "id", sortable: true },
   { name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true },
   { name: "actions", label: "Actions", align: "center", field: "actions", sortable: false },
-  { name: "expand", label: "Expand", align: "center", field: "expand", sortable: false }, // New column for the expansion button
+  { name: "expand", label: "Expand", align: "center", field: "expand", sortable: false },
 ];
 
 const views = {
@@ -182,19 +179,9 @@ onMounted(() => {
     console.log(projectId); // Output: 1
   }
 
-  storeDS.getDatasources(projectId)
+  storeDS.getRepositories(projectId)
 })
 
-const hasSourceGraph = (props) => {
-  if (props) {
-    if (props.graphicalGraph) {
-      return true;
-    } else if (props.row.graphicalGraph) {
-      return true;
-    }
-  }
-  return false;
-}
 const deleteRow = (props2) => {
   storeDS.deleteDataSource(props2.row)
 }
