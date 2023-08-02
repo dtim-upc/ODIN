@@ -5,17 +5,15 @@
     <div class="col-2" style="background:white">
       <q-scroll-area class="fit">
         <!-- class="q-pa-md" -->
-        <q-list >
+        <q-list>
           <q-item-section>
             <q-item-label>
-              <h5 class="q-pa-md" >Schema</h5>
+              <h5 class="q-pa-md">Schema</h5>
             </q-item-label>
-            <q-input outlined v-model="path" label="Path to file.ttl" />
+            <q-input outlined v-model="path" label="Path to file.ttl"/>
             <br>
-            <q-btn color="primary" label="Get" @Click="setGlobalSchema" />
+            <q-btn color="primary" label="Get" @Click="setGlobalSchema"/>
           </q-item-section>
-
-    
 
 
         </q-list>
@@ -23,12 +21,9 @@
     </div>
     <div class="col-10">
       <!-- <Graph :nodes="storeDS.datasources[0].schema.graphicalSchema.nodes" :links="storeDS.datasources[0].schema.graphicalSchema.links"></Graph> -->
-      <Graph :graphical="graphical" ></Graph>
+      <Graph :graphical="graphical"></Graph>
 
     </div>
-
-
-
 
 
   </q-page>
@@ -36,16 +31,16 @@
 
 
 <script setup>
-import { ref, onMounted } from "vue";
+import {ref, onMounted} from "vue";
 import Graph from 'components/graph/Graph.vue'
-import { useDataSourceStore } from 'src/stores/datasources.store.js'
+import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import api from "src/api/auth.api.js";
 import {useNotify} from 'src/use/useNotify.js'
 
 
 const graphical = ref('')
 const path = ref('')
-const notify  = useNotify()
+const notify = useNotify()
 
 const setGlobalSchema = () => {
 
@@ -53,14 +48,14 @@ const setGlobalSchema = () => {
 
   api.prueba(path.value).then((response) => {
 
-              console.log("response",response.data)
-              if(response.data != "")
-                graphical.value = JSON.stringify(response.data); 
-            
-            }).catch( (error) => {
-              console.log("error addding ds: ", error)
-            notify.negative("Something went wrong in the server.")
-          });
+    console.log("response", response.data)
+    if (response.data != "")
+      graphical.value = JSON.stringify(response.data);
+
+  }).catch((error) => {
+    console.log("error addding ds: ", error)
+    notify.negative("Something went wrong in the server.")
+  });
 }
 
 // onMounted ( () => {

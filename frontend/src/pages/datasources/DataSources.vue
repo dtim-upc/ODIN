@@ -1,7 +1,7 @@
 <template>
-<!-- class="flex flex-center" -->
-  <q-page >
-    <TableDataSources />
+  <!-- class="flex flex-center" -->
+  <q-page>
+    <TableDataSources/>
   </q-page>
 </template>
 

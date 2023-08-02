@@ -1,40 +1,40 @@
 <template>
 
-        <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+  <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
 
-          <q-input
-            filled
-            v-model="project.projectName"
-            label="Project name"
-            lazy-rules
-            :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"
-          />
+    <q-input
+      filled
+      v-model="project.projectName"
+      label="Project name"
+      lazy-rules
+      :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"
+    />
 
-          <q-input v-model="project.projectDescription" filled autogrow label="Description (Optional)"/>
+    <q-input v-model="project.projectDescription" filled autogrow label="Description (Optional)"/>
 
-          <q-select v-model="project.projectPrivacy" :options="optionsPrivacy" label="Privacy" class="q-mt-none"/>
+    <q-select v-model="project.projectPrivacy" :options="optionsPrivacy" label="Privacy" class="q-mt-none"/>
 
-          <q-select v-model="project.projectColor" :options="optionsColor" label="Color" class="q-mt-none"/>
+    <q-select v-model="project.projectColor" :options="optionsColor" label="Color" class="q-mt-none"/>
 
-          <div v-if="showFormButtons" >
-            <q-btn
-              :label="props.projectData ? 'Update' : 'Submit'"
-              type="submit"
-              color="primary"
-            />
-            <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" @click="cancelForm()"/>
-          </div>
-        </q-form>
+    <div v-if="showFormButtons">
+      <q-btn
+        :label="props.projectData ? 'Update' : 'Submit'"
+        type="submit"
+        color="primary"
+      />
+      <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" @click="cancelForm()"/>
+    </div>
+  </q-form>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, defineProps } from "vue";
-import { useNotify } from 'src/use/useNotify.js';
-import { useProjectsStore } from 'stores/projects.store.js';
+import {ref, reactive, onMounted, defineProps} from "vue";
+import {useNotify} from 'src/use/useNotify.js';
+import {useProjectsStore} from 'stores/projects.store.js';
 
 const props = defineProps({
-  showFormButtons: { type: Boolean, default: true },
-  projectData: { type: Object, default: null }, // Recibimos los datos del proyecto a través de las props
+  showFormButtons: {type: Boolean, default: true},
+  projectData: {type: Object, default: null}, // Recibimos los datos del proyecto a través de las props
 });
 
 const projectsStore = useProjectsStore();
@@ -44,7 +44,7 @@ const notify = useNotify();
 
 // Inicializamos project con los datos recibidos a través de las props
 const project = reactive({
-  projectId:props.projectData ? props.projectData.projectId : null,
+  projectId: props.projectData ? props.projectData.projectId : null,
   projectName: props.projectData ? props.projectData.projectName : "",
   projectDescription: props.projectData ? props.projectData.projectDescription : "",
   projectPrivacy: props.projectData ? props.projectData.projectPrivacy : "private",
@@ -55,7 +55,7 @@ const optionsPrivacy = ["private", "public"];
 const optionsColor = ["#dbe2e7", "#4e68f5"];
 
 const onReset = () => {
-  project.projectId=null;
+  project.projectId = null;
   project.projectName = "";
   project.projectDescription = "";
   project.projectPrivacy = "private";

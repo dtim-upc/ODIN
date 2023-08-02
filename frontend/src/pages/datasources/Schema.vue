@@ -48,33 +48,34 @@
     <div class="col-2 columnHeader">
       <q-scroll-area class="fit">
         <!-- class="q-pa-md" -->
-        <q-list >
+        <q-list>
           <q-item-section>
             <q-item>
-              <h5 >Schema</h5>
+              <h5>Schema</h5>
             </q-item>
           </q-item-section>
 
           <q-expansion-item label="Global schema" expand-icon="arrow_drop_down" default-opened>
             <q-list dense>
 
-              <q-item >
-                  <q-btn  flat padding="xs" label="project" class="full-width" :class="selectedSchema == 'project'? 'activebg': ''" align="left" @Click="setGlobalSchema()"/>
+              <q-item>
+                <q-btn flat padding="xs" label="project" class="full-width"
+                       :class="selectedSchema == 'project'? 'activebg': ''" align="left" @Click="setGlobalSchema()"/>
               </q-item>
 
-              </q-list>
+            </q-list>
           </q-expansion-item>
 
           <q-expansion-item label="Local schemata" expand-icon="arrow_drop_down">
             <q-list dense>
 
               <q-item v-for="ds in storeDS.datasources">
-                  <q-btn  flat padding="xs" :label="ds.datasetName" class="full-width" :class="selectedSchema == ds.datasetId? 'activebg': ''" align="left" @Click="setSchema(ds)"/>
+                <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
+                       :class="selectedSchema == ds.datasetId? 'activebg': ''" align="left" @Click="setSchema(ds)"/>
               </q-item>
 
             </q-list>
           </q-expansion-item>
-
 
 
         </q-list>
@@ -82,7 +83,7 @@
     </div>
     <div class="col-10">
       <!-- <Graph :nodes="storeDS.datasources[0].schema.graphicalSchema.nodes" :links="storeDS.datasources[0].schema.graphicalSchema.links"></Graph> -->
-      <Graph :graphical="graphical" ></Graph>
+      <Graph :graphical="graphical"></Graph>
 
     </div>
 
@@ -90,15 +91,14 @@
     <!-- </q-drawer> -->
 
 
-
   </q-page>
 </template>
 
 
 <script setup>
-import { ref, onMounted } from "vue";
+import {ref, onMounted} from "vue";
 import Graph from 'components/graph/Graph.vue'
-import { useDataSourceStore } from 'src/stores/datasources.store.js'
+import {useDataSourceStore} from 'src/stores/datasources.store.js'
 
 const miniState = ref(true)
 const storeDS = useDataSourceStore()
@@ -119,10 +119,10 @@ const setGlobalSchema = () => {
   graphical.value = storeDS.getGlobalSchema
 }
 
-onMounted ( () => {
-  if(storeDS.datasources.length > 0) {
-  //  setSchema( storeDS.datasources[0] )
-  setGlobalSchema()
+onMounted(() => {
+  if (storeDS.datasources.length > 0) {
+    //  setSchema( storeDS.datasources[0] )
+    setGlobalSchema()
   }
 })
 
@@ -193,18 +193,17 @@ onMounted ( () => {
 <style lang="scss">
 .body--light {
 
-  .columnHeader{
-  background:white;
-}
+  .columnHeader {
+    background: white;
+  }
 }
 
 .body--dark {
-  .columnHeader{
-  background: #202024;
-}
+  .columnHeader {
+    background: #202024;
+  }
 
 }
-
 
 
 </style>
