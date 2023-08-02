@@ -9,7 +9,13 @@
       <q-card-section>
 
         <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-          <q-select filled
+          <q-checkbox v-model="createNewRepository" label="Create new repository" :disable="storeDS.repositories.length === 0"/>
+
+          <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
+          <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName" label="Name of the new repository" lazy-rules
+                   :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
+          <q-select v-else
+                    filled
                     v-model="selectedRepositoryName"
                     :options="storeDS.repositories"
                     label="Repository"
@@ -18,13 +24,10 @@
                     map-options
                     option-value="id"
                     option-label="repositoryName"
+                    :rules="[(val) => !!val || 'Please select a repository']"
                     @input="onRepositoryChange"
           />
 
-          <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
-          <q-input v-if="newDatasource.repositoryName === 'Nuevo repositorio'"
-                   filled v-model="newRepositoryName" label="Introduce a new repository name"
-                   lazy-rules :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
           <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
           <q-select v-model="DataSourceType" :options="options" label="Type" class="q-mt-none"/>
@@ -56,7 +59,6 @@ import {ref, reactive, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
-import dataSourcesAPI from "../../api/dataSourcesAPI";
 import {useDataSourceStore} from "../../stores/datasources.store";
 
 // -------------------------------------------------------------
@@ -85,26 +87,6 @@ const storeDS = useDataSourceStore();
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
 // -------------------------------------------------------------
-// Fetch the list of repositories from the project and set them in the repositories ref
-const fetchRepositories = async () => {
-  try {
-    console.log(projectID.value+"+++++++++++++++++++++++pryect id REPOS CARGADOS OKKKKKKKK"); // Output: 1
-    console.log(projectID.value+"+++++++++++++++++++++++pryect id REPOS CARGADOS OKKKKKKKK"); // Output: 1
-    // Assuming the response data is an array of repositories, update the repositories ref.
-    await storeDS.getRepositories(projectID.value)
-
-    repositories.value = storeDS.repositories;
-    console.log(projectID.value+"+++++++++++++++++++++++pryect id REPOS CARGADOS OKKKKKKKK"); // Output: 1
-    console.log(repositories+"+++++++++++++++++++++++REPOS CARGADOS OKKKKKKKK"); // Output: 1
-    console.log(repositories.length+"+++++++++++++++++++++++ "); // Output: 1
-    console.log(storeDS.repositories.length+"+++++++++++++++++++++++ "); // Output: 1
-
-  } catch (error) {
-    console.error("Error fetching repositories:", error);
-    // Handle error if needed
-  }
-};
-
 const onRepositoryChange = () => {
   const selectedRepo = repositories.find(repo => repo.id === newDatasource.repositoryId);
   if (selectedRepo) {
@@ -118,6 +100,7 @@ const integrationStore = useIntegrationStore()
 
 const projectID = ref(null)
 const selectedRepositoryName = ref(null);
+const createNewRepository = ref(false); // Variable para determinar si se va a crear un nuevo repositorio
 
 
 // When the component is mounted, fetch the repositories for the current project.
@@ -130,7 +113,7 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId+"+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await fetchRepositories(); // Fetch repositories for the current project
+    await storeDS.getRepositories(projectID.value)
   }
 });
 

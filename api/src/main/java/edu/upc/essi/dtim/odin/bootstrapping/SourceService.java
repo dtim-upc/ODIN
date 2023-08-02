@@ -267,7 +267,7 @@ public class SourceService {
 
     public DataRepository createRepository(String repositoryName) {
         DataResource dataRepository = new DataRepository();
-        ((DataRepository) dataRepository).setRepositoryName("repositoryName");
+        ((DataRepository) dataRepository).setRepositoryName(repositoryName);
         return (DataRepository) ormDataResource.save(dataRepository);
     }
 
