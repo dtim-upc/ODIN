@@ -38,8 +38,6 @@
             <template v-slot:prepend>
               <q-icon name="attach_file" @click="this.$refs.fileds.pickFiles();"/>
             </template>
-
-
           </q-file>
 
           <div v-if="showFormButtons" >

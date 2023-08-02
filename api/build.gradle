@@ -118,8 +118,8 @@ tasks['sonarqube'].dependsOn test
 
 
 //para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
-def nextiaCoreJarPath = 'ruta\\NextiaCore\\build\\libs\\nextiacore-0.0.2-SNAPSHOT-uber.jar'
-def nextiaDIJarPath ='ruta\\NextiaDI\\source\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar'
+def nextiaCoreJarPath = 'C:\\Users\\victo\\Documents\\GitHub\\NextiaCore\\build\\libs\\nextiacore-0.0.2-SNAPSHOT-uber.jar'
+def nextiaDIJarPath ='C:\\Users\\victo\\Documents\\GitHub\\NextiaDI\\source\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar'
 task importExternalJar {
 	doLast {
 		configurations.compileClasspath.files.find { it.name == 'nextiacore-0.0.2-SNAPSHOT-uber.jar' }?.delete()

@@ -1,11 +1,8 @@
 package edu.upc.essi.dtim.odin.project;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.IntegratedGraph;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 
 import java.util.List;
@@ -19,17 +16,7 @@ public class Project {
     private String projectColor;
     private String createdBy;
     private List<Dataset> datasets;
-
-    public List<DataResource> getDataResources() {
-        return dataResources;
-    }
-
-    public void setDataResources(List<DataResource> dataResources) {
-        this.dataResources = dataResources;
-    }
-
-    private List<DataResource> dataResources;
-
+    private List<DataRepository> repositories;
     private IntegratedGraphJenaImpl integratedGraph;
 
     public String getProjectId() {
@@ -93,5 +80,13 @@ public class Project {
 
     public void setIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
         this.integratedGraph = integratedGraph;
+    }
+
+    public List<DataRepository> getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(List<DataRepository> dataResources) {
+        this.repositories = dataResources;
     }
 }

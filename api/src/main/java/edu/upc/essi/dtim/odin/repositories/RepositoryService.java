@@ -3,16 +3,10 @@ package edu.upc.essi.dtim.odin.repositories;
 import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalDBRepository;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +27,7 @@ public class RepositoryService {
 
     public List<DataRepository> getRepositoriesOfProject(String projectId) {
         ProjectService projectService = new ProjectService(appConfig);
-        List<DataResource> dataResources = projectService.findById(projectId).getDataResources();
+        List<DataRepository> dataResources = projectService.findById(projectId).getRepositories();
 
         List<DataRepository> dataRepositories = new ArrayList<>();
 

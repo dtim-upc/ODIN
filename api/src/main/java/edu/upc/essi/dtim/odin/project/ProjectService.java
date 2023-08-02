@@ -5,10 +5,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
@@ -94,14 +91,14 @@ public class ProjectService {
             throw new IllegalArgumentException("Project not found");
         }
 
-        List<DataResource> dataresourcesOfProjectToUpload = project.getDataResources();
+        List<DataRepository> dataresourcesOfProjectToUpload = project.getRepositories();
         boolean datasetFound = false;
         for (DataResource datasetInProject : dataresourcesOfProjectToUpload) {
             if (datasetId.equals(datasetInProject.getId())) {
                 datasetFound = true;
                 dataresourcesOfProjectToUpload.remove(datasetInProject);
 
-                project.setDataResources(dataresourcesOfProjectToUpload);
+                project.setRepositories(dataresourcesOfProjectToUpload);
                 break; // Rompemos el bucle después de eliminar el objeto
             }
         }
@@ -266,10 +263,10 @@ public class ProjectService {
             throw new IllegalArgumentException("Project not found");
         }
 
-        DataResource dataResource = ormProject.findById(DataRepository.class, repositoryId);
+        DataRepository dataResource = ormProject.findById(DataRepository.class, repositoryId);
 
         // Add the URI of the local graph to the project's list of local graph IDs
-        project.getDataResources().add(dataResource);
+        project.getRepositories().add(dataResource);
 
         saveProject(project);
     }
