@@ -32,6 +32,9 @@ export const useDataSourceStore = defineStore('datasource', {
         return state.project.integratedGraph.graphicalSchema
       return ""
     },
+    getRepos(state) {
+      return state.repositories
+    },
   },
   actions: {
 
@@ -145,7 +148,7 @@ export const useDataSourceStore = defineStore('datasource', {
       const authStore = useAuthStore()
       console.log("Pinia getting repositories...")
       const res = await api.getRepositories(projectId, authStore.user.accessToken).then(response => {
-        console.log("ds received", response.data)
+        console.log("repos received", response.data)
 
         if (response.data === "") { // when no datasources, api answer ""
           this.repositories = []

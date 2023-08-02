@@ -10,15 +10,14 @@
 
         <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
           <q-select filled
-                    v-model="newDatasource.repository"
-                    :options="repositories"
+                    v-model="selectedRepositoryName"
+                    :options="storeDS.repositories"
                     label="Repository"
                     class="q-mt-none"
                     emit-value
                     map-options
-                    option-value="name"
-                    option-label="name"
-
+                    option-value="id"
+                    option-label="repositoryName"
                     @input="onRepositoryChange"
           />
 
@@ -54,14 +53,11 @@
 
 <script setup>
 import {ref, reactive, onMounted, watch, computed} from "vue";
-// import {odinApi} from "boot/axios";
-import api from "src/api/dataSourcesAPI.js";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
-import projectAPI from "../../api/projectAPI";
-
+import dataSourcesAPI from "../../api/dataSourcesAPI";
+import {useDataSourceStore} from "../../stores/datasources.store";
 
 // -------------------------------------------------------------
 //                         PROPS & EMITS
@@ -84,18 +80,59 @@ const showS = computed({
   }
 })
 
+const storeDS = useDataSourceStore();
+
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
 // -------------------------------------------------------------
-// const storeDS = useDataSourceStore()
+// Fetch the list of repositories from the project and set them in the repositories ref
+const fetchRepositories = async () => {
+  try {
+    console.log(projectID.value+"+++++++++++++++++++++++pryect id REPOS CARGADOS OKKKKKKKK"); // Output: 1
+    console.log(projectID.value+"+++++++++++++++++++++++pryect id REPOS CARGADOS OKKKKKKKK"); // Output: 1
+    // Assuming the response data is an array of repositories, update the repositories ref.
+    await storeDS.getRepositories(projectID.value)
+
+    repositories.value = storeDS.repositories;
+    console.log(projectID.value+"+++++++++++++++++++++++pryect id REPOS CARGADOS OKKKKKKKK"); // Output: 1
+    console.log(repositories+"+++++++++++++++++++++++REPOS CARGADOS OKKKKKKKK"); // Output: 1
+    console.log(repositories.length+"+++++++++++++++++++++++ "); // Output: 1
+    console.log(storeDS.repositories.length+"+++++++++++++++++++++++ "); // Output: 1
+
+  } catch (error) {
+    console.error("Error fetching repositories:", error);
+    // Handle error if needed
+  }
+};
+
+const onRepositoryChange = () => {
+  const selectedRepo = repositories.find(repo => repo.id === newDatasource.repositoryId);
+  if (selectedRepo) {
+    selectedRepositoryName.value = selectedRepo.name;
+  } else {
+    selectedRepositoryName.value = null;
+  }
+}
 
 const integrationStore = useIntegrationStore()
 
-onMounted(() => {
-  // TODO: check if init is needed
-  // storeDS.init()
-  integrationStore.init()
-})
+const projectID = ref(null)
+const selectedRepositoryName = ref(null);
+
+
+// When the component is mounted, fetch the repositories for the current project.
+onMounted(async () => {
+  const url = window.location.href; // Get the current URL
+  const regex = /project\/(\d+)\//;
+  const match = url.match(regex);
+  let projectId;
+  if (match) {
+    projectId = match[1];
+    console.log(projectId+"+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
+    projectID.value = projectId;
+    await fetchRepositories(); // Fetch repositories for the current project
+  }
+});
 
 const route = useRoute()
 const router = useRouter()
@@ -114,12 +151,7 @@ const options = [
   "SQLDatabase", "Upload file"
 ];
 
-const repositories = [
-  {name: "1"},
-  {name: "2"},
-  {name: "Nuevo repositorio"}, // Add an option for "Nuevo repositorio"
-];
-
+const repositories = [];
 
 const newDatasource = reactive({
   repositoryId: null,
@@ -140,7 +172,7 @@ const onSubmit = () => {
   data.append("attach_file", uploadedFile.value);
   data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
-  data.append("repositoryName", newDatasource.repositoryName);
+  data.append("repositoryName", selectedRepositoryName.value);
   data.append("repositoryId", newDatasource.repositoryId);
 
   integrationStore.addDataSource(route.params.id, data, successCallback)
