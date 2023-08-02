@@ -1,8 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <!-- style="min-height: 70vh;margin-top:15px" -->
-    <!-- @selection="validateSelection2" -->
-    <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.project.repositories" :columns="columns" :filter="search"
+    <q-table :grid="gridEnable" ref="tableRef" :rows="rows" :columns="columns" :filter="search"
              :class="{ 'no-shadow': no_shadow }" row-key="id"
              no-data-label="I didn't find anything for you. Consider creating a new data source."
              no-results-label="The filter didn't uncover any results" :visible-columns="visibleColumns">
@@ -13,9 +11,8 @@
           <q-btn unelevated v-if="view === 'datasources'" padding="none" color="primary700" icon="add"
                  @click="addDataSource = true"/>
         </div>
-
       </template>
-      <!-- storeDS.selected.filter(v => (v.graphicalGraph || v.type == "INTEGRATED")).length != 2 -->
+
       <template v-slot:top-right="props">
         <q-btn v-if="!integrationStore.isDSEmpty" outline
                color="primary" label="Finish pending sources" class="q-mr-xs"
@@ -41,7 +38,6 @@
         </q-btn>
       </template>
 
-
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
           <q-chip text-color="white" color="accent" v-if="props.row.graphicalGraph === ''">
@@ -51,34 +47,11 @@
         </q-td>
       </template>
 
-      <template v-slot:body-cell-View_triples="props">
-        <q-td :props="props">
-          <q-btn dense round flat color="grey"
-                 icon="mdi-graphql" :to="{name: 'viewTriples', params: {datasourceID: props.row.id}}"></q-btn>
-        </q-td>
-      </template>
-
-      <template v-slot:body-cell-View_Source_Graph="props">
-        <q-td :props="props">
-          <q-btn dense round flat color="grey"
-                 icon="download" @click="storeDS.downloadSource(props.row.id)"></q-btn>
-
-          <!-- <q-btn v-if="props.row.type == 'INTEGRATED'" dense round flat color="grey"
-              :to="{ name: 'webvowl', params: { id: props.row.id, minimalI: true } }"
-              icon="mdi-vector-circle-variant"></q-btn>
-          <q-btn v-if="props.row.type == 'INTEGRATED'" dense round flat color="grey"
-              :to="{ name: 'webvowl', params: { id: props.row.id, integrated: true } }"
-              icon="mdi-shape-circle-plus"></q-btn> -->
-
-          <!--          :disable="props.row.graphicalGraph"-->
-        </q-td>
-      </template>
-
       <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
         <q-td :props="props">
           <!-- <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" -->
           <!-- icon="remove_red_eye"></q-btn> -->
-          <!-- <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn> -->
+          <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
           <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
         </q-td>
       </template>
@@ -121,21 +94,21 @@
       <!-- New slot for expandable content -->
       <template v-slot:body-cell="props">
         <q-td :props="props">
-          <!-- Use q-expansion-item to make rows expandable with localGraph -->
-          <q-expansion-item :label="'Show additional information'">
+          <!-- Use q-expansion-item to make rows expandable with datasets -->
+          <q-expansion-item :label="'Show datasets'">
             <!-- Content to be displayed when the row is expanded -->
             <div>
-              <p><b>Dataset Id:</b> {{ props.row.datasets.id }}</p>
-              <p><b>Dataset Name:</b> {{ props.row.datasets.datasetName }}</p>
+              <ul>
+                <li v-for="dataset in props.row.datasets" :key="dataset.id">
+                  <p><b>Dataset Id:</b> {{ dataset.id }}</p>
+                  <p><b>Dataset Name:</b> {{ dataset.datasetName }}</p>
+                </li>
+              </ul>
             </div>
           </q-expansion-item>
         </q-td>
       </template>
     </q-table>
-
-    <!-- <q-dialog v-model="addDataSource" >
-      <StepNewDataSource style="max-width: calc(100vh - 48px)" @finished="addDataSource = false"/>
-    </q-dialog>  -->
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
 
@@ -148,14 +121,8 @@
 import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
-import {useQuasar} from 'quasar'
 import {useNotify} from 'src/use/useNotify.js'
-// import NewDataSourceForm from "components/forms/NewDataSourceForm.vue";
-// import NewDatasourceWrapperStepper from "components/stepper/NewDatasourceWrapperStepper";
-// import StepNewDataSource from "components/stepper/StepNewDataSource.vue";
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
-// import { odinApi } from "boot/axios";
-import api from "src/api/dataSourcesAPI.js";
 
 /*
   props
@@ -165,22 +132,45 @@ const props = defineProps({
   view: {type: String, default: "datasources"},
 });
 const gridEnable = ref(false)
+
 /*
   store
 */
 const notify = useNotify()
 const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore();
+
 onBeforeMount(() => {
   storeDS.setProject()
   integrationStore.init()
 })
-// select, name, tag, size, type -> owner, members -> delete, view local schema
+
+const title = "Repositories";
+const search = ref("")
+const visibleColumns = ["id", "repositoryName", "actions", "expand"]; // Columns to be displayed
+
+const addDataSource = ref(false)
+
+const rows = computed(() => {
+  return storeDS.project.repositories.map((repo) => {
+    return {
+      ...repo,
+      datasets: repo.datasets, // Obtener la lista de Datasets asociados
+    };
+  });
+});
+
 const columns = [
-  {name: "id", label: "Id", align: "center", field: "id", sortable: true,},
-  {name: "repositoryName", label: "Name", align: "center", field: "repositoryName", sortable: true,},
-  {name: "actions", label: "actions", align: "center", field: "actions", sortable: false,},
+  { name: "id", label: "ID", align: "center", field: "id", sortable: true },
+  { name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true },
+  { name: "actions", label: "Actions", align: "center", field: "actions", sortable: false },
+  { name: "expand", label: "Expand", align: "center", field: "expand", sortable: false }, // New column for the expansion button
 ];
+
+const views = {
+  "integration": ['Id','Name', 'Type'],
+  "repositories": ['id','repositoryName',  'actions', 'expand'], // Include 'expand' in the visibleColumns list
+}
 
 onMounted(() => {
   const url = window.location.href; // Get the current URL
@@ -194,14 +184,7 @@ onMounted(() => {
 
   storeDS.getDatasources(projectId)
 })
-const views = {
-  "integration": ['Id','Name', 'Type'],
-  "repositories": ['id','repositoryName',  'actions']
-}
-const title = "Repositories";
-const search = ref("")
-const visibleColumns = views[props.view]
-const addDataSource = ref(false)
+
 const hasSourceGraph = (props) => {
   if (props) {
     if (props.graphicalGraph) {
