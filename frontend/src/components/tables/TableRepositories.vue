@@ -88,7 +88,7 @@
           <!-- Render the content for ID and Repository Name columns -->
           {{ props.row[props.col.name] }}
         </q-td>
-        
+
         <q-td :props="props" v-if="props.col.name === 'expand'">
           <!-- Use q-expansion-item to make rows expandable with datasets -->
           <template v-if="props.row.datasets && props.row.datasets.length > 0">
@@ -158,15 +158,15 @@ const rows = computed(() => {
 });
 
 const columns = [
-  { name: "id", label: "ID", align: "center", field: "id", sortable: true },
-  { name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true },
-  { name: "actions", label: "Actions", align: "center", field: "actions", sortable: false },
-  { name: "expand", label: "Expand", align: "center", field: "expand", sortable: false },
+  {name: "id", label: "ID", align: "center", field: "id", sortable: true},
+  {name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true},
+  {name: "actions", label: "Actions", align: "center", field: "actions", sortable: false},
+  {name: "expand", label: "Expand", align: "center", field: "expand", sortable: false},
 ];
 
 const views = {
-  "integration": ['Id','Name', 'Type'],
-  "repositories": ['id','repositoryName',  'actions', 'expand'], // Include 'expand' in the visibleColumns list
+  "integration": ['Id', 'Name', 'Type'],
+  "repositories": ['id', 'repositoryName', 'actions', 'expand'], // Include 'expand' in the visibleColumns list
 }
 
 onMounted(() => {
