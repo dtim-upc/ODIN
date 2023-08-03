@@ -57,6 +57,8 @@ public class SourceController {
             // Validate and authenticate access here
             //future check when adding authentification
 
+            boolean createRepo = (repositoryId.equals(null)) || (repositoryId.equals(""));
+
             // Iterate through the list of MultipartFiles to handle each file
             for (MultipartFile attachFile : attachFiles) {
                 // Get the original filename of the uploaded file
@@ -91,23 +93,25 @@ public class SourceController {
 
                 //Find/create repository
                 DataRepository repository;
-                if (!repositoryId.equals("")) {
-                    repository = sourceService.findRepositoryById(repositoryId);
-                    System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId);
-                    System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId.getClass());
-
-                } else {
+                if (createRepo) {
                     repository = sourceService.createRepository(repositoryName);
                     System.out.println(repository.getId() + "++++++++++++++++++++++++++++++++++++++++++++++" + repositoryName);
                     sourceService.addRepositoryToProject(projectId, repository.getId());
-
+                    createRepo = false;
+                    repositoryId = repository.getId();
+                } else {
+                    repository = sourceService.findRepositoryById(repositoryId);
+                    System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId);
+                    System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId.getClass());
+                    createRepo = false;
+                    repositoryId = repository.getId();
                 }
                 System.out.println(repository.getId() + " repoId++++++++++++++++++++++++++++++++++++++++++++++");
                 System.out.println(datasetWithGraph.getId() + " datasetId++++++++++++++++++++++++++++++++++++++++++++++");
 
-                repository = sourceService.addDatasetToRepository(
+                sourceService.addDatasetToRepository(
                         datasetWithGraph.getId(),
-                        repository.getId());
+                        repositoryId);
 
                 //Create the relation with project adding the datasetId
                 sourceService.addDatasetIdToProject(projectId, datasetWithGraph);

@@ -41,7 +41,9 @@
             class="q-mt-none"
           />
 
+          <!-- Show file selector if "Local file/s" is selected -->
           <q-file
+            v-if="isLocalFileOptionSelected"
             ref="fileds"
             outlined
             v-model="uploadedFiles"
@@ -59,6 +61,14 @@
               <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
             </template>
           </q-file>
+
+          <!-- Show database connection fields if "SQL Database" is selected -->
+          <div v-else>
+            <q-input filled v-model="databaseHost" label="Database Host" lazy-rules :rules="[(val) => !!val || 'Please enter the database host']" />
+            <q-input filled v-model="databaseUser" label="Database User" lazy-rules :rules="[(val) => !!val || 'Please enter the database user']" />
+            <q-input filled v-model="databasePassword" label="Database Password" type="password" />
+            <!-- Add more fields as needed for database connection -->
+          </div>
 
 
 
@@ -180,7 +190,7 @@ const onSubmit = () => {
   data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
-  data.append("repositoryId", newDatasource.repositoryId === null ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
+  data.append("repositoryId", newDatasource.repositoryId === null || createNewRepository.value ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
 
   // Append all files as an array under the key 'attach_files'
   uploadedFiles.value.forEach((file) => {
@@ -243,7 +253,7 @@ const fileAccept = computed(() => {
   }
 });
 
-const maxFilesValue = ref(1);
+const maxFilesValue = ref(undefined);
 
 // Watcher to update maxFilesValue whenever the DataSourceType changes
 watch(() => DataSourceType.value, () => {
@@ -261,6 +271,13 @@ watch(() => DataSourceType.value, () => {
 const updateUploadedFiles = (value) => {
   uploadedFiles.value = value;
 }
+
+const databaseHost = ref('');
+const databaseUser = ref('');
+const databasePassword = ref('');
+
+// Computed property to determine if "Local file/s" is selected
+const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local file/s');
 
 </script>
 
