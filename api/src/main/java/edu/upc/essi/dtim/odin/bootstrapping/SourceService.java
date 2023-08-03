@@ -272,12 +272,14 @@ public class SourceService {
     }
 
     public DataRepository addDatasetToRepository(String datasetId, String repositoryId) {
-        System.out.println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF "+repositoryId);
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
         Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
-
-        if(dataRepository != null)
-            ((DataRepository) dataRepository).getDatasets().add(dataset);
+        List<Dataset> repoDatasets;
+        if(dataRepository != null) {
+            repoDatasets = dataRepository.getDatasets();
+            repoDatasets.add(dataset);
+            dataRepository.setDatasets(repoDatasets);
+        }
 
         return (DataRepository) ormDataResource.save(dataRepository);
     }

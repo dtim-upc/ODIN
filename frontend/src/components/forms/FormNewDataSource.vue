@@ -16,7 +16,7 @@
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
           <q-select v-else
                     filled
-                    v-model="selectedRepositoryName"
+                    v-model="newDatasource.repositoryId"
                     :options="storeDS.repositories"
                     label="Repository"
                     class="q-mt-none"
@@ -88,18 +88,23 @@ const storeDS = useDataSourceStore();
 //                         STORES & GLOBALS
 // -------------------------------------------------------------
 const onRepositoryChange = () => {
-  const selectedRepo = repositories.find(repo => repo.id === newDatasource.repositoryId);
-  if (selectedRepo) {
-    selectedRepositoryName.value = selectedRepo.name;
+  if (createNewRepository.value) {
+    // User selected "Create new repository"
+    newDatasource.repositoryId = null;
   } else {
-    selectedRepositoryName.value = null;
+    // User selected an existing repository
+    const selectedRepo = storeDS.repositories.find(repo => repo.id === newDatasource.repositoryId);
+    if (selectedRepo) {
+      newDatasource.repositoryId = selectedRepo.id;
+    } else {
+      newDatasource.repositoryId = null; // Handle the case when the selected repository is not found
+    }
   }
 }
 
 const integrationStore = useIntegrationStore()
 
 const projectID = ref(null)
-const selectedRepositoryName = ref(null);
 const createNewRepository = ref(false); // Variable para determinar si se va a crear un nuevo repositorio
 
 
@@ -114,6 +119,8 @@ onMounted(async () => {
     console.log(projectId+"+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
     await storeDS.getRepositories(projectID.value)
+    if(storeDS.repositories.length===0)createNewRepository.value=true;
+    selectedRepositoryName.value = ref(null);
   }
 });
 
@@ -134,10 +141,8 @@ const options = [
   "SQLDatabase", "Upload file"
 ];
 
-const repositories = [];
-
 const newDatasource = reactive({
-  repositoryId: null,
+  repositoryId: ref(null),
   repositoryName: '',
   datasetName: '',
   datasetDescription: '',
@@ -155,8 +160,8 @@ const onSubmit = () => {
   data.append("attach_file", uploadedFile.value);
   data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
-  data.append("repositoryName", selectedRepositoryName.value);
-  data.append("repositoryId", newDatasource.repositoryId);
+  data.append("repositoryName", newDatasource.repositoryName);
+  data.append("repositoryId", newDatasource.repositoryId === null ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
 
   integrationStore.addDataSource(route.params.id, data, successCallback)
 }

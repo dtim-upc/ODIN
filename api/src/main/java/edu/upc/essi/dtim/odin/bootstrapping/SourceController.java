@@ -53,7 +53,7 @@ public class SourceController {
                                             @RequestPart(required = false) String datasetDescription,
                                             @RequestPart MultipartFile attach_file) {
         try{
-            logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP");
+            logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here
             //future check when adding authentification
 
@@ -83,13 +83,17 @@ public class SourceController {
 
             //Find/create repository
             DataRepository repository;
-            if(repositoryId.equals(null)) {
+            if(!repositoryId.equals("")) {
                 repository = sourceService.findRepositoryById(repositoryId);
                 System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId);
+                System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId.getClass());
+
             }
             else {
                 repository = sourceService.createRepository(repositoryName);
-                System.out.println(repository.getId()+"++++++++++++++++++++++++++++++++++++++++++++++");
+                System.out.println(repository.getId()+"++++++++++++++++++++++++++++++++++++++++++++++" + repositoryName);
+                sourceService.addRepositoryToProject(projectId, repository.getId());
+
             }
             System.out.println(repository.getId()+" repoId++++++++++++++++++++++++++++++++++++++++++++++");
             System.out.println(datasetWithGraph.getId()+" datasetId++++++++++++++++++++++++++++++++++++++++++++++");
@@ -100,8 +104,6 @@ public class SourceController {
 
             //Create the relation with project adding the datasetId
             sourceService.addDatasetIdToProject(projectId, datasetWithGraph);
-
-            sourceService.addRepositoryToProject(projectId, repository.getId());
 
             // Return success message
             return new ResponseEntity<>(datasetWithGraph, HttpStatus.OK);

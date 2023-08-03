@@ -265,9 +265,8 @@ public class ProjectService {
 
         DataRepository dataResource = ormProject.findById(DataRepository.class, repositoryId);
 
-        // Add the URI of the local graph to the project's list of local graph IDs
         project.getRepositories().add(dataResource);
-
+        
         saveProject(project);
     }
 
