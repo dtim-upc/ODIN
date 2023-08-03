@@ -43,17 +43,24 @@
 
           <q-file
             ref="fileds"
-            outlined v-model="uploadedFile"
+            outlined
+            v-model="uploadedFiles"
             auto-expand
-            label="Select the file you would like to import."
+            :label="fileInputLabel"
             :headers="{ 'content-type': 'multipart/form-data' }"
-            accept=".csv, application/json" :max-files="1"
-            lazy-rules :rules="[(val) => (val && val.name !== '') || 'Please upload a file' ]"
+            :accept="fileAccept"
+            :max-files="maxFilesValue"
+            lazy-rules
+            :rules="fileRules"
+            @update:modelValue="updateUploadedFiles"
+            multiple
           >
             <template v-slot:prepend>
-              <q-icon name="attach_file" @click="this.$refs.fileds.pickFiles();"/>
+              <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
             </template>
           </q-file>
+
+
 
           <div v-if="showFormButtons">
             <q-btn label="Submit" type="submit" color="primary"/>
@@ -132,7 +139,6 @@ onMounted(async () => {
     projectID.value = projectId;
     await storeDS.getRepositories(projectID.value)
     if(storeDS.repositories.length===0)createNewRepository.value=true;
-    selectedRepositoryName.value = ref(null);
   }
 });
 
@@ -150,10 +156,8 @@ defineExpose({
 })
 
 const options = [
-  "Single file",
-  "Multiples files",
-  "Directory",
-  "SQLDatabase",
+  "Local file/s",
+  "SQL Database",
 ];
 
 const newDatasource = reactive({
@@ -164,22 +168,28 @@ const newDatasource = reactive({
 })
 
 
-const uploadedFile = ref(null);
-const DataSourceType = options[0];
+const uploadedFiles = ref([]);
+const DataSourceType = ref(options[0]);
 const onReset = () => {
-  uploadedFile.value = null;
+  uploadedFiles.value = null;
 }
 
 const onSubmit = () => {
   const data = new FormData();
-  data.append("attach_file", uploadedFile.value);
+
   data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
   data.append("repositoryId", newDatasource.repositoryId === null ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
 
+  // Append all files as an array under the key 'attach_files'
+  uploadedFiles.value.forEach((file) => {
+    data.append('attach_files', file);
+  });
+
   integrationStore.addDataSource(route.params.id, data, successCallback)
 }
+
 
 const successCallback = (datasource) => {
 
@@ -199,14 +209,67 @@ const successCallback = (datasource) => {
 }
 
 
+// Computed property to determine the rules for the q-file component based on the selected DataSourceType
+const fileRules = computed(() => {
+  if (DataSourceType.value === 'Single file') {
+    return [(val) => (val && val.name !== '') || 'Please upload a file'];
+  } else if (DataSourceType.value === 'Local file/s') {
+    return [(val) => val && val.length > 0 || 'Please upload at least one file'];
+  } else if (DataSourceType.value === 'Directory') {
+    return [(val) => (val && val.length > 0) || 'Please select a directory'];
+  } else {
+    // For other DataSourceType values, no specific rules are required
+    return [];
+  }
+});
+
+// Computed property to determine the label for the q-file component based on the selected DataSourceType
+const fileInputLabel = computed(() => {
+  if (DataSourceType.value === 'Local file/s') {
+    return 'Select one or more files to import.';
+  } else {
+    // For other DataSourceType values, no specific label is required
+    return 'Select files to import.';
+  }
+});
+
+// Computed property to determine the accept attribute for the q-file component based on the selected DataSourceType
+const fileAccept = computed(() => {
+  if (DataSourceType.value === 'Local file/s') {
+    return '.csv, application/json';
+  } else {
+    // For other DataSourceType values, any file type is accepted
+    return '';
+  }
+});
+
+const maxFilesValue = ref(1);
+
+// Watcher to update maxFilesValue whenever the DataSourceType changes
+watch(() => DataSourceType.value, () => {
+  if (DataSourceType.value === 'Single file') {
+    maxFilesValue.value = 1;
+  } else if (DataSourceType.value === 'Local file/s' || DataSourceType.value === 'Directory') {
+    maxFilesValue.value = undefined; // Allow selecting any number of files
+  } else {
+    maxFilesValue.value = 1; // For other DataSourceType values, allow only one file to be uploaded
+  }
+});
+
+
+// Add this method to update the uploadedFile value when the q-file component emits the update:modelValue event
+const updateUploadedFiles = (value) => {
+  uploadedFiles.value = value;
+}
+
 </script>
 
 <style lang="scss">
 .fileBoxLabel {
 
-  margin: 0px;
-  padding: 0px;
-  border: 0px;
+  margin: 0;
+  padding: 0;
+  border: 0;
   font: inherit;
   vertical-align: baseline;
 
