@@ -12,7 +12,6 @@ import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.integration.integrationModuleImpl;
 import edu.upc.essi.dtim.odin.integration.integrationModuleInterface;
-import org.apache.hadoop.shaded.javax.xml.bind.SchemaOutputResolver;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.*;
