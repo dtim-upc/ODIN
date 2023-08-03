@@ -86,22 +86,44 @@ public class ProjectService {
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
         Project project = findById(projectId);
+        System.out.println("++++++++++++++++++++ DELETE DATASET OF PROJECTo");
 
         if (project == null) {
+            System.out.println("++++++++++++++++++++ QUÉ PASO NO ENCONTRÉ");
+
             throw new IllegalArgumentException("Project not found");
         }
 
         List<DataRepository> dataresourcesOfProjectToUpload = project.getRepositories();
         boolean datasetFound = false;
-        for (DataResource datasetInProject : dataresourcesOfProjectToUpload) {
-            if (datasetId.equals(datasetInProject.getId())) {
-                datasetFound = true;
-                dataresourcesOfProjectToUpload.remove(datasetInProject);
+        for (DataRepository repoInProject : dataresourcesOfProjectToUpload) {
+            for (Dataset dataset : repoInProject.getDatasets()) {
+                if (datasetId.equals(dataset.getId())) {
+                    System.out.println("++++++++++++++++++++encontrado");
+                    datasetFound = true;
+                    repoInProject.removeDataset(dataset);
 
-                project.setRepositories(dataresourcesOfProjectToUpload);
-                break; // Rompemos el bucle después de eliminar el objeto
+                    // Agregamos el código para verificar si el repositorio está vacío y, de ser así, eliminarlo del proyecto.
+                    if (repoInProject.getDatasets().isEmpty()) {
+                        dataresourcesOfProjectToUpload.remove(repoInProject);
+                    }
+
+                    // Agregamos el código para buscar el repositorio actualizado que contiene el dataset eliminado y reemplazarlo en la lista
+                    for (int i = 0; i < dataresourcesOfProjectToUpload.size(); i++) {
+                        DataRepository updatedRepo = dataresourcesOfProjectToUpload.get(i);
+                        if (updatedRepo.getId().equals(repoInProject.getId())) {
+                            // Encontramos el repositorio actualizado que coincide con el repositorio eliminado
+                            dataresourcesOfProjectToUpload.set(i, repoInProject);
+                            break;
+                        }
+                    }
+
+                    project.setRepositories(dataresourcesOfProjectToUpload);
+                    break; // Rompemos el bucle después de eliminar el objeto
+                }
             }
         }
+
         if(!datasetFound) {
             throw new IllegalArgumentException("Dataset not found");
         }
@@ -184,12 +206,23 @@ public class ProjectService {
      */
     public boolean projectContains(String projectId, String dataresourceId) {
         Project project = ormProject.findById(Project.class, projectId);
-        for (DataResource datasetInProject : project.getDatasets()) {
-            if (dataresourceId.equals(datasetInProject.getId())) {
-                return true;
+        List<DataRepository> repos = project.getRepositories();
+        System.out.println("++++++++++++++++++++ llegue "+repos.size()+repos.toString());
+
+        for (int i =0 ; i<repos.size(); ++i) {
+            List<Dataset> datasets = repos.get(i).getDatasets();
+            System.out.println("++++++++++++++++++++ entro "+i+" "+datasets.size());
+            // Aquí puedes agregar el código para verificar si dataresourceId existe en los datasets
+            for (int j =0 ; j<datasets.size(); ++j) {
+                System.out.println("++++++++++++++++++++ MIRO "+datasets.get(j).getId()+" "+dataresourceId);
+                if (datasets.get(j).getId().equals(dataresourceId)) {
+                    System.out.println("++++++++++++++++++++ ENCONTRÉ MUCHACHO");
+                    return true; // Si el dataresourceId existe en algún dataset, devuelve true
+                }
             }
         }
-        return false;
+        System.out.println("++++++++++++++++++++ NO ENCONTRÉ MUCHACHO");
+        return false; // Si no se encontró el dataresourceId en ningún dataset, devuelve false
     }
 
     /**
