@@ -266,7 +266,7 @@ public class ProjectService {
         DataRepository dataResource = ormProject.findById(DataRepository.class, repositoryId);
 
         project.getRepositories().add(dataResource);
-        
+
         saveProject(project);
     }
 

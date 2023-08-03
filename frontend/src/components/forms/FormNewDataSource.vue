@@ -28,16 +28,28 @@
                     @input="onRepositoryChange"
           />
 
+
           <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
-          <q-select v-model="DataSourceType" :options="options" label="Type" class="q-mt-none"/>
 
           <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
 
-          <q-file ref="fileds" outlined v-model="uploadedFile" auto-expand
-                  label="Select the file you would like to import."
-                  :headers="{ 'content-type': 'multipart/form-data' }" accept=".csv, application/json" :max-files="1"
-                  lazy-rules :rules="[(val) => (val && val.name !== '') || 'Please upload a file' ]">
+          <q-select
+            v-model="DataSourceType"
+            :options="options"
+            label="Type"
+            class="q-mt-none"
+          />
+
+          <q-file
+            ref="fileds"
+            outlined v-model="uploadedFile"
+            auto-expand
+            label="Select the file you would like to import."
+            :headers="{ 'content-type': 'multipart/form-data' }"
+            accept=".csv, application/json" :max-files="1"
+            lazy-rules :rules="[(val) => (val && val.name !== '') || 'Please upload a file' ]"
+          >
             <template v-slot:prepend>
               <q-icon name="attach_file" @click="this.$refs.fileds.pickFiles();"/>
             </template>
@@ -138,7 +150,10 @@ defineExpose({
 })
 
 const options = [
-  "SQLDatabase", "Upload file"
+  "Single file",
+  "Multiples files",
+  "Directory",
+  "SQLDatabase",
 ];
 
 const newDatasource = reactive({
@@ -150,7 +165,7 @@ const newDatasource = reactive({
 
 
 const uploadedFile = ref(null);
-const DataSourceType = ref("Upload file");
+const DataSourceType = options[0];
 const onReset = () => {
   uploadedFile.value = null;
 }
