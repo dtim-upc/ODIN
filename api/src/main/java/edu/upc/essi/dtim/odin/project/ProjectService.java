@@ -233,7 +233,11 @@ public class ProjectService {
      */
     public List<Dataset> getDatasetsOfProject(String id) {
         Project project = ormProject.findById(Project.class, id);
-        return project.getDatasets();
+        List<Dataset> datasets = new ArrayList<>();
+        for (DataRepository repository : project.getRepositories()){
+            datasets.addAll(repository.getDatasets());
+        }
+        return datasets;
     }
 
     public boolean editProject(Project project) {

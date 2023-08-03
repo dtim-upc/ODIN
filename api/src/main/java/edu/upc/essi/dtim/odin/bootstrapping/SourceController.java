@@ -86,7 +86,7 @@ public class SourceController {
                 //Create the relation with dataset adding the graph generated to generate an id
                 Dataset datasetWithGraph = sourceService.setLocalGraphToDataset((Dataset) savedDataset, graph);
                 graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-                graph.write("..\\api\\dbFiles\\ttl\\bootstrap.ttl");
+                graph.write("..\\api\\dbFiles\\ttl\\"+datasetName+".ttl");
 
                 // Save graph into database
                 boolean isSaved = sourceService.saveGraphToDatabase(graph);
