@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.integration;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
@@ -44,8 +45,15 @@ public class IntegrationController {
 
         Project project = integrationService.getProject(projectId);
 
-        //miramos si hay datasets suficientes a integrar en el proyecto
-        if(project.getDatasets().size() > 1){
+        int totalDatasets = 0;
+
+        // Count the total number of datasets within all repositories of the project
+        for (DataRepository repository : project.getRepositories()) {
+            totalDatasets += repository.getDatasets().size();
+        }
+
+        // Check if there are enough datasets to integrate in the project
+        if (totalDatasets > 1) {
             //integramos la nueva fuente de datos sobre el grafo integrado existente y lo sobreescrivimos
             Graph integratedGraph = integrationService.integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
 

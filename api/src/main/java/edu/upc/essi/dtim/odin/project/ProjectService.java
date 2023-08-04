@@ -33,48 +33,6 @@ public class ProjectService {
         }
     }
 
-    /**
-     * Adds a dataset ID to the specified project.
-     *
-     * @param projectId The ID of the project to add the dataset ID to.
-     * @param dataset The dataset to add.
-     * @throws IllegalArgumentException If the project with the given ID is not found.
-     */
-    public void addDatasetIdToProject(String projectId, Dataset dataset) {
-        // Retrieve the project with the given ID
-        Project project = getProjectById(projectId);
-
-        // If the project is not found, throw an exception
-        if (project == null) {
-            throw new IllegalArgumentException("Project not found");
-        }
-
-        // Add the URI of the local graph to the project's list of local graph IDs
-        project.getDatasets().add(dataset);
-
-        if(project.getDatasets().size() == 1){
-            Graph integratedGraph = CoreGraphFactory.createIntegratedGraph();
-
-            GraphStoreInterface graphStore;
-            try {
-                graphStore = GraphStoreFactory.getInstance(appConfig);
-
-                Graph datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
-
-                integratedGraph.setGraphName(null);
-                integratedGraph.setGraph(datasetGraph.getGraph());
-                integratedGraph.setGraphicalSchema(datasetGraph.getGraphicalSchema());
-
-                project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedGraph);
-                //saveProject(project);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        //saving the updated project
-        Project projectWithDatasetAndGraph = saveProject(project);
-    }
 
     /**
      * Deletes a dataset from the specified project.
@@ -273,25 +231,46 @@ public class ProjectService {
     public Project cloneProject(Project projectToClone) {
         projectToClone.setProjectId(null);
 
-        // Get the datasets from the original project
-        List<Dataset> datasetsToClone = projectToClone.getDatasets();
+        // Get the repositories from the original project
+        List<DataRepository> repositoriesToClone = projectToClone.getRepositories();
 
-        if (datasetsToClone != null && !datasetsToClone.isEmpty()) {
-            // Create a new list to store the cloned datasets
-            List<Dataset> clonedDatasets = new ArrayList<>();
+        if (repositoriesToClone != null && !repositoriesToClone.isEmpty()) {
+            // Create a new list to store the cloned repositories
+            List<DataRepository> clonedRepositories = new ArrayList<>();
 
-            for (Dataset datasetToClone : datasetsToClone) {
-                datasetToClone.getLocalGraph().setGraphName(null);
+            for (DataRepository repositoryToClone : repositoriesToClone) {
+                repositoryToClone.setId(null);
 
-                // Add the cloned dataset to the list of cloned datasets
-                clonedDatasets.add(datasetToClone);
+                // Get the datasets from the original repository
+                List<Dataset> datasetsToClone = repositoryToClone.getDatasets();
+
+                if (datasetsToClone != null && !datasetsToClone.isEmpty()) {
+                    // Create a new list to store the cloned datasets
+                    List<Dataset> clonedDatasets = new ArrayList<>();
+
+                    for (Dataset datasetToClone : datasetsToClone) {
+                        datasetToClone.setId(null);
+                        datasetToClone.getLocalGraph().setGraphName(null);
+
+                        // Add the cloned dataset to the list of cloned datasets
+                        clonedDatasets.add(datasetToClone);
+                    }
+
+                    // Set the list of cloned datasets to the cloned repository
+                    repositoryToClone.setDatasets(clonedDatasets);
+                }
+
+                // Add the cloned repository to the list of cloned repositories
+                clonedRepositories.add(repositoryToClone);
             }
 
-            // Set the list of cloned datasets to the cloned project
-            projectToClone.setDatasets(clonedDatasets);
+            // Set the list of cloned repositories to the cloned project
+            projectToClone.setRepositories(clonedRepositories);
         }
 
-        if(projectToClone.getIntegratedGraph() != null)projectToClone.getIntegratedGraph().setGraphName(null);
+        if (projectToClone.getIntegratedGraph() != null) {
+            projectToClone.getIntegratedGraph().setGraphName(null);
+        }
 
         return saveProject(projectToClone);
     }

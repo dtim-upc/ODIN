@@ -34,7 +34,7 @@
     <!-- </div> -->
 
 
-    <q-step v-if="integrationStore.project.datasets.length != 0" :name="3" title="Integrate with project"
+    <q-step v-if="datasetsNumber != 0" :name="3" title="Integrate with project"
             icon="create_new_folder" :done="step > 2" style="min-height: 70vh">
       <!-- <q-input outlined v-model="integratedName" label="Integrated datasource name" placeholder="Type a name for the integrated source" /> -->
 
@@ -42,7 +42,7 @@
       <!-- :alignments.sync="alignments" -->
     </q-step>
 
-    <q-step v-if="integrationStore.project.datasets.length != 0" :name="4" title="Review alignments"
+    <q-step v-if="datasetsNumber != 0" :name="4" title="Review alignments"
             icon="create_new_folder" :done="step > 3" style="min-height: 70vh">
 
       The following alignments cannot be integrated as their entity domains are not integrated. Delete them or indicate
@@ -51,7 +51,7 @@
     </q-step>
 
 
-    <q-step v-if="integrationStore.project.datasets.length != 0" :name="5" title="Preview integration" icon="settings"
+    <q-step v-if="datasetsNumber != 0" :name="5" title="Preview integration" icon="settings"
             style="min-height: 70vh;height: 1px" id="previewIntegration">
       <div class="row" style="height: 92%;">
         <div class="col-12">
@@ -98,12 +98,32 @@ import {useIntegrationStore} from 'src/stores/integration.store.js'
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
 // -------------------------------------------------------------
-const dataSourceStore = useDataSourceStore();
+const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore();
 
-onMounted(() => {
-  dataSourceStore.setProject()
+const projectID = ref(null);
+const datasetsNumber = ref(0);
+
+onMounted(async () => {
+  storeDS.setProject()
   integrationStore.setProject()
+
+  const url = window.location.href; // Get the current URL
+  const regex = /project\/(\d+)\//;
+  const match = url.match(regex);
+  let projectId;
+  if (match) {
+    projectId = match[1];
+    console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
+    projectID.value = projectId;
+    await storeDS.getRepositories(projectID.value)
+    // Count the datasets by summing the datasets in each repository
+    let totalDatasets = 0;
+    storeDS.repositories.forEach((repository) => {
+      totalDatasets += repository.datasets.length;
+    });
+    datasetsNumber.value = totalDatasets;
+  }
 })
 
 
@@ -155,7 +175,7 @@ const disableStepBtn = () => {
 const stepLabel = () => {
   switch (step.value) {
     case 2:
-      if (integrationStore.project.datasets.length <= 1)
+      if (datasetsNumber <= 1)
         return "Finish"
       return "Continue"
     case 4:
@@ -185,8 +205,8 @@ const clickOk = () => {
       step.value++
       break;
     case 2:
-      console.log(integrationStore.project.datasets.length + " +++++++++++++++++++++++++++++++++ numero de datasets")
-      if (integrationStore.project.datasets.length == 1) {
+      console.log(datasetsNumber + " +++++++++++++++++++++++++++++++++ numero de datasets")
+      if (datasetsNumber == 1) {
         // we persist data source
         console.log("finish preview...")
         dataSourceStore.finishPreview()

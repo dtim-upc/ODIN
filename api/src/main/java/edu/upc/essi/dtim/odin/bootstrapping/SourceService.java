@@ -6,6 +6,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
+import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
@@ -185,16 +186,6 @@ public class SourceService {
     }
 
     /**
-     * Adds a dataset ID to a project using the ProjectService class.
-     *
-     * @param projectId The ID of the project to add the dataset ID to.
-     * @param dataset   The Dataset object to add the ID of.
-     */
-    public void addDatasetIdToProject(String projectId, Dataset dataset) {
-        projectService.addDatasetIdToProject(projectId, dataset);
-    }
-
-    /**
      * Deletes a dataset from a project using the ProjectService class.
      *
      * @param projectId The ID of the project to delete the dataset from.
@@ -360,6 +351,61 @@ public class SourceService {
             ormDataResource.save(targetRepository);
         }
     }
+
+    public boolean projectHasIntegratedGraph(String projectId) {
+        // Retrieve the project with the given ID
+        Project project = projectService.getProjectById(projectId);
+
+        // If the project is not found, throw an exception
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found");
+        }
+
+        // Check if the project has an integrated graph assigned
+        return project.getIntegratedGraph() != null;
+    }
+
+    public void setProjectSchemasBase(String projectId, String datasetId) {
+        // Retrieve the project with the given ID
+        Project project = projectService.getProjectById(projectId);
+
+        // If the project is not found, throw an exception
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found");
+        }
+
+        // Find the dataset with the given datasetId
+        Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
+
+        // If the dataset is not found in the project, throw an exception
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset not found in the project");
+        }
+
+        // Check if the project already has an integrated graph assigned
+        if (project.getIntegratedGraph() != null) {
+            // If the project already has an integrated graph, throw an exception or handle it accordingly
+            throw new IllegalArgumentException("Project already has an integrated graph");
+        }
+
+        // Assign the schema of the dataset to the project's integrated graph
+        try {
+            Graph integratedGraph = CoreGraphFactory.createIntegratedGraph();
+            GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+
+            Graph datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
+
+            integratedGraph.setGraphName(null);
+            integratedGraph.setGraph(datasetGraph.getGraph());
+            integratedGraph.setGraphicalSchema(datasetGraph.getGraphicalSchema());
+
+            project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedGraph);
+            projectService.saveProject(project);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
 
 

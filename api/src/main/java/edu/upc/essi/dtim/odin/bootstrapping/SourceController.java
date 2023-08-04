@@ -1,13 +1,8 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
-import edu.upc.essi.dtim.odin.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +53,8 @@ public class SourceController {
             // Validate and authenticate access here
             //future check when adding authentification
 
-            boolean createRepo = (repositoryId.equals(null)) || (repositoryId.equals(""));
+            // Check if a new repository should be created or an existing one should be used
+            boolean createRepo = (repositoryId == null) || (repositoryId.equals(""));
 
             // Iterate through the list of MultipartFiles to handle each file
             for (MultipartFile attachFile : attachFiles) {
@@ -66,6 +62,7 @@ public class SourceController {
                 String originalFileName = attachFile.getOriginalFilename();
 
                 // Use the original filename as the datasetName
+                assert originalFileName != null;
                 datasetName = originalFileName.substring(0, originalFileName.lastIndexOf('.'));
 
                 // Reconstruct file from Multipart file
@@ -75,47 +72,40 @@ public class SourceController {
                 Dataset datasource = sourceService.extractData(filePath, datasetName, datasetDescription);
 
                 // Saving dataset to assign an id
-                DataResource savedDataset = sourceService.saveDataset(datasource);
+                Dataset savedDataset = sourceService.saveDataset(datasource);
 
                 // Transform datasource into graph
                 Graph graph = sourceService.transformToGraph(savedDataset);
 
-                //Generating visual schema for frontend
+                // Generating visual schema for frontend
                 String visualSchema = sourceService.generateVisualSchema(graph);
                 graph.setGraphicalSchema(visualSchema);
 
-                //Create the relation with dataset adding the graph generated to generate an id
-                Dataset datasetWithGraph = sourceService.setLocalGraphToDataset((Dataset) savedDataset, graph);
+                // Create the relation with dataset adding the graph generated to generate an id
+                Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
                 graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
                 graph.write("..\\api\\dbFiles\\ttl\\"+datasetName+".ttl");
 
-                // Save graph into database
-                boolean isSaved = sourceService.saveGraphToDatabase(graph);
+                // Save graph into the database
+                sourceService.saveGraphToDatabase(graph);
 
-                //Find/create repository
+                // Find/create repository
                 DataRepository repository;
                 if (createRepo) {
+                    // Create a new repository and add it to the project
                     repository = sourceService.createRepository(repositoryName);
-                    System.out.println(repository.getId() + "++++++++++++++++++++++++++++++++++++++++++++++" + repositoryName);
                     sourceService.addRepositoryToProject(projectId, repository.getId());
                     createRepo = false;
-                    repositoryId = repository.getId();
                 } else {
+                    // Find the existing repository using the provided repositoryId
                     repository = sourceService.findRepositoryById(repositoryId);
-                    System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId);
-                    System.out.println("REPO ID NOOOOOOOOOOOOOOOOOOOOT NULLLLLLLLLLL " + repositoryId.getClass());
-                    createRepo = false;
-                    repositoryId = repository.getId();
                 }
-                System.out.println(repository.getId() + " repoId++++++++++++++++++++++++++++++++++++++++++++++");
-                System.out.println(datasetWithGraph.getId() + " datasetId++++++++++++++++++++++++++++++++++++++++++++++");
+                repositoryId = repository.getId();
 
-                sourceService.addDatasetToRepository(
-                        datasetWithGraph.getId(),
-                        repositoryId);
+                // Add the dataset to the repository
+                sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
 
-                //Create the relation with project adding the datasetId
-                //sourceService.addDatasetIdToProject(projectId, datasetWithGraph);
+                if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
             }
 
             // Return success message
@@ -126,55 +116,6 @@ public class SourceController {
             e.printStackTrace();
             logger.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
-        }
-    }
-
-    /**
-     * Saves a dataset object and associates it with a specific project. NOT USED JUST FOR TESTING
-     *
-     * @param datasetName        The name of the dataset.
-     * @param datasetDescription The description of the dataset.
-     * @param path               The path of the dataset.
-     * @param projectId          The ID of the project to associate the dataset with.
-     * @return A ResponseEntity object containing the saved dataset or an error message.
-     */
-    @PostMapping("/project/{projectId}/datasources")
-    public ResponseEntity<Dataset> savingDatasetObject(
-            @RequestParam("datasetName") String datasetName,
-            @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
-            @RequestParam("datasetPath") String path,
-            @PathVariable String projectId) {
-        try {
-            logger.info("POST A DATASOURCE RECEIVED: {}",projectId);
-            Dataset dataset;
-
-            String extension = "";
-            int dotIndex = path.lastIndexOf('.');
-            if (dotIndex > 0 && dotIndex < path.length() - 1) {
-                extension = path.substring(dotIndex + 1);
-            }
-
-            switch (extension.toLowerCase()) {
-                case "csv":
-                    dataset = new CsvDataset(null, datasetName, datasetDescription, path);
-                    break;
-                case "json":
-                    dataset = new JsonDataset(null, datasetName, datasetDescription, path);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Dataset type not supported: " + extension);
-            }
-
-            Dataset savedDataset = sourceService.saveDataset(dataset);
-
-            //Create the relation with project adding the datasetId
-            sourceService.addDatasetIdToProject(projectId, (Dataset) savedDataset);
-
-            return new ResponseEntity<>(savedDataset, HttpStatus.OK);
-        } catch (UnsupportedOperationException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data source not created sucessfully");
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Data source not created sucessfully");
         }
     }
 
@@ -295,7 +236,7 @@ public class SourceController {
         boolean edited = sourceService.editDataset(dataset);
 
         // Check if the repositoryId is empty, which indicates a new repository should be created
-        boolean createRepo = (repositoryId.equals(null)) || (repositoryId.equals(""));
+        boolean createRepo = (repositoryId == null) || (repositoryId.equals(""));
 
         // Find or create the repository
         DataRepository repository;

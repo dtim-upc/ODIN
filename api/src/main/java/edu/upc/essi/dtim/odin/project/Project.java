@@ -1,8 +1,6 @@
 package edu.upc.essi.dtim.odin.project;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 
 import java.util.List;
@@ -15,7 +13,6 @@ public class Project {
     private String projectPrivacy;
     private String projectColor;
     private String createdBy;
-    private List<Dataset> datasets;
     private List<DataRepository> repositories;
     private IntegratedGraphJenaImpl integratedGraph;
 
@@ -67,13 +64,6 @@ public class Project {
         this.createdBy = createdBy;
     }
 
-    public List<Dataset> getDatasets() {
-        return datasets;
-    }
-
-    public void setDatasets(List<Dataset> datasets) {
-        this.datasets = datasets;
-    }
     public IntegratedGraphJenaImpl getIntegratedGraph() {
         return integratedGraph;
     }
