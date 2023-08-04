@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -199,8 +200,7 @@ public class SourceService {
      * @param datasetId The ID of the dataset to delete.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
-        ormDataResource.deleteOne(Dataset.class, datasetId);
-        //projectService.deleteDatasetFromProject(projectId, datasetId);
+        projectService.deleteDatasetFromProject(projectId, datasetId);
     }
 
     /**
@@ -280,9 +280,8 @@ public class SourceService {
             repoDatasets = dataRepository.getDatasets();
             repoDatasets.add(dataset);
             dataRepository.setDatasets(repoDatasets);
-            dataset.setRepository(dataRepository);
-            ormDataResource.save(dataset);
         }
+        ormDataResource.save(dataset);
 
         return (DataRepository) ormDataResource.save(dataRepository);
     }

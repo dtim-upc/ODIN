@@ -135,11 +135,6 @@
             <basic name="created_at">
                 <temporal>TIMESTAMP</temporal>
             </basic>
-
-            <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
-                <cascade><cascade-all/></cascade>
-            </many-to-one>
-
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
                 <cascade><cascade-all/></cascade>
             </one-to-one>
