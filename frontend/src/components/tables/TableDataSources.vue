@@ -80,6 +80,8 @@
           <!-- icon="remove_red_eye"></q-btn> -->
           <!-- <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn> -->
           <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
+          <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
+          <q-btn dense round flat color="grey" @click="integrateRow(props)" icon="join_full"></q-btn>
         </q-td>
       </template>
 
@@ -117,6 +119,7 @@
           <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate data sources with the project, please add at least two sources.</span>
         </div>
       </template>
+
     </q-table>
 
     <!-- <q-dialog v-model="addDataSource" >
@@ -132,16 +135,13 @@
 
 <script setup>
 import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} from "vue";
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
-import {useIntegrationStore} from 'src/stores/integration.store.js'
-import {useQuasar} from 'quasar'
-import {useNotify} from 'src/use/useNotify.js'
-// import NewDataSourceForm from "components/forms/NewDataSourceForm.vue";
-// import NewDatasourceWrapperStepper from "components/stepper/NewDatasourceWrapperStepper";
-// import StepNewDataSource from "components/stepper/StepNewDataSource.vue";
+import {useDataSourceStore} from 'src/stores/datasources.store.js';
+import {useIntegrationStore} from 'src/stores/integration.store.js';
+import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
-// import { odinApi } from "boot/axios";
-import api from "src/api/dataSourcesAPI.js";
+import {useRouter} from "vue-router";
+import dataSourcesAPI from "src/api/dataSourcesAPI";
+const router = useRouter()
 
 /*
   props
@@ -166,13 +166,14 @@ const columns = [
   {name: "id", label: "Id", align: "center", field: "id", sortable: true,},
   {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
   {name: "datasetType", label: "Type", align: "center", field: "datasetType", sortable: true,},
-  // {name: "#Wrappers", label: "#Wrappers", align: "center", field: "wrappers", sortable: true,},
   {name: "View_triples", label: "View triples", align: "center", field: "View_triples", sortable: false,},
   {
     name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph",
     sortable: false,
   },
   {name: "actions", label: "actions", align: "center", field: "actions", sortable: false,},
+  {name: "edit", label: "Edit", align: "center", field: "edit", sortable: false,},
+
 ];
 
 onMounted(() => {
@@ -208,6 +209,18 @@ const hasSourceGraph = (props) => {
 const deleteRow = (props2) => {
   storeDS.deleteDataSource(props2.row)
 }
+
+const editRow = (props) => {
+  // Implement the logic for the edit action here.
+  integrationStore.addSelectedDatasource(props.row)
+};
+
+const integrateRow = (props) => {
+  // Implement the logic for the integrate action here.
+
+  integrationStore.addSelectedDatasource(props.row)
+  router.push({name: 'dsIntegration'})
+};
 </script>
 
 <style lang="css" scoped>

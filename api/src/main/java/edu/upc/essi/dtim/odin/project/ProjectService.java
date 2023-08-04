@@ -96,30 +96,32 @@ public class ProjectService {
 
         List<DataRepository> dataresourcesOfProjectToUpload = project.getRepositories();
         boolean datasetFound = false;
-        for (DataRepository repoInProject : dataresourcesOfProjectToUpload) {
-            for (Dataset dataset : repoInProject.getDatasets()) {
-                if (datasetId.equals(dataset.getId())) {
-                    System.out.println("++++++++++++++++++++encontrado");
-                    datasetFound = true;
-                    repoInProject.removeDataset(dataset);
+        if(!dataresourcesOfProjectToUpload.isEmpty()) {
+            for (DataRepository repoInProject : dataresourcesOfProjectToUpload) {
+                for (Dataset dataset : repoInProject.getDatasets()) {
+                    if (datasetId.equals(dataset.getId())) {
+                        System.out.println("++++++++++++++++++++encontrado");
+                        datasetFound = true;
+                        repoInProject.removeDataset(dataset);
 
-                    // Agregamos el código para verificar si el repositorio está vacío y, de ser así, eliminarlo del proyecto.
-                    if (repoInProject.getDatasets().isEmpty()) {
-                        dataresourcesOfProjectToUpload.remove(repoInProject);
-                    }
-
-                    // Agregamos el código para buscar el repositorio actualizado que contiene el dataset eliminado y reemplazarlo en la lista
-                    for (int i = 0; i < dataresourcesOfProjectToUpload.size(); i++) {
-                        DataRepository updatedRepo = dataresourcesOfProjectToUpload.get(i);
-                        if (updatedRepo.getId().equals(repoInProject.getId())) {
-                            // Encontramos el repositorio actualizado que coincide con el repositorio eliminado
-                            dataresourcesOfProjectToUpload.set(i, repoInProject);
-                            break;
+                        // Agregamos el código para verificar si el repositorio está vacío y, de ser así, eliminarlo del proyecto.
+                        if (repoInProject.getDatasets().isEmpty()) {
+                            dataresourcesOfProjectToUpload.remove(repoInProject);
                         }
-                    }
 
-                    project.setRepositories(dataresourcesOfProjectToUpload);
-                    break; // Rompemos el bucle después de eliminar el objeto
+                        // Agregamos el código para buscar el repositorio actualizado que contiene el dataset eliminado y reemplazarlo en la lista
+                        for (int i = 0; i < dataresourcesOfProjectToUpload.size(); i++) {
+                            DataRepository updatedRepo = dataresourcesOfProjectToUpload.get(i);
+                            if (updatedRepo.getId().equals(repoInProject.getId())) {
+                                // Encontramos el repositorio actualizado que coincide con el repositorio eliminado
+                                dataresourcesOfProjectToUpload.set(i, repoInProject);
+                                break;
+                            }
+                        }
+
+                        project.setRepositories(dataresourcesOfProjectToUpload);
+                        break; // Rompemos el bucle después de eliminar el objeto
+                    }
                 }
             }
         }

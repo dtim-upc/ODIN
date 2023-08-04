@@ -212,10 +212,6 @@ const successCallback = (datasource) => {
   showS.value = false;
 
   integrationStore.addSelectedDatasource(datasource)
-
-  if (props.afterSubmitShowGraph)
-    router.push({name: 'dsIntegration'})
-
 }
 
 
