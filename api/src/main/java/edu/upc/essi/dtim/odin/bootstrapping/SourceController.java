@@ -7,6 +7,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
+import edu.upc.essi.dtim.odin.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +115,7 @@ public class SourceController {
                         repositoryId);
 
                 //Create the relation with project adding the datasetId
-                sourceService.addDatasetIdToProject(projectId, datasetWithGraph);
+                //sourceService.addDatasetIdToProject(projectId, datasetWithGraph);
             }
 
             // Return success message
@@ -138,14 +139,14 @@ public class SourceController {
      * @return A ResponseEntity object containing the saved dataset or an error message.
      */
     @PostMapping("/project/{projectId}/datasources")
-    public ResponseEntity<DataResource> savingDatasetObject(
+    public ResponseEntity<Dataset> savingDatasetObject(
             @RequestParam("datasetName") String datasetName,
             @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
             @RequestParam("datasetPath") String path,
             @PathVariable String projectId) {
         try {
             logger.info("POST A DATASOURCE RECEIVED: {}",projectId);
-            DataResource dataset;
+            Dataset dataset;
 
             String extension = "";
             int dotIndex = path.lastIndexOf('.');
@@ -164,7 +165,7 @@ public class SourceController {
                     throw new UnsupportedOperationException("Dataset type not supported: " + extension);
             }
 
-            DataResource savedDataset = sourceService.saveDataset(dataset);
+            Dataset savedDataset = sourceService.saveDataset(dataset);
 
             //Create the relation with project adding the datasetId
             sourceService.addDatasetIdToProject(projectId, (Dataset) savedDataset);
@@ -272,6 +273,28 @@ public class SourceController {
             return new ResponseEntity<>(datasets, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/editDataset")
+    public ResponseEntity<Boolean> editProject( @RequestParam("datasetId") String datasetId,
+                                                @RequestParam("datasetName") String datasetName,
+                                                @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription
+    ) {
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDescription);
+        logger.info("EDIT request received for editing dataset with ID: {}", dataset.getId());
+        logger.info("EDIT request received for editing dataset with ID: {}", dataset.getDatasetName());
+
+        // Call the projectService to delete the dataset and get the result
+        boolean edited = sourceService.editDataset(dataset);
+
+        // Check if the dataset was deleted successfully
+        if (edited) {
+            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
+            return ResponseEntity.ok(true);
+        } else {
+            // Return a ResponseEntity with HTTP status 404 (Not Found)
+            return ResponseEntity.notFound().build();
         }
     }
 }

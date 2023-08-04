@@ -128,6 +128,18 @@
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
 
+    <q-dialog v-model="showEditDialog">
+      <q-card flat bordered class="my-card" style="min-width: 30vw;">
+        <q-card-section class="q-pt-none">
+          <EditDatasetForm
+            @submit-success="showEditDialog=false"
+            @cancel-form="showEditDialog=false"
+            :datasetData="selectedDataset"
+          ></EditDatasetForm>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
 
   </div>
 </template>
@@ -141,7 +153,16 @@ import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 import {useRouter} from "vue-router";
 import dataSourcesAPI from "src/api/dataSourcesAPI";
+import EditDatasetForm from "components/forms/EditDatasetForm.vue";
 const router = useRouter()
+
+const showEditDialog = ref(false);
+const selectedDataset = ref(false);
+
+const openEditDialog = (data) => {
+  selectedDataset.value = data; // Make a copy of the project data to avoid reactivity issues
+  showEditDialog.value = true;
+};
 
 /*
   props
@@ -213,6 +234,8 @@ const deleteRow = (props2) => {
 
 const editRow = (props) => {
   // Implement the logic for the edit action here.
+  openEditDialog(props.row)
+
   integrationStore.addSelectedDatasource(props.row)
 };
 

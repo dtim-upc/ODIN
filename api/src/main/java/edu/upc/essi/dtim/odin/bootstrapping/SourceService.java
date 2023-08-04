@@ -209,7 +209,7 @@ public class SourceService {
      * @param dataset The Dataset object to save.
      * @return The saved Dataset object.
      */
-    public DataResource saveDataset(DataResource dataset) {
+    public Dataset saveDataset(Dataset dataset) {
         return ormDataResource.save(dataset);
     }
 
@@ -281,9 +281,11 @@ public class SourceService {
             repoDatasets.add(dataset);
             dataRepository.setDatasets(repoDatasets);
         }
-        ormDataResource.save(dataset);
+        dataRepository = ormDataResource.save(dataRepository);
+        //dataset.setRepository(dataRepository);
+        //ormDataResource.save(dataset);
 
-        return (DataRepository) ormDataResource.save(dataRepository);
+        return (DataRepository) dataRepository;
     }
 
     public void addRepositoryToProject(String projectId, String repositoryId) {
@@ -294,6 +296,27 @@ public class SourceService {
 
     public List<DataRepository> getRepositoriesOfProject(String id) {
         return projectService.getRepositoriesOfProject(id);
+    }
+
+    public boolean editDataset(Dataset dataset) {
+        Dataset originalDataset = ormDataResource.findById(Dataset.class, dataset.getId());
+
+        // Check if any attribute has changed
+        if (!dataset.getDatasetName().equals(originalDataset.getDatasetName())
+                || !dataset.getDatasetDescription().equals(originalDataset.getDatasetDescription())
+        ) {
+            // At least one attribute has changed
+            originalDataset.setDatasetName(dataset.getDatasetName());
+            originalDataset.setDatasetDescription(dataset.getDatasetDescription());
+
+            // Perform the database update operation to save the changes
+            saveDataset(originalDataset);
+
+            return true;
+        }
+
+        // No changes detected, return false
+        return false;
     }
 }
 

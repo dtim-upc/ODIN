@@ -143,6 +143,28 @@ export const useDataSourceStore = defineStore('datasource', {
 
     },
 
+    editDatasource(data, successCallback) {
+      const authStore = useAuthStore();
+      const notify = useNotify();
+      const datasetName = data.datasetName
+
+      api.editDatasource(data, authStore.user.accessToken)
+        .then((response) => {
+          if (response.status === 200) {
+              notify.positive(`Dataset successfully edited`);
+              successCallback()
+          } else {
+            notify.negative("Cannot edit data. Something went wrong on the server.");
+          }
+        })
+        .catch((error) => {
+          console.log("Error is: " + error);
+          if (error.response) {
+            notify.negative("Something went wrong on the server while editing the data.");
+          }
+        });
+    },
+
     async getRepositories(projectId) {
       const notify = useNotify()
       const authStore = useAuthStore()

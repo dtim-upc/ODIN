@@ -39,6 +39,9 @@ export default {
   deleteDatasource(projectID, id, token) {
     return odinApi.delete('/project/' + projectID + '/datasource/' + id/*, {headers: { Authorization: `Bearer ${token}` }}*/)
   },
+  editDatasource(data, successCallback) {
+    return odinApi.post('/editDataset', data)
+  },
   createDSPersistent(projectID, datasource, token) {
     return odinApi.post('/project/' + projectID + '/datasources/persist', datasource, {headers: {Authorization: `Bearer ${token}`}})
   },
@@ -52,7 +55,6 @@ export default {
   deleteTemporal(projectID, id, token) {
     return odinApi.delete('/project/' + projectID + '/temp/ds/' + id, {headers: {Authorization: `Bearer ${token}`}})
   },
-
   downloadSourceGraph(projectID, datasourceID, token) {
     return odinApi.get('/project/' + projectID + '/datasources/download/sourcegraph', {
       headers: {Authorization: `Bearer ${token}`},
