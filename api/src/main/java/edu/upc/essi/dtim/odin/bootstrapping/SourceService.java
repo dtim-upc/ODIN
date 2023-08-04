@@ -199,7 +199,8 @@ public class SourceService {
      * @param datasetId The ID of the dataset to delete.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
-        projectService.deleteDatasetFromProject(projectId, datasetId);
+        ormDataResource.deleteOne(Dataset.class, datasetId);
+        //projectService.deleteDatasetFromProject(projectId, datasetId);
     }
 
     /**
@@ -275,10 +276,12 @@ public class SourceService {
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
         Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
         List<Dataset> repoDatasets;
-        if(dataRepository != null) {
+        if(dataRepository != null && dataset != null) {
             repoDatasets = dataRepository.getDatasets();
             repoDatasets.add(dataset);
             dataRepository.setDatasets(repoDatasets);
+            dataset.setRepository(dataRepository);
+            ormDataResource.save(dataset);
         }
 
         return (DataRepository) ormDataResource.save(dataRepository);
