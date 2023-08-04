@@ -183,7 +183,7 @@ onMounted(() => {
   let projectId;
   if (match) {
     projectId = match[1];
-    console.log(projectId); // Output: 1
+    console.log(projectId);
   }
   storeDS.getDatasources(projectId)
 })
