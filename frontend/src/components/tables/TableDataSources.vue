@@ -185,7 +185,6 @@ onMounted(() => {
     projectId = match[1];
     console.log(projectId); // Output: 1
   }
-
   storeDS.getDatasources(projectId)
 })
 const views = {
@@ -193,9 +192,11 @@ const views = {
   "datasources": ['ID','Name', 'Type', '#Wrappers', 'View_triples', 'View_Source_Graph', 'actions']
 }
 const title = "Datasets";
-const search = ref("")
-const visibleColumns = views[props.view]
-const addDataSource = ref(false)
+const search = ref("");
+const visibleColumns = views[props.view];
+const addDataSource = ref(false);
+const computedDatasets = computed(() => storeDS.datasources);
+
 const hasSourceGraph = (props) => {
   if (props) {
     if (props.graphicalGraph) {
@@ -219,7 +220,9 @@ const integrateRow = (props) => {
   // Implement the logic for the integrate action here.
 
   integrationStore.addSelectedDatasource(props.row)
-  router.push({name: 'dsIntegration'})
+  console.log(computedDatasets.value.length+" DATASETS LENGTH++++++++++++++++++++++++++++++++++++++++")
+  if(computedDatasets.value.length > 1) router.push({name: 'dsIntegration'})
+  else notify.negative("Add another dataset to make an integration.")
 };
 </script>
 

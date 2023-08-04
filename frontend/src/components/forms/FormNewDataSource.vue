@@ -212,6 +212,7 @@ const successCallback = (datasource) => {
   showS.value = false;
 
   integrationStore.addSelectedDatasource(datasource)
+  storeDS.getDatasources(route.params.id)
 }
 
 
