@@ -9,10 +9,12 @@
       <q-card-section>
 
         <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-          <q-checkbox v-model="createNewRepository" label="Create new repository" :disable="storeDS.repositories.length === 0"/>
+          <q-checkbox v-model="createNewRepository" label="Create new repository"
+                      :disable="storeDS.repositories.length === 0"/>
 
           <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
-          <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName" label="Name of the new repository" lazy-rules
+          <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName"
+                   label="Name of the new repository" lazy-rules
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
           <q-select v-else
                     filled
@@ -28,9 +30,10 @@
                     @input="onRepositoryChange"
           />
 
-
+          <!-- datasetName field
           <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
                    :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
+           -->
 
           <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
 
@@ -64,12 +67,13 @@
 
           <!-- Show database connection fields if "SQL Database" is selected -->
           <div v-else>
-            <q-input filled v-model="databaseHost" label="Database Host" lazy-rules :rules="[(val) => !!val || 'Please enter the database host']" />
-            <q-input filled v-model="databaseUser" label="Database User" lazy-rules :rules="[(val) => !!val || 'Please enter the database user']" />
-            <q-input filled v-model="databasePassword" label="Database Password" type="password" />
+            <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
+                     :rules="[(val) => !!val || 'Please enter the database host']"/>
+            <q-input filled v-model="databaseUser" label="Database User" lazy-rules
+                     :rules="[(val) => !!val || 'Please enter the database user']"/>
+            <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
             <!-- Add more fields as needed for database connection -->
           </div>
-
 
 
           <div v-if="showFormButtons">
@@ -145,10 +149,10 @@ onMounted(async () => {
   let projectId;
   if (match) {
     projectId = match[1];
-    console.log(projectId+"+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
+    console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
     await storeDS.getRepositories(projectID.value)
-    if(storeDS.repositories.length===0)createNewRepository.value=true;
+    if (storeDS.repositories.length === 0) createNewRepository.value = true;
   }
 });
 
