@@ -98,14 +98,14 @@ import {useIntegrationStore} from 'src/stores/integration.store.js'
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
 // -------------------------------------------------------------
-const storeDS = useDataSourceStore();
+const dataSourceStore = useDataSourceStore();
 const integrationStore = useIntegrationStore();
 
 const projectID = ref(null);
 const datasetsNumber = ref(0);
 
 onMounted(async () => {
-  storeDS.setProject()
+  dataSourceStore.setProject()
   integrationStore.setProject()
 
   const url = window.location.href; // Get the current URL
@@ -116,10 +116,10 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await storeDS.getRepositories(projectID.value)
+    await dataSourceStore.getRepositories(projectID.value)
     // Count the datasets by summing the datasets in each repository
     let totalDatasets = 0;
-    storeDS.repositories.forEach((repository) => {
+    dataSourceStore.repositories.forEach((repository) => {
       totalDatasets += repository.datasets.length;
     });
     datasetsNumber.value = totalDatasets;
