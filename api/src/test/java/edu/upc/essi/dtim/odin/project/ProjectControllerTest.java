@@ -55,8 +55,8 @@ class ProjectControllerTest {
         project.setProjectId("testProject");
         project.setProjectName("Test Project");
 
-        // Mock the projectService.findById method
-        Mockito.when(projectService.findById("1")).thenReturn(project);
+        // Mock the projectService.getProjectById method
+        Mockito.when(projectService.getProjectById("1")).thenReturn(project);
 
         // Call the getProject method
         ResponseEntity<Project> response = projectController.getProject("1");
@@ -65,14 +65,14 @@ class ProjectControllerTest {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(project, response.getBody());
 
-        // Verify that projectService.findById was called with the correct ID
-        Mockito.verify(projectService).findById("1");
+        // Verify that projectService.getProjectById was called with the correct ID
+        Mockito.verify(projectService).getProjectById("1");
     }
 
     @Test
     void testGetProject_NonExistingProject() {
-        // Mock the projectService.findById method to return null
-        Mockito.when(projectService.findById("1")).thenReturn(null);
+        // Mock the projectService.getProjectById method to return null
+        Mockito.when(projectService.getProjectById("1")).thenReturn(null);
 
         // Call the getProject method
         ResponseEntity<Project> response = projectController.getProject("1");
@@ -81,8 +81,8 @@ class ProjectControllerTest {
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertNull(response.getBody());
 
-        // Verify that projectService.findById was called with the correct ID
-        Mockito.verify(projectService).findById("1");
+        // Verify that projectService.getProjectById was called with the correct ID
+        Mockito.verify(projectService).getProjectById("1");
     }
 
     @Test

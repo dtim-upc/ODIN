@@ -3,7 +3,6 @@ package edu.upc.essi.dtim.odin.integration;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
@@ -64,7 +63,7 @@ public class IntegrationService {
     public Project getProject(String projectId) {
         ProjectService projectService = new ProjectService(appConfig);
 
-        return projectService.findById(projectId);
+        return projectService.getProjectById(projectId);
     }
 
     public Project saveProject(Project project) {

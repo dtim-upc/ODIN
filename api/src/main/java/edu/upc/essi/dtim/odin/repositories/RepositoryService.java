@@ -27,7 +27,7 @@ public class RepositoryService {
 
     public List<DataRepository> getRepositoriesOfProject(String projectId) {
         ProjectService projectService = new ProjectService(appConfig);
-        List<DataRepository> dataResources = projectService.findById(projectId).getRepositories();
+        List<DataRepository> dataResources = projectService.getProjectById(projectId).getRepositories();
 
         List<DataRepository> dataRepositories = new ArrayList<>();
 

@@ -1,6 +1,5 @@
 package edu.upc.essi.dtim.odin.project;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
@@ -43,7 +42,7 @@ public class ProjectService {
      */
     public void addDatasetIdToProject(String projectId, Dataset dataset) {
         // Retrieve the project with the given ID
-        Project project = findById(projectId);
+        Project project = getProjectById(projectId);
 
         // If the project is not found, throw an exception
         if (project == null) {
@@ -85,7 +84,7 @@ public class ProjectService {
      * @throws IllegalArgumentException If the project with the given ID is not found.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
-        Project project = findById(projectId);
+        Project project = getProjectById(projectId);
         System.out.println("++++++++++++++++++++ DELETE DATASET OF PROJECTo");
 
         if (project == null) {
@@ -166,7 +165,7 @@ public class ProjectService {
      * @param projectId The ID of the project to find.
      * @return The found project, or null if not found.
      */
-    public Project findById(String projectId) {
+    public Project getProjectById(String projectId) {
         System.out.println(projectId+" ++++++++++++++++++++++++++++++++projectId");
         Project project = ormProject.findById(Project.class, projectId);
 
@@ -299,7 +298,7 @@ public class ProjectService {
 
     public void addRepositoryToProject(String projectId, String repositoryId) {
         // Retrieve the project with the given ID
-        Project project = findById(projectId);
+        Project project = getProjectById(projectId);
 
         // If the project is not found, throw an exception
         if (project == null) {

@@ -64,6 +64,29 @@ const storeDS = useDataSourceStore();
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
 // -------------------------------------------------------------
+// Function to set the initial value of repositoryId and repositoryName based on the datasetData
+const setInitialValues = () => {
+  if (props.datasetData) {
+    // Get the repositoryId of the datasetData
+    const datasetRepositoryId = getDatasetRepositoryId(props.datasetData.id);
+    newDatasource.repositoryId = datasetRepositoryId || null;
+    // If a repositoryId is found, get the repository name
+    newDatasource.repositoryName = datasetRepositoryId ? getRepositoryName(datasetRepositoryId) : "";
+  }
+};
+
+// Function to find the repositoryId based on the datasetId
+const getDatasetRepositoryId = (datasetId) => {
+  let repositoryId = null;
+  storeDS.repositories.forEach((repo) => {
+    const foundDataset = repo.datasets.find((dataset) => dataset.id === datasetId);
+    if (foundDataset) {
+      repositoryId = repo.id;
+    }
+  });
+  return repositoryId;
+};
+
 const onRepositoryChange = () => {
   if (createNewRepository.value) {
     // User selected "Create new repository"
@@ -96,6 +119,8 @@ onMounted(async () => {
     await storeDS.getRepositories(projectID.value)
     if (storeDS.repositories.length === 0) createNewRepository.value = true;
   }
+  setInitialValues();
+
 });
 
 const route = useRoute()
@@ -137,7 +162,7 @@ const onSubmit = () => {
     data.append("datasetDescription", newDatasource.datasetDescription);
     data.append("repositoryName", newDatasource.repositoryName);
     data.append("repositoryId", newDatasource.repositoryId === null || createNewRepository.value ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
-
+    data.append("projectId", projectID.value)
     storeDS.editDatasource(data, successCallback)
 }
 

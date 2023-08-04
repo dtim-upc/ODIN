@@ -47,7 +47,7 @@ public class ProjectController {
     @GetMapping("/projects/{id}")
     public ResponseEntity<Project> getProject(@PathVariable("id") String id) {
         logger.info("GET request received for retrieving project with ID: {}", id);
-        Project project = projectService.findById(id);
+        Project project = projectService.getProjectById(id);
         if (project.getProjectId() != null) {
             return ResponseEntity.ok(project);
         } else {
@@ -114,7 +114,7 @@ public class ProjectController {
         logger.info("CLONE request received for editing project with ID: {}", id);
 
         // Call the projectService to delete the project and get the result
-        Project projectToClone = projectService.findById(id);
+        Project projectToClone = projectService.getProjectById(id);
 
         Project projectClone = projectService.cloneProject(projectToClone);
 

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -28,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -48,6 +48,7 @@ public class SourceService {
      * The ORMStoreInterface dependency for storing datasets.
      */
     private final ORMStoreInterface ormDataResource;
+
     /**
      * Constructs a new instance of SourceService.
      *
@@ -55,7 +56,7 @@ public class SourceService {
      * @param projectService The ProjectService dependency.
      */
     public SourceService(@Autowired AppConfig appConfig,
-                         @Autowired ProjectService projectService){
+                         @Autowired ProjectService projectService) {
         this.appConfig = appConfig;
         this.projectService = projectService;
         try {
@@ -85,7 +86,7 @@ public class SourceService {
                 sb.append(characters.charAt(randomIndex));
             }
 
-            String filename = sb +"_"+ multipartFile.getOriginalFilename();
+            String filename = sb + "_" + multipartFile.getOriginalFilename();
 
             // Get the disk path from the app configuration
             Path diskPath = Path.of(appConfig.getDiskPath());
@@ -100,7 +101,7 @@ public class SourceService {
 
             // Copy the input stream of the multipart file to the destination file
             try (InputStream inputStream = multipartFile.getInputStream()) {
-                Files.copy(inputStream, destinationFile,StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
             }
 
             return destinationFile.toString();
@@ -124,7 +125,7 @@ public class SourceService {
         Dataset dataset;
 
         // Create a new dataset object with the extracted data
-        switch (extension.toLowerCase()){
+        switch (extension.toLowerCase()) {
             case "csv":
                 dataset = new CsvDataset(null, datasetName, datasetDescription, filePath);
                 break;
@@ -273,18 +274,21 @@ public class SourceService {
     }
 
     public DataRepository addDatasetToRepository(String datasetId, String repositoryId) {
+        // Step 1: Find the repository and dataset using their IDs
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
         Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
-        List<Dataset> repoDatasets;
-        if(dataRepository != null && dataset != null) {
-            repoDatasets = dataRepository.getDatasets();
+
+        // Step 2: If the repository and dataset exist, add the dataset to the repository's list of datasets
+        if (dataRepository != null && dataset != null) {
+            List<Dataset> repoDatasets = dataRepository.getDatasets();
             repoDatasets.add(dataset);
             dataRepository.setDatasets(repoDatasets);
         }
-        dataRepository = ormDataResource.save(dataRepository);
-        //dataset.setRepository(dataRepository);
-        //ormDataResource.save(dataset);
 
+        // Step 3: Save the changes to the repository
+        dataRepository = ormDataResource.save(dataRepository);
+
+        // Step 4: Return the updated DataRepository object
         return (DataRepository) dataRepository;
     }
 
@@ -316,7 +320,45 @@ public class SourceService {
         }
 
         // No changes detected, return false
-        return false;
+        return true;
+    }
+
+    /**
+     * Deletes a dataset from the list of datasets in a repository given a datasetId.
+     *
+     * @param projectId The ID of the project to find the repository.
+     * @param datasetId The ID of the dataset to delete.
+     */
+    public void deleteDatasetFromRepo(String projectId, String datasetId) {
+        // Step 1: Get the project by projectId
+        Project project = projectService.getProjectById(projectId);
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found with projectId: " + projectId);
+        }
+
+        // Step 2: Find the repository that contains the dataset with datasetId
+        List<DataRepository> repositories = project.getRepositories();
+        DataRepository targetRepository = null;
+
+        for (DataRepository repository : repositories) {
+            for (Dataset dataset : repository.getDatasets()) {
+                if (dataset.getId().equals(datasetId)) {
+                    targetRepository = repository;
+                    break;
+                }
+            }
+            if (targetRepository != null) {
+                break;
+            }
+        }
+
+        // Step 3: If the repository is found, remove the dataset and save the changes
+        if (targetRepository != null) {
+            List<Dataset> datasets = targetRepository.getDatasets();
+            datasets.removeIf(dataset -> dataset.getId().equals(datasetId));
+            targetRepository.setDatasets(datasets);
+            ormDataResource.save(targetRepository);
+        }
     }
 }
 

@@ -277,18 +277,44 @@ public class SourceController {
     }
 
     @PostMapping("/editDataset")
-    public ResponseEntity<Boolean> editProject( @RequestParam("datasetId") String datasetId,
+    public ResponseEntity<Boolean> editProject( @RequestParam("projectId") String projectId,
+                                                @RequestParam("datasetId") String datasetId,
                                                 @RequestParam("datasetName") String datasetName,
-                                                @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription
+                                                @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
+                                                @RequestParam("repositoryId") String repositoryId,
+                                                @RequestParam("repositoryName") String repositoryName
     ) {
+        // Create a new Dataset object with the provided dataset information
         Dataset dataset = new Dataset(datasetId, datasetName, datasetDescription);
-        logger.info("EDIT request received for editing dataset with ID: {}", dataset.getId());
-        logger.info("EDIT request received for editing dataset with ID: {}", dataset.getDatasetName());
 
-        // Call the projectService to delete the dataset and get the result
+        // Log the dataset ID and dataset name for debugging purposes
+        logger.info("EDIT request received for editing dataset with ID: {}", dataset.getId());
+        logger.info("EDIT request received for editing dataset with name: {}", dataset.getDatasetName());
+
+        // Call the projectService to edit the dataset and get the result
         boolean edited = sourceService.editDataset(dataset);
 
-        // Check if the dataset was deleted successfully
+        // Check if the repositoryId is empty, which indicates a new repository should be created
+        boolean createRepo = (repositoryId.equals(null)) || (repositoryId.equals(""));
+
+        // Find or create the repository
+        DataRepository repository;
+        if (createRepo) {
+            // Create a new repository if repositoryId is empty
+            repository = sourceService.createRepository(repositoryName);
+            repositoryId = repository.getId();
+
+            // Add the new repository to the project
+            sourceService.addRepositoryToProject(projectId, repositoryId);
+        }
+
+        // Remove the dataset from the repository it belongs to
+        sourceService.deleteDatasetFromRepo(projectId, datasetId);
+
+        // Add the dataset to the specified repository
+        sourceService.addDatasetToRepository(datasetId, repositoryId);
+
+        // Check if the dataset was edited successfully
         if (edited) {
             // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
             return ResponseEntity.ok(true);
