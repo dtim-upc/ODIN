@@ -34,7 +34,7 @@
     <!-- </div> -->
 
 
-    <q-step v-if="datasetsNumber != 0" :name="3" title="Integrate with project"
+    <q-step v-if="0!==datasetsNumber" :name="3" title="Integrate with project"
             icon="create_new_folder" :done="step > 2" style="min-height: 70vh">
       <!-- <q-input outlined v-model="integratedName" label="Integrated datasource name" placeholder="Type a name for the integrated source" /> -->
 
@@ -42,7 +42,7 @@
       <!-- :alignments.sync="alignments" -->
     </q-step>
 
-    <q-step v-if="datasetsNumber != 0" :name="4" title="Review alignments"
+    <q-step v-if="0!==datasetsNumber" :name="4" title="Review alignments"
             icon="create_new_folder" :done="step > 3" style="min-height: 70vh">
 
       The following alignments cannot be integrated as their entity domains are not integrated. Delete them or indicate
@@ -51,7 +51,7 @@
     </q-step>
 
 
-    <q-step v-if="datasetsNumber != 0" :name="5" title="Preview integration" icon="settings"
+    <q-step v-if="0!==datasetsNumber" :name="5" title="Preview integration" icon="settings"
             style="min-height: 70vh;height: 1px" id="previewIntegration">
       <div class="row" style="height: 92%;">
         <div class="col-12">
@@ -61,7 +61,7 @@
           <q-toggle :label="previewGS" false-value="Schema integrated" true-value="Global schema" v-model="previewGS"/>
 
           <Graph
-            :graphical="previewGS == 'Global schema' ? integrationStore.getGlobalSchema: integrationStore.getGraphicalSchemaIntegration"></Graph>
+            :graphical="previewGS === 'Global schema' ? integrationStore.getGlobalSchema: integrationStore.getGraphicalSchemaIntegration"></Graph>
         </div>
       </div>
     </q-step>
@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import {ref, onBeforeMount, onMounted} from '@vue/runtime-core'
+import {ref, onMounted} from '@vue/runtime-core'
 // import CSVPreview from 'components/previews/CSVPreview.vue';
 import TableAligments from 'components/tables/TableAligments.vue';
 import TableJoinAlignments from 'components/tables/TableJoinAlignments.vue';
@@ -150,23 +150,14 @@ const disableStepBtn = () => {
   switch (step.value) {
     case 1: // list uploaded data sources
       console.log("return true")
-      return integrationStore.selectedDS.length != 1;
-      // return integrationStore.selectedDS.length != 2
-      // return selectedDS.value.filter(v => (v.graphicalGraph  || v.graphicalMinimalIntegration  ) ).length != 2
-      return false;
-      break;
+      return integrationStore.selectedDS.length !== 1;
     case 2: // preview bootstrapped graph
       // return alignments.value.length == 0
       break;
     case 3: // selection of alignments
-      if (integrationStore.alignments.length == 0)
-        return true;
-      return false;
-      break;
+      return integrationStore.alignments.length === 0;
     case 4: // review of alignments
-
       return !integrationStore.isJoinAlignmentsRelationshipsComplete;
-      break;
     default: //present final integration
       return false;
   }
@@ -184,13 +175,12 @@ const stepLabel = () => {
       return "Finish"
     default:
       return "Continue"
-      break;
   }
 }
 
 const previousStep = () => {
 
-  if (integrationStore.joinAlignments.length == 0 && step.value == 5) {
+  if (integrationStore.joinAlignments.length === 0 && step.value === 5) {
     step.value = 3
   } else {
     step.value--
@@ -206,7 +196,7 @@ const clickOk = () => {
       break;
     case 2:
       console.log(datasetsNumber + " +++++++++++++++++++++++++++++++++ numero de datasets")
-      if (datasetsNumber == 1) {
+      if (datasetsNumber === 1) {
         // we persist data source
         console.log("finish preview...")
         dataSourceStore.finishPreview()
@@ -221,7 +211,7 @@ const clickOk = () => {
       console.log("integrate with project. Step value", step.value)
       integrationStore.integrateTemporal(function () {
 
-        if (integrationStore.joinAlignments.length == 0) {
+        if (integrationStore.joinAlignments.length === 0) {
           step.value = 5
         } else {
           step.value++
