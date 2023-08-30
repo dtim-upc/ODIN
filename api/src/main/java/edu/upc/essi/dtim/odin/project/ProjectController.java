@@ -136,7 +136,7 @@ public class ProjectController {
     }
 
     @GetMapping("/project/{id}/download/projectschema")
-    public ResponseEntity<InputStreamResource> downloadSourceGraph(
+    public ResponseEntity<InputStreamResource> downloadProjectSchema(
             @PathVariable("id") String projectID
     ) {
         Project project = projectService.getProjectById(projectID);
@@ -150,13 +150,13 @@ public class ProjectController {
         model.write(writer, "TTL");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName() + ".ttl");
 
         InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .contentType(MediaType.parseMediaType("text/turtle")) // Adjust media type accordingly
+                .contentType(MediaType.parseMediaType("text/turtle"))
                 .body(resource);
     }
 }
