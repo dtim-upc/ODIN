@@ -406,6 +406,23 @@ public class SourceService {
         }
     }
 
+    public Dataset getDatasetById(String datasetId) {
+        Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
+
+        //recuperamos el contenido del grafo del dataset
+        GraphStoreInterface graphStore;
+        try {
+            graphStore = GraphStoreFactory.getInstance(appConfig);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        assert graphStore != null;
+        Graph datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
+
+        dataset.setLocalGraph((LocalGraphJenaImpl) datasetGraph);
+
+        return dataset;
+    }
 }
 
 

@@ -52,7 +52,7 @@ export default {
     return odinApi.delete('/project/' + projectID + '/temp/ds/' + id, {headers: {Authorization: `Bearer ${token}`}})
   },
   downloadSourceGraph(projectID, datasourceID, token) {
-    return odinApi.get('/project/' + projectID + '/datasources/download/sourcegraph', {
+    return odinApi.get('/project/' + projectID + '/datasources/download/datasetschema', {
       headers: {Authorization: `Bearer ${token}`},
       params: {dsID: datasourceID},
       responseType: 'blob'

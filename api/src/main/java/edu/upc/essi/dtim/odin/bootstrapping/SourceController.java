@@ -3,15 +3,22 @@ package edu.upc.essi.dtim.odin.bootstrapping;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.odin.project.Project;
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -263,6 +270,32 @@ public class SourceController {
             // Return a ResponseEntity with HTTP status 404 (Not Found)
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/project/{id}/datasources/download/datasetschema")
+    public ResponseEntity<InputStreamResource> downloadDatasetSchema(
+            @PathVariable("id") String projectID,
+            @RequestParam("dsID") String datasetId
+    ) {
+        Dataset dataset = sourceService.getDatasetById(datasetId);
+
+        if (dataset == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Model model = dataset.getLocalGraph().getGraph();
+        StringWriter writer = new StringWriter();
+        model.write(writer, "TTL");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dataset.getDatasetName() + ".ttl");
+
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle"))
+                .body(resource);
     }
 }
 
