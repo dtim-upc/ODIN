@@ -105,8 +105,8 @@ const projectID = ref(null);
 const datasetsNumber = ref(0);
 
 onMounted(async () => {
-  dataSourceStore.setProject()
-  integrationStore.setProject()
+  await dataSourceStore.setProject()
+  await integrationStore.setProject()
 
   const url = window.location.href; // Get the current URL
   const regex = /project\/(\d+)\//;
@@ -196,7 +196,7 @@ const clickOk = () => {
       break;
     case 2:
       console.log(datasetsNumber + " +++++++++++++++++++++++++++++++++ numero de datasets")
-      if (datasetsNumber === 1) {
+      if (datasetsNumber.value === 1) {
         // we persist data source
         console.log("finish preview...")
         dataSourceStore.finishPreview()
