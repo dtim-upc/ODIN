@@ -48,10 +48,6 @@ export default {
   getTriples(projectID, datasourceID, token) {
     return odinApi.get('/project/' + projectID + '/datasources/triples/' + datasourceID, {headers: {Authorization: `Bearer ${token}`}})
   },
-
-  getAllTemporal(projectID, token) {
-    return odinApi.get('/project/' + projectID + '/temp/ds', {headers: {Authorization: `Bearer ${token}`}})
-  },
   deleteTemporal(projectID, id, token) {
     return odinApi.delete('/project/' + projectID + '/temp/ds/' + id, {headers: {Authorization: `Bearer ${token}`}})
   },
