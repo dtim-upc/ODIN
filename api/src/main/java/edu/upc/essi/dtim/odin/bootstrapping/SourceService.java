@@ -264,24 +264,31 @@ public class SourceService {
         return (DataRepository) ormDataResource.save(dataRepository);
     }
 
-    public DataRepository addDatasetToRepository(String datasetId, String repositoryId) {
+    public DataRepository addDatasetToRepository(String datasetId, String repositoryId) throws IllegalArgumentException {
         // Step 1: Find the repository and dataset using their IDs
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
         Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
 
         // Step 2: If the repository and dataset exist, add the dataset to the repository's list of datasets
-        if (dataRepository != null && dataset != null) {
-            List<Dataset> repoDatasets = dataRepository.getDatasets();
-            repoDatasets.add(dataset);
-            dataRepository.setDatasets(repoDatasets);
+        if (dataRepository == null) {
+            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
         }
+
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
+        }
+
+        List<Dataset> repoDatasets = new ArrayList<>(dataRepository.getDatasets());
+        repoDatasets.add(dataset);
+        dataRepository.setDatasets(repoDatasets);
 
         // Step 3: Save the changes to the repository
         dataRepository = ormDataResource.save(dataRepository);
 
         // Step 4: Return the updated DataRepository object
-        return (DataRepository) dataRepository;
+        return dataRepository;
     }
+
 
     public void addRepositoryToProject(String projectId, String repositoryId) {
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
@@ -345,9 +352,16 @@ public class SourceService {
 
         // Step 3: If the repository is found, remove the dataset and save the changes
         if (targetRepository != null) {
-            List<Dataset> datasets = targetRepository.getDatasets();
-            datasets.removeIf(dataset -> dataset.getId().equals(datasetId));
+            List<Dataset> datasets = new ArrayList<>(targetRepository.getDatasets()); // Create a mutable copy of the list
+            System.out.println(datasets.size()+" -------------------------------------------------------DATASETS SIZE PRE DELETE");
+            System.out.println(datasets.get(0).getId() + " -------------------------------------------------------DATASET 0 id PRE DELETE");
+            System.out.println(datasetId + " -------------------------------------------------------DATASET id to delete PRE DELETE");
+
+
+            datasets.removeIf(dataset -> dataset.getId().toString().equals(datasetId));
             targetRepository.setDatasets(datasets);
+            System.out.println(datasets.size()+" -------------------------------------------------------DATASETS SIZE POST DELETE");
+
             ormDataResource.save(targetRepository);
         }
     }
