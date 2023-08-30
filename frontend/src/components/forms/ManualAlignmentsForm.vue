@@ -56,7 +56,7 @@
 
           <q-card-section class="col q-pl-none">
             <div class="row bg-primary justify-center text-white q-pa-xs"> DataSource:
-              {{ integrationStore.getSourceB.name }}
+              {{ integrationStore.getSourceB.datasetName }}
             </div>
             <!-- <q-responsive :ratio="4/3" style="max-height: 53vh">
               <Webvowl :view="'bdi_manual_alignments'" :id="dsB.id"   :minimal-i="dsB.type == 'INTEGRATED'? true: false"/>
