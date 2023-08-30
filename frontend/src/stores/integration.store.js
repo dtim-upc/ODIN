@@ -19,7 +19,7 @@ export const useIntegrationStore = defineStore('integration', {
     project: {},
     projectTemporal: {},
     datasources: [], // these ds are in temporal landing
-    selectedDS: [], //selected ds. It is an array because of table requirement input but it will always contain only one element
+    selectedDS: [], //selected ds. It is an array because of table requirement input, but it will always contain only one element
     alignments: [],
     joinAlignments: []
     // {"domainLabelA":"person", "domainLabelB":"country", "rightArrow":"true" ,"iriA": "A", "iriB": "B", "labelA": "lA", "labelB": "lB", "l": "i2", "type":"property" }]
@@ -43,7 +43,7 @@ export const useIntegrationStore = defineStore('integration', {
       return state.datasources.length
     },
     getSourceB(state) {
-      if (state.selectedDS.length == 1)
+      if (state.selectedDS.length === 1)
         return state.selectedDS[0]
       else
         return null
@@ -53,7 +53,7 @@ export const useIntegrationStore = defineStore('integration', {
       return state.project.integratedGraph.graphicalSchema
     },
     getGraphicalB(state) {
-      if (state.selectedDS.length == 1) {
+      if (state.selectedDS.length === 1) {
         console.log("******************" + state.selectedDS[0])
         return state.selectedDS[0].localGraph.graphicalSchema
       } else
@@ -71,17 +71,15 @@ export const useIntegrationStore = defineStore('integration', {
       return ""
     },
     isDSEmpty(state) {
-      return state.datasources.length == 0
+      return state.datasources.length === 0
     },
     isJoinAlignmentsRelationshipsComplete(state) {
 
-      if (state.joinAlignments.length == 0)
+      if (state.joinAlignments.length === 0)
         return true;
 
-      if (state.joinAlignments.filter(a => a.relationship == "").length == 0) {
-        return true;
-      }
-      return false;
+      return state.joinAlignments.filter(a => a.relationship === "").length === 0;
+
 
     }
   },
@@ -119,7 +117,7 @@ export const useIntegrationStore = defineStore('integration', {
 
         const response = await projectAPI.getProjectByID(route.params.id, authStore.user.accessToken)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.project = response.data
         }
 
@@ -142,7 +140,7 @@ export const useIntegrationStore = defineStore('integration', {
         console.log("delete ds temporal")
         console.log(response.data)
 
-        if (response.status == 204) {
+        if (response.status === 204) {
           let index = this.datasources.indexOf(ds)
           if (index > -1) {
             console.log("dele index")
@@ -183,7 +181,7 @@ export const useIntegrationStore = defineStore('integration', {
       const authStore = useAuthStore()
 
       console.log("Pinia getting temporal data sources...")
-      const res = await api.getAll(this.project.projectId, authStore.user.accessToken).then(response => {
+      await api.getAll(this.project.projectId, authStore.user.accessToken).then(response => {
 
         console.log("ds temporal received", response)
 
@@ -207,7 +205,6 @@ export const useIntegrationStore = defineStore('integration', {
           notify.negative("Cannot connect to the server.")
         }
       });
-
     },
 
     // this will upload the data source
@@ -218,7 +215,7 @@ export const useIntegrationStore = defineStore('integration', {
       api.bootstrap(projectID, authStore.user.accessToken, data)
         .then((response) => {
           console.log("dataset created ", response)
-          if (response.status == 200) {
+          if (response.status === 200) {
 
             // this should be in temporal landing
             //this.project.datasets.push(response.data)
@@ -263,7 +260,7 @@ export const useIntegrationStore = defineStore('integration', {
         this.selectedDS.splice(index, 1)
       } else {
 
-        this.selectedDS = this.selectedDS.filter(x => x.id != ds.id)
+        this.selectedDS = this.selectedDS.filter(x => x.id !== ds.id)
         // console.log("check!!! something wrong else delete selected ds")
         // this.selectedDS =
       }
@@ -314,7 +311,7 @@ export const useIntegrationStore = defineStore('integration', {
       integrationAPI.integrate(this.project.projectId, data, authStore.user.accessToken).then((response) => {
         console.log("integration response...", response)
         //   console.log(response)
-        if (response.status == 201 || response.status) {
+        if (response.status === 201 || response.status) {
           notify.positive("Integration succeeded")
 
           this.projectTemporal = response.data.project
@@ -326,7 +323,7 @@ export const useIntegrationStore = defineStore('integration', {
         }
       }).catch((error) => {
         console.log("error integrating ds")
-        notify.negative("Something went wrong in the server. No possible to integrate it")
+        notify.negative("Something went wrong in the server. No possible to integrate it " + error)
       });
     },
     integrateJoins(callback) {
@@ -338,7 +335,7 @@ export const useIntegrationStore = defineStore('integration', {
         integrationAPI.integrateJoins(this.project.projectId, this.joinAlignments, authStore.user.accessToken).then((response) => {
           console.log("join integration response...", response)
 
-          if (response.status == 201 || response.status) {
+          if (response.status === 201 || response.status) {
             notify.positive("Integration succeeded")
 
             this.projectTemporal = response.data
@@ -351,7 +348,7 @@ export const useIntegrationStore = defineStore('integration', {
 
         }).catch((error) => {
           console.log("error integrating ds")
-          notify.negative("Something went wrong in the server. No possible to integrate it")
+          notify.negative("Something went wrong in the server. No possible to integrate it " + error)
         });
 
 
@@ -371,7 +368,7 @@ export const useIntegrationStore = defineStore('integration', {
       integrationAPI.finishIntegration(this.project.projectId, authStore.user.accessToken).then((response) => {
         console.log("integration response...", response)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
 
           // this.projectTemporal = response.data
           if (callback)
@@ -412,7 +409,7 @@ export const useIntegrationStore = defineStore('integration', {
       integrationAPI.surveyAlignments(this.project.projectId, this.selectedDS[0].id, authStore.user.accessToken).then((response) => {
         console.log("survey alignments response...", response)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.alignments = response.data
         }
       }).catch((error) => {

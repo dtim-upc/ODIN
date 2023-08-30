@@ -1,6 +1,6 @@
 <template>
 
-  <div class="folder" :class="activeFolder == props.row.projectId ? 'active' : ''">
+  <div class="folder" :class="activeFolder === props.row.projectId ? 'active' : ''">
     <div class="folder__back" :style="folderBackColor">
       <div class="paper"></div>
       <div class="paper"></div>
@@ -99,12 +99,9 @@
 
 
 <script setup>
-import {ref, computed, onMounted} from "vue";
+import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
 import {colors} from 'quasar'
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
-import dataSourcesAPI from "src/api/dataSourcesAPI";
-import projectAPI from "src/api/projectAPI";
 import {useProjectsStore} from "stores/projects.store";
 import AddFolderForm from 'components/forms/AddFolderForm.vue';
 
@@ -189,7 +186,7 @@ $paperColor: #ffffff;
     position: relative;
     width: 100%;
     padding: 35%;
-    border-radius: 0px 5px 5px 5px;
+    border-radius: 0 5px 5px 5px;
 
     .folder__back_after {
       position: absolute;
