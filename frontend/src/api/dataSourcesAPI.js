@@ -59,7 +59,7 @@ export default {
     })
   },
   downloadProjectGraph(projectID, token) {
-    return odinApi.get('/project/' + projectID + '/integration/download/projectschema', {
+    return odinApi.get('/project/' + projectID + '/download/projectschema', {
       headers: {Authorization: `Bearer ${token}`},
       responseType: 'blob'
     })

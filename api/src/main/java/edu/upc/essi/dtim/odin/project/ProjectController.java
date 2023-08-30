@@ -1,12 +1,20 @@
 package edu.upc.essi.dtim.odin.project;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
 @RestController
@@ -125,5 +133,30 @@ public class ProjectController {
         } else {
             return new ResponseEntity<>(null, HttpStatus.NOT_MODIFIED);
         }
+    }
+
+    @GetMapping("/project/{id}/download/projectschema")
+    public ResponseEntity<InputStreamResource> downloadSourceGraph(
+            @PathVariable("id") String projectID
+    ) {
+        Project project = projectService.getProjectById(projectID);
+
+        if (project == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Model model = project.getIntegratedGraph().getGraph();
+        StringWriter writer = new StringWriter();
+        model.write(writer, "TTL");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName());
+
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle")) // Adjust media type accordingly
+                .body(resource);
     }
 }
