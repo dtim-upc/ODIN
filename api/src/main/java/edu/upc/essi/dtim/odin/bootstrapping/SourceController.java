@@ -109,7 +109,7 @@ public class SourceController {
                 }
                 repositoryId = repository.getId();
 
-                // Add the dataset to the repository
+                // Add the dataset to the repository and delete the reference from others if exists
                 sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
 
                 if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
@@ -256,10 +256,7 @@ public class SourceController {
             sourceService.addRepositoryToProject(projectId, repositoryId);
         }
 
-        // Remove the dataset from the repository it belongs to
-        sourceService.deleteDatasetFromRepo(projectId, datasetId);
-
-        // Add the dataset to the specified repository
+        // Add the dataset to the repository and delete the reference from others if exists
         sourceService.addDatasetToRepository(datasetId, repositoryId);
 
         // Check if the dataset was edited successfully
