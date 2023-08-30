@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted, defineProps} from "vue";
+import {ref, reactive, defineProps} from "vue";
 import {useNotify} from 'src/use/useNotify.js';
 import {useProjectsStore} from 'stores/projects.store.js';
 
