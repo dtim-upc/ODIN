@@ -225,7 +225,7 @@ public class SourceController {
     }
 
     @PostMapping("/editDataset")
-    public ResponseEntity<Boolean> editProject( @RequestParam("projectId") String projectId,
+    public ResponseEntity<Boolean> editDataset( @RequestParam("projectId") String projectId,
                                                 @RequestParam("datasetId") String datasetId,
                                                 @RequestParam("datasetName") String datasetName,
                                                 @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
