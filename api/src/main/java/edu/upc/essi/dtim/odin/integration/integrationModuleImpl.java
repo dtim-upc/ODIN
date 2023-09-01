@@ -15,6 +15,9 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the integration module interface for integrating RDF graphs.
+ */
 public class integrationModuleImpl implements integrationModuleInterface{
     @Override
     public Graph integrate(Graph graphA, Graph graphB, List<Alignment> alignments) {
@@ -72,6 +75,12 @@ public class integrationModuleImpl implements integrationModuleInterface{
         return joinGraph;
     }
 
+    /**
+     * Generates a global graph based on the input graph.
+     *
+     * @param graph The input graph.
+     * @return A global graph.
+     */
     public Graph generateGlobalGraph(Graph graph){
         Graph globalGraph = CoreGraphFactory.createGlobalGraph();
 
@@ -85,7 +94,13 @@ public class integrationModuleImpl implements integrationModuleInterface{
         return globalGraph;
     }
 
-
+    /**
+     * Retrieves a source graph with specified alignments.
+     *
+     * @param alignments The list of alignments.
+     * @param graph      The input graph.
+     * @return A source graph.
+     */
     public Model retrieveSourceGraph(List<Alignment> alignments, Graph graph) {
         // Todo think in a better way to do this. Maybe identifiers should be declared when loading data
         List<Alignment> aligId= alignments.stream().filter(x -> x.getType().contains("datatype")  ).collect(Collectors.toList());;
