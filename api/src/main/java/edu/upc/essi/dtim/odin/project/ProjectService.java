@@ -33,7 +33,6 @@ public class ProjectService {
         }
     }
 
-
     /**
      * Deletes a dataset from the specified project.
      *
@@ -42,54 +41,60 @@ public class ProjectService {
      * @throws IllegalArgumentException If the project with the given ID is not found.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
+        // Retrieve the project with the given ID
         Project project = getProjectById(projectId);
         System.out.println("++++++++++++++++++++ DELETE DATASET OF PROJECTo");
 
+        // Check if the project is found
         if (project == null) {
             System.out.println("++++++++++++++++++++ QUÉ PASO NO ENCONTRÉ");
 
+            // Throw an IllegalArgumentException if the project is not found
             throw new IllegalArgumentException("Project not found");
         }
 
+        // Get the list of data repositories associated with the project
         List<DataRepository> dataresourcesOfProjectToUpload = project.getRepositories();
         boolean datasetFound = false;
-        if(!dataresourcesOfProjectToUpload.isEmpty()) {
+
+        // Check if the list of data repositories is not empty
+        if (!dataresourcesOfProjectToUpload.isEmpty()) {
+            // Iterate through the data repositories
             for (DataRepository repoInProject : dataresourcesOfProjectToUpload) {
+                // Iterate through the datasets in each data repository
                 for (Dataset dataset : repoInProject.getDatasets()) {
+                    // Check if the dataset ID matches the specified dataset ID
                     if (datasetId.equals(dataset.getId())) {
                         System.out.println("++++++++++++++++++++encontrado");
                         datasetFound = true;
+
+                        // Remove the dataset from the data repository
                         repoInProject.removeDataset(dataset);
+
+                        // Save the updated list of data repositories
                         ormProject.save(dataresourcesOfProjectToUpload);
 
-                        // Agregamos el código para verificar si el repositorio está vacío y, de ser así, eliminarlo del proyecto.
+                        // Check if the data repository is now empty and remove it from the project
                         if (repoInProject.getDatasets().isEmpty()) {
                             dataresourcesOfProjectToUpload.remove(repoInProject);
                         }
 
-                        // Agregamos el código para buscar el repositorio actualizado que contiene el dataset eliminado y reemplazarlo en la lista
-                        /*
-                        for (int i = 0; i < dataresourcesOfProjectToUpload.size(); i++) {
-                            DataRepository updatedRepo = dataresourcesOfProjectToUpload.get(i);
-                            if (updatedRepo.getId().equals(repoInProject.getId())) {
-                                // Encontramos el repositorio actualizado que coincide con el repositorio eliminado
-                                dataresourcesOfProjectToUpload.set(i, repoInProject);
-                                break;
-                            }
-                        }
-
-                         */
-
+                        // Update the project's list of data repositories
                         project.setRepositories(dataresourcesOfProjectToUpload);
-                        break; // Rompemos el bucle después de eliminar el objeto
+
+                        // Exit the loop after deleting the dataset
+                        break;
                     }
                 }
             }
         }
 
-        if(!datasetFound) {
+        // Check if the dataset was not found in any data repository
+        if (!datasetFound) {
             throw new IllegalArgumentException("Dataset not found");
         }
+
+        // Save the updated project
         saveProject(project);
     }
 
@@ -100,23 +105,33 @@ public class ProjectService {
      * @return The saved project.
      */
     public Project saveProject(Project project) {
+        // Save the project using the ORM store and get the saved project
         Project savedProject = ormProject.save(project);
-        if(savedProject.getIntegratedGraph() != null){
-            if(savedProject.getIntegratedGraph().getGraphName() != null) {
-                try {
-                    GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
-                    Graph graph = project.getIntegratedGraph();
-                    graph.setGraphName(savedProject.getIntegratedGraph().getGraphName());
-                    graphStoreInterface.saveGraph(graph);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+
+        // Check if the project has an integrated graph and a graph name
+        if (savedProject.getIntegratedGraph() != null && savedProject.getIntegratedGraph().getGraphName() != null) {
+            try {
+                // Get the GraphStore interface using the AppConfig
+                GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
+
+                // Get the integrated graph from the project
+                Graph graph = project.getIntegratedGraph();
+
+                // Set the graph name to match the saved project's integrated graph name
+                graph.setGraphName(savedProject.getIntegratedGraph().getGraphName());
+
+                // Save the graph to the graph store
+                graphStoreInterface.saveGraph(graph);
+            } catch (Exception e) {
+                // Handle any exceptions by throwing a runtime exception
+                throw new RuntimeException(e);
             }
         }
 
+        // Return the saved project
         return savedProject;
     }
-
+    
     /**
      * Finds a project by its ID.
      *
@@ -124,20 +139,28 @@ public class ProjectService {
      * @return The found project, or null if not found.
      */
     public Project getProjectById(String projectId) {
-        System.out.println(projectId+" ++++++++++++++++++++++++++++++++projectId");
+        // Print the project ID for debugging
+        System.out.println(projectId + " ++++++++++++++++++++++++++++++++projectId");
+
+        // Retrieve the project with the specified ID from the ORM store
         Project project = ormProject.findById(Project.class, projectId);
 
-        //debemos cargar también el contenido de las triplas de la relación con el grafo
+        // Check if the project has an integrated graph
         try {
-            if(project.getIntegratedGraph() != null) {
+            if (project.getIntegratedGraph() != null) {
+                // Get the GraphStoreInterface from the GraphStoreFactory using the appConfig
                 GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
+
+                // Retrieve the integrated graph by its graph name and cast it to IntegratedGraphJenaImpl
                 Graph integratedGraph = graphStoreInterface.getGraph(project.getIntegratedGraph().getGraphName());
                 project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedGraph);
             }
         } catch (Exception e) {
+            // Throw a runtime exception if an error occurs while loading the integrated graph
             throw new RuntimeException(e);
         }
 
+        // Return the found project (or null if not found)
         return project;
     }
 
@@ -168,42 +191,74 @@ public class ProjectService {
      * @return true if the project contains the dataset, false otherwise.
      */
     public boolean projectContains(String projectId, String dataresourceId) {
+        // Retrieve the project by its ID from the database
         Project project = ormProject.findById(Project.class, projectId);
-        List<DataRepository> repos = project.getRepositories();
-        System.out.println("++++++++++++++++++++ llegue "+repos.size()+repos.toString());
 
-        for (int i =0 ; i<repos.size(); ++i) {
+        // Get the list of repositories in the project
+        List<DataRepository> repos = project.getRepositories();
+
+        // Print debugging information
+        System.out.println("++++++++++++++++++++ llegue " + repos.size() + repos.toString());
+
+        // Iterate through the repositories
+        for (int i = 0; i < repos.size(); ++i) {
+            // Get the datasets associated with the current repository
             List<Dataset> datasets = repos.get(i).getDatasets();
-            System.out.println("++++++++++++++++++++ entro "+i+" "+datasets.size());
-            // Aquí puedes agregar el código para verificar si dataresourceId existe en los datasets
-            for (int j =0 ; j<datasets.size(); ++j) {
-                System.out.println("++++++++++++++++++++ MIRO "+datasets.get(j).getId()+" "+dataresourceId);
-                if (datasets.get(j).getId().equals(dataresourceId)) {
+
+            // Print debugging information
+            System.out.println("++++++++++++++++++++ entro " + i + " " + datasets.size());
+
+            // Iterate through the datasets
+            for (int j = 0; j < datasets.size(); ++j) {
+                // Get the ID of the current dataset
+                String datasetId = datasets.get(j).getId();
+
+                // Print debugging information
+                System.out.println("++++++++++++++++++++ MIRO " + datasetId + " " + dataresourceId);
+
+                // Check if the dataset ID matches the provided dataresourceId
+                if (datasetId.equals(dataresourceId)) {
+                    // Dataset with the specified ID found in the project
                     System.out.println("++++++++++++++++++++ ENCONTRÉ MUCHACHO");
-                    return true; // Si el dataresourceId existe en algún dataset, devuelve true
+                    return true; // Return true if the dataresourceId exists in any dataset
                 }
             }
         }
+
+        // Dataset with the specified ID not found in the project
         System.out.println("++++++++++++++++++++ NO ENCONTRÉ MUCHACHO");
-        return false; // Si no se encontró el dataresourceId en ningún dataset, devuelve false
+        return false; // Return false if the dataresourceId is not found in any dataset
     }
 
     /**
-     * Retrieves the datasets of a project.
+     * Retrieves the datasets associated with a project.
      *
      * @param id The ID of the project.
      * @return A list of datasets belonging to the project.
      */
     public List<Dataset> getDatasetsOfProject(String id) {
+        // Retrieve the project by its ID from the database
         Project project = ormProject.findById(Project.class, id);
+
+        // Create a list to store the datasets associated with the project
         List<Dataset> datasets = new ArrayList<>();
+
+        // Iterate through the repositories in the project and collect their datasets
         for (DataRepository repository : project.getRepositories()){
             datasets.addAll(repository.getDatasets());
         }
-        return datasets;
+
+        return datasets; // Return the list of datasets associated with the project
     }
 
+    /**
+     * Edits a project by updating its attributes if they have changed.
+     *
+     * @param project The modified project with updated attributes.
+     * @return true if the project was edited and saved, false if no changes were detected.
+     */
     public boolean editProject(Project project) {
+        // Retrieve the original project from the database based on its ID
         Project originalProject = ormProject.findById(Project.class, project.getProjectId());
 
         // Check if any attribute has changed
@@ -212,7 +267,7 @@ public class ProjectService {
                 || !project.getProjectColor().equals(originalProject.getProjectColor())
                 || !project.getProjectPrivacy().equals(originalProject.getProjectPrivacy())
         ) {
-            // At least one attribute has changed
+            // At least one attribute has changed, update the original project
             originalProject.setProjectName(project.getProjectName());
             originalProject.setProjectDescription(project.getProjectDescription());
             originalProject.setProjectColor(project.getProjectColor());
@@ -221,35 +276,48 @@ public class ProjectService {
             // Perform the database update operation to save the changes
             saveProject(originalProject);
 
-            return true;
+            return true; // Changes were detected and saved
         }
 
         // No changes detected, return false
         return false;
     }
 
+    /**
+     * Clones a project, creating a new project with the same structure and data as the original project.
+     *
+     * @param projectToClone The project to be cloned.
+     * @return The cloned project.
+     */
     public Project cloneProject(Project projectToClone) {
+        // Reset the project ID to null to create a new project
         projectToClone.setProjectId(null);
 
-        // Get the repositories from the original project
+        // Get the list of repositories from the original project
         List<DataRepository> repositoriesToClone = projectToClone.getRepositories();
 
         if (repositoriesToClone != null && !repositoriesToClone.isEmpty()) {
             // Create a new list to store the cloned repositories
             List<DataRepository> clonedRepositories = new ArrayList<>();
 
+            // Iterate through each repository in the original project
             for (DataRepository repositoryToClone : repositoriesToClone) {
+                // Reset the repository ID to null to create a new repository
                 repositoryToClone.setId(null);
 
-                // Get the datasets from the original repository
+                // Get the list of datasets from the original repository
                 List<Dataset> datasetsToClone = repositoryToClone.getDatasets();
 
                 if (datasetsToClone != null && !datasetsToClone.isEmpty()) {
                     // Create a new list to store the cloned datasets
                     List<Dataset> clonedDatasets = new ArrayList<>();
 
+                    // Iterate through each dataset in the original repository
                     for (Dataset datasetToClone : datasetsToClone) {
+                        // Reset the dataset ID to null to create a new dataset
                         datasetToClone.setId(null);
+
+                        // Reset the graph name associated with the dataset to null
                         datasetToClone.getLocalGraph().setGraphName(null);
 
                         // Add the cloned dataset to the list of cloned datasets
@@ -268,13 +336,22 @@ public class ProjectService {
             projectToClone.setRepositories(clonedRepositories);
         }
 
+        // Reset the graph name associated with the integrated graph to null
         if (projectToClone.getIntegratedGraph() != null) {
             projectToClone.getIntegratedGraph().setGraphName(null);
         }
 
+        // Save the cloned project and return it
         return saveProject(projectToClone);
     }
 
+    /**
+     * Adds a data repository to a project.
+     *
+     * @param projectId    The ID of the project to which the repository should be added.
+     * @param repositoryId The ID of the repository to be added.
+     * @throws IllegalArgumentException If the project with the given ID is not found.
+     */
     public void addRepositoryToProject(String projectId, String repositoryId) {
         // Retrieve the project with the given ID
         Project project = getProjectById(projectId);
@@ -284,16 +361,29 @@ public class ProjectService {
             throw new IllegalArgumentException("Project not found");
         }
 
-        DataRepository dataResource = ormProject.findById(DataRepository.class, repositoryId);
+        // Retrieve the data repository by its ID
+        DataRepository dataRepository = ormProject.findById(DataRepository.class, repositoryId);
 
-        project.getRepositories().add(dataResource);
+        // Add the data repository to the project's list of repositories
+        project.getRepositories().add(dataRepository);
 
+        // Save the project to persist the changes
         saveProject(project);
     }
 
+    /**
+     * Retrieves the list of data repositories associated with a project.
+     *
+     * @param id The ID of the project.
+     * @return A list of DataRepository objects belonging to the project.
+     */
     public List<DataRepository> getRepositoriesOfProject(String id) {
+        // Find the project by its ID
         Project project = ormProject.findById(Project.class, id);
+
+        // Return the list of data repositories associated with the project
         return project.getRepositories();
     }
+
 }
 
