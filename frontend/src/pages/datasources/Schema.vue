@@ -14,7 +14,7 @@
 
               <q-item>
                 <q-btn flat padding="xs" label="project" class="full-width"
-                       :class="selectedSchema == 'project'? 'activebg': ''" align="left" @Click="setGlobalSchema()"/>
+                       :class="selectedSchema === 'project'? 'activebg': ''" align="left" @Click="setGlobalSchema()"/>
               </q-item>
 
             </q-list>
@@ -25,7 +25,7 @@
 
               <q-item v-for="ds in storeDS.datasources">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
-                       :class="selectedSchema == ds.datasetId? 'activebg': ''" align="left" @Click="setSchema(ds)"/>
+                       :class="selectedSchema === ds.datasetId? 'activebg': ''" align="left" @Click="setSchema(ds)"/>
               </q-item>
 
             </q-list>
