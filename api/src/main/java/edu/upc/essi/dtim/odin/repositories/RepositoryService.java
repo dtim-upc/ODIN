@@ -25,19 +25,38 @@ public class RepositoryService {
     }
 
 
+    /**
+     * Get the repositories associated with a specific project.
+     *
+     * @param projectId The ID of the project.
+     * @return A list of DataRepository objects representing the repositories.
+     */
     public List<DataRepository> getRepositoriesOfProject(String projectId) {
+        // Create a new instance of the ProjectService using the AppConfig
         ProjectService projectService = new ProjectService(appConfig);
+
+        // Get the list of DataResource objects associated with the project
         List<DataRepository> dataResources = projectService.getProjectById(projectId).getRepositories();
 
+        // Create a list to store DataRepository objects
         List<DataRepository> dataRepositories = new ArrayList<>();
 
-        for(DataResource dataResource : dataResources){
-            if(dataResource.getId().equals("0")) System.out.println("++++++++++++++++++++++++++++ GET REPOSITORIES");
+        // Iterate through the DataResource objects
+        for (DataResource dataResource : dataResources) {
+            // Check if the ID of the DataResource is "0"
+            if (dataResource.getId().equals("0")) {
+                System.out.println("++++++++++++++++++++++++++++ GET REPOSITORIES");
+            }
         }
+
+        // Create a new RelationalDBRepository and set some properties
         DataRepository dr = new RelationalDBRepository();
         ((RelationalDBRepository) dr).setUsername("RAMON DEL REPO");
+
+        // Add the DataRepository to the list
         dataRepositories.add(dr);
 
+        // Return the list of DataRepository objects
         return dataRepositories;
     }
 }
