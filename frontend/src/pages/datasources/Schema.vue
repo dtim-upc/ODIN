@@ -68,13 +68,25 @@ const setGlobalSchema = () => {
   graphical.value = storeDS.getGlobalSchema
 }
 
-onMounted(() => {
-  if (storeDS.datasources.length > 0) {
-    //  setSchema( storeDS.datasources[0] )
-    setGlobalSchema()
-  }
-})
+onMounted(async () => {
+  try {
+    const url = window.location.href; // Get the current URL
+    const regex = /project\/(\d+)\//;
+    const match = url.match(regex);
+    let projectId;
+    if (match) {
+      projectId = match[1];
+      console.log(projectId);
+    }
+    await storeDS.getDatasources(projectId);
 
+    if (storeDS.datasources.length > 0) {
+      setGlobalSchema();
+    }
+  } catch (error) {
+    console.error("Error al cargar los datos de datasources desde la API:", error);
+  }
+});
 </script>
 
 
