@@ -2,7 +2,6 @@ package edu.upc.essi.dtim.odin.project;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
@@ -19,7 +18,7 @@ import java.util.List;
 @Service
 public class ProjectService {
     ORMStoreInterface ormProject;
-    private AppConfig appConfig;
+    private final AppConfig appConfig;
 
     /**
      * Constructs a new ProjectService.
@@ -131,7 +130,7 @@ public class ProjectService {
         // Return the saved project
         return savedProject;
     }
-    
+
     /**
      * Finds a project by its ID.
      *
@@ -198,7 +197,7 @@ public class ProjectService {
         List<DataRepository> repos = project.getRepositories();
 
         // Print debugging information
-        System.out.println("++++++++++++++++++++ llegue " + repos.size() + repos.toString());
+        System.out.println("++++++++++++++++++++ llegue " + repos.size() + repos);
 
         // Iterate through the repositories
         for (int i = 0; i < repos.size(); ++i) {
@@ -209,9 +208,9 @@ public class ProjectService {
             System.out.println("++++++++++++++++++++ entro " + i + " " + datasets.size());
 
             // Iterate through the datasets
-            for (int j = 0; j < datasets.size(); ++j) {
+            for (Dataset dataset : datasets) {
                 // Get the ID of the current dataset
-                String datasetId = datasets.get(j).getId();
+                String datasetId = dataset.getId();
 
                 // Print debugging information
                 System.out.println("++++++++++++++++++++ MIRO " + datasetId + " " + dataresourceId);
