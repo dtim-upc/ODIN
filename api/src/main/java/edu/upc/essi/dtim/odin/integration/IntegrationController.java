@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller class for handling integration operations.
+ */
 @RestController
 public class IntegrationController {
 
@@ -38,6 +41,13 @@ public class IntegrationController {
         this.integrationService = integrationService;
     }
 
+    /**
+     * Handles the integration of datasets for a project.
+     *
+     * @param projectId The ID of the project.
+     * @param iData     The IntegrationData containing datasets and alignments.
+     * @return A ResponseEntity containing the IntegrationTemporalResponse or an error status.
+     */
     @PostMapping(value = "/project/{id}/integration")
     public ResponseEntity<IntegrationTemporalResponse> integrate(@PathVariable("id") String projectId,
                                                                  @RequestBody IntegrationData iData) {
@@ -54,15 +64,10 @@ public class IntegrationController {
 
         // Check if there are enough datasets to integrate in the project
         if (totalDatasets > 1) {
-            //integramos la nueva fuente de datos sobre el grafo integrado existente y lo sobreescrivimos
+            // Integrate the new data source onto the existing integrated graph and overwrite it
             Graph integratedGraph = integrationService.integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
 
             String path = "..\\api\\dbFiles\\ttl\\";
-            /*
-            project.getIntegratedGraph().write(path+"graphA.ttl");
-            iData.getDsB().getLocalGraph().write(path+"graphB.ttl");
-            integratedGraph.write(path+"integrated.ttl");
-             */
 
             Project projectToSave = integrationService.updateIntegratedGraphProject(project, integratedGraph);
 
@@ -77,12 +82,19 @@ public class IntegrationController {
 
             return new ResponseEntity<>(new IntegrationTemporalResponse(project2, joinProperties), HttpStatus.OK);
         }
-        //si no hay suficientes ERROR
         else{
+            // If there are not enough datasets to integrate, return a bad request status
             return new ResponseEntity<>(new IntegrationTemporalResponse(null,null), HttpStatus.BAD_REQUEST);
         }
     }
 
+    /**
+     * Handles the integration of join alignments into the project's integrated graph.
+     *
+     * @param id     The ID of the project.
+     * @param joinA  The list of JoinAlignment objects representing the join alignments to integrate.
+     * @return A ResponseEntity containing the updated Project with integrated joins or an error status.
+     */
     @PostMapping(value = "/project/{id}/integration/join")
     public ResponseEntity<Project> integrateJoins(@PathVariable("id") String id, @RequestBody List<JoinAlignment> joinA){
 
@@ -90,29 +102,50 @@ public class IntegrationController {
 
         Project project = integrationService.getProject(id);
 
+        // Integrate the join alignments into the integrated graph
         Graph integratedSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
 
+        // Update the project's integrated graph with the integrated schema
         project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedSchema);
 
+        // Integrate the join alignments into the global schema
         Graph globalSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
 
+        // Set the global graph of the project's integrated graph
         project.getIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalSchema);
 
-
+        // Save and return the updated project
         Project savedProject = integrationService.saveProject(project);
 
         return new ResponseEntity(savedProject, HttpStatus.OK);
     }
 
+
+    /**
+     * Accepts and persists the integration results for a specific project.
+     *
+     * @param id The ID of the project for which integration results are accepted and persisted.
+     * @return A ResponseEntity containing the updated Project with integrated data or an error status.
+     */
     @PostMapping(value = "/project/{id}/integration/persist")
     public ResponseEntity<Project> acceptIntegration(@PathVariable("id") String id) {
-        //todo: delete this call
+        // TODO: Delete this call
+        // Currently, this method returns the Project by calling integrationService.getProject(id)
         return new ResponseEntity(integrationService.getProject(id), HttpStatus.OK);
     }
 
+    /**
+     * Persists a dataset as a data source for a specific project.
+     *
+     * @param id         The ID of the project where the dataset will be persisted as a data source.
+     * @param dataSource The dataset to be persisted as a data source.
+     * @return A ResponseEntity containing the persisted Dataset or an error status.
+     */
     @PostMapping(value = "/project/{id}/datasources/persist")
     public ResponseEntity<Dataset> persistDataSource(@PathVariable("id") String id, @RequestBody Dataset dataSource) {
-        //Dataset dataset = new Datase
+        // TODO: Delete this call
+        // Currently, this method returns the input Dataset without performing any actual persistence logic.
         return new ResponseEntity<>(dataSource, HttpStatus.CREATED);
     }
+
 }
