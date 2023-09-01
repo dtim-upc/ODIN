@@ -56,7 +56,7 @@ public class bsModuleImpl implements bsModuleInterface{
 
         return bootstrapG;
     }
-    
+
     /**
      * Convierte un conjunto de datos en un modelo RDF.
      *

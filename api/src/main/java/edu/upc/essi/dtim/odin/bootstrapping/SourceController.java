@@ -186,18 +186,29 @@ public class SourceController {
         }
     }
 
+    /**
+     * Retrieves all repositories from a specific project.
+     *
+     * @param id The ID of the project to retrieve repositories from.
+     * @return A ResponseEntity object containing the list of repositories or an error message.
+     */
     @GetMapping("/project/{id}/repositories")
     public ResponseEntity<Object> getRepositoriesFromProject(@PathVariable String id) {
         try {
-            logger.info("GET ALL repositories FROM PROJECT {}" , id);
+            logger.info("GET ALL repositories FROM PROJECT {}", id);
+
+            // Retrieve a list of repositories associated with the project
             List<DataRepository> repositories = sourceService.getRepositoriesOfProject(id);
 
             if (repositories.isEmpty()) {
-                return new ResponseEntity<>("There are no datasets yet",HttpStatus.NO_CONTENT);
+                // If there are no repositories, return a response with "No content" status
+                return new ResponseEntity<>("There are no repositories yet", HttpStatus.NO_CONTENT);
             }
 
+            // Return the list of repositories with "OK" status
             return new ResponseEntity<>(repositories, HttpStatus.OK);
         } catch (Exception e) {
+            // Handle exceptions and return an error response if an error occurs
             logger.error(e.getMessage());
             return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -212,26 +223,41 @@ public class SourceController {
     public ResponseEntity<Object> getAllDatasource() {
         try {
             logger.info("GET ALL DATASOURCE RECEIVED");
+
+            // Retrieve a list of all datasets
             List<Dataset> datasets = sourceService.getDatasets();
 
             if (datasets.isEmpty()) {
+                // If there are no datasets, return a response with "Not Found" status
                 return new ResponseEntity<>("No datasets found", HttpStatus.NOT_FOUND);
             }
 
+            // Return the list of datasets with "OK" status
             return new ResponseEntity<>(datasets, HttpStatus.OK);
         } catch (Exception e) {
+            // Handle exceptions and return an error response if an error occurs
             return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * Edits a dataset in a specific project.
+     *
+     * @param projectId         The ID of the project where the dataset belongs.
+     * @param datasetId         The ID of the dataset to edit.
+     * @param datasetName       The new name for the dataset.
+     * @param datasetDescription The new description for the dataset (optional, default is an empty string).
+     * @param repositoryId      The ID of the repository where the dataset should be stored.
+     * @param repositoryName    The name of the repository (used when creating a new one).
+     * @return A ResponseEntity object containing a boolean indicating if the dataset was edited successfully or not.
+     */
     @PostMapping("/editDataset")
-    public ResponseEntity<Boolean> editDataset( @RequestParam("projectId") String projectId,
-                                                @RequestParam("datasetId") String datasetId,
-                                                @RequestParam("datasetName") String datasetName,
-                                                @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
-                                                @RequestParam("repositoryId") String repositoryId,
-                                                @RequestParam("repositoryName") String repositoryName
-    ) {
+    public ResponseEntity<Boolean> editDataset(@RequestParam("projectId") String projectId,
+                                               @RequestParam("datasetId") String datasetId,
+                                               @RequestParam("datasetName") String datasetName,
+                                               @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
+                                               @RequestParam("repositoryId") String repositoryId,
+                                               @RequestParam("repositoryName") String repositoryName) {
         // Create a new Dataset object with the provided dataset information
         Dataset dataset = new Dataset(datasetId, datasetName, datasetDescription);
 
@@ -239,7 +265,7 @@ public class SourceController {
         logger.info("EDIT request received for editing dataset with ID: {}", dataset.getId());
         logger.info("EDIT request received for editing dataset with name: {}", dataset.getDatasetName());
 
-        // Call the projectService to edit the dataset and get the result
+        // Call the sourceService to edit the dataset and get the result
         boolean edited = sourceService.editDataset(dataset);
 
         // Check if the repositoryId is empty, which indicates a new repository should be created
@@ -269,30 +295,47 @@ public class SourceController {
         }
     }
 
+
+    /**
+     * Downloads the schema of a specific dataset as a Turtle (.ttl) file.
+     *
+     * @param projectID The ID of the project that contains the dataset.
+     * @param datasetId The ID of the dataset to download the schema for.
+     * @return A ResponseEntity object containing the Turtle schema file or a "Not Found" response if the dataset doesn't exist.
+     */
     @GetMapping("/project/{id}/datasources/download/datasetschema")
     public ResponseEntity<InputStreamResource> downloadDatasetSchema(
             @PathVariable("id") String projectID,
             @RequestParam("dsID") String datasetId
     ) {
+        // Get the dataset by its ID
         Dataset dataset = sourceService.getDatasetById(datasetId);
 
         if (dataset == null) {
+            // If the dataset doesn't exist, return a "Not Found" response
             return ResponseEntity.notFound().build();
         }
 
+        // Get the RDF model (graph) from the dataset
         Model model = dataset.getLocalGraph().getGraph();
         StringWriter writer = new StringWriter();
+
+        // Write the model (graph) to a StringWriter in Turtle format
         model.write(writer, "TTL");
 
         HttpHeaders headers = new HttpHeaders();
+        // Set the HTTP headers to specify the content disposition as an attachment with the dataset name and .ttl extension
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dataset.getDatasetName() + ".ttl");
 
+        // Create an InputStreamResource from the StringWriter
         InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
 
+        // Return a ResponseEntity with the Turtle schema file, content type, and headers
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("text/turtle"))
                 .body(resource);
     }
+
 }
 
