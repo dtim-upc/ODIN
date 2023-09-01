@@ -4,9 +4,19 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Represents a graph with nodes and links.
+ */
 @Data
 public class Graphy {
 
-    List<Nodes> nodes;
-    List<Links> links;
+    /**
+     * List of nodes in the graph.
+     */
+    private List<Nodes> nodes;
+
+    /**
+     * List of links connecting nodes in the graph.
+     */
+    private List<Links> links;
 }
