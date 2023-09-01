@@ -16,17 +16,26 @@ import org.apache.jena.rdf.model.ModelFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * Implementación de la interfaz para realizar la conversión de un conjunto de datos a un grafo.
+ */
 public class bsModuleImpl implements bsModuleInterface{
 
+    /**
+     * Convierte un conjunto de datos en un grafo.
+     *
+     * @param dataset El conjunto de datos que se va a convertir.
+     * @return Un grafo que representa el conjunto de datos.
+     */
     @Override
     public Graph convertDatasetToGraph(DataResource dataset) {
         Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
 
-        //bloque de código deprecado
+        // Bloque de código deprecado
         Model bootstrapM = convertDatasetToModel(dataset);
         bootstrapG.setGraph(bootstrapM);
 
-        /* todo update when new BS is ready
+        /* TODO: update when new BS is ready
         if (dataset.getClass().equals(CsvDataset.class)) {
             CSVBootstrap_with_DataFrame_MM_without_Jena bootstrap = new CSVBootstrap_with_DataFrame_MM_without_Jena(dataset.getDatasetId(), dataset.getDatasetName(), ((CsvDataset) dataset).getPath());
             try {
@@ -47,7 +56,13 @@ public class bsModuleImpl implements bsModuleInterface{
 
         return bootstrapG;
     }
-
+    
+    /**
+     * Convierte un conjunto de datos en un modelo RDF.
+     *
+     * @param dataset El conjunto de datos que se va a convertir.
+     * @return Un modelo RDF que representa el conjunto de datos.
+     */
     Model convertDatasetToModel(DataResource dataset) {
         Model bootstrapM = ModelFactory.createDefaultModel();
         if (dataset.getClass().equals(CsvDataset.class)) {
