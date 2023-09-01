@@ -6,12 +6,20 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * A POJO (Plain Old Java Object) class representing a response for integration with temporal information.
+ */
 @Data
 @AllArgsConstructor
 public class IntegrationTemporalResponse {
 
-    Project project;
-    List<JoinAlignment> joins;
+    /**
+     * The project associated with the integration response.
+     */
+    private Project project;
 
-
+    /**
+     * A list of join alignments related to the integration.
+     */
+    private List<JoinAlignment> joins;
 }
