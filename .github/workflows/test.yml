@@ -19,7 +19,7 @@ jobs:
       - name: Cache Gradle dependencies
         uses: actions/cache@v2
         with:
-          path: ~/ODINwhiteboard/odin/.gradle/caches
+          path: ~/ODIN/odin/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
       - name: Grant execute permission to gradlew
