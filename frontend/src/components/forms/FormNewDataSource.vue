@@ -1,90 +1,96 @@
 <template>
   <q-dialog v-model="showS" @hide="props.show=false">
-    <!--  -->
     <q-card style="width: 400px; max-width: 80vw">
+      <!-- Sección 1: Título -->
       <q-card-section>
-        <div class="text-h6">Create new dataset</div>
+        <div class="text-h5">Create new dataset</div>
       </q-card-section>
 
+      <!-- Sección 2: Información del Repositorio -->
       <q-card-section>
-
+        <div class="text-h6">Repository information</div>
         <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-          <q-checkbox v-model="createNewRepository" label="Create new repository"
-                      :disable="storeDS.repositories.length === 0"/>
+          <q-card-section>
+            <q-checkbox v-model="createNewRepository" label="Create new repository"
+                        :disable="storeDS.repositories.length === 0"/>
 
-          <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
-          <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName"
-                   label="Name of the new repository" lazy-rules
-                   :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
-          <q-select v-else
-                    filled
-                    v-model="newDatasource.repositoryId"
-                    :options="storeDS.repositories"
-                    label="Repository"
-                    class="q-mt-none"
-                    emit-value
-                    map-options
-                    option-value="id"
-                    option-label="repositoryName"
-                    :rules="[(val) => !!val || 'Please select a repository']"
-                    @input="onRepositoryChange"
-          />
+            <!-- Mostrar el campo de entrada para el nombre del nuevo repositorio si "Create new repository" está seleccionado -->
+            <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName"
+                     label="Name of the new repository" lazy-rules
+                     :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
+            <q-select
+              v-else
+              filled
+              v-model="newDatasource.repositoryId"
+              :options="storeDS.repositories"
+              label="Repository"
+              class="q-mt-none"
+              emit-value
+              map-options
+              option-value="id"
+              option-label="repositoryName"
+              :rules="[(val) => !!val || 'Please select a repository']"
+              @input="onRepositoryChange"
+            />
+          </q-card-section>
 
-          <!-- datasetName field
-          <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
-                   :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
-           -->
+          <!-- Sección 3: Información del Conjunto de Datos -->
+          <q-card-section>
+            <div class="text-h6">Dataset information</div>
+            <!-- Tipo de origen de datos -->
+            <q-select
+              v-model="DataSourceType"
+              :options="options"
+              label="Type"
+              class="q-mt-none"
+            />
 
-          <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
+            <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
+            <q-file
+              v-if="isLocalFileOptionSelected"
+              ref="fileds"
+              outlined
+              v-model="uploadedFiles"
+              auto-expand
+              :label="fileInputLabel"
+              :headers="{ 'content-type': 'multipart/form-data' }"
+              :accept="fileAccept"
+              :max-files="maxFilesValue"
+              lazy-rules
+              :rules="fileRules"
+              @update:modelValue="updateUploadedFiles"
+              multiple
+            >
+              <template v-slot:prepend>
+                <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
+              </template>
+            </q-file>
 
-          <q-select
-            v-model="DataSourceType"
-            :options="options"
-            label="Type"
-            class="q-mt-none"
-          />
+            <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
+            <q-card-section v-else>
+              <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
+                       :rules="[(val) => !!val || 'Please enter the database host']"/>
+              <q-input filled v-model="databaseUser" label="Database User" lazy-rules
+                       :rules="[(val) => !!val || 'Please enter the database user']"/>
+              <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
+              <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
+            </q-card-section>
 
-          <!-- Show file selector if "Local file/s" is selected -->
-          <q-file
-            v-if="isLocalFileOptionSelected"
-            ref="fileds"
-            outlined
-            v-model="uploadedFiles"
-            auto-expand
-            :label="fileInputLabel"
-            :headers="{ 'content-type': 'multipart/form-data' }"
-            :accept="fileAccept"
-            :max-files="maxFilesValue"
-            lazy-rules
-            :rules="fileRules"
-            @update:modelValue="updateUploadedFiles"
-            multiple
-          >
-            <template v-slot:prepend>
-              <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
-            </template>
-          </q-file>
+            <!-- Descripción del conjunto de datos (opcional) -->
+            <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
+          </q-card-section>
 
-          <!-- Show database connection fields if "SQL Database" is selected -->
-          <div v-else>
-            <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
-                     :rules="[(val) => !!val || 'Please enter the database host']"/>
-            <q-input filled v-model="databaseUser" label="Database User" lazy-rules
-                     :rules="[(val) => !!val || 'Please enter the database user']"/>
-            <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
-            <!-- Add more fields as needed for database connection -->
-          </div>
-
-
-          <div v-if="showFormButtons">
-            <q-btn label="Submit" type="submit" color="primary"/>
-            <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup/>
-          </div>
+          <!-- Botones del formulario -->
+          <q-card-section>
+            <div v-if="showFormButtons">
+              <q-btn label="Submit" type="submit" color="primary"/>
+              <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup/>
+            </div>
+          </q-card-section>
         </q-form>
       </q-card-section>
     </q-card>
   </q-dialog>
-
 </template>
 
 <script setup>
