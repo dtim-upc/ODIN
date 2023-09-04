@@ -2,9 +2,9 @@ name: Test, Analyze and Generate documentation
 
 on:
   push:
-    branches: [ main, addingDataResourceFlow ]
+    branches: [main, addingDataResourceFlow]
 
-jobs:  
+jobs:
   test:
     runs-on: ubuntu-latest
     steps:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Grant execute permission to gradlew
         run: |
-          chmod +x ODIN/odin/gradlew
+          chmod +x api/gradlew
 
       - name: Create test file
         run: |
