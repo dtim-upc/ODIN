@@ -20,23 +20,23 @@ jobs:
       - name: Cache Gradle dependencies
         uses: actions/cache@v2
         with:
-          path: ODIN/odin/.gradle/caches
+          path: ${{ github.workspace }}/ODIN/odin/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('ODIN/odin/**/*.gradle') }}
 
       - name: Debugging
         run: |
           pwd
           ls -la
-          cd ODIN/odin
+          cd ${{ github.workspace }}/ODIN/odin
           ls -la
 
       - name: Grant execute permission to gradlew
         run: |
-          chmod +x ODIN/odin/gradlew
+          chmod +x ${{ github.workspace }}/ODIN/odin/gradlew
 
       - name: Create test file
         run: |
-          cd ODIN/odin
+          cd ${{ github.workspace }}/ODIN/odin
           mkdir -p src/test/resources
           touch src/test/resources/credentials.properties
           echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> src/test/resources/credentials.properties
@@ -45,14 +45,13 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          cd ODIN/odin
+          cd ${{ github.workspace }}/ODIN/odin
           ./gradlew build --warning-mode all
 
       - name: Run tests with Gradle
         run: |
-          cd ODIN/odin
-          ./gradlew test
-
+          cd ${{ github.workspace }}/ODIN/odin
+          ./grad
 
   # analyze:
   #   runs-on: ubuntu-latest
