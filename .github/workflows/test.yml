@@ -1,6 +1,6 @@
 name: Test, Analyze and Generate documentation
 
-on: 
+on:
   push:
     branches: [ main, addingDataResourceFlow ]
 
@@ -19,8 +19,8 @@ jobs:
       - name: Cache Gradle dependencies
         uses: actions/cache@v2
         with:
-          path: ~/ODIN/odin/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: ODIN/odin/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('ODIN/**/*.gradle') }}
 
       - name: Debugging
         run: |
@@ -31,12 +31,11 @@ jobs:
 
       - name: Grant execute permission to gradlew
         run: |
-          chmod +x ODIN/gradlew
+          chmod +x ODIN/odin/gradlew
 
       - name: Create test file
         run: |
-          cd ODIN
-          cd odin
+          cd ODIN/odin
           mkdir -p src/test/resources
           touch src/test/resources/credentials.properties
           echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> src/test/resources/credentials.properties
@@ -45,15 +44,14 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          cd ODIN
-          cd odin
+          cd ODIN/odin
           ./gradlew build --warning-mode all
 
       - name: Run tests with Gradle
         run: |
-          cd ODIN
-          cd odin
+          cd ODIN/odin
           ./gradlew test
+
 
   # analyze:
   #   runs-on: ubuntu-latest
