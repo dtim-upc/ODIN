@@ -1,12 +1,15 @@
-name: Test, Analyze and Generate documentation
+name: Test, Analyze, and Generate documentation
 
 on:
   push:
-    branches: [main, addingDataResourceFlow]
+    branches:
+      - main
+      - addingDataResourceFlow
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -30,19 +33,22 @@ jobs:
 
       - name: Create test file
         run: |
-          mkdir -p ODIN/odin/src/test/resources
-          touch ODIN/odin/src/test/resources/credentials.properties
-          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> ODIN/odin/src/test/resources/credentials.properties
-          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> ODIN/odin/src/test/resources/credentials.properties
-          echo "db.url=${{ secrets.DATABASE_URL }}" >> ODIN/odin/src/test/resources/credentials.properties
+          mkdir -p api/src/test/resources
+          touch api/src/test/resources/credentials.properties
+          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> api/src/test/resources/credentials.properties
+          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> api/src/test/resources/credentials.properties
+          echo "db.url=${{ secrets.DATABASE_URL }}" >> api/src/test/resources/credentials.properties
 
       - name: Build with Gradle
+        working-directory: api  # Specify the correct working directory
         run: |
-          api/gradlew build --warning-mode all
+          ./gradlew build --warning-mode all
 
       - name: Run tests with Gradle
+        working-directory: api  # Specify the correct working directory
         run: |
-          api/gradlew test
+          ./gradlew test
+
 
   # analyze:
   #   runs-on: ubuntu-latest
