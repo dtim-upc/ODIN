@@ -26,7 +26,7 @@ jobs:
 
       - name: Grant execute permission to gradlew
         run: |
-          chmod +x ./gradlew
+          chmod +x ODIN/odin/gradlew
 
       - name: Create test file
         run: |
