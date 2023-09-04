@@ -17,41 +17,34 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/ODIN/odin/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('ODIN/odin/**/*.gradle') }}
-
       - name: Debugging
         run: |
           pwd
           ls -la
-          cd ${{ github.workspace }}/ODIN/odin
+          cd ${{ github.workspace }}
           ls -la
 
       - name: Grant execute permission to gradlew
         run: |
-          chmod +x ${{ github.workspace }}/ODIN/odin/gradlew
+          chmod +x ./gradlew
 
       - name: Create test file
         run: |
-          cd ${{ github.workspace }}/ODIN/odin
-          mkdir -p src/test/resources
-          touch src/test/resources/credentials.properties
-          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> src/test/resources/credentials.properties
-          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> src/test/resources/credentials.properties
-          echo "db.url=${{ secrets.DATABASE_URL }}" >> src/test/resources/credentials.properties
+          mkdir -p ODIN/odin/src/test/resources
+          touch ODIN/odin/src/test/resources/credentials.properties
+          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> ODIN/odin/src/test/resources/credentials.properties
+          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> ODIN/odin/src/test/resources/credentials.properties
+          echo "db.url=${{ secrets.DATABASE_URL }}" >> ODIN/odin/src/test/resources/credentials.properties
 
       - name: Build with Gradle
         run: |
-          cd ${{ github.workspace }}/ODIN/odin
+          cd ODIN/odin
           ./gradlew build --warning-mode all
 
       - name: Run tests with Gradle
         run: |
-          cd ${{ github.workspace }}/ODIN/odin
-          ./grad
+          cd ODIN/odin
+          ./gradlew test
 
   # analyze:
   #   runs-on: ubuntu-latest
