@@ -2,7 +2,7 @@ name: Test, Analyze and Generate documentation
 
 on: 
   push:
-    branches: [ main ]
+    branches: [ main, addingDataResourceFlow ]
 
 jobs:  
   test:
