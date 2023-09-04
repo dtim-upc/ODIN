@@ -28,14 +28,10 @@ jobs:
           ls -la
           cd ODIN
           ls -la
-          cd odin
-          ls -la
 
       - name: Grant execute permission to gradlew
         run: |
-          cd ODIN
-          cd odin
-          chmod +x ./gradlew
+          chmod +x ODIN/gradlew
 
       - name: Create test file
         run: |
