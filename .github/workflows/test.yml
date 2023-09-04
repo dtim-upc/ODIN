@@ -38,12 +38,10 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          cd ODIN/odin
           api/gradlew build --warning-mode all
 
       - name: Run tests with Gradle
         run: |
-          cd ODIN/odin
           api/gradlew test
 
   # analyze:
