@@ -8,7 +8,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -20,13 +21,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ODIN/odin/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('ODIN/**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('ODIN/odin/**/*.gradle') }}
 
       - name: Debugging
         run: |
           pwd
           ls -la
-          cd ODIN
+          cd ODIN/odin
           ls -la
 
       - name: Grant execute permission to gradlew
