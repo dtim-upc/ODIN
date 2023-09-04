@@ -13,8 +13,8 @@
           <q-btn unelevated v-if="view === 'datasources'" padding="none" color="primary700" icon="add"
                  @click="addDataSource = true"/>
         </div>
-
       </template>
+
       <!-- storeDS.selected.filter(v => (v.graphicalGraph || v.type == "INTEGRATED")).length != 2 -->
       <template v-slot:top-right="props">
         <q-btn v-if="!integrationStore.isDSEmpty" outline

@@ -8,8 +8,8 @@
       <template v-slot:top-left="">
         <div class="q-table__title">
           {{ title }}
-          <q-btn unelevated v-if="view === 'datasources'" padding="none" color="primary700" icon="add"
-                 @click="addDataSource = true"/>
+          <q-btn unelevated v-if="view === 'repositories'" padding="none" color="primary700" icon="add"
+                 @click="addDataRepository = true"/>
         </div>
       </template>
 
@@ -109,7 +109,7 @@
 
     </q-table>
 
-    <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
+    <FormNewDataSource v-model:show="addDataRepository"></FormNewDataSource>
 
   </div>
 </template>
@@ -146,7 +146,7 @@ const title = "Repositories";
 const search = ref("")
 const visibleColumns = ["id", "repositoryName", "actions", "expand"]; // Columns to be displayed
 
-const addDataSource = ref(false)
+const addDataRepository = ref(false)
 
 const rows = computed(() => {
   return storeDS.repositories.map((repo) => {
