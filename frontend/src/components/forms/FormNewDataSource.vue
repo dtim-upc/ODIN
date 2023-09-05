@@ -66,6 +66,7 @@
               use-chips
 
               counter
+              :counter-label="counterLabelFunction"
             >
               <template v-slot:prepend>
                 <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
@@ -99,12 +100,17 @@
   </q-dialog>
 </template>
 
+
 <script setup>
 import {ref, reactive, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
+
+function counterLabelFunction({filesNumber, maxFiles, totalSize}){
+  return `${filesNumber} files of ${totalSize}`
+}
 
 // -------------------------------------------------------------
 //                         PROPS & EMITS
