@@ -50,7 +50,7 @@
               type="file"
               v-if="isLocalFileOptionSelected"
               ref="fileds"
-              outlined
+
               v-model="uploadedFiles"
               auto-expand
               :label="fileInputLabel"
@@ -61,6 +61,7 @@
               :rules="fileRules"
               @update:modelValue="updateUploadedFiles"
               multiple
+              append
 
               clearable
               use-chips
