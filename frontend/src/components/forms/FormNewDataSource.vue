@@ -47,6 +47,7 @@
 
             <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
             <q-file
+              type="file"
               v-if="isLocalFileOptionSelected"
               ref="fileds"
               outlined
@@ -60,6 +61,11 @@
               :rules="fileRules"
               @update:modelValue="updateUploadedFiles"
               multiple
+
+              clearable
+              use-chips
+
+              counter
             >
               <template v-slot:prepend>
                 <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
@@ -210,7 +216,6 @@ const onSubmit = () => {
   integrationStore.addDataSource(route.params.id, data, successCallback)
 }
 
-
 const successCallback = (datasource) => {
 
   console.log("success callback")
@@ -226,38 +231,19 @@ const successCallback = (datasource) => {
 }
 
 
-// Computed property to determine the rules for the q-file component based on the selected DataSourceType
+// Computed property para determinar las reglas para el componente <q-file> -->
 const fileRules = computed(() => {
-  if (DataSourceType.value === 'Single file') {
-    return [(val) => (val && val.name !== '') || 'Please upload a file'];
-  } else if (DataSourceType.value === 'Local file/s') {
-    return [(val) => val && val.length > 0 || 'Please upload at least one file'];
-  } else if (DataSourceType.value === 'Directory') {
-    return [(val) => (val && val.length > 0) || 'Please select a directory'];
-  } else {
-    // For other DataSourceType values, no specific rules are required
-    return [];
-  }
+  return [(val) => (val && val.length > 0) || 'Please upload at least one file or folder'];
 });
 
-// Computed property to determine the label for the q-file component based on the selected DataSourceType
+// Computed property para determinar la etiqueta del componente <q-file> -->
 const fileInputLabel = computed(() => {
-  if (DataSourceType.value === 'Local file/s') {
-    return 'Select one or more files to import.';
-  } else {
-    // For other DataSourceType values, no specific label is required
-    return 'Select files to import.';
-  }
+  return 'Select files or folders to import.';
 });
 
 // Computed property to determine the accept attribute for the q-file component based on the selected DataSourceType
 const fileAccept = computed(() => {
-  if (DataSourceType.value === 'Local file/s') {
-    return '.csv, application/json';
-  } else {
-    // For other DataSourceType values, any file type is accepted
-    return '';
-  }
+
 });
 
 const maxFilesValue = ref(undefined);
@@ -287,6 +273,7 @@ const databasePassword = ref('');
 const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local file/s');
 
 </script>
+
 
 <style lang="scss">
 .fileBoxLabel {
