@@ -71,6 +71,11 @@
             >
               <template v-slot:prepend>
                 <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
+                <q-icon
+                  name="folder"
+                  class="interactive-icon"
+                  @click="openDirectoryPicker"
+                />
               </template>
             </q-file>
 
@@ -108,6 +113,57 @@ import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
+// Función para abrir el selector de directorios
+const openDirectoryPicker = () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.webkitdirectory = 'webkitdirectory'; // Esto permite seleccionar directorios
+  input.addEventListener('change', handleDirectorySelection);
+  input.click();
+}
+
+// Función para manejar la selección de directorios
+const handleDirectorySelection = async (event) => {
+  const selectedFiles = event.target.files;
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+
+    if (file.isDirectory) {
+      await processDirectory(file);
+    } else {
+      // Es un archivo, agrégalo a la lista
+      uploadedFiles.value.push(file);
+    }
+  }
+};
+
+const processDirectory = async (directory) => {
+  const directoryReader = directory.createReader();
+
+  const readEntriesRecursively = async (reader) => {
+    const entries = await new Promise((resolve) => reader.readEntries(resolve));
+
+    if (entries.length === 0) {
+      return;
+    }
+
+    for (const entry of entries) {
+      if (entry.isDirectory) {
+        await readEntriesRecursively(entry.createReader());
+      } else {
+        // Es un archivo, agrégalo a la lista
+        uploadedFiles.value.push(entry);
+      }
+    }
+
+    await readEntriesRecursively(reader);
+  };
+
+  await readEntriesRecursively(directoryReader);
+};
+
+
 
 function counterLabelFunction({filesNumber, maxFiles, totalSize}){
   return `${filesNumber} files of ${totalSize}`
