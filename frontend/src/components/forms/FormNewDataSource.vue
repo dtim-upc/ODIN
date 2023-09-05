@@ -265,6 +265,8 @@ const onReset = () => {
 
 const onSubmit = () => {
   const data = new FormData();
+  console.log("Contenido de uploadedFiles:", uploadedFiles.value);
+
 
   data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
@@ -273,6 +275,7 @@ const onSubmit = () => {
 
   // Append all files as an array under the key 'attach_files'
   uploadedFiles.value.forEach((file) => {
+    console.log("Archivo que se va a agregar:", file);
     data.append('attach_files', file);
   });
 

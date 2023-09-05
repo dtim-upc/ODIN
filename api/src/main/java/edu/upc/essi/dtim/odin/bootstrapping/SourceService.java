@@ -68,12 +68,11 @@ public class SourceService {
     }
 
     /**
-     * Stores a multipart file in the specified disk path and returns the absolute path of the file.
+     * Stores a multipart file in the specified disk path with a modified filename and returns the absolute path of the file.
      *
      * @param multipartFile The multipart file to store.
      * @return The absolute path of the stored file.
-     * @throws RuntimeException if the file is empty, cannot be stored outside the current directory,
-     *                          or an error occurs during the file storage process.
+     * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
      */
     public String reconstructFile(MultipartFile multipartFile) {
         try {
@@ -90,18 +89,17 @@ public class SourceService {
                 sb.append(characters.charAt(randomIndex));
             }
 
-            String filename = sb + "_" + multipartFile.getOriginalFilename();
+            String originalFilename = multipartFile.getOriginalFilename();
+            String modifiedFilename = "_" + sb + "_" + originalFilename;
 
             // Get the disk path from the app configuration
             Path diskPath = Path.of(appConfig.getDiskPath());
 
-            // Resolve the destination file path using the disk path and the generated filename
-            Path destinationFile = diskPath.resolve(Paths.get(filename));
+            // Resolve the destination file path using the disk path and the modified filename
+            Path destinationFile = diskPath.resolve(Paths.get(modifiedFilename));
 
-            // Perform a security check to ensure that the destination file is within the disk path
-            if (!destinationFile.getParent().equals(diskPath)) {
-                throw new RuntimeException("Cannot store file outside the current directory.");
-            }
+            // Create parent directories if they don't exist
+            Files.createDirectories(destinationFile.getParent());
 
             // Copy the input stream of the multipart file to the destination file
             try (InputStream inputStream = multipartFile.getInputStream()) {
@@ -115,6 +113,7 @@ public class SourceService {
             throw new RuntimeException("Failed to store file.", e);
         }
     }
+
 
 
     /**
