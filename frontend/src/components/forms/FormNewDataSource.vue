@@ -60,6 +60,7 @@
               lazy-rules
               :rules="fileRules"
               @update:modelValue="updateUploadedFiles"
+              borderless
               multiple
               append
 
