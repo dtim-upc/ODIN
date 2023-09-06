@@ -72,11 +72,11 @@
             >
               <template v-slot:prepend>
                 <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
-                <q-icon
-                  name="folder"
-                  class="interactive-icon"
-                  @click="openDirectoryPicker"
-                />
+                <q-icon name="folder" class="interactive-icon" @click="openDirectoryPicker"/>
+              </template>
+              <template v-slot:label>
+                <label class="fileLabel">Upload files</label><br>
+                <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a folder</a>
               </template>
             </q-file>
 
@@ -165,8 +165,7 @@ const processDirectory = async (directory) => {
 };
 
 
-
-function counterLabelFunction({filesNumber, maxFiles, totalSize}){
+function counterLabelFunction({filesNumber, maxFiles, totalSize}) {
   return `${filesNumber} files of ${totalSize}`
 }
 
@@ -308,6 +307,10 @@ const fileInputLabel = computed(() => {
   return 'Select files or folders to import.';
 });
 
+const folderInputLabel = computed(() => {
+  return 'Or select a folder';
+});
+
 // Computed property to determine the accept attribute for the q-file component based on the selected DataSourceType
 const fileAccept = computed(() => {
 
@@ -403,8 +406,18 @@ const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local
 
 
   }
+}
 
+.fileLabel {
+  font-size: 22px; /* Cambia el tamaño de la fuente según tus preferencias */
+  margin-bottom: 10px; /* Espacio entre la etiqueta y el texto richText */
+}
 
+.richText {
+  font-size: 16px;
+  color: grey; /* Color del texto richText, puedes cambiarlo según tu preferencia */
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 
