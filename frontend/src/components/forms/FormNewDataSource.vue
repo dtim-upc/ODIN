@@ -76,9 +76,63 @@
               </template>
               <template v-slot:label>
                 <label class="fileLabel">Upload files</label><br>
-                <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a folder</a>
+                <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a
+                  folder</a>
               </template>
             </q-file>
+
+            <!-- Botón personalizado con dos columnas -->
+            <q-card-section v-if="isLocalFileOptionSelected">
+              <div class="uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
+                <div class="uploader__empty-state-column">
+                  <svg viewBox="0 0 72 72" role="img" aria-label="Subir archivos">
+                    <path
+                      d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
+                      fill="#5268ff" fill-rule="nonzero"></path>                  </svg>
+                </div>
+                <div class="uploader__empty-state-column">
+                  <div class="uploader__empty-state-text">
+                    <h2>Subir archivos</h2>
+                    <button class="uploader__sub-title uploader__directories-dialog-trigger">O selecciona una carpeta</button>
+                  </div>
+                </div>
+              </div>
+
+
+              <label for="fileInput" class="q-btn q-btn-item q-btn-sm round q-mr-md">
+                <q-row justify="left" align="center">
+                  <!-- Columna 1: Icono de suma en un círculo -->
+                  <q-col cols="auto">
+                    <input
+                      id="fileInput"
+                      type="file"
+                      style="display: none"
+                      multiple
+                      accept="*"
+                      @change="handleDirectorySelection"
+                    />
+                    <q-btn
+                      icon="add"
+                      round
+                      color="primary"
+                      size="sm"
+                      class="q-mr-md"
+                      @click="openFilePicker"
+                      @change="updateUploadedFiles"
+                    ></q-btn>
+                  </q-col>
+                  <!-- Columna 2: Texto "Upload files" y botón "Or select a folder" -->
+                  <q-col cols="auto">
+                    <div class="text-h6">Upload files</div>
+                    <q-btn
+                      label="Or select a folder"
+                      color="primary"
+                      @click.prevent="openDirectoryPicker"
+                    />
+                  </q-col>
+                </q-row>
+              </label>
+            </q-card-section>
 
             <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
             <q-card-section v-else>
@@ -120,6 +174,13 @@ const openDirectoryPicker = () => {
   input.type = 'file';
   input.webkitdirectory = 'webkitdirectory'; // Esto permite seleccionar directorios
   input.addEventListener('change', handleDirectorySelection);
+  input.click();
+}
+
+const openFilePicker = () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.addEventListener('change', updateUploadedFiles);
   input.click();
 }
 
@@ -345,7 +406,7 @@ const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 .fileBoxLabel {
 
   margin: 0;
@@ -420,5 +481,44 @@ const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local
   text-decoration: underline;
 }
 
+.q-dialog {
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 400;
+  font-family: Actief Grotesque Normal,-apple-system,\.SFNSText-Regular,San Francisco,Roboto,Segoe UI,Helvetica Neue,Lucida Grande,sans-serif;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: 0;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  padding: 0 1.25em;
+  min-height: 6.875em;
+}
+
+.uploader__empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.uploader__empty-state-column {
+  flex: 1; /* Esto asegura que ambas columnas ocupen un espacio igual */
+  padding: 10px; /* Añade un espacio entre las columnas si es necesario */
+}
+
+/* Estilo adicional para el contenido SVG en la primera columna */
+.uploader__empty-state-column svg {
+  width: 100%;
+  max-width: 50px; /* Ajusta el ancho máximo según tus preferencias */
+}
+/* Estilo adicional para el botón en la segunda columna */
+.uploader__sub-title {
+  background-color: #5268ff; /* Cambia el color de fondo según tus preferencias */
+  color: white; /* Cambia el color del texto según tus preferencias */
+  padding: 5px 10px; /* Ajusta el espaciado del botón según tus preferencias */
+  border: none; /* Quita el borde si es necesario */
+}
 
 </style>
