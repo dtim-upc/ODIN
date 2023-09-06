@@ -81,59 +81,6 @@
               </template>
             </q-file>
 
-            <!-- Botón personalizado con dos columnas -->
-            <q-card-section v-if="isLocalFileOptionSelected">
-              <div class="uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
-                <div class="uploader__empty-state-column">
-                  <svg viewBox="0 0 72 72" role="img" aria-label="Subir archivos">
-                    <path
-                      d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
-                      fill="#5268ff" fill-rule="nonzero"></path>                  </svg>
-                </div>
-                <div class="uploader__empty-state-column">
-                  <div class="uploader__empty-state-text">
-                    <h2>Subir archivos</h2>
-                    <button class="uploader__sub-title uploader__directories-dialog-trigger">O selecciona una carpeta</button>
-                  </div>
-                </div>
-              </div>
-
-
-              <label for="fileInput" class="q-btn q-btn-item q-btn-sm round q-mr-md">
-                <q-row justify="left" align="center">
-                  <!-- Columna 1: Icono de suma en un círculo -->
-                  <q-col cols="auto">
-                    <input
-                      id="fileInput"
-                      type="file"
-                      style="display: none"
-                      multiple
-                      accept="*"
-                      @change="handleDirectorySelection"
-                    />
-                    <q-btn
-                      icon="add"
-                      round
-                      color="primary"
-                      size="sm"
-                      class="q-mr-md"
-                      @click="openFilePicker"
-                      @change="updateUploadedFiles"
-                    ></q-btn>
-                  </q-col>
-                  <!-- Columna 2: Texto "Upload files" y botón "Or select a folder" -->
-                  <q-col cols="auto">
-                    <div class="text-h6">Upload files</div>
-                    <q-btn
-                      label="Or select a folder"
-                      color="primary"
-                      @click.prevent="openDirectoryPicker"
-                    />
-                  </q-col>
-                </q-row>
-              </label>
-            </q-card-section>
-
             <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
             <q-card-section v-else>
               <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
@@ -360,7 +307,7 @@ const successCallback = (datasource) => {
 
 // Computed property para determinar las reglas para el componente <q-file> -->
 const fileRules = computed(() => {
-  return [(val) => (val && val.length > 0) || 'Please upload at least one file or folder'];
+  return [(val) => (val && val.length > 0 ) || 'Please upload at least one file or folder'];
 });
 
 // Computed property para determinar la etiqueta del componente <q-file> -->
