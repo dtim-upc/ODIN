@@ -138,11 +138,14 @@ const handleDirectorySelection = async (event) => {
   for (let i = 0; i < selectedFiles.length; i++) {
     const file = selectedFiles[i];
 
-    if (file.isDirectory) {
-      await processDirectory(file);
-    } else {
-      // Es un archivo, agrégalo a la lista
-      uploadedFiles.value.push(file);
+    if (file) { // Comprobar si el archivo no es nulo
+      if (file.isDirectory) {
+        await processDirectory(file);
+      } else {
+        if (uploadedFiles.value == null) uploadedFiles.value = [];
+        // Es un archivo, agrégalo a la lista
+        uploadedFiles.value.push(file);
+      }
     }
   }
 };
@@ -267,7 +270,7 @@ const newDatasource = reactive({
 const uploadedFiles = ref([]);
 const DataSourceType = ref(options[0]);
 const onReset = () => {
-  uploadedFiles.value = null;
+  uploadedFiles.value = ref([]);
 }
 
 const onSubmit = () => {
@@ -287,6 +290,8 @@ const onSubmit = () => {
   });
 
   integrationStore.addDataSource(route.params.id, data, successCallback)
+  // Limpia la lista de archivos cargados después de enviar el formulario
+  uploadedFiles.value = ref([]);
 }
 
 const successCallback = (datasource) => {
@@ -305,7 +310,7 @@ const successCallback = (datasource) => {
 
 // Computed property para determinar las reglas para el componente <q-file> -->
 const fileRules = computed(() => {
-  return [(val) => (val && val.length > 0 ) || 'Please upload at least one file or folder'];
+  return [(val) => (val && val.length > 0) || 'Please upload at least one file or folder'];
 });
 
 
