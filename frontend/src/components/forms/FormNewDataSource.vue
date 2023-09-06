@@ -172,7 +172,6 @@ const processDirectory = async (directory) => {
   await readEntriesRecursively(directoryReader);
 };
 
-
 function counterLabelFunction({filesNumber, maxFiles, totalSize}) {
   return `${filesNumber} files of ${totalSize}`
 }
@@ -310,6 +309,7 @@ const fileRules = computed(() => {
   return [(val) => (val && val.length > 0 ) || 'Please upload at least one file or folder'];
 });
 
+
 // Computed property para determinar la etiqueta del componente <q-file> -->
 const fileInputLabel = computed(() => {
   return 'Select files or folders to import.';
@@ -427,45 +427,4 @@ const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local
   cursor: pointer;
   text-decoration: underline;
 }
-
-.q-dialog {
-  text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  font-weight: 400;
-  font-family: Actief Grotesque Normal,-apple-system,\.SFNSText-Regular,San Francisco,Roboto,Segoe UI,Helvetica Neue,Lucida Grande,sans-serif;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  box-sizing: border-box;
-  cursor: pointer;
-  outline: 0;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  padding: 0 1.25em;
-  min-height: 6.875em;
-}
-
-.uploader__empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.uploader__empty-state-column {
-  flex: 1; /* Esto asegura que ambas columnas ocupen un espacio igual */
-  padding: 10px; /* Añade un espacio entre las columnas si es necesario */
-}
-
-/* Estilo adicional para el contenido SVG en la primera columna */
-.uploader__empty-state-column svg {
-  width: 100%;
-  max-width: 50px; /* Ajusta el ancho máximo según tus preferencias */
-}
-/* Estilo adicional para el botón en la segunda columna */
-.uploader__sub-title {
-  background-color: #5268ff; /* Cambia el color de fondo según tus preferencias */
-  color: white; /* Cambia el color del texto según tus preferencias */
-  padding: 5px 10px; /* Ajusta el espaciado del botón según tus preferencias */
-  border: none; /* Quita el borde si es necesario */
-}
-
 </style>
