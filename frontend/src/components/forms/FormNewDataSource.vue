@@ -82,7 +82,26 @@
             </q-file>
 
             <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
-            <q-card-section v-else>
+            <q-card-section v-if="isRemoteFileOptionSelected">
+              <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
+              <q-input
+                v-if="isRemoteFileOptionSelected"
+                filled
+                v-model="remoteFileUrl"
+                label="Remote File URL"
+                lazy-rules
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
+              />
+              <q-btn
+                v-if="isRemoteFileOptionSelected"
+                label="Download Remote File"
+                color="primary"
+                @click="downloadRemoteFile"
+              />
+            </q-card-section>
+
+            <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
+            <q-card-section v-if="!isLocalFileOptionSelected && !isRemoteFileOptionSelected">
               <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
                        :rules="[(val) => !!val || 'Please enter the database host']"/>
               <q-input filled v-model="databaseUser" label="Database User" lazy-rules
@@ -115,6 +134,7 @@ import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
+import axios from "axios";
 // Función para abrir el selector de directorios
 const openDirectoryPicker = () => {
   const input = document.createElement('input');
@@ -174,6 +194,31 @@ const processDirectory = async (directory) => {
 
   await readEntriesRecursively(directoryReader);
 };
+
+const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
+
+const downloadRemoteFile = async () => {
+  if (remoteFileUrl.value) {
+    try {
+      const response = await axios.get(remoteFileUrl.value, { responseType: "blob" });
+      const fileBlob = response.data;
+
+      if (fileBlob instanceof Blob) {
+        // Agrega el archivo descargado a la lista de uploadedFiles
+        uploadedFiles.value.push(fileBlob);
+        // Limpia el campo de entrada de la URL del archivo remoto
+        remoteFileUrl.value = "";
+      } else {
+        console.error("La respuesta no es un blob válido");
+      }
+    } catch (error) {
+      console.error(error);
+      // Maneja los errores de la descarga aquí
+    }
+  }
+};
+
+
 
 function counterLabelFunction({filesNumber, maxFiles, totalSize}) {
   return `${filesNumber} files of ${totalSize}`
@@ -256,6 +301,7 @@ defineExpose({
 
 const options = [
   "Local file/s",
+  "Remote file/s",
   "SQL Database",
 ];
 
@@ -298,7 +344,7 @@ const successCallback = (datasource) => {
 
   console.log("success callback")
 
-  notify.positive(`Data Source ${datasource.datasetName} successfully uploaded`)
+  notify.positive(`Data Source ${datasource.datasetId} successfully uploaded`)
   onReset()
   form.value.resetValidation()
 
@@ -352,7 +398,9 @@ const databaseUser = ref('');
 const databasePassword = ref('');
 
 // Computed property to determine if "Local file/s" is selected
-const isLocalFileOptionSelected = computed(() => DataSourceType.value === 'Local file/s');
+const isLocalFileOptionSelected = computed(() => DataSourceType.value === options[0]);
+
+const isRemoteFileOptionSelected = computed(() => DataSourceType.value === options[1]);
 
 </script>
 
