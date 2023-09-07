@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="showS" @hide="props.show=false">
     <q-card style="width: 400px; max-width: 80vw">
-
+      <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
 
       <!-- Sección 1: Título -->
       <q-card-section>
@@ -130,7 +130,6 @@
       </div>
 
 
-      <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <!-- Botones del formulario -->
         <q-card-section>
           <div v-if="showFormButtons">
@@ -179,7 +178,7 @@ const handleDirectorySelection = async (event) => {
       if (file.isDirectory) {
         await processDirectory(file);
       } else {
-        if (uploadedFiles.value == null) uploadedFiles.value = [];
+        if (uploadedFiles.value == null) uploadedFiles.value = ref([]);
         // Es un archivo, agrégalo a la lista
         uploadedFiles.value.push(file);
       }
@@ -334,13 +333,14 @@ const newDatasource = reactive({
   repositoryName: '',
   datasetName: '',
   datasetDescription: '',
-})
+});
 
 
 const uploadedFiles = ref([]);
 const DataSourceType = ref(options[0]);
 const onReset = () => {
   uploadedFiles.value = ref([]);
+  DataSourceType.value = options[0];
 }
 
 const onSubmit = () => {
@@ -361,7 +361,8 @@ const onSubmit = () => {
 
   integrationStore.addDataSource(route.params.id, data, successCallback)
   // Limpia la lista de archivos cargados después de enviar el formulario
-  uploadedFiles.value = ref([]);
+
+  onReset();
 }
 
 const successCallback = (datasource) => {
@@ -411,6 +412,13 @@ watch(() => DataSourceType.value, () => {
   }
 });
 
+// Agrega un watcher para limpiar uploadedFiles cuando el formulario se muestra
+watch(showS, (show) => {
+  if (!show) {
+    // Si el formulario se cierra, limpia uploadedFiles
+    uploadedFiles.value = [];
+  }
+});
 
 // Add this method to update the uploadedFile value when the q-file component emits the update:modelValue event
 const updateUploadedFiles = (value) => {
