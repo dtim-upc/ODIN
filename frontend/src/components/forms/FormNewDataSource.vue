@@ -350,7 +350,7 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
   databasePassword.value = '';
   remoteFileUrl.value = '';
   createNewRepository.value = false;
-  
+
   uploadedFiles.value = ref([]);
   DataSourceType.value = options[0];
 }
@@ -396,6 +396,30 @@ const fileRules = computed(() => {
   return [(val) => (val && val.length > 0) || 'Please upload at least one file or folder'];
 });
 
+// Agrega este método en tu bloque <script setup>
+
+const autoSelectRepository = () => {
+  if (!createNewRepository.value && uploadedFiles.value.length > 0) {
+    const fileName = uploadedFiles.value[0].name; // Supongo que solo verificas el primer archivo
+    if (storeDS.repositories) { // Verifica si storeDS.repositories está definido
+      const matchingRepository = storeDS.repositories.find(repo => repo.repositoryName === fileName);
+      if (matchingRepository) {
+        createNewRepository.value = false;
+        newDatasource.repositoryId = matchingRepository.id;
+      }
+      else{
+        createNewRepository.value = true;
+        newDatasource.repositoryName = fileName;
+      }
+    }
+  }
+};
+
+// Agrega un watcher para ejecutar la función autoSelectRepository cada vez que se actualice uploadedFiles
+watch(uploadedFiles, () => {
+  autoSelectRepository();
+});
+
 
 // Computed property para determinar la etiqueta del componente <q-file> -->
 const fileInputLabel = computed(() => {
@@ -435,6 +459,8 @@ watch(showS, (show) => {
 // Add this method to update the uploadedFile value when the q-file component emits the update:modelValue event
 const updateUploadedFiles = (value) => {
   uploadedFiles.value = value;
+
+  if(value == null) uploadedFiles.value = [];
 }
 
 const databaseHost = ref('');
