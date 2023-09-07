@@ -338,7 +338,19 @@ const newDatasource = reactive({
 
 const uploadedFiles = ref([]);
 const DataSourceType = ref(options[0]);
-const onReset = () => {
+const onReset = () => {// Restablece los valores de los campos a su estado inicial
+  newDatasource.repositoryId = null;
+  newDatasource.repositoryName = '';
+  newDatasource.datasetName = '';
+  newDatasource.datasetDescription = '';
+  uploadedFiles.value = [];
+  DataSourceType.value = options[0];
+  databaseHost.value = '';
+  databaseUser.value = '';
+  databasePassword.value = '';
+  remoteFileUrl.value = '';
+  createNewRepository.value = false;
+  
   uploadedFiles.value = ref([]);
   DataSourceType.value = options[0];
 }
