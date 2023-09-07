@@ -176,39 +176,17 @@ const handleDirectorySelection = async (event) => {
 
     if (file) { // Comprobar si el archivo no es nulo
       if (file.isDirectory) {
-        await processDirectory(file);
+        //await processDirectory(file);
       } else {
         if (uploadedFiles.value == null) uploadedFiles.value = ref([]);
         // Es un archivo, agrégalo a la lista
         uploadedFiles.value.push(file);
+        // Establece el nombre de la carpeta como el nombre del repositorio
+        createNewRepository.value = true;
+        newDatasource.repositoryName = event.target.files[0].webkitRelativePath.substring(0, event.target.files[0].webkitRelativePath.indexOf('/'));
       }
     }
   }
-};
-
-const processDirectory = async (directory) => {
-  const directoryReader = directory.createReader();
-
-  const readEntriesRecursively = async (reader) => {
-    const entries = await new Promise((resolve) => reader.readEntries(resolve));
-
-    if (entries.length === 0) {
-      return;
-    }
-
-    for (const entry of entries) {
-      if (entry.isDirectory) {
-        await readEntriesRecursively(entry.createReader());
-      } else {
-        // Es un archivo, agrégalo a la lista
-        uploadedFiles.value.push(entry);
-      }
-    }
-
-    await readEntriesRecursively(reader);
-  };
-
-  await readEntriesRecursively(directoryReader);
 };
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
