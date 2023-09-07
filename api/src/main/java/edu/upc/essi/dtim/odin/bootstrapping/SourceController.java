@@ -20,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -46,26 +48,27 @@ public class SourceController {
     @GetMapping("/download")
     public ResponseEntity<ByteArrayResource> downloadFileFromURL(@RequestParam String url) {
         try {
+            // Parsea la URL para obtener el nombre del archivo
+            URL fileUrl = new URL(url);
+            String fileName = Paths.get(fileUrl.getPath()).getFileName().toString();
+
             // Realiza la solicitud HTTP y obtén el contenido del archivo
             byte[] fileContent = restTemplate.getForObject(url, byte[].class);
-            logger.warn("DESCARGA: " + url);
-
 
             if (fileContent != null && fileContent.length > 0) {
-                logger.info("ÉXITO DESCARGA");
-
-                // Configura los encabezados de la respuesta
+                // Configura los encabezados de la respuesta con el nombre del archivo
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                headers.setContentDispositionFormData("attachment", "nombre_archivo.ext");
+                headers.setContentDispositionFormData("attachment", fileName); // Establece el nombre del archivo
 
-                // Crea una ByteArrayResource a partir del contenido del archivo
+                // Crea un objeto ByteArrayResource a partir del contenido del archivo
                 ByteArrayResource resource = new ByteArrayResource(fileContent);
 
-                // Devuelve la respuesta con el archivo
-                return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+                // Devuelve la respuesta con el archivo como MultipartFile
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(resource);
             } else {
-                logger.error("DESCARGA FALLIDA: " + url);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
         } catch (Exception e) {

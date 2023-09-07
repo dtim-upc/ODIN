@@ -45,6 +45,15 @@
               class="q-mt-none"
             />
 
+            <!-- Sección 4: Lista de archivos cargados -->
+            <q-card-section v-if="uploadedFiles.length > 0">
+              <div class="text-h6">Uploaded Files</div>
+              <ul>
+                <li v-for="(file, index) in uploadedFiles" :key="index">{{ file.name }}</li>
+              </ul>
+            </q-card-section>
+
+
             <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
             <q-file
               type="file"
@@ -202,22 +211,27 @@ async function downloadFile() {
   let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
   try {
     const response = await odinApi.get(`/download?url=${encodeURIComponent(url)}`, {
-      responseType: 'blob',
+      responseType: 'arraybuffer', // Cambia el tipo de respuesta a 'arraybuffer'
     });
 
-    // Crear un objeto URL para el blob y abrirlo en una nueva ventana o descargarlo
-    const blob = new Blob([response.data]);
-    const urlObject = window.URL.createObjectURL(blob);
+    const contentDisposition = response.headers['content-disposition'];
+    let filename;
 
-    const link = document.createElement('a');
-    link.href = urlObject;
-    link.target = '_blank'; // Abre el enlace en una nueva ventana
-    link.download = 'nombre_archivo.ext'; // Establece el nombre del archivo
+    if (contentDisposition) {
+      // Si el encabezado content-disposition existe, obtén el nombre del archivo
+      filename = contentDisposition.split(';')[1].trim().split('=')[1];
+    } else {
+      // Si el encabezado no existe, intenta obtener el nombre del archivo de la URL
+      const urlParts = url.split('/');
+      filename = urlParts[urlParts.length - 1];
+    }
 
-    link.click();
+    // Crea un nuevo objeto File a partir de la respuesta
+    const blob = new Blob([response.data], { type: 'application/octet-stream' });
+    const file = new File([blob], filename, { type: 'application/octet-stream' });
 
-    // Libera el objeto URL creado
-    window.URL.revokeObjectURL(urlObject);
+    // Agrega el archivo a la lista uploadedFiles
+    uploadedFiles.value.push(file);
   } catch (error) {
     console.error('Error al descargar el archivo:', error);
   }
