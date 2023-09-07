@@ -1,15 +1,107 @@
 <template>
   <q-dialog v-model="showS" @hide="props.show=false">
     <q-card style="width: 400px; max-width: 80vw">
+
+      <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+
       <!-- Sección 1: Título -->
       <q-card-section>
         <div class="text-h5">Create new dataset</div>
       </q-card-section>
 
-      <!-- Sección 2: Información del Repositorio -->
+      <!-- Sección 2: Información del Conjunto de Datos -->
+      <q-card-section>
+        <div class="text-h6">Dataset information</div>
+        <!-- Tipo de origen de datos -->
+        <q-select
+          v-model="DataSourceType"
+          :options="options"
+          label="Type"
+          class="q-mt-none"
+        />
+
+        <!-- Sección 4: Lista de archivos cargados -->
+        <q-card-section v-if="uploadedFiles.length > 0">
+          <div class="text-h6">Uploaded Files</div>
+          <ul>
+            <li v-for="(file, index) in uploadedFiles" :key="index">{{ file.name }}</li>
+          </ul>
+        </q-card-section>
+
+
+        <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
+        <q-file
+          type="file"
+          v-if="isLocalFileOptionSelected"
+          ref="fileds"
+
+          v-model="uploadedFiles"
+          auto-expand
+          :label="fileInputLabel"
+          :headers="{ 'content-type': 'multipart/form-data' }"
+          :accept="fileAccept"
+          :max-files="maxFilesValue"
+          lazy-rules
+          :rules="fileRules"
+          @update:modelValue="updateUploadedFiles"
+          borderless
+          multiple
+          append
+
+          clearable
+          use-chips
+
+          counter
+          :counter-label="counterLabelFunction"
+        >
+          <template v-slot:prepend>
+            <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
+            <q-icon name="folder" class="interactive-icon" @click="openDirectoryPicker"/>
+          </template>
+          <template v-slot:label>
+            <label class="fileLabel">Upload files</label><br>
+            <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a
+              folder</a>
+          </template>
+        </q-file>
+
+        <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
+        <q-card-section v-if="isRemoteFileOptionSelected">
+          <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
+          <q-input
+            v-if="isRemoteFileOptionSelected"
+            filled
+            v-model="remoteFileUrl"
+            label="Remote File URL"
+            lazy-rules
+            :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
+          />
+          <q-btn
+            v-if="isRemoteFileOptionSelected"
+            label="Download Remote File"
+            color="primary"
+            @click="downloadFile"
+          />
+        </q-card-section>
+
+        <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
+        <q-card-section v-if="!isLocalFileOptionSelected && !isRemoteFileOptionSelected">
+          <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
+                   :rules="[(val) => !!val || 'Please enter the database host']"/>
+          <q-input filled v-model="databaseUser" label="Database User" lazy-rules
+                   :rules="[(val) => !!val || 'Please enter the database user']"/>
+          <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
+          <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
+        </q-card-section>
+
+        <!-- Descripción del conjunto de datos (opcional) -->
+        <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
+      </q-card-section>
+
+      <!-- Sección 3: Información del Repositorio -->
       <q-card-section>
         <div class="text-h6">Repository information</div>
-        <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+
           <q-card-section>
             <q-checkbox v-model="createNewRepository" label="Create new repository"
                         :disable="storeDS.repositories.length === 0"/>
@@ -33,105 +125,16 @@
               @input="onRepositoryChange"
             />
           </q-card-section>
-
-          <!-- Sección 3: Información del Conjunto de Datos -->
-          <q-card-section>
-            <div class="text-h6">Dataset information</div>
-            <!-- Tipo de origen de datos -->
-            <q-select
-              v-model="DataSourceType"
-              :options="options"
-              label="Type"
-              class="q-mt-none"
-            />
-
-            <!-- Sección 4: Lista de archivos cargados -->
-            <q-card-section v-if="uploadedFiles.length > 0">
-              <div class="text-h6">Uploaded Files</div>
-              <ul>
-                <li v-for="(file, index) in uploadedFiles" :key="index">{{ file.name }}</li>
-              </ul>
-            </q-card-section>
-
-
-            <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
-            <q-file
-              type="file"
-              v-if="isLocalFileOptionSelected"
-              ref="fileds"
-
-              v-model="uploadedFiles"
-              auto-expand
-              :label="fileInputLabel"
-              :headers="{ 'content-type': 'multipart/form-data' }"
-              :accept="fileAccept"
-              :max-files="maxFilesValue"
-              lazy-rules
-              :rules="fileRules"
-              @update:modelValue="updateUploadedFiles"
-              borderless
-              multiple
-              append
-
-              clearable
-              use-chips
-
-              counter
-              :counter-label="counterLabelFunction"
-            >
-              <template v-slot:prepend>
-                <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
-                <q-icon name="folder" class="interactive-icon" @click="openDirectoryPicker"/>
-              </template>
-              <template v-slot:label>
-                <label class="fileLabel">Upload files</label><br>
-                <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a
-                  folder</a>
-              </template>
-            </q-file>
-
-            <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
-            <q-card-section v-if="isRemoteFileOptionSelected">
-              <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
-              <q-input
-                v-if="isRemoteFileOptionSelected"
-                filled
-                v-model="remoteFileUrl"
-                label="Remote File URL"
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
-              />
-              <q-btn
-                v-if="isRemoteFileOptionSelected"
-                label="Download Remote File"
-                color="primary"
-                @click="downloadFile"
-              />
-            </q-card-section>
-
-            <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
-            <q-card-section v-if="!isLocalFileOptionSelected && !isRemoteFileOptionSelected">
-              <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
-                       :rules="[(val) => !!val || 'Please enter the database host']"/>
-              <q-input filled v-model="databaseUser" label="Database User" lazy-rules
-                       :rules="[(val) => !!val || 'Please enter the database user']"/>
-              <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
-              <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
-            </q-card-section>
-
-            <!-- Descripción del conjunto de datos (opcional) -->
-            <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
-          </q-card-section>
-
-          <!-- Botones del formulario -->
-          <q-card-section>
-            <div v-if="showFormButtons">
-              <q-btn label="Submit" type="submit" color="primary"/>
-              <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup/>
-            </div>
-          </q-card-section>
-        </q-form>
       </q-card-section>
+
+        <!-- Botones del formulario -->
+        <q-card-section>
+          <div v-if="showFormButtons">
+            <q-btn label="Submit" type="submit" color="primary"/>
+            <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup/>
+          </div>
+        </q-card-section>
+      </q-form>
     </q-card>
   </q-dialog>
 </template>
