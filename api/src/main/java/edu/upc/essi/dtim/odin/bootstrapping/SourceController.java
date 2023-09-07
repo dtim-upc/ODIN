@@ -3,17 +3,18 @@ package edu.upc.essi.dtim.odin.bootstrapping;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.odin.project.Project;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,6 +39,41 @@ public class SourceController {
     SourceController(@Autowired SourceService sourceService) {
         this.sourceService = sourceService;
     }
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/download")
+    public ResponseEntity<ByteArrayResource> downloadFileFromURL(@RequestParam String url) {
+        try {
+            // Realiza la solicitud HTTP y obtén el contenido del archivo
+            byte[] fileContent = restTemplate.getForObject(url, byte[].class);
+            logger.warn("DESCARGA: " + url);
+
+
+            if (fileContent != null && fileContent.length > 0) {
+                logger.info("ÉXITO DESCARGA");
+
+                // Configura los encabezados de la respuesta
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", "nombre_archivo.ext");
+
+                // Crea una ByteArrayResource a partir del contenido del archivo
+                ByteArrayResource resource = new ByteArrayResource(fileContent);
+
+                // Devuelve la respuesta con el archivo
+                return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+            } else {
+                logger.error("DESCARGA FALLIDA: " + url);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 
     /**
      * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.

@@ -96,7 +96,7 @@
                 v-if="isRemoteFileOptionSelected"
                 label="Download Remote File"
                 color="primary"
-                @click="downloadRemoteFile"
+                @click="downloadFile"
               />
             </q-card-section>
 
@@ -135,6 +135,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
 import axios from "axios";
+import {odinApi} from "../../boot/axios";
 // Función para abrir el selector de directorios
 const openDirectoryPicker = () => {
   const input = document.createElement('input');
@@ -197,28 +198,30 @@ const processDirectory = async (directory) => {
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
 
-const downloadRemoteFile = async () => {
-  if (remoteFileUrl.value) {
-    try {
-      const response = await axios.get(remoteFileUrl.value, { responseType: "blob" });
-      const fileBlob = response.data;
+async function downloadFile() {
+  let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
+  try {
+    const response = await odinApi.get(`/download?url=${encodeURIComponent(url)}`, {
+      responseType: 'blob',
+    });
 
-      if (fileBlob instanceof Blob) {
-        // Agrega el archivo descargado a la lista de uploadedFiles
-        uploadedFiles.value.push(fileBlob);
-        // Limpia el campo de entrada de la URL del archivo remoto
-        remoteFileUrl.value = "";
-      } else {
-        console.error("La respuesta no es un blob válido");
-      }
-    } catch (error) {
-      console.error(error);
-      // Maneja los errores de la descarga aquí
-    }
+    // Crear un objeto URL para el blob y abrirlo en una nueva ventana o descargarlo
+    const blob = new Blob([response.data]);
+    const urlObject = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = urlObject;
+    link.target = '_blank'; // Abre el enlace en una nueva ventana
+    link.download = 'nombre_archivo.ext'; // Establece el nombre del archivo
+
+    link.click();
+
+    // Libera el objeto URL creado
+    window.URL.revokeObjectURL(urlObject);
+  } catch (error) {
+    console.error('Error al descargar el archivo:', error);
   }
-};
-
-
+}
 
 function counterLabelFunction({filesNumber, maxFiles, totalSize}) {
   return `${filesNumber} files of ${totalSize}`

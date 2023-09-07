@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @PropertySource("classpath:credentials.properties")
@@ -17,5 +19,10 @@ public class OdinApplication {
 
 		// Registra un mensaje en el registro de eventos cuando la aplicación se inicia correctamente
 		logger.info("Application started. Ready to receive API requests.");
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 }
