@@ -17,12 +17,14 @@
             <div class="uploaded-items-list">
               <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item"
                    @mouseover="showSpecialButton(index)" @mouseleave="hideSpecialButton(index)">
+
+                <div class="special-button special-button-hidden" >
+                  <q-button @click="removeUploadedItem(index)" flat round>
+                    <q-icon name="close" size="1em" color="red"/>
+                  </q-button>
+                </div>
+
                 <template v-if="item.files === undefined">
-                  <div class="special-button">
-                    <q-button @click="removeUploadedItem(index)" flat round>
-                      <q-icon name="close" size="1em" color="red"/>
-                    </q-button>
-                  </div>
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -35,11 +37,6 @@
                 </template>
 
                 <template v-else>
-                  <div class="special-button">
-                    <q-button @click="removeUploadedItem(index)" flat round>
-                      <q-icon name="close" size="1em" color="red"/>
-                    </q-button>
-                  </div>
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -291,12 +288,12 @@ const onRepositoryChange = () => {
 }
 
 const showSpecialButton = (index) => {
-  const specialButton = document.querySelectorAll('.uploaded-item .special-button')[index];
+  const specialButton = document.querySelectorAll('.special-button')[index];
   specialButton.classList.remove('special-button-hidden');
 }
 
 const hideSpecialButton = (index) => {
-  const specialButton = document.querySelectorAll('.uploaded-item .special-button')[index];
+  const specialButton = document.querySelectorAll('.special-button')[index];
   specialButton.classList.add('special-button-hidden');
 }
 
@@ -494,7 +491,6 @@ watch(uploadedItems, () => {
   autoSelectRepository();
 });
 
-
 const maxFilesValue = ref(undefined);
 
 // Watcher to update maxFilesValue whenever the DataSourceType changes
@@ -633,7 +629,7 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 }
 
 /* Estilos para el botón especial */
-.special-button q-button {
+.special-button {
   cursor: pointer;
 }
 
