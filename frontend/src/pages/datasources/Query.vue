@@ -114,8 +114,7 @@
         </q-card-section> -->
 
         <q-card-section>
-
-          <TableQueryResult :columns="columns" :rows="rows" :no_shadow=true/>
+          <TableQueryResult :columns="columns" :rows="rows" :no_shadow=true />
         </q-card-section>
 
         <q-card-actions align="right">
