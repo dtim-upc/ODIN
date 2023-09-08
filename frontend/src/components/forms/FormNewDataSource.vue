@@ -396,8 +396,7 @@ const onSubmit = () => {
     }
   });
 
-  integrationStore.addDataSource(route.params.id, data, successCallback)
-  // Limpia la lista de archivos cargados después de enviar el formulario
+  integrationStore.addDataSource(route.params.id, data, successCallback);
 
   onReset();
 }
