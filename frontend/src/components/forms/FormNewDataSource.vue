@@ -28,7 +28,7 @@
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
-                      {{ item.size }} ·
+                      {{ formatFileSize(item.size) }} ·
                     </span>
                     <span class="file-system-entry__detail">
                       {{ item.type }}
@@ -461,6 +461,17 @@ const handleFolderUpload = (event) => {
 
   uploadedItems.value.push(folderInfo);
   autoSelectRepository();
+};
+
+// Función para dar formato al tamaño del archivo con unidades
+const formatFileSize = (size) => {
+  if (size < 1024) {
+    return `${size} Bytes`;
+  } else if (size < 1024 * 1024) {
+    return `${Math.round(size / 1024)} KB`;
+  } else {
+    return `${Math.round(size / (1024 * 1024))} MB`;
+  }
 };
 
 const removeUploadedItem = (index) => {
