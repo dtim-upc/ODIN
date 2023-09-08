@@ -198,46 +198,6 @@
   </q-dialog>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      uploadedItems: [],
-    };
-  },
-  methods: {
-    triggerFileUpload() {
-      this.$refs.fileUpload.click();
-    },
-    triggerFolderUpload() {
-      this.$refs.folderUpload.click();
-    },
-    handleFileUpload(event) {
-      const files = Array.from(event.target.files);
-      this.uploadedItems.push(...files);
-    },
-    handleFolderUpload(event) {
-      const folder = event.target.files[0].webkitRelativePath.substring(0, event.target.files[0].webkitRelativePath.indexOf('/'));
-      const files = Array.from(event.target.files);
-      // Handle folder selection
-      const folderInfo = {
-        type: 'folder',
-        name: folder,
-        files: files, // Array to store files in the folder
-        totalSize: 0, // Total size of files in the folder
-      };
-
-      files.forEach((file) => {
-        folderInfo.totalSize += file.size;
-      });
-
-      this.uploadedItems.push(folderInfo);
-    }
-  }
-}
-</script>
-
-
 <script setup>
 import {ref, reactive, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
@@ -246,43 +206,7 @@ import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
 import axios from "axios";
 import {odinApi} from "../../boot/axios";
-// Función para abrir el selector de directorios
-const openDirectoryPicker = () => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.webkitdirectory = 'webkitdirectory'; // Esto permite seleccionar directorios
-  input.addEventListener('change', handleDirectorySelection);
-  input.click();
-}
 
-const openFilePicker = () => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.addEventListener('change', updateUploadedFiles);
-  input.click();
-}
-
-// Función para manejar la selección de directorios
-const handleDirectorySelection = async (event) => {
-  const selectedFiles = event.target.files;
-
-  for (let i = 0; i < selectedFiles.length; i++) {
-    const file = selectedFiles[i];
-
-    if (file) { // Comprobar si el archivo no es nulo
-      if (file.isDirectory) {
-        //await processDirectory(file);
-      } else {
-        if (uploadedFiles.value == null) uploadedFiles.value = ref([]);
-        // Es un archivo, agrégalo a la lista
-        uploadedFiles.value.push(file);
-        // Establece el nombre de la carpeta como el nombre del repositorio
-        createNewRepository.value = true;
-        newDatasource.repositoryName = event.target.files[0].webkitRelativePath.substring(0, event.target.files[0].webkitRelativePath.indexOf('/'));
-      }
-    }
-  }
-};
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
 
@@ -314,10 +238,6 @@ async function downloadFile() {
   } catch (error) {
     console.error('Error al descargar el archivo:', error);
   }
-}
-
-function counterLabelFunction({filesNumber, maxFiles, totalSize}) {
-  return `${filesNumber} files of ${totalSize}`
 }
 
 // -------------------------------------------------------------
@@ -408,7 +328,7 @@ const newDatasource = reactive({
   datasetDescription: '',
 });
 
-
+const uploadedItems = ref([]);
 const uploadedFiles = ref([]);
 const DataSourceType = ref(options[0]);
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
@@ -424,7 +344,7 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
   remoteFileUrl.value = '';
   createNewRepository.value = false;
 
-  this.uploadedItems.value = ref([]);
+  uploadedItems.value = []; // Vacía la lista de archivos cargados
 
   uploadedFiles.value = ref([]);
   DataSourceType.value = options[0];
@@ -441,9 +361,18 @@ const onSubmit = () => {
   data.append("repositoryId", newDatasource.repositoryId === null || createNewRepository.value ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
 
   // Append all files as an array under the key 'attach_files'
-  uploadedFiles.value.forEach((file) => {
-    console.log("Archivo que se va a agregar:", file);
-    data.append('attach_files', file);
+  uploadedItems.value.forEach((item) => {
+    console.log("Archivo que se va a agregar:", item);
+
+    //si item.files === undefined es un fichero individual
+    if(item.files === undefined) data.append('attach_files', item);
+
+    //si item.files !== undefined es una carpeta, accedemos a item.files
+    else{
+      item.files.forEach((file) => {
+        data.append('attach_files', file);
+      });
+    }
   });
 
   integrationStore.addDataSource(route.params.id, data, successCallback)
@@ -466,12 +395,48 @@ const successCallback = (datasource) => {
   storeDS.getDatasources(route.params.id)
 }
 
-// Computed property para determinar las reglas para el componente <q-file> -->
-const fileRules = computed(() => {
-  return [(val) => (val && val.length > 0) || 'Please upload at least one file or folder'];
-});
+// Método para abrir el selector de archivos
+const triggerFileUpload = () => {
+  const fileUploadInput = document.createElement('input');
+  fileUploadInput.type = 'file';
+  fileUploadInput.addEventListener('change', handleFileUpload);
+  fileUploadInput.click();
+};
 
-// Agrega este método en tu bloque <script setup>
+// Método para abrir el selector de carpetas
+const triggerFolderUpload = () => {
+  const folderUploadInput = document.createElement('input');
+  folderUploadInput.type = 'file';
+  folderUploadInput.webkitdirectory = 'webkitdirectory'; // Permite seleccionar directorios
+  folderUploadInput.addEventListener('change', handleFolderUpload);
+  folderUploadInput.click();
+};
+
+// Método para manejar la carga de archivos
+const handleFileUpload = (event) => {
+  const files = Array.from(event.target.files);
+  uploadedItems.value.push(...files);
+};
+
+// Método para manejar la carga de carpetas
+const handleFolderUpload = (event) => {
+  const folder = event.target.files[0].webkitRelativePath.substring(0, event.target.files[0].webkitRelativePath.indexOf('/'));
+  const files = Array.from(event.target.files);
+
+  // Manejar la selección de carpeta
+  const folderInfo = {
+    type: 'folder',
+    name: folder,
+    files: files, // Array para almacenar archivos en la carpeta
+    totalSize: 0, // Tamaño total de los archivos en la carpeta
+  };
+
+  files.forEach((file) => {
+    folderInfo.totalSize += file.size;
+  });
+
+  uploadedItems.value.push(folderInfo);
+};
 
 const autoSelectRepository = () => {
   if (!createNewRepository.value && uploadedFiles.value.length > 0) {
