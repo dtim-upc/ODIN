@@ -67,8 +67,8 @@
             </div>
 
             <!-- Hidden Inputs for File and Folder Upload -->
-            <input type="file" ref="fileUpload" @change="handleFileUpload" style="display: none;" webkitdirectory multiple>
-            <input type="file" ref="folderUpload" webkitdirectory directory @change="handleFolderUpload"
+            <input type="file" ref="fileUpload" @change="handleFileUpload" style="display: none;" multiple>
+            <input type="file" ref="folderUpload" directory @change="handleFolderUpload"
                    style="display: none;">
 
             <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
@@ -203,7 +203,6 @@ import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
-import axios from "axios";
 import {odinApi} from "../../boot/axios";
 
 
@@ -468,19 +467,7 @@ watch(uploadedItems, () => {
 });
 
 
-// Computed property para determinar la etiqueta del componente <q-file> -->
-const fileInputLabel = computed(() => {
-  return 'Select files or folders to import.';
-});
 
-const folderInputLabel = computed(() => {
-  return 'Or select a folder';
-});
-
-// Computed property to determine the accept attribute for the q-file component based on the selected DataSourceType
-const fileAccept = computed(() => {
-
-});
 
 const maxFilesValue = ref(undefined);
 
