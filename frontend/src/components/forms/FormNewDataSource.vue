@@ -413,6 +413,7 @@ const triggerFolderUpload = () => {
 const handleFileUpload = (event) => {
   const files = Array.from(event.target.files);
   uploadedItems.value.push(...files);
+  autoSelectRepository();
 };
 
 // Método para manejar la carga de carpetas
@@ -433,13 +434,24 @@ const handleFolderUpload = (event) => {
   });
 
   uploadedItems.value.push(folderInfo);
+  autoSelectRepository();
 };
 
 const autoSelectRepository = () => {
-  if (!createNewRepository.value && uploadedItems.value.length > 0) {
-    const fileName = uploadedItems.value[0].name; // Supongo que solo verificas el primer archivo
+  if (uploadedItems.value.length > 0) {
+    const fileName = ref("");
+
+    if (uploadedItems.value[0] && uploadedItems.value[0].files !== undefined) {
+      fileName.value = uploadedItems.value[0].files[0].webkitRelativePath.substring(0, uploadedItems.value[0].files[0].webkitRelativePath.indexOf('/'));
+    } else {
+      fileName.value = uploadedItems.value[0].name;
+      //fileName.value = uploadedItems.value[0].webkitRelativePath.substring(0, uploadedItems.value[0].webkitRelativePath.indexOf('/'))
+      console.log()
+    }
+
+
     if (storeDS.repositories) { // Verifica si storeDS.repositories está definido
-      const matchingRepository = storeDS.repositories.find(repo => repo.repositoryName === fileName);
+      const matchingRepository = storeDS.repositories.find(repo => repo.repositoryName === fileName.value);
       if (matchingRepository) {
         createNewRepository.value = false;
         newDatasource.repositoryId = matchingRepository.id;
