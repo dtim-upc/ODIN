@@ -60,7 +60,7 @@
           <!-- File and Folder Upload Section -->
           <q-card-section v-if="isLocalFileOptionSelected">
             <div
-              class="uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
+              class="hoverDiv uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
               <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
                 <path
                   d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
@@ -610,6 +610,14 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   //text-decoration: none; /* Elimina el subrayado al pasar el cursor */
 }
 
+.hoverDiv h2:hover {
+  color: blue; /* Cambia el color al pasar el cursor */
+}
+
+.hoverDiv svg:hover {
+  color: blue; /* Cambia el color al pasar el cursor */
+}
+
 /* Styles for the List of Uploaded Items */
 .uploaded-items-list {
   margin-top: 20px;
@@ -628,6 +636,11 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   left: 91%; /* Coloca el botón a la derecha del contenido */
   color: blue;
   cursor: pointer;
+}
+
+.special-button q-button:hover {
+  color: red; /* Cambia el color al pasar el cursor */
+  //text-decoration: none; /* Elimina el subrayado al pasar el cursor */
 }
 
 .special-button-hidden {
