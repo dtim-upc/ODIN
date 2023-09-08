@@ -647,4 +647,20 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   padding: 10px;
   margin-bottom: 10px;
 }
+
+.uploader__empty-state-text button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: grey;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline; /* Agregar subrayado */
+  transition: color 0.3s ease, text-decoration 0.3s ease; /* Transiciones de estilo */
+}
+
+.uploader__empty-state-text button:hover {
+  color: blue; /* Cambia el color al pasar el cursor */
+  //text-decoration: none; /* Elimina el subrayado al pasar el cursor */
+}
 </style>
