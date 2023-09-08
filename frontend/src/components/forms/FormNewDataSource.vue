@@ -16,9 +16,12 @@
             <!-- List of Uploaded Files/Folders -->
             <div class="uploaded-items-list">
               <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item">
-                <q-button @click="removeUploadedItem(index)" flat round>
-                  <q-icon name="close" size="1em" color="red" />
-                </q-button>
+                <div class="delete-uploaded-item d-flex justify-end align-center">
+                  <q-button @click="removeUploadedItem(index)" flat round>
+                    <q-icon name="close" size="1em" color="red" />
+                  </q-button>
+                </div>
+
                 <template v-if="item.files === undefined">
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
@@ -606,5 +609,14 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
+}
+
+/* Estilos para el botón */
+.delete-uploaded-item q-button {
+  margin-left: auto; /* Mueve el botón a la derecha */
+  display: flex;
+  justify-content: space-between; /* Alinea el botón a la derecha */
+  align-items: center; /* Centra verticalmente el contenido del div */
+  cursor: pointer;
 }
 </style>
