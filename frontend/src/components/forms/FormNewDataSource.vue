@@ -577,7 +577,7 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 .uploader__empty-state svg {
   width: 50px;
   height: 50px;
-  margin-top: 5px;
+  margin-top: 15px;
   margin-right: 15px;
 }
 
