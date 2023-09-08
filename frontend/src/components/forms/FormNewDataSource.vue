@@ -530,14 +530,11 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 
 <style lang="scss" scoped>
 .fileBoxLabel {
-
   margin: 0;
   padding: 0;
   border: 0;
   font: inherit;
   vertical-align: baseline;
-
-
 }
 
 .fileBox {
@@ -549,8 +546,6 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   .q-field__control:before {
     border: 1px dashed #A4A4A4;
   }
-
-
 }
 
 .fileUploadBox {
@@ -569,38 +564,19 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   text-align: center;
   overflow: hidden;
 
-
   .contentFile {
-
     display: table-cell;
     vertical-align: middle;
-
-
   }
 
   input {
-
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     opacity: 0;
-
-
   }
-}
-
-.fileLabel {
-  font-size: 22px; /* Cambia el tamaño de la fuente según tus preferencias */
-  margin-bottom: 10px; /* Espacio entre la etiqueta y el texto richText */
-}
-
-.richText {
-  font-size: 16px;
-  color: grey; /* Color del texto richText, puedes cambiarlo según tu preferencia */
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 /* Styles for the Upload Section */
@@ -625,27 +601,7 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 .uploader__empty-state-text h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #5268ff;
-}
-
-.uploader__empty-state-text button {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  color: #5268ff;
-  cursor: pointer;
-  padding: 0;
-}
-
-/* Styles for the List of Uploaded Items */
-.uploaded-items-list {
-  margin-top: 20px;
-}
-
-.uploaded-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
+  font-weight: bold; /* Agregar negrita (bold) */
 }
 
 .uploader__empty-state-text button {
@@ -662,5 +618,16 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 .uploader__empty-state-text button:hover {
   color: blue; /* Cambia el color al pasar el cursor */
   //text-decoration: none; /* Elimina el subrayado al pasar el cursor */
+}
+
+/* Styles for the List of Uploaded Items */
+.uploaded-items-list {
+  margin-top: 20px;
+}
+
+.uploaded-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 </style>
