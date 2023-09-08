@@ -400,7 +400,6 @@ const triggerFileUpload = () => {
   fileUploadInput.click();
 };
 
-
 // Método para abrir el selector de carpetas
 const triggerFolderUpload = () => {
   const folderUploadInput = document.createElement('input');
