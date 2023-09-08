@@ -3,131 +3,168 @@
     <q-card style="width: 400px; max-width: 80vw">
       <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
 
-      <!-- Sección 1: Título -->
-      <q-card-section>
-        <div class="text-h5">Create new dataset</div>
-      </q-card-section>
-
-      <!-- Resto del contenido con desplazamiento -->
-      <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
-        <!-- Sección 2: Información del Conjunto de Datos -->
+        <!-- Sección 1: Título -->
         <q-card-section>
-          <div class="text-h6">Dataset information</div>
-          <!-- Tipo de origen de datos -->
-          <q-select
-            v-model="DataSourceType"
-            :options="options"
-            label="Type"
-            class="q-mt-none"
-          />
-
-          <!-- Sección 4: Lista de archivos cargados -->
-          <q-card-section v-if="uploadedFiles.length > 0">
-            <div class="text-h6">Uploaded Files</div>
-            <ul>
-              <li v-for="(file, index) in uploadedFiles" :key="index">{{ file.name }}</li>
-            </ul>
-          </q-card-section>
-
-
-          <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
-          <q-file
-            type="file"
-            v-if="isLocalFileOptionSelected"
-            ref="fileds"
-
-            v-model="uploadedFiles"
-            auto-expand
-            :label="fileInputLabel"
-            :headers="{ 'content-type': 'multipart/form-data' }"
-            :accept="fileAccept"
-            :max-files="maxFilesValue"
-            lazy-rules
-            :rules="fileRules"
-            @update:modelValue="updateUploadedFiles"
-            borderless
-            multiple
-            append
-
-            clearable
-            use-chips
-
-            counter
-            :counter-label="counterLabelFunction"
-          >
-            <template v-slot:prepend>
-              <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
-              <q-icon name="folder" class="interactive-icon" @click="openDirectoryPicker"/>
-            </template>
-            <template v-slot:label>
-              <label class="fileLabel">Upload files</label><br>
-              <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a
-                folder</a>
-            </template>
-          </q-file>
-
-          <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
-          <q-card-section v-if="isRemoteFileOptionSelected">
-            <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
-            <q-input
-              v-if="isRemoteFileOptionSelected"
-              filled
-              v-model="remoteFileUrl"
-              label="Remote File URL"
-              lazy-rules
-              :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
-            />
-            <q-btn
-              v-if="isRemoteFileOptionSelected"
-              label="Download Remote File"
-              color="primary"
-              @click="downloadFile"
-            />
-          </q-card-section>
-
-          <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
-          <q-card-section v-if="!isLocalFileOptionSelected && !isRemoteFileOptionSelected">
-            <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
-                     :rules="[(val) => !!val || 'Please enter the database host']"/>
-            <q-input filled v-model="databaseUser" label="Database User" lazy-rules
-                     :rules="[(val) => !!val || 'Please enter the database user']"/>
-            <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
-            <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
-          </q-card-section>
-
-          <!-- Descripción del conjunto de datos (opcional) -->
-          <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
+          <div class="text-h5">Create new dataset</div>
         </q-card-section>
 
-        <!-- Sección 3: Información del Repositorio -->
-        <q-card-section>
-          <div class="text-h6">Repository information</div>
-
+        <!-- Resto del contenido con desplazamiento -->
+        <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
+          <!-- Sección 2: Información del Conjunto de Datos -->
           <q-card-section>
-            <q-checkbox v-model="createNewRepository" label="Create new repository"
-                        :disable="storeDS.repositories.length === 0"/>
-
-            <!-- Mostrar el campo de entrada para el nombre del nuevo repositorio si "Create new repository" está seleccionado -->
-            <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName"
-                     label="Name of the new repository" lazy-rules
-                     :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
+            <div class="text-h6">Dataset information</div>
+            <!-- Tipo de origen de datos -->
             <q-select
-              v-else
-              filled
-              v-model="newDatasource.repositoryId"
-              :options="storeDS.repositories"
-              label="Repository"
+              v-model="DataSourceType"
+              :options="options"
+              label="Type"
               class="q-mt-none"
-              emit-value
-              map-options
-              option-value="id"
-              option-label="repositoryName"
-              :rules="[(val) => !!val || 'Please select a repository']"
-              @input="onRepositoryChange"
             />
+
+            <!-- Sección 4: Lista de archivos cargados -->
+            <q-card-section v-if="uploadedFiles.length > 0">
+              <div class="text-h6">Uploaded Files</div>
+              <ul>
+                <li v-for="(file, index) in uploadedFiles" :key="index">{{ file.name }}</li>
+              </ul>
+            </q-card-section>
+
+            <!-- File and Folder Upload Section -->
+            <div
+              class="uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
+              <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
+                <path
+                  d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
+                  fill="#5268ff" fill-rule="nonzero"></path>
+              </svg>
+              <div class="uploader__empty-state-text">
+                <h2 @click="triggerFileUpload">Upload files</h2>
+                <button @click="triggerFolderUpload" class="uploader__sub-title uploader__directories-dialog-trigger">Or
+                  select a folder
+                </button>
+              </div>
+            </div>
+
+            <!-- List of Uploaded Files/Folders -->
+            <div class="uploaded-items-list">
+              <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item">
+                <template v-if="item.files === undefined">
+                  {{ item.name }}
+                </template>
+                <template v-else>
+                  <div>{{ item.name }}</div>
+                  <div>{{ item.files.length }} files</div>
+                  <div>Total Size: {{ item.totalSize }} bytes</div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Hidden Inputs for File and Folder Upload -->
+            <input type="file" ref="fileUpload" multiple @change="handleFileUpload" style="display: none;">
+            <input type="file" ref="folderUpload" webkitdirectory directory @change="handleFolderUpload"
+                   style="display: none;">
+
+
+            <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
+            <!--
+            <q-file
+              type="file"
+              v-if="isLocalFileOptionSelected"
+              ref="fileds"
+
+              v-model="uploadedFiles"
+              auto-expand
+              :label="fileInputLabel"
+              :headers="{ 'content-type': 'multipart/form-data' }"
+              :accept="fileAccept"
+              :max-files="maxFilesValue"
+              lazy-rules
+              :rules="fileRules"
+              @update:modelValue="updateUploadedFiles"
+              borderless
+              multiple
+              append
+
+              clearable
+              use-chips
+
+              counter
+              :counter-label="counterLabelFunction"
+            >
+              <template v-slot:prepend>
+                <q-icon name="attach_files" @click="this.$refs.fileds.pickFiles();"/>
+                <q-icon name="folder" class="interactive-icon" @click="openDirectoryPicker"/>
+              </template>
+              <template v-slot:label>
+                <label class="fileLabel">Upload files</label><br>
+                <a href="javascript:void(0)" class="richText" @click.prevent="openDirectoryPicker">Or select a
+                  folder</a>
+              </template>
+            </q-file>
+            -->
+
+            <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
+            <q-card-section v-if="isRemoteFileOptionSelected">
+              <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
+              <q-input
+                v-if="isRemoteFileOptionSelected"
+                filled
+                v-model="remoteFileUrl"
+                label="Remote File URL"
+                lazy-rules
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
+              />
+              <q-btn
+                v-if="isRemoteFileOptionSelected"
+                label="Download Remote File"
+                color="primary"
+                @click="downloadFile"
+              />
+            </q-card-section>
+
+            <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
+            <q-card-section v-if="!isLocalFileOptionSelected && !isRemoteFileOptionSelected">
+              <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
+                       :rules="[(val) => !!val || 'Please enter the database host']"/>
+              <q-input filled v-model="databaseUser" label="Database User" lazy-rules
+                       :rules="[(val) => !!val || 'Please enter the database user']"/>
+              <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
+              <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
+            </q-card-section>
+
+            <!-- Descripción del conjunto de datos (opcional) -->
+            <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
           </q-card-section>
-        </q-card-section>
-      </div>
+
+          <!-- Sección 3: Información del Repositorio -->
+          <q-card-section>
+            <div class="text-h6">Repository information</div>
+
+            <q-card-section>
+              <q-checkbox v-model="createNewRepository" label="Create new repository"
+                          :disable="storeDS.repositories.length === 0"/>
+
+              <!-- Mostrar el campo de entrada para el nombre del nuevo repositorio si "Create new repository" está seleccionado -->
+              <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName"
+                       label="Name of the new repository" lazy-rules
+                       :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
+              <q-select
+                v-else
+                filled
+                v-model="newDatasource.repositoryId"
+                :options="storeDS.repositories"
+                label="Repository"
+                class="q-mt-none"
+                emit-value
+                map-options
+                option-value="id"
+                option-label="repositoryName"
+                :rules="[(val) => !!val || 'Please select a repository']"
+                @input="onRepositoryChange"
+              />
+            </q-card-section>
+          </q-card-section>
+        </div>
 
 
         <!-- Botones del formulario -->
@@ -141,6 +178,45 @@
     </q-card>
   </q-dialog>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      uploadedItems: [],
+    };
+  },
+  methods: {
+    triggerFileUpload() {
+      this.$refs.fileUpload.click();
+    },
+    triggerFolderUpload() {
+      this.$refs.folderUpload.click();
+    },
+    handleFileUpload(event) {
+      const files = Array.from(event.target.files);
+      this.uploadedItems.push(...files);
+    },
+    handleFolderUpload(event) {
+      const folder = event.target.files[0].webkitRelativePath.substring(0, event.target.files[0].webkitRelativePath.indexOf('/'));
+      const files = Array.from(event.target.files);
+      // Handle folder selection
+      const folderInfo = {
+        type: 'folder',
+        name: folder,
+        files: files, // Array to store files in the folder
+        totalSize: 0, // Total size of files in the folder
+      };
+
+      files.forEach((file) => {
+        folderInfo.totalSize += file.size;
+      });
+
+      this.uploadedItems.push(folderInfo);
+    }
+  }
+}
+</script>
 
 
 <script setup>
@@ -384,8 +460,7 @@ const autoSelectRepository = () => {
       if (matchingRepository) {
         createNewRepository.value = false;
         newDatasource.repositoryId = matchingRepository.id;
-      }
-      else{
+      } else {
         createNewRepository.value = true;
         newDatasource.repositoryName = fileName;
       }
@@ -438,7 +513,7 @@ watch(showS, (show) => {
 const updateUploadedFiles = (value) => {
   uploadedFiles.value = value;
 
-  if(value == null) uploadedFiles.value = [];
+  if (value == null) uploadedFiles.value = [];
 }
 
 const databaseHost = ref('');
@@ -526,5 +601,50 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   color: grey; /* Color del texto richText, puedes cambiarlo según tu preferencia */
   cursor: pointer;
   text-decoration: underline;
+}
+
+/* Styles for the Upload Section */
+.uploader__empty-state {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.uploader__empty-state svg {
+  width: 50px;
+  height: 50px;
+  margin-right: 20px;
+}
+
+.uploader__empty-state-text {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.uploader__empty-state-text h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #5268ff;
+}
+
+.uploader__empty-state-text button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #5268ff;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Styles for the List of Uploaded Items */
+.uploaded-items-list {
+  margin-top: 20px;
+}
+
+.uploaded-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 </style>
