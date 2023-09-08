@@ -233,8 +233,8 @@ async function downloadFile() {
     const blob = new Blob([response.data], {type: 'application/octet-stream'});
     const file = new File([blob], filename, {type: 'application/octet-stream'});
 
-    // Agrega el archivo a la lista uploadedFiles
-    uploadedFiles.value.push(file);
+    // Agrega el archivo a la lista uploadedItems
+    uploadedItems.value.push(file);
   } catch (error) {
     console.error('Error al descargar el archivo:', error);
   }
@@ -329,14 +329,12 @@ const newDatasource = reactive({
 });
 
 const uploadedItems = ref([]);
-const uploadedFiles = ref([]);
 const DataSourceType = ref(options[0]);
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
   newDatasource.repositoryId = null;
   newDatasource.repositoryName = '';
   newDatasource.datasetName = '';
   newDatasource.datasetDescription = '';
-  uploadedFiles.value = [];
   DataSourceType.value = options[0];
   databaseHost.value = '';
   databaseUser.value = '';
@@ -346,13 +344,12 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 
   uploadedItems.value = []; // Vacía la lista de archivos cargados
 
-  uploadedFiles.value = ref([]);
   DataSourceType.value = options[0];
 }
 
 const onSubmit = () => {
   const data = new FormData();
-  console.log("Contenido de uploadedFiles:", uploadedFiles.value);
+  console.log("Contenido de uploadedItems:", uploadedItems.value);
 
 
   data.append("datasetName", newDatasource.datasetName);
@@ -439,8 +436,8 @@ const handleFolderUpload = (event) => {
 };
 
 const autoSelectRepository = () => {
-  if (!createNewRepository.value && uploadedFiles.value.length > 0) {
-    const fileName = uploadedFiles.value[0].name; // Supongo que solo verificas el primer archivo
+  if (!createNewRepository.value && uploadedItems.value.length > 0) {
+    const fileName = uploadedItems.value[0].name; // Supongo que solo verificas el primer archivo
     if (storeDS.repositories) { // Verifica si storeDS.repositories está definido
       const matchingRepository = storeDS.repositories.find(repo => repo.repositoryName === fileName);
       if (matchingRepository) {
@@ -454,8 +451,8 @@ const autoSelectRepository = () => {
   }
 };
 
-// Agrega un watcher para ejecutar la función autoSelectRepository cada vez que se actualice uploadedFiles
-watch(uploadedFiles, () => {
+// Agrega un watcher para ejecutar la función autoSelectRepository cada vez que se actualice uploadedItems
+watch(uploadedItems, () => {
   autoSelectRepository();
 });
 
@@ -486,21 +483,6 @@ watch(() => DataSourceType.value, () => {
     maxFilesValue.value = 1; // For other DataSourceType values, allow only one file to be uploaded
   }
 });
-
-// Agrega un watcher para limpiar uploadedFiles cuando el formulario se muestra
-watch(showS, (show) => {
-  if (!show) {
-    // Si el formulario se cierra, limpia uploadedFiles
-    uploadedFiles.value = [];
-  }
-});
-
-// Add this method to update the uploadedFile value when the q-file component emits the update:modelValue event
-const updateUploadedFiles = (value) => {
-  uploadedFiles.value = value;
-
-  if (value == null) uploadedFiles.value = [];
-}
 
 const databaseHost = ref('');
 const databaseUser = ref('');
