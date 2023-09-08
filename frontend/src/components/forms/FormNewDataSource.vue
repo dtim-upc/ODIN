@@ -20,7 +20,7 @@
 
                 <div class="special-button special-button-hidden" >
                   <q-button @click="removeUploadedItem(index)" flat round>
-                    <q-icon name="close" size="1em" color="red"/>
+                    <q-icon name="close" size="1.25em"/>
                   </q-button>
                 </div>
 
@@ -619,17 +619,14 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
+  position: relative;
 }
 
 .special-button {
-  position: relative; /* Posición absoluta para superponer el botón */
-  top: 100%; /* Coloca el botón en el centro vertical */
-  left: 95%; /* Coloca el botón a la derecha del contenido */
-  transform: translateY(75%); /* Centra verticalmente el botón */
-}
-
-/* Estilos para el botón especial */
-.special-button {
+  position: absolute;
+  top: 30%; /* Coloca el botón en el centro vertical */
+  left: 91%; /* Coloca el botón a la derecha del contenido */
+  color: blue;
   cursor: pointer;
 }
 
