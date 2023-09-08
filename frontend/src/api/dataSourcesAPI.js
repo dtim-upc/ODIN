@@ -37,7 +37,7 @@ export default {
     return odinApi.get('/project/' + projectID + '/repositories'/*, {headers: { Authorization: `Bearer ${token}` }} */)
   },
   setDatasetSchemaAsProjectOne(projectID, id, token) {
-    return odinApi.post('/project/' + projectID + '/datasource/' + id/*, {headers: { Authorization: `Bearer ${token}` }}*/)
+    return odinApi.post('/project/' + projectID + '/datasource/' + id +'/setProjectSchema'/*, {headers: { Authorization: `Bearer ${token}` }}*/)
   },
   deleteDatasource(projectID, id, token) {
     return odinApi.delete('/project/' + projectID + '/datasource/' + id/*, {headers: { Authorization: `Bearer ${token}` }}*/)
