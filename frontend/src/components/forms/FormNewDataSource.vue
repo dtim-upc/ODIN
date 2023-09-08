@@ -15,14 +15,14 @@
             <!-- Sección 3: Lista de archivos cargados -->
             <!-- List of Uploaded Files/Folders -->
             <div class="uploaded-items-list">
-              <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item">
-                <div class="delete-uploaded-item d-flex justify-end align-center">
-                  <q-button @click="removeUploadedItem(index)" flat round>
-                    <q-icon name="close" size="1em" color="red"/>
-                  </q-button>
-                </div>
-
+              <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item"
+                   @mouseover="showSpecialButton(index)" @mouseleave="hideSpecialButton(index)">
                 <template v-if="item.files === undefined">
+                  <div class="special-button">
+                    <q-button @click="removeUploadedItem(index)" flat round>
+                      <q-icon name="close" size="1em" color="red"/>
+                    </q-button>
+                  </div>
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -35,6 +35,11 @@
                 </template>
 
                 <template v-else>
+                  <div class="special-button">
+                    <q-button @click="removeUploadedItem(index)" flat round>
+                      <q-icon name="close" size="1em" color="red"/>
+                    </q-button>
+                  </div>
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -284,6 +289,17 @@ const onRepositoryChange = () => {
     }
   }
 }
+
+const showSpecialButton = (index) => {
+  const specialButton = document.querySelectorAll('.uploaded-item .special-button')[index];
+  specialButton.classList.remove('special-button-hidden');
+}
+
+const hideSpecialButton = (index) => {
+  const specialButton = document.querySelectorAll('.uploaded-item .special-button')[index];
+  specialButton.classList.add('special-button-hidden');
+}
+
 
 const integrationStore = useIntegrationStore()
 
@@ -609,12 +625,19 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   margin-bottom: 10px;
 }
 
-/* Estilos para el botón */
-.delete-uploaded-item q-button {
-  margin-left: auto; /* Mueve el botón a la derecha */
-  display: flex;
-  justify-content: space-between; /* Alinea el botón a la derecha */
-  align-items: center; /* Centra verticalmente el contenido del div */
+.special-button {
+  position: relative; /* Posición absoluta para superponer el botón */
+  top: 100%; /* Coloca el botón en el centro vertical */
+  left: 95%; /* Coloca el botón a la derecha del contenido */
+  transform: translateY(75%); /* Centra verticalmente el botón */
+}
+
+/* Estilos para el botón especial */
+.special-button q-button {
   cursor: pointer;
+}
+
+.special-button-hidden {
+  display: none;
 }
 </style>
