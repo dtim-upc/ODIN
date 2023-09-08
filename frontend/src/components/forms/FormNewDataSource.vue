@@ -13,13 +13,6 @@
           <!-- Sección 2: Información del Conjunto de Datos -->
           <q-card-section>
             <div class="text-h6">Dataset information</div>
-            <!-- Tipo de origen de datos -->
-            <q-select
-              v-model="DataSourceType"
-              :options="options"
-              label="Type"
-              class="q-mt-none"
-            />
 
             <!-- Sección 4: Lista de archivos cargados -->
             <q-card-section v-if="uploadedFiles.length > 0">
@@ -28,22 +21,6 @@
                 <li v-for="(file, index) in uploadedFiles" :key="index">{{ file.name }}</li>
               </ul>
             </q-card-section>
-
-            <!-- File and Folder Upload Section -->
-            <div
-              class="uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
-              <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
-                <path
-                  d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
-                  fill="#5268ff" fill-rule="nonzero"></path>
-              </svg>
-              <div class="uploader__empty-state-text">
-                <h2 @click="triggerFileUpload">Upload files</h2>
-                <button @click="triggerFolderUpload" class="uploader__sub-title uploader__directories-dialog-trigger">Or
-                  select a folder
-                </button>
-              </div>
-            </div>
 
             <!-- List of Uploaded Files/Folders -->
             <div class="uploaded-items-list">
@@ -59,14 +36,29 @@
               </div>
             </div>
 
+            <!-- File and Folder Upload Section -->
+            <div
+              class="uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
+              <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
+                <path
+                  d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
+                  fill="#5268ff" fill-rule="nonzero"></path>
+              </svg>
+              <div class="uploader__empty-state-text">
+                <h2 @click="triggerFileUpload">Upload files</h2>
+                <button @click="triggerFolderUpload" class="uploader__sub-title uploader__directories-dialog-trigger">
+                  Or select a folder
+                </button>
+              </div>
+            </div>
+
             <!-- Hidden Inputs for File and Folder Upload -->
             <input type="file" ref="fileUpload" multiple @change="handleFileUpload" style="display: none;">
             <input type="file" ref="folderUpload" webkitdirectory directory @change="handleFolderUpload"
                    style="display: none;">
 
-
             <!-- Mostrar selector de archivo si se selecciona "Local file/s" -->
-            <!--
+            <!-- file picker comentado para replicar entrada de wetransfer
             <q-file
               type="file"
               v-if="isLocalFileOptionSelected"
@@ -102,6 +94,16 @@
               </template>
             </q-file>
             -->
+
+            <q-card-section>
+              <!-- Tipo de origen de datos -->
+              <q-select
+                v-model="DataSourceType"
+                :options="options"
+                label="Type"
+                class="q-mt-none"
+              />
+            </q-card-section>
 
             <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
             <q-card-section v-if="isRemoteFileOptionSelected">
@@ -589,7 +591,8 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 .uploader__empty-state svg {
   width: 50px;
   height: 50px;
-  margin-right: 20px;
+  margin-top: 5px;
+  margin-right: 15px;
 }
 
 .uploader__empty-state-text {
@@ -601,7 +604,7 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 .uploader__empty-state-text h2 {
   margin: 0;
   font-size: 1.5rem;
-  font-weight: bold; /* Agregar negrita (bold) */
+  font-weight: 400; /* Agregar negrita (bold) */
 }
 
 .uploader__empty-state-text button {
@@ -613,6 +616,7 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   padding: 0;
   text-decoration: underline; /* Agregar subrayado */
   transition: color 0.3s ease, text-decoration 0.3s ease; /* Transiciones de estilo */
+  margin-top: -15px; /* Ajusta el espacio vertical entre button y h2 */
 }
 
 .uploader__empty-state-text button:hover {
