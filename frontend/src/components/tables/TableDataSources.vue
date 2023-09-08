@@ -227,8 +227,12 @@ const hasSourceGraph = (props) => {
   }
   return false;
 }
-const deleteRow = (props2) => {
-  storeDS.deleteDataSource(props2.row)
+
+const setProjectSchema = (props) => {
+  storeDS.setDatasetAsProjectSchema(props.row)
+}
+const deleteRow = (props) => {
+  storeDS.deleteDataSource(props.row)
 }
 
 const editRow = (props) => {

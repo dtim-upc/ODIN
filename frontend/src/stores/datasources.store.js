@@ -102,7 +102,7 @@ export const useDataSourceStore = defineStore('datasource', {
 
       if (response.status == 200) {
         this.project = response.data
-        integrationStore.setProject(this.project)
+        await integrationStore.setProject(this.project)
       }
     },
 
@@ -249,7 +249,25 @@ export const useDataSourceStore = defineStore('datasource', {
       // this.datasources.push(ds)
       // console.log(this.datasources)
     },
-
+    setDatasetAsProjectSchema(ds) {
+      const authStore = useAuthStore()
+      const notify = useNotify()
+      api.setDatasetSchemaAsProjectOne(this.project.projectId, ds.id, authStore.user.accessToken)
+        .then((response) => {
+          if (response.status == 200) {
+            notify.positive("Schema successfully set")
+            this.updateProjectInfo()
+          } else {
+            // 500
+            notify.negative("Something went wrong setting the schema of the project.")
+          }
+        }).catch(err => {
+        console.log("Error setting project schema of the project")
+        // check how to get err status e.g., 401
+        console.log(err)
+        notify.negative("Something went wrong setting the schema of the project.")
+      })
+    },
     deleteDataSource(ds) {
       const authStore = useAuthStore()
       const notify = useNotify()
