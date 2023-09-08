@@ -145,13 +145,7 @@ const token = 'your_token_value_here';
 
 const deleteItem = (id) => {
   // Perform deletion logic here
-  projectsStore.deleteProjectByID(id, token)
-    .then(() => {
-      console.log('Item deleted');
-    })
-    .catch((error) => {
-      console.error('Error deleting item:', error);
-    });
+  projectsStore.deleteProjectByID(id, token);
 };
 
 const openEditDialog = (project) => {
