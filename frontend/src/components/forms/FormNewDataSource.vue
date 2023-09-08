@@ -394,9 +394,12 @@ const successCallback = (datasource) => {
 const triggerFileUpload = () => {
   const fileUploadInput = document.createElement('input');
   fileUploadInput.type = 'file';
+  fileUploadInput.accept = '.csv, .json'; // Specify accepted file extensions
+  fileUploadInput.multiple = true; // Enable multiple file selection
   fileUploadInput.addEventListener('change', handleFileUpload);
   fileUploadInput.click();
 };
+
 
 // Método para abrir el selector de carpetas
 const triggerFolderUpload = () => {
