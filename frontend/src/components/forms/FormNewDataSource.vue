@@ -2,7 +2,7 @@
   <q-dialog v-model="showS" @hide="props.show=false">
     <q-card style="width: 400px; max-width: 80vw">
 
-        <q-card-section>
+      <q-card-section>
         <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
@@ -18,7 +18,7 @@
               <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item">
                 <div class="delete-uploaded-item d-flex justify-end align-center">
                   <q-button @click="removeUploadedItem(index)" flat round>
-                    <q-icon name="close" size="1em" color="red" />
+                    <q-icon name="close" size="1em" color="red"/>
                   </q-button>
                 </div>
 
@@ -188,7 +188,7 @@
             />
           </q-card-section>
         </div>
-        </q-card-section>
+      </q-card-section>
 
       <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <!-- Botones del formulario -->
@@ -366,10 +366,10 @@ const onSubmit = () => {
     console.log("Archivo que se va a agregar:", item);
 
     //si item.files === undefined es un fichero individual
-    if(item.files === undefined) data.append('attach_files', item);
+    if (item.files === undefined) data.append('attach_files', item);
 
     //si item.files !== undefined es una carpeta, accedemos a item.files
-    else{
+    else {
       item.files.forEach((file) => {
         data.append('attach_files', file);
       });
@@ -477,8 +477,6 @@ const autoSelectRepository = () => {
 watch(uploadedItems, () => {
   autoSelectRepository();
 });
-
-
 
 
 const maxFilesValue = ref(undefined);
