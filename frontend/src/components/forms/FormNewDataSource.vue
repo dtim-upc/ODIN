@@ -16,6 +16,9 @@
             <!-- List of Uploaded Files/Folders -->
             <div class="uploaded-items-list">
               <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item">
+                <q-button @click="removeUploadedItem(index)" flat round>
+                  <q-icon name="close" size="1em" color="red" />
+                </q-button>
                 <template v-if="item.files === undefined">
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
@@ -436,6 +439,10 @@ const handleFolderUpload = (event) => {
   uploadedItems.value.push(folderInfo);
   autoSelectRepository();
 };
+
+const removeUploadedItem = (index) => {
+  uploadedItems.value.splice(index, 1); // Elimina el elemento en el índice dado
+}
 
 const autoSelectRepository = () => {
   if (uploadedItems.value.length > 0) {
