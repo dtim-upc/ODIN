@@ -365,6 +365,13 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 }
 
 const onSubmit = () => {
+  // Check if uploadedItems is empty
+  if (uploadedItems.value.length === 0) {
+    // Display a notification indicating that at least one file should be added
+    notify.negative('Please add at least one file before submitting.');
+    return; // Abort form submission
+  }
+
   const data = new FormData();
   console.log("Contenido de uploadedItems:", uploadedItems.value);
 
