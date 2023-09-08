@@ -614,10 +614,6 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   color: blue; /* Cambia el color al pasar el cursor */
 }
 
-.hoverDiv svg:hover {
-  color: blue; /* Cambia el color al pasar el cursor */
-}
-
 /* Styles for the List of Uploaded Items */
 .uploaded-items-list {
   margin-top: 20px;
