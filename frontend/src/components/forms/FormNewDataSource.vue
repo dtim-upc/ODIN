@@ -1,7 +1,6 @@
 <template>
   <q-dialog v-model="showS" @hide="props.show=false">
     <q-card style="width: 400px; max-width: 80vw">
-      <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
 
         <q-card-section>
         <!-- Resto del contenido con desplazamiento -->
@@ -68,7 +67,7 @@
             </div>
 
             <!-- Hidden Inputs for File and Folder Upload -->
-            <input type="file" ref="fileUpload" multiple @change="handleFileUpload" style="display: none;">
+            <input type="file" ref="fileUpload" @change="handleFileUpload" style="display: none;" webkitdirectory multiple>
             <input type="file" ref="folderUpload" webkitdirectory directory @change="handleFolderUpload"
                    style="display: none;">
 
@@ -185,7 +184,7 @@
         </div>
         </q-card-section>
 
-
+      <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <!-- Botones del formulario -->
         <q-card-section>
           <div v-if="showFormButtons">
@@ -446,7 +445,7 @@ const autoSelectRepository = () => {
     } else {
       fileName.value = uploadedItems.value[0].name;
       //fileName.value = uploadedItems.value[0].webkitRelativePath.substring(0, uploadedItems.value[0].webkitRelativePath.indexOf('/'))
-      console.log()
+      console.log(uploadedItems.value[0])
     }
 
 
@@ -457,7 +456,7 @@ const autoSelectRepository = () => {
         newDatasource.repositoryId = matchingRepository.id;
       } else {
         createNewRepository.value = true;
-        newDatasource.repositoryName = fileName;
+        newDatasource.repositoryName = fileName.value;
       }
     }
   }
