@@ -76,8 +76,8 @@
 
       <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <!-- <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" -->
-          <!-- icon="remove_red_eye"></q-btn> -->
+          <!-- <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" icon="remove_red_eye"></q-btn> -->
+          <q-btn dense round flat color="grey" @click="setProjectSchema(props)" icon="bookmark"></q-btn>
           <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
           <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
           <q-btn dense round flat color="grey" @click="integrateRow(props)" icon="join_full"></q-btn>
