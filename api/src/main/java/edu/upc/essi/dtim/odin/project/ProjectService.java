@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -53,37 +54,42 @@ public class ProjectService {
         }
 
         // Get the list of data repositories associated with the project
-        List<DataRepository> dataresourcesOfProjectToUpload = project.getRepositories();
+        List<DataRepository> repositoriesOfProjectToUpload = project.getRepositories();
         boolean datasetFound = false;
 
-        // Check if the list of data repositories is not empty
-        if (!dataresourcesOfProjectToUpload.isEmpty()) {
-            // Iterate through the data repositories
-            for (DataRepository repoInProject : dataresourcesOfProjectToUpload) {
-                // Iterate through the datasets in each data repository
-                for (Dataset dataset : repoInProject.getDatasets()) {
-                    // Check if the dataset ID matches the specified dataset ID
-                    if (datasetId.equals(dataset.getId())) {
-                        System.out.println("++++++++++++++++++++encontrado");
-                        datasetFound = true;
+        // Create an iterator for the data repositories
+        Iterator<DataRepository> repositoryIterator = repositoriesOfProjectToUpload.iterator();
 
-                        // Remove the dataset from the data repository
-                        repoInProject.removeDataset(dataset);
+        // Iterate through the data repositories using the iterator
+        while (repositoryIterator.hasNext()) {
+            DataRepository repoInProject = repositoryIterator.next();
 
-                        // Save the updated list of data repositories
-                        ormProject.save(dataresourcesOfProjectToUpload);
+            // Iterate through the datasets in each data repository
+            Iterator<Dataset> datasetIterator = repoInProject.getDatasets().iterator();
+            while (datasetIterator.hasNext()) {
+                Dataset dataset = datasetIterator.next();
 
-                        // Check if the data repository is now empty and remove it from the project
-                        if (repoInProject.getDatasets().isEmpty()) {
-                            dataresourcesOfProjectToUpload.remove(repoInProject);
-                        }
+                // Check if the dataset ID matches the specified dataset ID
+                if (datasetId.equals(dataset.getId())) {
+                    System.out.println("++++++++++++++++++++encontrado");
+                    datasetFound = true;
 
-                        // Update the project's list of data repositories
-                        project.setRepositories(dataresourcesOfProjectToUpload);
+                    // Remove the dataset from the data repository
+                    datasetIterator.remove();
 
-                        // Exit the loop after deleting the dataset
-                        break;
+                    // Check if the data repository is now empty and remove it from the project
+                    if (repoInProject.getDatasets().isEmpty()) {
+                        repositoryIterator.remove();
                     }
+
+                    // Save the updated list of data repositories
+                    ormProject.save(repositoriesOfProjectToUpload);
+
+                    // Update the project's list of data repositories
+                    project.setRepositories(repositoriesOfProjectToUpload);
+
+                    // Exit the loop after deleting the dataset
+                    break;
                 }
             }
         }
