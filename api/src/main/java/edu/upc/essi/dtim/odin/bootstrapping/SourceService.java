@@ -542,12 +542,6 @@ public class SourceService {
             throw new IllegalArgumentException("Dataset not found in the project");
         }
 
-        // Check if the project already has an integrated graph assigned
-        if (project.getIntegratedGraph() != null) {
-            // If the project already has an integrated graph, throw an exception or handle it accordingly
-            throw new IllegalArgumentException("Project already has an integrated graph");
-        }
-
         // Assign the schema of the dataset to the project's integrated graph
         try {
             Graph integratedGraph = CoreGraphFactory.createIntegratedGraph();

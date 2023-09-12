@@ -289,11 +289,13 @@ const editRow = (props) => {
 
 const integrateRow = (props) => {
   // Implement the logic for the integrate action here.
-
   integrationStore.addSelectedDatasource(props.row)
   console.log(computedDatasets.value.length+" DATASETS LENGTH++++++++++++++++++++++++++++++++++++++++")
-  if(computedDatasets.value.length > 1) router.push({name: 'dsIntegration'})
-  else notify.negative("Add another dataset to make an integration.")
+  if(integrationStore.getGraphicalA) {
+    if (computedDatasets.value.length > 1) router.push({name: 'dsIntegration'})
+    else notify.negative("Add another dataset to make an integration.")
+  }
+  else notify.negative("There's no base schema set. Define one to start the integration.")
 };
 </script>
 
