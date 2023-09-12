@@ -36,7 +36,16 @@
       </q-scroll-area>
     </div>
     <div class="col-10">
-      <Graph :graphical="graphical"></Graph>
+      <Graph v-if="graphical" :graphical="graphical"></Graph>
+      <div v-else class="empty-content">
+        <p class="empty-message">
+          Content is not available at the moment. Possible reasons:
+          <br />
+          - You haven't integrated any schema yet.
+          <br />
+          - You haven't defined the project's base schema.
+        </p>
+      </div>
 
     </div>
 
@@ -102,6 +111,22 @@ onMounted(async () => {
   .columnHeader {
     background: #202024;
   }
+}
 
+.empty-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.empty-message {
+  font-size: 1.5rem;
+  color: #555;
+  text-align: center;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 </style>
