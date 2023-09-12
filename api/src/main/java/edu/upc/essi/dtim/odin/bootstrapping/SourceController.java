@@ -3,6 +3,7 @@ package edu.upc.essi.dtim.odin.bootstrapping;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.odin.project.Project;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +152,7 @@ public class SourceController {
                 // Add the dataset to the repository and delete the reference from others if exists
                 sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
 
-                if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
+                //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
             }
 
             // Return success message
@@ -374,6 +375,29 @@ public class SourceController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("text/turtle"))
                 .body(resource);
+    }
+
+    /**
+     * Sets the dataset schema as the project schema.
+     *
+     * @param projectID The ID of the project.
+     * @param datasetID The ID of the dataset whose schema should be set as the project schema.
+     * @return ResponseEntity containing the API response.
+     */
+    @PostMapping("/project/{projectID}/dataset/{datasetID}/setProjectSchema")
+    public ResponseEntity<?> setDatasetSchemaAsProjectSchema(
+            @PathVariable("projectID") String projectID,
+            @PathVariable("datasetID") String datasetID
+    ) {
+        logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
+
+
+            sourceService.setProjectSchemasBase(projectID,datasetID);
+
+            return ResponseEntity.ok("Dataset schema set as project schema.");
+
+
+        //return ResponseEntity.notFound().build();
     }
 
 }

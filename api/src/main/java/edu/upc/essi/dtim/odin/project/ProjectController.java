@@ -177,33 +177,4 @@ public class ProjectController {
                 .contentType(MediaType.parseMediaType("text/turtle"))
                 .body(resource);
     }
-
-    /**
-     * Sets the dataset schema as the project schema.
-     *
-     * @param projectID The ID of the project.
-     * @param datasetID The ID of the dataset whose schema should be set as the project schema.
-     * @return ResponseEntity containing the API response.
-     */
-    @PostMapping("/project/{projectID}/dataset/{datasetID}/setProjectSchema")
-    public ResponseEntity<?> setDatasetSchemaAsProjectSchema(
-            @PathVariable("projectID") String projectID,
-            @PathVariable("datasetID") String datasetID
-    ) {
-        logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
-
-        // Retrieve the project by its ID
-        Project project = projectService.getProjectById(projectID);
-
-        if (project != null) {
-            projectService.setDatasetSchemaAsProjectSchema(projectID, datasetID);
-
-            // Save the project to persist the changes
-            projectService.saveProject(project);
-
-            return ResponseEntity.ok("Dataset schema set as project schema.");
-        }
-
-        return ResponseEntity.notFound().build();
-    }
 }
