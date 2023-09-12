@@ -172,13 +172,12 @@
 
 
 <script setup>
-import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} from "vue";
+import {computed, onBeforeMount, onMounted, defineProps, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js';
 import {useIntegrationStore} from 'src/stores/integration.store.js';
 import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 import {useRouter} from "vue-router";
-import dataSourcesAPI from "src/api/dataSourcesAPI";
 import EditDatasetForm from "components/forms/EditDatasetForm.vue";
 const router = useRouter()
 
@@ -197,8 +196,6 @@ const setProjectSchema = (props) => {
   showSetSchemaDialog.value = true;
 
   selectedRow.value = props.row;
-  console.log(props+" GGGGGGGGGGGGGGGGGGGGGGGGGG");
-  console.log(props.row)+ " HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH";
 };
 
 const cancelSetSchema = () => {
@@ -264,7 +261,7 @@ onMounted(() => {
     projectId = match[1];
     console.log(projectId);
   }
-  storeDS.getDatasources(projectId)
+  storeDS.getDatasources(projectId);
 })
 const views = {
   "integration": ['Name', 'Type'],
@@ -302,7 +299,7 @@ const integrateRow = (props) => {
   // Implement the logic for the integrate action here.
   integrationStore.addSelectedDatasource(props.row)
   console.log(computedDatasets.value.length+" DATASETS LENGTH++++++++++++++++++++++++++++++++++++++++")
-  if(integrationStore.getGraphicalA) {
+  if(integrationStore.getGraphicalA === null) {
     if (computedDatasets.value.length > 1) router.push({name: 'dsIntegration'})
     else notify.negative("Add another dataset to make an integration.")
   }
