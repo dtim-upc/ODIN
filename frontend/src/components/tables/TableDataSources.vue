@@ -141,19 +141,30 @@
 
     <!-- setProjectSchema action -->
     <q-dialog v-model="showSetSchemaDialog">
-      <q-card flat bordered class="my-card">
+      <q-card flat bordered class="my-card" style="width: 400px; max-width: 80vw">
         <q-card-section class="q-pt-none">
-          <div>
-            <p v-if="showGlobalSchemaPrompt">Do you want to overwrite the existing project schema?</p>
-            <p v-else>Do you want to set the dataset schema as the base integration schema for the project?</p>
-          </div>
-          <div class="q-mt-md">
-            <q-btn label="Cancel" color="primary" @click="cancelSetSchema" />
-            <q-btn label="Accept" color="primary" @click="acceptSetSchema" />
+          <q-card-title>
+            <h6 class="q-mb-sm">
+              {{ showGlobalSchemaPrompt ? 'Overwrite Project Schema' : 'Set Dataset Schema as Project Base Schema' }}
+            </h6>
+          </q-card-title>
+          <div class="q-pa-md">
+            <p class="q-mb-md" v-if="showGlobalSchemaPrompt">
+              Do you want to overwrite the existing project schema?
+            </p>
+            <p class="q-mb-md" v-else>
+              Do you want to set the dataset schema as the base integration schema for the project?
+            </p>
+            <div class="q-gutter-md">
+              <q-btn label="Accept" color="primary" @click="acceptSetSchema" />
+              <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-md" @click="cancelSetSchema" />
+            </div>
           </div>
         </q-card-section>
       </q-card>
     </q-dialog>
+
+
 
 
   </div>
@@ -295,7 +306,9 @@ const integrateRow = (props) => {
     if (computedDatasets.value.length > 1) router.push({name: 'dsIntegration'})
     else notify.negative("Add another dataset to make an integration.")
   }
-  else notify.negative("There's no base schema set. Define one to start the integration.")
+  else {
+    notify.negative("There's no base schema set. Define one to start the integration.")
+  }
 };
 </script>
 
