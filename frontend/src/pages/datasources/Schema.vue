@@ -38,13 +38,13 @@
     <div class="col-10">
       <Graph v-if="graphical" :graphical="graphical"></Graph>
       <div v-else class="empty-content">
-        <p class="empty-message">
-          Content is not available at the moment. Possible reasons:
-          <br />
-          - You haven't integrated any schema yet.
-          <br />
-          - You haven't defined the project's base schema.
-        </p>
+        <div class="empty-message">
+          <p>Content is not available at the moment. Possible reasons:</p>
+          <ul style="text-align: left;">
+            <li>You haven't integrated any schema yet.</li>
+            <li>You haven't defined the project's base schema.</li>
+          </ul>
+        </div>
       </div>
 
     </div>
