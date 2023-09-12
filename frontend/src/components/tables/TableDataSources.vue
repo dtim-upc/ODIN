@@ -145,11 +145,11 @@
         <q-card-section class="q-pt-none">
           <q-card-title>
             <h6 class="q-mb-sm">
-              {{ showGlobalSchemaPrompt ? 'Overwrite Project Schema' : 'Set Dataset Schema as Project Base Schema' }}
+              {{ integrationStore.getGraphicalA !== null ? 'Overwrite Project Schema' : 'Set Dataset Schema as Project Base Schema' }}
             </h6>
           </q-card-title>
           <div class="q-pa-md">
-            <p class="q-mb-md" v-if="showGlobalSchemaPrompt">
+            <p class="q-mb-md" v-if="integrationStore.getGraphicalA !== null">
               Do you want to overwrite the existing project schema?
             </p>
             <p class="q-mb-md" v-else>
@@ -184,14 +184,10 @@ const router = useRouter()
 const showEditDialog = ref(false);
 const selectedDataset = ref(false);
 const showSetSchemaDialog = ref(false);
-const showGlobalSchemaPrompt = ref(true);
 
 let selectedRow = ref(null);
 
 const setProjectSchema = (props) => {
-  // Determine whether to show the global schema prompt or not
-  showGlobalSchemaPrompt.value = !!props.row.globalSchema;
-
   // Show the dialog
   showSetSchemaDialog.value = true;
 
