@@ -139,6 +139,22 @@
       </q-card>
     </q-dialog>
 
+    <!-- setProjectSchema action -->
+    <q-dialog v-model="showSetSchemaDialog">
+      <q-card flat bordered class="my-card">
+        <q-card-section class="q-pt-none">
+          <div>
+            <p v-if="showGlobalSchemaPrompt">Do you want to overwrite the existing project schema?</p>
+            <p v-else>Do you want to set the dataset schema as the base integration schema for the project?</p>
+          </div>
+          <div class="q-mt-md">
+            <q-btn label="Cancel" color="primary" @click="cancelSetSchema" />
+            <q-btn label="Accept" color="primary" @click="acceptSetSchema" />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
 
   </div>
 </template>
@@ -157,6 +173,38 @@ const router = useRouter()
 
 const showEditDialog = ref(false);
 const selectedDataset = ref(false);
+const showSetSchemaDialog = ref(false);
+const showGlobalSchemaPrompt = ref(true);
+
+let selectedRow = ref(null);
+
+const setProjectSchema = (props) => {
+  // Determine whether to show the global schema prompt or not
+  showGlobalSchemaPrompt.value = !!props.row.globalSchema;
+
+  // Show the dialog
+  showSetSchemaDialog.value = true;
+
+  selectedRow.value = props.row;
+  console.log(props+" GGGGGGGGGGGGGGGGGGGGGGGGGG");
+  console.log(props.row)+ " HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH";
+};
+
+const cancelSetSchema = () => {
+  // Close the dialog without taking any action
+  showSetSchemaDialog.value = false;
+};
+
+const acceptSetSchema = () => {
+  if(selectedRow){
+    // Call storeDS.setDatasetAsProjectSchema(props.row) here
+    storeDS.setDatasetAsProjectSchema(selectedRow.value);
+
+    // Close the dialog
+    showSetSchemaDialog.value = false;
+  }
+  else notify.negative("Something went wrong, try it again later.");
+};
 
 const openEditDialog = (data) => {
   selectedDataset.value = data; // Make a copy of the project data to avoid reactivity issues
@@ -228,9 +276,6 @@ const hasSourceGraph = (props) => {
   return false;
 }
 
-const setProjectSchema = (props) => {
-  storeDS.setDatasetAsProjectSchema(props.row)
-}
 const deleteRow = (props) => {
   storeDS.deleteDataSource(props.row)
 }

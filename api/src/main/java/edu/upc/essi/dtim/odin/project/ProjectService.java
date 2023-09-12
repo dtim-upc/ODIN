@@ -2,7 +2,9 @@ package edu.upc.essi.dtim.odin.project;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.NextiaCore.graph.IntegratedGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
@@ -388,6 +390,36 @@ public class ProjectService {
 
         // Return the list of data repositories associated with the project
         return project.getRepositories();
+    }
+
+    /**
+     * Sets the dataset schema as the project schema.
+     *
+     * @param projectID The ID of the project.
+     * @param datasetID The ID of the dataset whose schema should be set as the project schema.
+     * @return true if the schema was set successfully, false otherwise.
+     */
+    public boolean setDatasetSchemaAsProjectSchema(String projectID, String datasetID) {
+        // Retrieve the project by its ID
+        Project project = ormProject.findById(Project.class, projectID);
+
+        // Retrieve the dataset by its ID
+        Dataset dataset = ormProject.findById(Dataset.class, datasetID);
+
+        if (project != null && dataset != null) {
+            Graph integratedGraph = CoreGraphFactory.createIntegratedGraph();
+            integratedGraph.setGraph(dataset.getLocalGraph().getGraph());
+
+            // Set the dataset schema as the project schema
+            project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedGraph);
+
+            // Save the project to persist the changes
+            saveProject(project);
+
+            return true; // Schema set successfully
+        }
+
+        return false; // Project or dataset not found
     }
 
 }

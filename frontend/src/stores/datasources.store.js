@@ -254,6 +254,7 @@ export const useDataSourceStore = defineStore('datasource', {
       const notify = useNotify()
       api.setDatasetSchemaAsProjectOne(this.project.projectId, ds.id, authStore.user.accessToken)
         .then((response) => {
+          console.log(response+" fffffffffffffffffffffffffffffffffff");
           if (response.status == 200) {
             notify.positive("Schema successfully set")
             this.updateProjectInfo()
