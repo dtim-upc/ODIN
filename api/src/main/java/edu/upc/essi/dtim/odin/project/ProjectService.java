@@ -299,6 +299,7 @@ public class ProjectService {
     public Project cloneProject(Project projectToClone) {
         // Reset the project ID to null to create a new project
         projectToClone.setProjectId(null);
+        projectToClone.setProjectName(projectToClone.getProjectName()+" - Copy");
 
         // Get the list of repositories from the original project
         List<DataRepository> repositoriesToClone = projectToClone.getRepositories();
