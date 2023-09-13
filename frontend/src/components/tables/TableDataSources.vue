@@ -110,6 +110,12 @@
         </div>
       </template>
 
+      <template v-slot:body-cell-timestamp="props">
+        <q-td :props="props">
+          {{ formatTimestamp(props.row.created_at) }}
+        </q-td>
+      </template>
+
     </q-table>
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
@@ -150,7 +156,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-
 
     <q-dialog v-model="showGraphDialog">
       <q-card style="max-width: 400px; margin: 20px auto;">
@@ -226,6 +231,13 @@ const openEditDialog = (data) => {
   showEditDialog.value = true;
 };
 
+const formatTimestamp = (timestamp) => {
+  const date = new Date(timestamp); // Convierte el timestamp en una fecha
+  // Formatea la fecha como desees, por ejemplo, "YYYY-MM-DD HH:MM:SS"
+  const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+  return formattedDate;
+};
+
 /*
   props
 */
@@ -246,17 +258,16 @@ onBeforeMount(() => {
 })
 // select, name, tag, size, type -> owner, members -> delete, view local schema
 const columns = [
-  {name: "id", label: "Id", align: "center", field: "id", sortable: true,},
+  {name: "id", label: "ID", align: "center", field: "id", sortable: true,},
   {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
-  {name: "datasetType", label: "Type", align: "center", field: "datasetType", sortable: true,},
+  {name: "Description", label: "Description", align: "center", field: "datasetDescription", sortable: true,},
   {name: "View_triples", label: "View triples", align: "center", field: "View_triples", sortable: false,},
   {
     name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph",
     sortable: false,
   },
-  {name: "actions", label: "actions", align: "center", field: "actions", sortable: false,},
-  {name: "edit", label: "Edit", align: "center", field: "edit", sortable: false,},
-
+  {name: "actions", label: "Actions", align: "center", field: "actions", sortable: false,},
+  {name: "timestamp", label: "Upload date", align: "center", field: "created_at", sortable: true,},
 ];
 
 onMounted(() => {
@@ -272,7 +283,7 @@ onMounted(() => {
 })
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['ID','Name', 'Type', '#Wrappers', 'View_triples', 'View_Source_Graph', 'actions']
+  "datasources": ['ID','Name', 'Description', '#Wrappers', 'View_Source_Graph', 'actions', 'timestamp']
 }
 const title = "Datasets";
 const search = ref("");
