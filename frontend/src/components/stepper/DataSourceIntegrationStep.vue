@@ -2,14 +2,16 @@
   <q-stepper style="width:100%;margin-top:15px" v-model="step" ref="stepper" color="primary" animated
              class="no-padding-stepper">
 
+    <!--
     <q-step :name="1" title="Uploaded data sources" icon="settings" :done="step > 1" style="min-height: 70vh">
       Here are the uploaded data sources that have not yet been integrated into the project
       <TableTemporalDataSources :no_shadow="true"></TableTemporalDataSources>
     </q-step>
+    -->
 
     <!-- v-if="integrationStore.project.numberOfDS == '0'" -->
     <!-- <div> -->
-    <q-step :name="2" title="Preview data source" icon="settings" :done="step > 1" style="min-height: 70vh;height: 1px"
+    <q-step :name="2" title="Preview data source" icon="remove_red_eye" :done="step > 1" style="min-height: 70vh;height: 1px"
             id="previewSourceStep">
       <!-- For each ad campaign that you create, you can control how much you're willing to -->
       <!-- spend on clicks and conversions, which networks and geographical locations you want -->
@@ -82,13 +84,12 @@
 
 <script setup>
 import {ref, onMounted} from '@vue/runtime-core'
-// import CSVPreview from 'components/previews/CSVPreview.vue';
 import TableAligments from 'components/tables/TableAligments.vue';
 import TableJoinAlignments from 'components/tables/TableJoinAlignments.vue';
-import TableTemporalDataSources from "components/tables/TableTemporalDataSources.vue"
 import Graph from 'components/graph/Graph.vue'
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useRouter} from "vue-router";
 
 
 // -------------------------------------------------------------
@@ -127,7 +128,7 @@ onMounted(async () => {
 })
 
 
-const step = ref(1)
+const step = ref(2)
 if (integrationStore.selectedDS.length > 0) {
   step.value = 2
 }
@@ -178,15 +179,18 @@ const stepLabel = () => {
   }
 }
 
+const router = useRouter();
+
 const previousStep = () => {
 
   if (integrationStore.joinAlignments.length === 0 && step.value === 5) {
     step.value = 3
+  } else if(step.value === 2) {
+    // Redirige a una página específica cuando step.value es 1
+    router.push({ name: 'datasources' });
   } else {
     step.value--
   }
-
-
 }
 
 const clickOk = () => {
