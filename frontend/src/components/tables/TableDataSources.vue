@@ -67,7 +67,7 @@
 
       <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" icon="remove_red_eye"></q-btn>
+          <q-btn dense round flat color="grey" @click="setSelectedGraphical(props)" icon="remove_red_eye"></q-btn>
           <q-btn dense round flat color="grey" @click="setProjectSchema(props)" icon="bookmark"></q-btn>
           <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
           <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
@@ -151,8 +151,15 @@
       </q-card>
     </q-dialog>
 
-
-
+    <q-dialog v-model="showGraphDialog">
+      <div class="q-dialog__content">
+        <Graph v-if="selectedGraphical" :graphical="selectedGraphical"></Graph>
+      </div>
+      <q-separator />
+      <div class="q-dialog__actions">
+        <q-btn label="Close" color="primary" @click="showGraphDialog = false" />
+      </div>
+    </q-dialog>
 
   </div>
 </template>
@@ -166,13 +173,22 @@ import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 import {useRouter} from "vue-router";
 import EditDatasetForm from "components/forms/EditDatasetForm.vue";
+import Graph from "../graph/Graph.vue";
 const router = useRouter()
 
 const showEditDialog = ref(false);
 const selectedDataset = ref(false);
 const showSetSchemaDialog = ref(false);
+const showGraphDialog = ref(false);
 
 let selectedRow = ref(null);
+
+const selectedGraphical = ref(null);
+
+const setSelectedGraphical = (props) => {
+  selectedGraphical.value = props.row.localGraph.graphicalSchema;
+  showGraphDialog.value = true;
+};
 
 const setProjectSchema = (props) => {
   // Show the dialog
