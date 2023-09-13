@@ -434,6 +434,7 @@ public class SourceService {
     public boolean editDataset(Dataset dataset) {
         // Retrieve the original dataset from the database using its ID
         Dataset originalDataset = ormDataResource.findById(Dataset.class, dataset.getId());
+        Dataset savedDS = null;
 
         // Check if any attribute has changed
         if (!dataset.getDatasetName().equals(originalDataset.getDatasetName())
@@ -445,10 +446,10 @@ public class SourceService {
             originalDataset.setDatasetDescription(dataset.getDatasetDescription());
 
             // Perform the database update operation to save the changes
-            saveDataset(originalDataset);
-
-            return true; // Changes saved successfully
+            savedDS = saveDataset(originalDataset);
         }
+
+        if(savedDS.getId() != null) return true;
 
         // No changes detected, return false
         return false;
