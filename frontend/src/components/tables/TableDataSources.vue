@@ -151,14 +151,22 @@
       </q-card>
     </q-dialog>
 
+
     <q-dialog v-model="showGraphDialog">
-      <div class="q-dialog__content">
-        <Graph v-if="selectedGraphical" :graphical="selectedGraphical"></Graph>
-      </div>
-      <q-separator />
-      <div class="q-dialog__actions">
-        <q-btn label="Close" color="primary" @click="showGraphDialog = false" />
-      </div>
+      <q-card style="max-width: 400px; margin: 20px auto;">
+        <q-card-section class="q-pt-md q-pb-md">
+          <div class="text-h6">Graphical Data</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <div class="q-dialog__content">
+            <Graph v-if="selectedGraphical" :graphical="selectedGraphical"></Graph>
+          </div>
+        </q-card-section>
+        <q-separator />
+        <q-card-actions align="center">
+          <q-btn label="Cerrar" color="primary" @click="showGraphDialog = false" />
+        </q-card-actions>
+      </q-card>
     </q-dialog>
 
   </div>
