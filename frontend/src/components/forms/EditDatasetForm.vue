@@ -87,6 +87,16 @@ const getDatasetRepositoryId = (datasetId) => {
   return repositoryId;
 };
 
+const getRepositoryName = (repositoryId) => {
+  let repositoryName = null;
+  storeDS.repositories.forEach((repo) => {
+    if (repo.id === repositoryId) {
+      repositoryName = repo.name;
+    }
+  });
+  return repositoryName;
+};
+
 const onRepositoryChange = () => {
   if (createNewRepository.value) {
     // User selected "Create new repository"
