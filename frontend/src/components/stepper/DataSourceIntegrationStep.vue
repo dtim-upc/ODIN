@@ -11,7 +11,7 @@
 
     <!-- v-if="integrationStore.project.numberOfDS == '0'" -->
     <!-- <div> -->
-    <q-step :name="2" title="Preview data source" icon="remove_red_eye" :done="step > 1" style="min-height: 70vh;height: 1px"
+    <q-step :name="2" title="Preview data source" icon="settings" :done="step > 1" style="min-height: 70vh;height: 1px"
             id="previewSourceStep">
       <!-- For each ad campaign that you create, you can control how much you're willing to -->
       <!-- spend on clicks and conversions, which networks and geographical locations you want -->
@@ -37,7 +37,7 @@
 
 
     <q-step v-if="0!==datasetsNumber" :name="3" title="Integrate with project"
-            icon="create_new_folder" :done="step > 2" style="min-height: 70vh">
+            icon="mdi-graph-outline" :done="step > 2" style="min-height: 70vh">
       <!-- <q-input outlined v-model="integratedName" label="Integrated datasource name" placeholder="Type a name for the integrated source" /> -->
 
       <TableAligments :no_shadow="true"/>
@@ -45,7 +45,7 @@
     </q-step>
 
     <q-step v-if="0!==datasetsNumber" :name="4" title="Review alignments"
-            icon="create_new_folder" :done="step > 3" style="min-height: 70vh">
+            icon="mdi-table-headers-eye" :done="step > 3" style="min-height: 70vh">
 
       The following alignments cannot be integrated as their entity domains are not integrated. Delete them or indicate
       the relationships of their entity domains to integrate them.
@@ -53,7 +53,7 @@
     </q-step>
 
 
-    <q-step v-if="0!==datasetsNumber" :name="5" title="Preview integration" icon="settings"
+    <q-step v-if="0!==datasetsNumber" :name="5" title="Preview integration" icon="mdi-eye"
             style="min-height: 70vh;height: 1px" id="previewIntegration">
       <div class="row" style="height: 92%;">
         <div class="col-12">
@@ -211,10 +211,8 @@ const clickOk = () => {
       }
       break;
     case 3:
-
       console.log("integrate with project. Step value", step.value)
       integrationStore.integrateTemporal(function () {
-
         if (integrationStore.joinAlignments.length === 0) {
           step.value = 5
         } else {
