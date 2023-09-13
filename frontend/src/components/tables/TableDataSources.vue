@@ -283,7 +283,7 @@ onMounted(() => {
 })
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['ID','Name', 'Description', '#Wrappers', 'View_Source_Graph', 'actions', 'timestamp']
+  "datasources": ['id','Name', 'Description', '#Wrappers', 'View_Source_Graph', 'actions', 'timestamp']
 }
 const title = "Datasets";
 const search = ref("");
