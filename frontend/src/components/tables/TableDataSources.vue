@@ -62,21 +62,12 @@
         <q-td :props="props">
           <q-btn dense round flat color="grey"
                  icon="download" @click="storeDS.downloadSource(props.row.id)"></q-btn>
-
-          <!-- <q-btn v-if="props.row.type == 'INTEGRATED'" dense round flat color="grey"
-              :to="{ name: 'webvowl', params: { id: props.row.id, minimalI: true } }"
-              icon="mdi-vector-circle-variant"></q-btn>
-          <q-btn v-if="props.row.type == 'INTEGRATED'" dense round flat color="grey"
-              :to="{ name: 'webvowl', params: { id: props.row.id, integrated: true } }"
-              icon="mdi-shape-circle-plus"></q-btn> -->
-
-          <!--          :disable="props.row.graphicalGraph"-->
         </q-td>
       </template>
 
       <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <!-- <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" icon="remove_red_eye"></q-btn> -->
+          <q-btn dense round flat color="grey" :to="'/dataSources/view/' + props.row.id" icon="remove_red_eye"></q-btn>
           <q-btn dense round flat color="grey" @click="setProjectSchema(props)" icon="bookmark"></q-btn>
           <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
           <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
@@ -120,10 +111,6 @@
       </template>
 
     </q-table>
-
-    <!-- <q-dialog v-model="addDataSource" >
-      <StepNewDataSource style="max-width: calc(100vh - 48px)" @finished="addDataSource = false"/>
-    </q-dialog>  -->
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
 
