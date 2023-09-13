@@ -23,10 +23,11 @@
           <q-expansion-item label="Local schema" expand-icon="arrow_drop_down">
             <q-list dense>
 
-              <q-item v-for="ds in storeDS.datasources">
+              <q-item v-for="ds in storeDS.datasources" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
-                       :class="selectedSchema === ds.datasetId? 'activebg': ''" align="left" @Click="setSchema(ds)"/>
+                       :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
               </q-item>
+
 
             </q-list>
           </q-expansion-item>
@@ -66,7 +67,7 @@ const selectedSchema = ref('')
 
 
 const setSchema = datasource => {
-  selectedSchema.value = datasource.datasetId
+  selectedSchema.value = datasource.id
   graphical.value = datasource.localGraph.graphicalSchema
 }
 
