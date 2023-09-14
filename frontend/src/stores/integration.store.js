@@ -49,7 +49,7 @@ export const useIntegrationStore = defineStore('integration', {
         return null
     },
     getGraphicalA(state) {
-      const graphicalSchema = state.project.integratedGraph?.graphicalSchema;
+      const graphicalSchema = state.project.integratedGraph.globalGraph.graphicalSchema;
       if (graphicalSchema !== null && graphicalSchema !== undefined) {
         return graphicalSchema;
       } else {
@@ -343,6 +343,10 @@ export const useIntegrationStore = defineStore('integration', {
             notify.positive("Integration succeeded")
 
             this.projectTemporal = response.data
+            console.log("***",this.projectTemporal)
+            console.log(response.data)
+
+
             if (callback)
               callback()
 

@@ -79,6 +79,10 @@ public class IntegrationController {
             Project project2 = integrationService.getProject(project1.getProjectId());
 
             List<JoinAlignment> joinProperties =  integrationService.generateJoinAlignments(project.getIntegratedGraph(), (Graph) iData.getDsB().getLocalGraph(), iData);
+            System.out.println(joinProperties);
+            for(int i = 0; i < joinProperties.size(); ++i){
+                System.out.println(joinProperties.get(i));
+            }
 
             return new ResponseEntity<>(new IntegrationTemporalResponse(project2, joinProperties), HttpStatus.OK);
         }
@@ -101,21 +105,28 @@ public class IntegrationController {
         logger.info("INTEGRATING joins...");
 
         Project project = integrationService.getProject(id);
+        System.out.println(project.getIntegratedGraph().getGlobalGraph().getGraphicalSchema()+"DDDDDDDDDDDDDDDDDDDDDDDDDDD");
 
         // Integrate the join alignments into the integrated graph
         Graph integratedSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
 
         // Update the project's integrated graph with the integrated schema
-        project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedSchema);
+        //project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedSchema);
+        project = integrationService.updateIntegratedGraphProject(project, integratedSchema);
 
         // Integrate the join alignments into the global schema
         Graph globalSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
 
         // Set the global graph of the project's integrated graph
-        project.getIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalSchema);
+        //project.getIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalSchema);
+        project = integrationService.updateGlobalGraphProject(project, globalSchema);
 
         // Save and return the updated project
         Project savedProject = integrationService.saveProject(project);
+
+        savedProject = integrationService.getProject(savedProject.getProjectId());
+        System.out.println(savedProject.getIntegratedGraph().getGlobalGraph().getGraphicalSchema());
+
 
         return new ResponseEntity(savedProject, HttpStatus.OK);
     }

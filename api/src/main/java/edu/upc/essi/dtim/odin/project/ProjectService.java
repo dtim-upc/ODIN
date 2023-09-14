@@ -125,7 +125,7 @@ public class ProjectService {
                 Graph graph = project.getIntegratedGraph();
 
                 // Set the graph name to match the saved project's integrated graph name
-                graph.setGraphName(savedProject.getIntegratedGraph().getGraphName());
+                graph.setGraphName(savedProject.getIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getIntegratedGraph().getGraphName());
 
                 // Save the graph to the graph store
                 graphStoreInterface.saveGraph(graph);

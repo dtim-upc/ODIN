@@ -2,9 +2,12 @@ package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.odin.NextiaGraphy.NextiaGraphy;
 import edu.upc.essi.dtim.odin.project.Project;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -398,6 +401,22 @@ public class SourceController {
 
 
         //return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("prueba")
+    public ResponseEntity<String> pru(@RequestBody String path){
+        System.out.println("Generating visual graph for file: "+path);
+        String visualSchemaIntegration = "";
+        if(path != null) {
+            Model model = RDFDataMgr.loadModel(path) ;
+            Graph g = CoreGraphFactory.createNormalGraph();
+            g.setGraph(model);
+            NextiaGraphy ng = new NextiaGraphy();
+//        String visualSchemaIntegration = ng.generateVisualGraph(model);
+            visualSchemaIntegration = ng.generateVisualGraphNew(g);
+        }
+
+        return new ResponseEntity<>(visualSchemaIntegration, HttpStatus.OK);
     }
 
 }
