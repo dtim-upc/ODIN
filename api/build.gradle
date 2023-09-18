@@ -77,8 +77,8 @@ dependencies {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////// OLD BOOTSTRAPPING LIB //////////////////////////////////////////
-	//implementation fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar'])
-	//runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar']))
 	implementation fileTree(dir: 'lib', include: ['NextiaBS.jar'])
 	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS.jar']))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
