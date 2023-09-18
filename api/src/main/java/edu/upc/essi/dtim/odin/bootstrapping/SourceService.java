@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -74,13 +75,14 @@ public class SourceService {
      * @return The absolute path of the stored file.
      * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
      */
-    public String reconstructFile(MultipartFile multipartFile) {
+    public String reconstructFile(MultipartFile multipartFile, String repositoryIdAndName) {
         try {
             if (multipartFile.isEmpty()) {
                 throw new RuntimeException("Failed to store empty file.");
             }
 
             // Generate a random 16-character string as part of the filename
+            /*
             final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             StringBuilder sb = new StringBuilder(16);
             SecureRandom random = new SecureRandom();
@@ -88,9 +90,25 @@ public class SourceService {
                 int randomIndex = random.nextInt(characters.length());
                 sb.append(characters.charAt(randomIndex));
             }
+             */
 
             String originalFilename = multipartFile.getOriginalFilename();
-            String modifiedFilename = "_" + sb + "_" + originalFilename;
+
+            if (originalFilename != null) {
+                int lastSlashIndex = originalFilename.lastIndexOf("/");
+
+                if (lastSlashIndex >= 0) {
+                    originalFilename = originalFilename.substring(lastSlashIndex + 1);
+                    // extractedSubstring ahora contiene la parte de la cadena después de la última "/"
+                    System.out.println("Substring extraída: " + originalFilename);
+                } else {
+                    // No se encontró "/" en el nombre de archivo original, por lo que originalFilename no se modifica.
+                    System.out.println("No se encontró '/' en el nombre de archivo original.");
+                }
+            }
+
+            String modifiedFilename = repositoryIdAndName + "/" + originalFilename;
+            System.out.println(originalFilename);
 
             // Get the disk path from the app configuration
             Path diskPath = Path.of(appConfig.getDiskPath());
@@ -145,6 +163,44 @@ public class SourceService {
                 // Throw an exception for unsupported file formats
                 throw new IllegalArgumentException("Unsupported file format: " + extension);
         }
+
+        // Assign an ID to the dataset
+        dataset = saveDataset(dataset);
+        String datasetId = dataset.getId();
+
+        // Modify the datasetPath to include the ID
+        String datasetPath;
+        int lastSlashIndex = Math.max(filePath.lastIndexOf("/"), filePath.lastIndexOf("\\"));
+        if (lastSlashIndex >= 0) {
+            datasetPath = filePath.substring(0, lastSlashIndex + 1) + datasetId + filePath.substring(lastSlashIndex + 1);
+            System.out.println(datasetPath + "+++++++++++++++++++ dataset path slash detection");
+            System.out.println(filePath + "+++++++++++++++++++ FILE ORIGINAL path slash detection");
+
+        } else {
+            datasetPath = datasetId + filePath;
+            System.out.println(datasetPath + "+++++++++++++++++++ dataset path SIN SLASH");
+        }
+
+
+        // Update the datasetPath in the dataset object
+        if (dataset instanceof JsonDataset) {
+            ((JsonDataset) dataset).setPath(datasetPath);
+        } else if (dataset instanceof CsvDataset) {
+            ((CsvDataset) dataset).setPath(datasetPath);
+        }
+
+        // Rename the file on disk with the updated datasetPath
+        File originalFile = new File(filePath);
+        File renamedFile = new File(datasetPath);
+        if (originalFile.renameTo(renamedFile)) {
+            System.out.println("File renamed successfully.");
+        } else {
+            System.out.println("File renaming failed.");
+        }
+
+        // Save the dataset again with the updated datasetPath
+        dataset = saveDataset(dataset);
+
 
         return dataset;
     }

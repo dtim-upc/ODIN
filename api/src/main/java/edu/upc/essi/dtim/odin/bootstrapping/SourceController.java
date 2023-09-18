@@ -5,6 +5,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.odin.NextiaGraphy.NextiaGraphy;
+import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.project.Project;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -37,13 +39,16 @@ public class SourceController {
 
     private final SourceService sourceService;
 
+    private final AppConfig appConfig;
+
     /**
      * Constructs a new instance of SourceController.
      *
      * @param sourceService the SourceService dependency for performing datasource operations
      */
-    SourceController(@Autowired SourceService sourceService) {
+    SourceController(@Autowired SourceService sourceService, @Autowired AppConfig appConfig) {
         this.sourceService = sourceService;
+        this.appConfig = appConfig;
     }
 
     @Autowired
@@ -106,6 +111,20 @@ public class SourceController {
             // Check if a new repository should be created or an existing one should be used
             boolean createRepo = (repositoryId == null) || (repositoryId.equals(""));
 
+            // Find/create repository
+            DataRepository repository;
+            if (createRepo) {
+                // Create a new repository and add it to the project
+                repository = sourceService.createRepository(repositoryName);
+                sourceService.addRepositoryToProject(projectId, repository.getId());
+                createRepo = false;
+            } else {
+                // Find the existing repository using the provided repositoryId
+                repository = sourceService.findRepositoryById(repositoryId);
+            }
+            repositoryId = repository.getId();
+            String directoryName = repositoryId.toString() + repository.getRepositoryName();
+
             // Iterate through the list of MultipartFiles to handle each file
             for (MultipartFile attachFile : attachFiles) {
                 // Get the original filename of the uploaded file
@@ -113,16 +132,14 @@ public class SourceController {
 
                 // Use the original filename as the datasetName
                 assert originalFileName != null;
-                datasetName = originalFileName.substring(0, originalFileName.lastIndexOf('.'));
+                int slashIndex = originalFileName.lastIndexOf("/");
+                datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex+1:0, originalFileName.lastIndexOf('.'));
 
                 // Reconstruct file from Multipart file
-                String filePath = sourceService.reconstructFile(attachFile);
+                String filePath = sourceService.reconstructFile(attachFile, directoryName);
 
-                // Extract data from datasource file
-                Dataset datasource = sourceService.extractData(filePath, datasetName, datasetDescription);
-
-                // Saving dataset to assign an id
-                Dataset savedDataset = sourceService.saveDataset(datasource);
+                // Extract data from datasource file and save it
+                Dataset savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
 
                 // Transform datasource into graph
                 Graph graph = sourceService.transformToGraph(savedDataset);
@@ -134,23 +151,12 @@ public class SourceController {
                 // Create the relation with dataset adding the graph generated to generate an id
                 Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
                 graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-                graph.write("..\\api\\dbFiles\\ttl\\"+datasetName+".ttl");
+                // Get the disk path from the app configuration
+                Path diskPath = Path.of(appConfig.getDiskPath());
+                graph.write(diskPath.toString()+"/"+directoryName+"/"+datasetWithGraph.getId()+datasetName+".ttl");
 
                 // Save graph into the database
                 sourceService.saveGraphToDatabase(graph);
-
-                // Find/create repository
-                DataRepository repository;
-                if (createRepo) {
-                    // Create a new repository and add it to the project
-                    repository = sourceService.createRepository(repositoryName);
-                    sourceService.addRepositoryToProject(projectId, repository.getId());
-                    createRepo = false;
-                } else {
-                    // Find the existing repository using the provided repositoryId
-                    repository = sourceService.findRepositoryById(repositoryId);
-                }
-                repositoryId = repository.getId();
 
                 // Add the dataset to the repository and delete the reference from others if exists
                 sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);

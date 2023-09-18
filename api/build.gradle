@@ -77,8 +77,10 @@ dependencies {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////// OLD BOOTSTRAPPING LIB //////////////////////////////////////////
-	implementation fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar'])
-	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar']))
+	//implementation fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar'])
+	//runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaBS.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS.jar']))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
@@ -120,8 +122,11 @@ tasks['sonarqube'].dependsOn test
 //para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
 def nextiaCoreJarPath = 'C:/Users/victo/Documents/GitHub/NextiaCore/build/libs/nextiacore-0.0.2-SNAPSHOT-uber.jar'
 def nextiaDIJarPath ='C:/Users/victo/Documents/GitHub/NextiaDI/source/build/libs/nextiadi-0.1.0-SNAPSHOT-uber.jar'
+def nextiaBSJarPath ='C:/Users/victo/Documents/GitHub/NextiaBS/build/libs/NextiaBS-1.0-SNAPSHOT-uber.jar'
+
 task importExternalJar {
 	doLast {
+		//////////////////////////COPIAR NEXTIACORE JAR
 		configurations.compileClasspath.files.find { it.name == 'nextiacore-0.0.2-SNAPSHOT-uber.jar' }?.delete()
 		configurations.compileClasspath.files.find { it.name == 'NextiaCore.jar' }?.delete()
 
@@ -130,7 +135,9 @@ task importExternalJar {
 			into "../api/lib"
 			rename { 'NextiaCore.jar' }
 		}
+		/////////////////////////////////////////////////
 
+		//////////////////////////COPIAR nextiadi JAR
 		configurations.compileClasspath.files.find { it.name == 'nextiadi-0.1.0-SNAPSHOT-uber.jar' }?.delete()
 		configurations.compileClasspath.files.find { it.name == 'nextiadi.jar' }?.delete()
 
@@ -139,6 +146,18 @@ task importExternalJar {
 			into "../api/lib"
 			rename { 'nextiadi.jar' }
 		}
+		/////////////////////////////////////////////////
+
+		//////////////////////////COPIAR NEXTIABS JAR
+		configurations.compileClasspath.files.find { it.name == 'NextiaBS-1.0-SNAPSHOT-uber.jar' }?.delete()
+		configurations.compileClasspath.files.find { it.name == 'NextiaBS.jar' }?.delete()
+
+		copy {
+			from nextiaBSJarPath
+			into "../api/lib"
+			rename { 'NextiaBS.jar' }
+		}
+		/////////////////////////////////////////////////
 	}
 }
 
