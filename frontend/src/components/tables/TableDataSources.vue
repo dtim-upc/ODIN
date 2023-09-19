@@ -15,7 +15,6 @@
         </div>
       </template>
 
-      <!-- storeDS.selected.filter(v => (v.graphicalGraph || v.type == "INTEGRATED")).length != 2 -->
       <template v-slot:top-right="props">
         <q-btn v-if="!integrationStore.isDSEmpty" outline
                color="primary" label="Finish pending sources" class="q-mr-xs"
@@ -39,16 +38,6 @@
             {{ props.inFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen" }}
           </q-tooltip>
         </q-btn>
-      </template>
-
-
-      <template v-slot:body-cell-status="props">
-        <q-td :props="props">
-          <q-chip text-color="white" color="accent" v-if="props.row.graphicalGraph === ''">
-            Missing Data Sources
-          </q-chip>
-          <q-chip text-color="white" color="blue" v-else> Completed</q-chip>
-        </q-td>
       </template>
 
       <template v-slot:body-cell-View_triples="props">
@@ -324,6 +313,7 @@ const columns = [
   {name: "id", label: "ID", align: "center", field: "id", sortable: true,},
   {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
   {name: "Description", label: "Description", align: "center", field: "datasetDescription", sortable: true,},
+  {name: 'repository', label: 'Repository', align: 'center', field: 'repositoryName', sortable: true,},
   {name: "View_triples", label: "View triples", align: "center", field: "View_triples", sortable: false,},
   //{name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph", sortable: false,},
   {name: "timestamp", label: "Upload date", align: "center", field: "created_at", sortable: true,},
@@ -344,7 +334,7 @@ onMounted(() => {
 
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['id','Name', 'Description', '#Wrappers', 'actions', 'timestamp']
+  "datasources": ['id','Name', 'Description', '#Wrappers', 'actions', 'timestamp', 'repository']
 }
 const title = "Datasets";
 const search = ref("");
