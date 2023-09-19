@@ -9,8 +9,8 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
-import edu.upc.essi.dtim.nextiabs2.CSVBootstrap_with_DataFrame_MM_without_Jena;
-import edu.upc.essi.dtim.nextiabs2.JSONBootstrap_with_DataFrame_MM_without_Jena;
+import edu.upc.essi.dtim.nextiabs.CSVBootstrap_with_DataFrame_MM_without_Jena;
+import edu.upc.essi.dtim.nextiabs.JSONBootstrap_with_DataFrame_MM_without_Jena;
 import edu.upc.essi.dtim.nextiadi.bootstraping.CSVBootstrap;
 import edu.upc.essi.dtim.nextiadi.bootstraping.JSONBootstrapSWJ;
 

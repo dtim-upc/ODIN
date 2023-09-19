@@ -36,6 +36,7 @@
         </q-list>
       </q-scroll-area>
     </div>
+
     <div class="col-10">
       <Graph v-if="graphical" :graphical="graphical"></Graph>
       <div v-else class="empty-content">
@@ -47,9 +48,7 @@
           </ul>
         </div>
       </div>
-
     </div>
-
   </q-page>
 </template>
 
@@ -62,9 +61,8 @@ import {useDataSourceStore} from 'src/stores/datasources.store.js'
 const miniState = ref(true)
 const storeDS = useDataSourceStore()
 
-const graphical = ref('')
-const selectedSchema = ref('')
-
+const graphical = ref('');
+const selectedSchema = ref('');
 
 const setSchema = datasource => {
   selectedSchema.value = datasource.id
