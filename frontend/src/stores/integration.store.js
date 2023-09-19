@@ -49,12 +49,13 @@ export const useIntegrationStore = defineStore('integration', {
         return null
     },
     getGraphicalA(state) {
-      const graphicalSchema = state.project.integratedGraph.globalGraph.graphicalSchema;
-      if (graphicalSchema !== null && graphicalSchema !== undefined) {
-        return graphicalSchema;
-      } else {
-        return null;
+      if (state.project.integratedGraph !== null && state.project.integratedGraph !== undefined) {
+        const graphicalSchema = state.project.integratedGraph.globalGraph?.graphicalSchema;
+        if (graphicalSchema !== null && graphicalSchema !== undefined) {
+          return graphicalSchema;
+        }
       }
+      return null; // Devuelve null si no se puede acceder a graphicalSchema
     },
     getGraphicalB(state) {
       if (state.selectedDS.length === 1) {
