@@ -58,23 +58,6 @@
         </q-td>
       </template>
 
-      <template v-slot:body-cell-View_Source_Graph="props">
-        <q-td :props="props">
-          <q-btn dense round flat color="grey"
-                 icon="download" @click="storeDS.downloadSource(props.row.id)"></q-btn>
-        </q-td>
-      </template>
-
-      <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <q-btn dense round flat color="grey" @click="setSelectedGraphical(props)" icon="remove_red_eye"></q-btn>
-          <q-btn dense round flat color="grey" @click="setProjectSchema(props)" icon="bookmark"></q-btn>
-          <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
-          <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
-          <q-btn dense round flat color="grey" @click="integrateRow(props)" icon="join_full"></q-btn>
-        </q-td>
-      </template>
-
       <template v-slot:no-data="{ icon, message, filter }">
         <div class="full-width row flex-center text-accent q-gutter-sm q-pa-xl" style="flex-direction: column">
           <svg width="160px" height="88px" viewBox="0 0 216 120" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -116,6 +99,84 @@
         </q-td>
       </template>
 
+      <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
+        <q-td :props="props">
+          <q-btn dense round flat color="grey" icon="more_vert" label="">
+            <q-menu auto-close>
+              <q-list style="min-width: 100px">
+
+                <q-item clickable @click="setSelectedGraphical(props)">
+                  <q-item-section horizontal>
+                    <div style="display: flex; align-items: center;">
+                      <q-icon color="grey" name="remove_red_eye" />
+                      <span style="margin-left: 8px;">See schema</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable @click="setProjectSchema(props)">
+                  <q-item-section horizontal>
+                    <div style="display: flex; align-items: center;">
+                      <q-icon color="grey" name="bookmark" />
+                      <span style="margin-left: 8px;">Set base schema</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable @click="integrateRow(props)">
+                  <q-item-section horizontal>
+                    <div style="display: flex; align-items: center;">
+                      <q-icon color="grey" name="join_full" />
+                      <span style="margin-left: 8px;">Integrate schema</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+
+                <q-separator />
+
+                <q-item clickable @click="editRow(props)">
+                  <q-item-section horizontal>
+                    <div style="display: flex; align-items: center;">
+                      <q-icon color="grey" name="edit" />
+                      <span style="margin-left: 8px;">Edit dataset</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable @click="deleteRow(props)">
+                  <q-item-section horizontal>
+                    <div style="display: flex; align-items: center;">
+                      <q-icon color="grey" name="delete" />
+                      <span style="margin-left: 8px;">Delete dataset</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+
+                <q-separator />
+
+                <q-item clickable @click="storeDS.downloadSource(props.row.id)">
+                  <q-item-section horizontal>
+                    <div style="display: flex; align-items: center;">
+                      <q-icon color="grey" name="download" />
+                      <span style="margin-left: 8px;">Download schema</span>
+                    </div>
+                  </q-item-section>
+                </q-item>
+
+              </q-list>
+            </q-menu>
+          </q-btn>
+
+          <!--
+          <q-btn dense round flat color="grey" @click="setSelectedGraphical(props)" icon="remove_red_eye"></q-btn>
+          <q-item @click="setSelectedGraphical(props)" icon="remove_red_eye"><q-icon color="grey"  icon="remove_red_eye"></q-icon></q-item>
+          <q-btn dense round flat color="grey" @click="setProjectSchema(props)" icon="bookmark"></q-btn>
+          <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
+          <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
+          <q-btn dense round flat color="grey" @click="integrateRow(props)" icon="join_full"></q-btn>
+          -->
+        </q-td>
+      </template>
     </q-table>
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
@@ -187,6 +248,8 @@ import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 import {useRouter} from "vue-router";
 import EditDatasetForm from "components/forms/EditDatasetForm.vue";
 import Graph from "../graph/Graph.vue";
+import { QBtn, QMenu, QItem, QTooltip } from 'quasar';
+
 const router = useRouter()
 
 const showEditDialog = ref(false);
@@ -262,12 +325,9 @@ const columns = [
   {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
   {name: "Description", label: "Description", align: "center", field: "datasetDescription", sortable: true,},
   {name: "View_triples", label: "View triples", align: "center", field: "View_triples", sortable: false,},
-  {
-    name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph",
-    sortable: false,
-  },
-  {name: "actions", label: "Actions", align: "center", field: "actions", sortable: false,},
+  //{name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph", sortable: false,},
   {name: "timestamp", label: "Upload date", align: "center", field: "created_at", sortable: true,},
+  {name: 'actions', label: 'Actions', align: 'center', field: 'actions', sortable: false,},
 ];
 
 onMounted(() => {
@@ -281,9 +341,10 @@ onMounted(() => {
   }
   storeDS.getDatasources(projectId);
 })
+
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['id','Name', 'Description', '#Wrappers', 'View_Source_Graph', 'actions', 'timestamp']
+  "datasources": ['id','Name', 'Description', '#Wrappers', 'actions', 'timestamp']
 }
 const title = "Datasets";
 const search = ref("");

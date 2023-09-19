@@ -65,7 +65,6 @@ export const useIntegrationStore = defineStore('integration', {
         return ""
     },
     getGlobalSchema(state) {
-
       if (state.projectTemporal.integratedGraph.globalGraph.graphicalSchema)
         return state.projectTemporal.integratedGraph.globalGraph.graphicalSchema
       return ""
