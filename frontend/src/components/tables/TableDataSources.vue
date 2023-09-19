@@ -11,7 +11,7 @@
         <div class="q-table__title">
           {{ title }}
           <q-btn unelevated v-if="view === 'datasources'" padding="none" color="primary700" icon="add"
-                 @click="addDataSource = true"/>
+                 @click="openSelectRepository = true"/>
         </div>
       </template>
 
@@ -174,6 +174,25 @@
       </template>
     </q-table>
 
+    <template>
+      <div>
+        <div v-if="currentStep === 1">
+          <!-- Mostrar el primer formulario -->
+          <StepOneForm @nextStep="nextStep" />
+        </div>
+        <div v-else-if="currentStep === 2">
+          <!-- Mostrar el segundo formulario -->
+          <StepTwoForm @previousStep="previousStep" @submitStepTwo="submitStepTwo" />
+        </div>
+        <div v-else>
+          <!-- Mostrar el formulario de agregar datasource -->
+          <FormNewDataSource @cancel="previousStep" @submit="handleAddDataSource" />
+        </div>
+      </div>
+    </template>
+
+    <FormSelectRepository v-model:show="openSelectRepository"></FormSelectRepository>
+
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
 
     <q-dialog v-model="showEditDialog">
@@ -233,7 +252,6 @@
   </div>
 </template>
 
-
 <script setup>
 import {computed, onBeforeMount, onMounted, defineProps, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js';
@@ -244,6 +262,7 @@ import {useRouter} from "vue-router";
 import EditDatasetForm from "components/forms/EditDatasetForm.vue";
 import Graph from "../graph/Graph.vue";
 import { QBtn, QMenu, QItem, QTooltip } from 'quasar';
+import FormSelectRepository from "../forms/FormSelectRepository.vue";
 
 const router = useRouter()
 
@@ -345,6 +364,7 @@ const views = {
 const title = "Datasets";
 const search = ref("");
 const visibleColumns = views[props.view];
+const openSelectRepository = ref(false);
 const addDataSource = ref(false);
 const computedDatasets = computed(() => storeDS.datasources);
 
