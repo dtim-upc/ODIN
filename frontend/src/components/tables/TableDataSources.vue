@@ -40,6 +40,12 @@
         </q-btn>
       </template>
 
+      <template v-slot:body-cell-repository="props">
+        <q-td :props="props">
+          {{ getRepositoryName(props.row.id) }}
+        </q-td>
+      </template>
+
       <template v-slot:body-cell-View_triples="props">
         <q-td :props="props">
           <q-btn dense round flat color="grey"
@@ -352,6 +358,25 @@ const hasSourceGraph = (props) => {
   }
   return false;
 }
+
+const getRepositoryName = (datasetId) => {
+  // Obtiene la lista de repositorios del store
+  const repositories = storeDS.repositories;
+
+  // Itera a través de la lista de repositorios para buscar el dataset
+  for (const repository of repositories) {
+    // Verifica si el repositorio contiene el datasetId
+    const dataset = repository.datasets.find((dataset) => dataset.id === datasetId);
+    if (dataset) {
+      // Si encuentra el dataset, devuelve el nombre del repositorio
+      return repository.repositoryName;
+    }
+  }
+
+  // Si no se encuentra el dataset, devuelve un valor por defecto o maneja la situación de otra manera
+  return "Repositorio no encontrado"; // Puedes cambiar esto según tus necesidades
+};
+
 
 const deleteRow = (props) => {
   storeDS.deleteDataSource(props.row)
