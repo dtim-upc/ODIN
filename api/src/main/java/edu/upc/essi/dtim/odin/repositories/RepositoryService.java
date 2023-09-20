@@ -36,15 +36,15 @@ public class RepositoryService {
         ProjectService projectService = new ProjectService(appConfig);
 
         // Get the list of DataResource objects associated with the project
-        List<DataRepository> dataResources = projectService.getProjectById(projectId).getRepositories();
+        List<DataRepository> repositories = projectService.getProjectById(projectId).getRepositories();
 
         // Create a list to store DataRepository objects
         List<DataRepository> dataRepositories = new ArrayList<>();
 
         // Iterate through the DataResource objects
-        for (DataResource dataResource : dataResources) {
+        for (DataRepository dataRepository : repositories) {
             // Check if the ID of the DataResource is "0"
-            if (dataResource.getId().equals("0")) {
+            if (dataRepository.getId().equals("0")) {
                 System.out.println("++++++++++++++++++++++++++++ GET REPOSITORIES");
             }
         }

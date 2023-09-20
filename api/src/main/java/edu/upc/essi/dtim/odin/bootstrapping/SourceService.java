@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -212,7 +211,7 @@ public class SourceService {
      * @return A GraphModelPair object containing the transformed Graph and the corresponding Model.
      * @throws UnsupportedOperationException if the dataset type is not supported or an error occurs during the transformation.
      */
-    public Graph transformToGraph(DataResource dataset) {
+    public Graph transformToGraph(Dataset dataset) {
         try {
             // Create an instance of the bsModuleImpl class that implements the bsModuleInterface
             bsModuleInterface bsInterface = new bsModuleImpl();
@@ -374,7 +373,7 @@ public class SourceService {
      */
     public DataRepository createRepository(String repositoryName) {
         // Create a new DataRepository instance
-        DataResource dataRepository = new DataRepository();
+        DataRepository dataRepository = new DataRepository();
 
         // Set the repository name for the DataRepository
         ((DataRepository) dataRepository).setRepositoryName(repositoryName);

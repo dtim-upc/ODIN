@@ -83,23 +83,16 @@
     </entity>
 
     <!--> MAPPING DATASET CLASS<-->
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.DataResource">
-        <table name="DataResource">
-            <unique-constraint>
-                <column-name>id</column-name>
-            </unique-constraint>
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+        <table name="DataRepository">
+        <unique-constraint>
+            <column-name>id</column-name>
+        </unique-constraint>
         </table>
-        <inheritance strategy="JOINED"/>
         <attributes>
             <id name="id">
                 <generated-value strategy="AUTO"/>
             </id>
-        </attributes>
-    </entity>
-
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
-        <table name="DataRepository"/>
-        <attributes>
             <basic name="repositoryName"/>
 
             <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
@@ -121,9 +114,16 @@
     </entity>
 
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
-        <table name="Dataset"/>
+        <table name="Dataset">
+        <unique-constraint>
+            <column-name>id</column-name>
+        </unique-constraint>
+        </table>
         <inheritance strategy="JOINED"/>
         <attributes>
+            <id name="id">
+                <generated-value strategy="AUTO"/>
+            </id>
             <basic name="datasetName"/>
             <basic name="datasetDescription"/>
             <basic name="created_at">

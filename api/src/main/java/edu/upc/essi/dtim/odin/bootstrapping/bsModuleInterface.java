@@ -1,6 +1,5 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 
@@ -11,5 +10,5 @@ public interface bsModuleInterface {
      * @param dataset The dataset to be converted into a graph.
      * @return The resulting graph representing the dataset.
      */
-    Graph convertDatasetToGraph(DataResource dataset);
+    Graph convertDatasetToGraph(Dataset dataset);
 }

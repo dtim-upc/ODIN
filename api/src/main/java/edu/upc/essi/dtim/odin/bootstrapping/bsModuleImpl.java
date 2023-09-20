@@ -28,8 +28,7 @@ public class bsModuleImpl implements bsModuleInterface{
      * @param dataset El conjunto de datos que se va a convertir.
      * @return Un grafo que representa el conjunto de datos.
      */
-    @Override
-    public Graph convertDatasetToGraph(DataResource dataset) {
+    public Graph convertDatasetToGraph(Dataset dataset) {
         int bsVersion = 1;
 
         Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
@@ -66,7 +65,7 @@ public class bsModuleImpl implements bsModuleInterface{
      * @param dataset El conjunto de datos que se va a convertir.
      * @return Un modelo RDF que representa el conjunto de datos.
      */
-    Model convertDatasetToModel(DataResource dataset) {
+    Model convertDatasetToModel(Dataset dataset) {
         Model bootstrapM = ModelFactory.createDefaultModel();
         if (dataset.getClass().equals(CsvDataset.class)) {
             CSVBootstrap bootstrap = new CSVBootstrap();
