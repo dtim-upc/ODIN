@@ -104,6 +104,12 @@
               </div>
             </q-expansion-item>
           </template>
+          <template v-else>
+              <!-- Content to be displayed when the row is expanded -->
+              <div>
+                There are no datasets in this repository
+              </div>
+          </template>
         </q-td>
       </template>
 
