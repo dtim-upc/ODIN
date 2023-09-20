@@ -334,6 +334,7 @@ const successCallback = (datasource) => {
 
   integrationStore.addSelectedDatasource(datasource)
   storeDS.getDatasources(route.params.id)
+  storeDS.getRepositories(route.params.id)
 }
 
 // Método para abrir el selector de archivos
