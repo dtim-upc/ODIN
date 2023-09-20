@@ -15,7 +15,8 @@ export const useDataSourceStore = defineStore('datasource', {
   state: () => ({
     project: {},
     datasources: [],
-    repositories: []
+    repositories: [],
+    selectedRepositoryId: null,
   }),
 
   getters: {
@@ -40,6 +41,16 @@ export const useDataSourceStore = defineStore('datasource', {
 
     async init() {
     },
+
+    setSelectedRepositoryId(repositoryId) {
+      this.selectedRepositoryId = repositoryId;
+      this.setSelectedRepositoryName(repositoryId);
+    },
+
+    setSelectedRepositoryName(repositoryId){
+      this.selectedRepositoryName = repositoryId;
+    },
+
     async setProject(proj) {
       const route = useRoute()
       const authStore = useAuthStore()
@@ -142,7 +153,6 @@ export const useDataSourceStore = defineStore('datasource', {
       });
 
     },
-
     editDatasource(data, successCallback) {
       const authStore = useAuthStore();
       const notify = useNotify();

@@ -191,7 +191,7 @@
       </div>
     </template>
 
-    <FormSelectRepository v-model:show="openSelectRepository"></FormSelectRepository>
+    <FormSelectRepository v-model:show="openSelectRepository" @repository-selected="handleRepositorySelected"></FormSelectRepository>
 
     <FormNewDataSource v-model:show="addDataSource"></FormNewDataSource>
 
@@ -313,6 +313,16 @@ const formatTimestamp = (timestamp) => {
   // Formatea la fecha como desees, por ejemplo, "YYYY-MM-DD HH:MM:SS"
   const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
   return formattedDate;
+};
+
+// Variable para almacenar el ID del repositorio seleccionado
+let selectedRepositoryId = null;
+
+// Método para manejar la selección de repositorio
+const handleRepositorySelected = (repositoryId) => {
+  selectedRepositoryId = repositoryId;
+  openSelectRepository.value = false;
+  addDataSource.value = true;
 };
 
 /*

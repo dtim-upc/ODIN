@@ -6,80 +6,17 @@
         <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
-          <div class="text-h5">Create new dataset</div>
-          <div class="text-h5">repositoryId: {{ storeDS.selectedRepositoryId }}</div>
-
-
-          <!-- Sección 2: Información del Conjunto de Datos -->
-          <q-card-section v-if="uploadedItems.length > 0">
-            <div class="text-h6">Datasets information</div>
-
-            <!-- Sección 3: Lista de archivos cargados -->
-            <!-- List of Uploaded Files/Folders -->
-            <div class="uploaded-items-list">
-              <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item"
-                   @mouseover="showSpecialButton(index)" @mouseleave="hideSpecialButton(index)">
-
-                <div class="special-button special-button-hidden" >
-                  <q-button @click="removeUploadedItem(index)" flat round>
-                    <q-icon name="close" size="1.25em"/>
-                  </q-button>
-                </div>
-
-                <template v-if="item.files === undefined">
-                  <div>{{ item.name }}</div>
-                  <div class="file-system-entry__details">
-                    <span class="file-system-entry__detail">
-                      {{ formatFileSize(item.size) }} ·
-                    </span>
-                    <span class="file-system-entry__detail">
-                      {{ item.type }}
-                    </span>
-                  </div>
-                </template>
-
-                <template v-else>
-                  <div>{{ item.name }}</div>
-                  <div class="file-system-entry__details">
-                    <span class="file-system-entry__detail">
-                      <svg viewBox="0 0 9 7" width="9" height="7" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M0 6.14285714V.85714286C0 .38375593.38375593 0 .85714286 0h2.26447876c1.33783784 0 .74324324 1.23673511 2.08108108 1.23673511h2.94015444C8.61624407 1.23673511 9 1.62049104 9 2.09387797v4.04897917C9 6.61624407 8.61624407 7 8.14285714 7H.85714286C.38375593 7 0 6.61624407 0 6.14285714z"
-                          fill="#6a6d70">
-                        </path>
-                      </svg>
-                      <span class="directory__type-detail">
-                        Folder ·
-                      </span>
-                    </span>
-                    <span class="file-system-entry__detail">{{ item.files.length }} elements</span>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </q-card-section>
+          <div class="text-h5">Create new repository</div>
 
           <!-- File and Folder Upload Section -->
           <q-card-section v-if="isLocalFileOptionSelected">
-            <div
-              class="hoverDiv uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
-              <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
-                <path
-                  d="M36.493 72C16.118 72 0 55.883 0 36.493 0 16.118 16.118 0 36.493 0 55.882 0 72 16.118 72 36.493 72 55.882 55.883 72 36.493 72zM34 34h-9c-.553 0-1 .452-1 1.01v1.98A1 1 0 0 0 25 38h9v9c0 .553.452 1 1.01 1h1.98A1 1 0 0 0 38 47v-9h9c.553 0 1-.452 1-1.01v-1.98A1 1 0 0 0 47 34h-9v-9c0-.553-.452-1-1.01-1h-1.98A1 1 0 0 0 34 25v9z"
-                  fill="#5268ff" fill-rule="nonzero"></path>
-              </svg>
-              <div class="uploader__empty-state-text">
-                <h2 @click="triggerFileUpload">Upload files</h2>
-                <button @click="triggerFolderUpload" class="uploader__sub-title uploader__directories-dialog-trigger">
-                  Or select a folder
-                </button>
-              </div>
-            </div>
-
-            <!-- Hidden Inputs for File and Folder Upload -->
-            <input type="file" ref="fileUpload" @change="handleFileUpload" style="display: none;" multiple>
-            <input type="file" ref="folderUpload" directory @change="handleFolderUpload"
-                   style="display: none;">
+            <q-input
+              filled
+              v-model="localRepository"
+              label="Repository name"
+              lazy-rules
+              :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
+            />
           </q-card-section>
 
           <!-- Mostrar campos de input URL si se selecciona "Remote file" -->
@@ -153,6 +90,7 @@ import {odinApi} from "../../boot/axios";
 
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
+const localRepository = ref(""); // Variable para almacenar la URL del archivo remoto
 
 async function downloadFile() {
   let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
@@ -260,8 +198,7 @@ const options = [
 ];
 
 const newDatasource = reactive({
-  repositoryId: storeDS.selectedRepositoryId,
-  repositoryName: storeDS.selectedRepositoryName,
+  repositoryName: '',
   datasetName: '',
   datasetDescription: '',
 });
@@ -286,38 +223,13 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 }
 
 const onSubmit = () => {
-  // Check if uploadedItems is empty
-  if (uploadedItems.value.length === 0) {
-    // Display a notification indicating that at least one file should be added
-    notify.negative('Please add at least one file before submitting.');
-    return; // Abort form submission
-  }
-
   const data = new FormData();
   console.log("Contenido de uploadedItems:", uploadedItems.value);
 
-
-  data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
-  data.append("repositoryName", newDatasource.repositoryName);
-  data.append("repositoryId", storeDS.selectedRepositoryId); // Set as empty string if repositoryId is null
-  console.log(newDatasource.repositoryId,"++++++++++++++++++++++++++");
-  // Append all files as an array under the key 'attach_files'
-  uploadedItems.value.forEach((item) => {
-    console.log("Archivo que se va a agregar:", item);
+  data.append("repositoryName", localRepository.value);
 
-    //si item.files === undefined es un fichero individual
-    if (item.files === undefined) data.append('attach_files', item);
-
-    //si item.files !== undefined es una carpeta, accedemos a item.files
-    else {
-      item.files.forEach((file) => {
-        data.append('attach_files', file);
-      });
-    }
-  });
-
-  integrationStore.addDataSource(route.params.id, data, successCallback);
+  integrationStore.addDataRepository(route.params.id, data, successCallback);
 
   onReset();
 }
@@ -332,8 +244,7 @@ const successCallback = (datasource) => {
 
   showS.value = false;
 
-  integrationStore.addSelectedDatasource(datasource)
-  storeDS.getDatasources(route.params.id)
+  storeDS.getRepositories(route.params.id);
 }
 
 // Método para abrir el selector de archivos

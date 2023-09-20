@@ -109,7 +109,7 @@
 
     </q-table>
 
-    <FormNewDataSource v-model:show="addDataRepository"></FormNewDataSource>
+    <FormNewRepository v-model:show="addDataRepository"></FormNewRepository>
 
   </div>
 </template>
@@ -119,7 +119,7 @@ import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} f
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useNotify} from 'src/use/useNotify.js'
-import FormNewDataSource from "components/forms/FormNewDataSource.vue";
+import FormNewRepository from "components/forms/FormNewRepository.vue";
 
 /*
   props

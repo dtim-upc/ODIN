@@ -238,6 +238,34 @@ export const useIntegrationStore = defineStore('integration', {
         notify.negative("Something went wrong in the server.")
       });
     },
+
+    addDataRepository(projectID, data, success) {
+      const notify = useNotify()
+      const authStore = useAuthStore()
+      console.log("adding data source...", data)
+      api.addRepository(projectID, authStore.user.accessToken, data)
+        .then((response) => {
+          console.log("dataset created ", response)
+          if (response.status === 200) {
+
+            // this should be in temporal landing
+            //this.project.datasets.push(response.data)
+
+            // this.temporalDatasources.push(response.data)
+
+            success(response.data);
+            // storeDS.addDataSource(response.data)
+
+          } else {
+            // console.log("error")
+            notify.negative("Cannot create datasource. Something went wrong in the server.")
+          }
+        }).catch((error) => {
+        console.log("error addding ds: ", error)
+        notify.negative("Something went wrong in the server.")
+      });
+    },
+
     addSelectedDatasource(ds) {
       console.log(
         "METODO ADDSELECTEDDATASOURCE**************************", ds

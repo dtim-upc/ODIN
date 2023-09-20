@@ -1,23 +1,16 @@
 <template>
-  <q-dialog v-model="showS" @hide="props.show=false">
+  <q-dialog v-model="showS" @hide="props.show = false">
     <q-card style="width: 400px; max-width: 80vw">
-
       <q-card-section>
-        <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
-          <!-- Sección 1: Título form -->
           <div class="text-h5">Select your repository</div>
-
-          <!-- Sección 4: Información del Repositorio -->
           <q-card-section>
             <template v-if="storeDS.repositories.length === 0">
-              <!-- Mostrar el mensaje si no hay repositorios -->
               <div class="text-h6 text-warning">
                 No repositories available. Please create a new repository.
               </div>
             </template>
             <template v-else>
-              <!-- Mostrar el campo de selección de repositorio si hay repositorios disponibles -->
               <q-select
                 filled
                 v-model="newDatasource.repositoryId"
@@ -33,16 +26,14 @@
               />
             </template>
           </q-card-section>
-
         </div>
       </q-card-section>
 
-      <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-        <!-- Botones del formulario -->
+      <q-form ref="form" @submit="onSubmit" class="q-gutter-md">
         <q-card-section>
           <div v-if="showFormButtons" align="right">
-            <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup/>
-            <q-btn label="Next" type="submit" color="primary"/>
+            <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup />
+            <q-btn label="Next" type="submit" color="primary" @click="nextStep"/>
           </div>
         </q-card-section>
       </q-form>
@@ -51,24 +42,16 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted, watch, computed} from "vue";
-import {useNotify} from 'src/use/useNotify.js'
-import {useRoute, useRouter} from "vue-router";
-import {useIntegrationStore} from 'src/stores/integration.store.js'
-import {useDataSourceStore} from "../../stores/datasources.store";
-
-// -------------------------------------------------------------
-//                         PROPS & EMITS
-// -------------------------------------------------------------
+import { ref, reactive, onMounted, computed } from "vue";
+import { useNotify } from 'src/use/useNotify.js'
+import { useDataSourceStore } from "../../stores/datasources.store";
 
 const props = defineProps({
-  show: {type: Boolean, default: false, required: true},
-  showFormButtons: {type: Boolean, default: true},
-  afterSubmitShowGraph: {type: Boolean, default: true},
+  show: { type: Boolean, default: false, required: true },
+  showFormButtons: { type: Boolean, default: true },
 });
 
-
-const emit = defineEmits(["update:show"])
+const emit = defineEmits(["update:show"]);
 const showS = computed({
   get() {
     return props.show
@@ -76,94 +59,52 @@ const showS = computed({
   set(newValue) {
     emit('update:show', newValue)
   }
-})
+});
+
+onMounted(async () => {
+  storeDS.selectedRepositoryId = null;
+  onReset();
+});
 
 const storeDS = useDataSourceStore();
 
-// -------------------------------------------------------------
-//                         STORES & GLOBALS
-// -------------------------------------------------------------
 const onRepositoryChange = () => {
-  if (createNewRepository.value) {
-    // User selected "Create new repository"
-    newDatasource.repositoryId = null;
+  const selectedRepo = storeDS.repositories.find(repo => repo.id === newDatasource.repositoryId);
+  if (selectedRepo) {
+    newDatasource.repositoryId = selectedRepo.id;
   } else {
-    // User selected an existing repository
-    const selectedRepo = storeDS.repositories.find(repo => repo.id === newDatasource.repositoryId);
-    if (selectedRepo) {
-      newDatasource.repositoryId = selectedRepo.id;
-    } else {
-      newDatasource.repositoryId = null; // Handle the case when the selected repository is not found
-    }
+    newDatasource.repositoryId = null;
   }
-}
-
-const integrationStore = useIntegrationStore()
-
-const projectID = ref(null)
-const createNewRepository = ref(false); // Variable para determinar si se va a crear un nuevo repositorio
-
-
-// When the component is mounted, fetch the repositories for the current project.
-onMounted(async () => {
-  const url = window.location.href; // Get the current URL
-  const regex = /project\/(\d+)\//;
-  const match = url.match(regex);
-  let projectId;
-  if (match) {
-    projectId = match[1];
-    console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
-    projectID.value = projectId;
-    await storeDS.getRepositories(projectID.value)
-    if (storeDS.repositories.length === 0) createNewRepository.value = true;
-  }
-});
-
-const route = useRoute()
-const router = useRouter()
-// -------------------------------------------------------------
-//                         Others
-// -------------------------------------------------------------
-
-const form = ref(null)
-const notify = useNotify()
-
-defineExpose({
-  form
-})
+};
 
 const newDatasource = reactive({
   repositoryId: ref(null),
   repositoryName: '',
 });
 
+const onSubmit = () => {
+  onReset();
+};
 
-const onReset = () => {// Restablece los valores de los campos a su estado inicial
+const nextStep = () => {
+  // Emitir un evento personalizado con los datos seleccionados
+  const selectedRepositoryId = newDatasource.repositoryId;
+  console.log(selectedRepositoryId,"----------------------------");
+  storeDS.selectedRepositoryId = selectedRepositoryId;
+
+  emit("repository-selected", selectedRepositoryId);
+};
+
+const onReset = () => {
   newDatasource.repositoryId = null;
   newDatasource.repositoryName = '';
-}
+};
 
-const onSubmit = () => {
-  const data = new FormData();
+const notify = useNotify();
 
-  data.append("repositoryId", newDatasource.repositoryId === null || createNewRepository.value ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
-
-  onReset();
-}
-
-const successCallback = (datasource) => {
-
-  console.log("success callback")
-
-  notify.positive(`Data Source ${datasource.id} successfully uploaded`)
-  onReset()
-  form.value.resetValidation()
-
-  showS.value = false;
-
-  integrationStore.addSelectedDatasource(datasource)
-  storeDS.getDatasources(route.params.id)
-}
+defineExpose({
+  form: ref(null)
+});
 
 </script>
 

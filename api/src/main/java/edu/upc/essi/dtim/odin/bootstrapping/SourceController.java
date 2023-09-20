@@ -425,5 +425,34 @@ public class SourceController {
         return new ResponseEntity<>(visualSchemaIntegration, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/project/{id}/newRepository")
+    public ResponseEntity<Object> addRepository(@PathVariable("id") String projectId,
+                                            @RequestParam String repositoryName,
+                                            @RequestParam(required = false) String datasetDescription)
+    {
+        try{
+            logger.info("POST REPOSITORY RECEIVED FOR " + projectId);
+            // Validate and authenticate access here
+            //future check when adding authentification
+
+            // Find/create repository
+            DataRepository repository;
+
+            // Create a new repository and add it to the project
+            repository = sourceService.createRepository(repositoryName);
+            sourceService.addRepositoryToProject(projectId, repository.getId());
+
+            // Return success message
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (UnsupportedOperationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Repository not created successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
+        }
+    }
+
+
 }
 

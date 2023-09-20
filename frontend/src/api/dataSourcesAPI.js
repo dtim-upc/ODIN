@@ -30,6 +30,9 @@ export default {
   bootstrap(projectID, token, data) {
     return odinApi.post('/project/' + projectID, data)
   },
+  addRepository(projectID, token, data) {
+    return odinApi.post('/project/' + projectID + '/newRepository', data)
+  },
   getAll(projectID, token) {
     return odinApi.get('/project/' + projectID + '/datasources'/*, {headers: { Authorization: `Bearer ${token}` }} */)
   },
