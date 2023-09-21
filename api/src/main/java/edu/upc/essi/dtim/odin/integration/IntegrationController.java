@@ -73,12 +73,11 @@ public class IntegrationController {
 
             Graph globalGraph = integrationService.generateGlobalGraph(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
             projectToSave=integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
-
-
-            projectToSave = integrationService.addIntegratedDataset(projectToSave.getProjectId(), iData.getDsB().getId());
-
+            
             Project project1 = integrationService.saveProject(projectToSave);
             logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
+            project1 = integrationService.addIntegratedDataset(project1.getProjectId(), iData.getDsB().getId());
+
             Project project2 = integrationService.getProject(project1.getProjectId());
 
             List<JoinAlignment> joinProperties =  integrationService.generateJoinAlignments(project.getIntegratedGraph(), (Graph) iData.getDsB().getLocalGraph(), iData);
