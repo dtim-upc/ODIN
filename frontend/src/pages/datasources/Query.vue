@@ -140,7 +140,6 @@ import {useAuthStore} from 'stores/auth.store.js'
 import queryAPI from "src/api/query.api.js";
 import {useNotify} from 'src/use/useNotify.js'
 
-
 const miniState = ref(true)
 const storeDS = useDataSourceStore()
 const authStore = useAuthStore();
@@ -225,8 +224,9 @@ const query = (data) => {
 }
 
 onBeforeMount(async () => {
-  await storeDS.setProject()
-  setGlobalSchema()
+  await storeDS.setProject();
+  setGlobalSchema();
+  document.title = "Query"; // Título de la pestaña
 })
 
 // onMounted ( () => {

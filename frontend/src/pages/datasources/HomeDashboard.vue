@@ -244,8 +244,9 @@ const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore()
 
 onBeforeMount(() => {
-  storeDS.setProject()
-  integrationStore.setProject()
+  storeDS.setProject();
+  integrationStore.setProject();
+  document.title = "Home"; // Título de la pestaña
 })
 
 const showIntegrationView = () => {

@@ -58,6 +58,12 @@ import {ref, onMounted} from "vue";
 import Graph from 'components/graph/Graph.vue'
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 
+import { onBeforeMount } from "vue";
+
+onBeforeMount(() => {
+  document.title = "Schema"; // Título de la pestaña
+});
+
 const miniState = ref(true)
 const storeDS = useDataSourceStore()
 

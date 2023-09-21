@@ -409,8 +409,40 @@ const getRepositoryName = (datasetId) => {
 
 
 const deleteRow = (props) => {
-  storeDS.deleteDataSource(props.row)
-}
+  // Obtén la lista de datasets integrados en el proyecto
+  const integratedDatasets = storeDS.project.integratedDatasets;
+
+  // Verifica si el ID de la fila está en la lista de datasets integrados
+  const isIntegrated = integratedDatasets.some(dataset => dataset.id === props.row.id);
+
+  if (isIntegrated) {
+    // Muestra un mensaje de confirmación
+    const confirmDelete = window.confirm(
+      "Este dataset está integrado en el proyecto. ¿Deseas eliminarlo y perder todo el progreso?"
+    );
+
+    if (confirmDelete) {
+      // Si el usuario confirma la eliminación, llama a la función para eliminar el dataset
+      storeDS.deleteDataSource(props.row);
+    } else {
+      // Si el usuario cancela la eliminación, no hagas nada
+      // Puedes mostrar un mensaje o realizar cualquier otra acción necesaria aquí
+    }
+  } else {
+    // Muestra un mensaje de confirmación
+    const confirmDelete = window.confirm(
+      "Este dataset aún no ha sido integrado. Si deseas eliminarlo no se perderá ningún progreso pero no podrás integrarlo. ¿Seguro que deseas eliminarlo?"
+    );
+
+    if (confirmDelete) {
+      // Si el usuario confirma la eliminación, llama a la función para eliminar el dataset
+      storeDS.deleteDataSource(props.row);
+    } else {
+      // Si el usuario cancela la eliminación, no hagas nada
+      // Puedes mostrar un mensaje o realizar cualquier otra acción necesaria aquí
+    }
+  }
+};
 
 const editRow = (props) => {
   // Implement the logic for the edit action here.
