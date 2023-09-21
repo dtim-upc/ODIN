@@ -11,24 +11,31 @@
 
           <q-expansion-item label="Global schema" expand-icon="arrow_drop_down" default-opened>
             <q-list dense>
-
               <q-item>
                 <q-btn flat padding="xs" label="project" class="full-width"
                        :class="selectedSchema === 'project'? 'activebg': ''" align="left" @Click="setGlobalSchema()"/>
               </q-item>
+            </q-list>
+          </q-expansion-item>
+
+          <q-expansion-item label="Integrated schemas" expand-icon="arrow_drop_down">
+            <q-list dense>
+
+              <q-item v-for="ds in storeDS.project.integratedDatasets" :key="ds.id">
+                <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
+                       :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
+              </q-item>
+
 
             </q-list>
           </q-expansion-item>
 
           <q-expansion-item label="Local schema" expand-icon="arrow_drop_down">
             <q-list dense>
-
               <q-item v-for="ds in storeDS.datasources" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
                        :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
               </q-item>
-
-
             </q-list>
           </q-expansion-item>
 
