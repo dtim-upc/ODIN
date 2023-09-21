@@ -73,7 +73,7 @@ public class IntegrationController {
 
             Graph globalGraph = integrationService.generateGlobalGraph(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
             projectToSave=integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
-            
+
             Project project1 = integrationService.saveProject(projectToSave);
             logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
             project1 = integrationService.addIntegratedDataset(project1.getProjectId(), iData.getDsB().getId());
