@@ -88,6 +88,12 @@
         </div>
       </template>
 
+      <template v-slot:body-cell-isIntegrated="props">
+        <q-td :props="props">
+          {{ isDatasetIntegrated(props.row) ? 'Sí' : 'No' }}
+        </q-td>
+      </template>
+
       <template v-slot:body-cell-timestamp="props">
         <q-td :props="props">
           {{ formatTimestamp(props.row.created_at) }}
@@ -308,6 +314,15 @@ const openEditDialog = (data) => {
   showEditDialog.value = true;
 };
 
+const isDatasetIntegrated = (row) => {
+  // Obtén la lista de IDs de datasets integrados en el proyecto
+  const integratedDatasets = storeDS.project.integratedDatasets;
+  console.log("ENTROOOOOOOO IS INTEGRATED")
+
+  // Verifica si el ID de la fila está en la lista de datasets integrados
+  return integratedDatasets.some(dataset => dataset.id === row.id);
+};
+
 const formatTimestamp = (timestamp) => {
   const date = new Date(timestamp); // Convierte el timestamp en una fecha
   // Formatea la fecha como desees, por ejemplo, "YYYY-MM-DD HH:MM:SS"
@@ -347,7 +362,8 @@ onBeforeMount(() => {
 const columns = [
   {name: "id", label: "ID", align: "center", field: "id", sortable: true,},
   {name: "Name", label: "Name", align: "center", field: "datasetName", sortable: true,},
-  {name: "Description", label: "Description", align: "center", field: "datasetDescription", sortable: true,},
+  //{name: "Description", label: "Description", align: "center", field: "datasetDescription", sortable: true,},
+  {name: "isIntegrated", label: "Integrated", align: "center", field: "integrated", sortable: true,},
   {name: 'repository', label: 'Repository', align: 'center', field: 'repositoryName', sortable: true,},
   {name: "View_triples", label: "View triples", align: "center", field: "View_triples", sortable: false,},
   //{name: "View_Source_Graph", label: "Source Graph", align: "center", field: "View Source Graph", sortable: false,},
@@ -369,7 +385,7 @@ onMounted(() => {
 
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['id','Name', 'Description', '#Wrappers', 'actions', 'timestamp', 'repository']
+  "datasources": ['id','Name', 'isIntegrated', '#Wrappers', 'actions', 'timestamp', 'repository']
 }
 const title = "Datasets";
 const search = ref("");
