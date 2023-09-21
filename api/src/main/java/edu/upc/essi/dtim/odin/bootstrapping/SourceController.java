@@ -399,9 +399,8 @@ public class SourceController {
             @PathVariable("datasetID") String datasetID
     ) {
         logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
-
-
             sourceService.setProjectSchemasBase(projectID,datasetID);
+            sourceService.addIntegratedDataset(projectID,datasetID);
 
             return ResponseEntity.ok("Dataset schema set as project schema.");
 

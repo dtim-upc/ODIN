@@ -45,6 +45,11 @@
                 <cascade><cascade-all/></cascade>
             </one-to-many>
 
+            <one-to-many orphan-removal="true" name="integratedDatasets" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                <join-column name="PROJECTID"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+
             <one-to-one name="integratedGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
                 <cascade><cascade-all/></cascade>
             </one-to-one>

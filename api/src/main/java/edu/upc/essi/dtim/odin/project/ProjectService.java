@@ -200,7 +200,7 @@ public class ProjectService {
      */
     public boolean projectContains(String projectId, String dataresourceId) {
         // Retrieve the project by its ID from the database
-        Project project = ormProject.findById(Project.class, projectId);
+        Project project = getProjectById(projectId);
 
         // Get the list of repositories in the project
         List<DataRepository> repos = project.getRepositories();
@@ -403,7 +403,7 @@ public class ProjectService {
      */
     public boolean setDatasetSchemaAsProjectSchema(String projectID, String datasetID) {
         // Retrieve the project by its ID
-        Project project = ormProject.findById(Project.class, projectID);
+        Project project = getProjectById(projectID);
 
         // Retrieve the dataset by its ID
         Dataset dataset = ormProject.findById(Dataset.class, datasetID);
@@ -424,5 +424,23 @@ public class ProjectService {
         return false; // Project or dataset not found
     }
 
+    public Project addIntegratedDataset(String projectID, String datasetID) {
+        // Retrieve the project by its ID
+        Project project = getProjectById(projectID);
+
+        // Retrieve the dataset by its ID
+        Dataset dataset = ormProject.findById(Dataset.class, datasetID);
+
+        if (project != null && dataset != null) {
+            List<Dataset> integratedDatasets = project.getIntegratedDatasets();
+            integratedDatasets.add(dataset);
+            project.setIntegratedDatasets(integratedDatasets);
+
+            // Save the project to persist the changes
+            return saveProject(project);
+        }
+
+        return null; // Project or dataset not found
+    }
 }
 

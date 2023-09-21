@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.project;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class Project {
     private String createdBy;
     private List<DataRepository> repositories;
     private IntegratedGraphJenaImpl integratedGraph;
+
+    private List<Dataset> integratedDatasets;
 
     /**
      * Get the unique identifier of the project.
@@ -161,6 +164,14 @@ public class Project {
      */
     public void setRepositories(List<DataRepository> dataResources) {
         this.repositories = dataResources;
+    }
+
+    public List<Dataset> getIntegratedDatasets() {
+        return integratedDatasets;
+    }
+
+    public void setIntegratedDatasets(List<Dataset> integratedDatasets) {
+        this.integratedDatasets = integratedDatasets;
     }
 }
 

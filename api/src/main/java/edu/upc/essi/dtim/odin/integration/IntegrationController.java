@@ -74,6 +74,9 @@ public class IntegrationController {
             Graph globalGraph = integrationService.generateGlobalGraph(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
             projectToSave=integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
 
+
+            projectToSave = integrationService.addIntegratedDataset(projectToSave.getProjectId(), iData.getDsB().getId());
+
             Project project1 = integrationService.saveProject(projectToSave);
             logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
             Project project2 = integrationService.getProject(project1.getProjectId());
@@ -120,6 +123,8 @@ public class IntegrationController {
         // Set the global graph of the project's integrated graph
         //project.getIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalSchema);
         project = integrationService.updateGlobalGraphProject(project, globalSchema);
+
+        //project = integrationService.addIntegratedDataset(datasetId);
 
         // Save and return the updated project
         Project savedProject = integrationService.saveProject(project);

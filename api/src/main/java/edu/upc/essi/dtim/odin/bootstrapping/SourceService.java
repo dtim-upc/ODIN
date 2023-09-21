@@ -394,7 +394,7 @@ public class SourceService {
     public DataRepository addDatasetToRepository(String datasetId, String repositoryId) throws IllegalArgumentException {
         // Find the new repository and dataset by their respective IDs
         DataRepository newRepository = ormDataResource.findById(DataRepository.class, repositoryId);
-        Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
+        Dataset dataset = getDatasetById(datasetId);
 
         // Check if the new repository and dataset were found
         if (newRepository == null) {
@@ -591,7 +591,7 @@ public class SourceService {
         }
 
         // Find the dataset with the given datasetId
-        Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
+        Dataset dataset = getDatasetById(datasetId);
 
         // If the dataset is not found in the project, throw an exception
         if (dataset == null) {
@@ -643,6 +643,9 @@ public class SourceService {
         return dataset;
     }
 
+    public Project addIntegratedDataset(String projectID, String datasetID) {
+        return projectService.addIntegratedDataset(projectID, datasetID);
+    }
 }
 
 

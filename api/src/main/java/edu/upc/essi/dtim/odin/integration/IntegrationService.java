@@ -32,6 +32,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class IntegrationService {
+    /**
+     * The dependency on the ProjectService class.
+     */
+    private final ProjectService projectService;
     private final AppConfig appConfig;
 
     /**
@@ -39,8 +43,9 @@ public class IntegrationService {
      *
      * @param appConfig The application configuration.
      */
-    public IntegrationService(@Autowired AppConfig appConfig){
+    public IntegrationService(@Autowired AppConfig appConfig, @Autowired ProjectService projectService){
         this.appConfig = appConfig;
+        this.projectService = projectService;
     }
 
     /**
@@ -339,5 +344,9 @@ public class IntegrationService {
 
         // Return the resulting global graph after the join operation.
         return globalGraph;
+    }
+
+    public Project addIntegratedDataset(String projectId, String id) {
+        return projectService.addIntegratedDataset(projectId, id);
     }
 }
