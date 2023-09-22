@@ -124,13 +124,15 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable @click="integrateRow(props)">
+                <q-item :clickable="!isDatasetIntegrated(props.row)" @click="integrateRow(props)" :disable="isDatasetIntegrated(props.row)">
                   <q-item-section horizontal>
                     <div style="display: flex; align-items: center;">
                       <q-icon color="grey" name="join_full" />
                       <span style="margin-left: 8px;">Integrate schema</span>
                     </div>
                   </q-item-section>
+                  <q-tooltip v-if="!isDatasetIntegrated(props.row)">Integrate with the project</q-tooltip>
+                  <q-tooltip v-else>This schema is already integrated</q-tooltip>
                 </q-item>
 
                 <q-separator />
@@ -370,6 +372,8 @@ const columns = [
   {name: "timestamp", label: "Upload date", align: "center", field: "created_at", sortable: true,},
   {name: 'actions', label: 'Actions', align: 'center', field: 'actions', sortable: false,},
 ];
+
+const showTooltip = true;
 
 onMounted(() => {
   const url = window.location.href; // Get the current URL
