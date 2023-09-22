@@ -6,9 +6,8 @@
         <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
-          <div class="text-h5">Create new dataset</div>
-          <div class="text-h5">repositoryId: {{ storeDS.selectedRepositoryId }}</div>
-
+          <div class="text-h4">Create new dataset</div>
+          <div class="text-h5">Parent Repository: {{ storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId).repositoryName : "ERROR 404" }}</div>
 
           <!-- Sección 2: Información del Conjunto de Datos -->
           <q-card-section v-if="uploadedItems.length > 0">
