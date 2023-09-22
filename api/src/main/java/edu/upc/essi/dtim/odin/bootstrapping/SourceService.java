@@ -646,6 +646,10 @@ public class SourceService {
     public Project addIntegratedDataset(String projectID, String datasetID) {
         return projectService.addIntegratedDataset(projectID, datasetID);
     }
+
+    public Project deleteIntegratedDatasets(String projectID) {
+        return projectService.deleteIntegratedDatasets(projectID);
+    }
 }
 
 

@@ -462,5 +462,17 @@ public class ProjectService {
         return false;
     }
 
+    public Project deleteIntegratedDatasets(String projectID) {
+        // 1. Recupera el proyecto por su ID
+        Project project = getProjectById(projectID);
+
+        if (project != null) {
+            project.setIntegratedDatasets(new ArrayList<>());
+            System.out.println(project.getIntegratedDatasets());
+            System.out.println("+++++++++++++++++++++++ELIMINADOS EXTERMINADOSSSSS");
+            return saveProject(project);
+        }
+        return null; // Proyecto no encontrado o dataset no encontrado
+    }
 }
 

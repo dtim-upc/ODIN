@@ -400,6 +400,7 @@ public class SourceController {
     ) {
         logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
             sourceService.setProjectSchemasBase(projectID,datasetID);
+            sourceService.deleteIntegratedDatasets(projectID);
             sourceService.addIntegratedDataset(projectID,datasetID);
 
             return ResponseEntity.ok("Dataset schema set as project schema.");
