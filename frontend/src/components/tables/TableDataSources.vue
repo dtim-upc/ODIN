@@ -77,8 +77,8 @@
               </clipPath>
             </defs>
           </svg>
-          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">Data sources not found.</span>
-          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate data sources with the project, please add at least two sources.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">Datasets not found.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate datasets with the project, please add at least two sources.</span>
         </div>
       </template>
 
@@ -251,8 +251,8 @@
               </clipPath>
             </defs>
           </svg>
-          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">Data sources not found.</span>
-          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate data sources with the project, please add at least two sources.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">There are no datasets integrated yet.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate datasets, set one of them as the base schema of project, please add at least two sources.</span>
         </div>
       </template>
 
