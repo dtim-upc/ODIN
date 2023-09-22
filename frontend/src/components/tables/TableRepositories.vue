@@ -83,34 +83,36 @@
       </template>
 
       <!-- New slot for expandable content -->
-      <template v-slot:body-cell="props">
-        <q-td :props="props" v-if="props.col.name !== 'expand' && props.col.name !== 'actions'">
-          <!-- Render the content for ID and Repository Name columns -->
-          {{ props.row[props.col.name] }}
+      <template v-slot:body-cell-expand="props">
+        
+        <q-td :props="props">
+          <!-- Use q-expansion-item to make rows expandable with datasets -->
+          <q-expansion-item :label="'Show datasets'">
+            <!-- Content to be displayed when the row is expanded -->
+            <div>
+              <table>
+                <thead>
+                <tr>
+                  <th><b>Dataset Id</b></th>
+                  <th><b>Dataset Name</b></th>
+                  <th><b>Is integrated</b></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-if="props.row.datasets && props.row.datasets.length > 0" v-for="dataset in props.row.datasets" :key="dataset.id">
+                  <td>{{ dataset.id }}</td>
+                  <td>{{ dataset.datasetName }}</td>
+                  <td>{{ storeDS.project.integratedDatasets.some(integratedDataset => integratedDataset.id === dataset.id) ? 'Yes' : 'No' }}</td>
+                </tr>
+                <tr v-else>
+                  <td colspan="3">There are no datasets in this repository</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </q-expansion-item>
         </q-td>
 
-        <q-td :props="props" v-if="props.col.name === 'expand'">
-          <!-- Use q-expansion-item to make rows expandable with datasets -->
-          <template v-if="props.row.datasets && props.row.datasets.length > 0">
-            <q-expansion-item :label="'Show datasets'">
-              <!-- Content to be displayed when the row is expanded -->
-              <div>
-                <ul>
-                  <li v-for="dataset in props.row.datasets" :key="dataset.id">
-                    <p><b>Dataset Id:</b> {{ dataset.id }}</p>
-                    <p><b>Dataset Name:</b> {{ dataset.datasetName }}</p>
-                  </li>
-                </ul>
-              </div>
-            </q-expansion-item>
-          </template>
-          <template v-else>
-              <!-- Content to be displayed when the row is expanded -->
-              <div>
-                There are no datasets in this repository
-              </div>
-          </template>
-        </q-td>
       </template>
 
     </q-table>
@@ -166,13 +168,12 @@ const rows = computed(() => {
 const columns = [
   {name: "id", label: "ID", align: "center", field: "id", sortable: true},
   {name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true},
-  {name: "expand", label: "Expand", align: "center", field: "expand", sortable: false},
-  {name: "actions", label: "Actions", align: "center", field: "actions", sortable: false},
+  {name: "expand", label: "Datasets", align: "center", field: "expand", sortable: false},
 ];
 
 const views = {
   "integration": ['Id', 'Name', 'Type'],
-  "repositories": ['id', 'repositoryName', 'actions', 'expand'], // Include 'expand' in the visibleColumns list
+  "repositories": ['id', 'repositoryName', 'expand'], // Include 'expand' in the visibleColumns list
 }
 
 onMounted(() => {
