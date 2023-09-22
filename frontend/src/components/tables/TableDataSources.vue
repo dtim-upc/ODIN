@@ -2,7 +2,11 @@
   <div class="q-pa-md">
     <!-- style="min-height: 70vh;margin-top:15px" -->
     <!-- @selection="validateSelection2" -->
-    <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.datasources" :columns="columns" :filter="search"
+
+    <div>
+      <!-- Tabla para nuevos datasets (no integrados) -->
+      <h5>New Datasets</h5>
+      <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.datasources.filter(dataset => !isDatasetIntegrated(dataset))" :columns="columns" :filter="search"
              :class="{ 'no-shadow': no_shadow }" row-key="id"
              no-data-label="I didn't find anything for you. Consider creating a new data source."
              no-results-label="The filter didn't uncover any results" :visible-columns="visibleColumns">
@@ -16,21 +20,11 @@
       </template>
 
       <template v-slot:top-right="props">
-        <q-btn v-if="!integrationStore.isDSEmpty" outline
-               color="primary" label="Finish pending sources" class="q-mr-xs"
-               :to="{ name: 'dsIntegration' }">
-          <q-badge color="orange" floating>{{ integrationStore.datasources.length }}</q-badge>
-        </q-btn>
-
-        <q-btn label="Integrated schema" dense color="primary" icon="download" @click="storeDS.downloadProjectS"
-               style="margin-right:10px"></q-btn>
-
         <q-input outlined dense debounce="400" color="primary" v-model="search">
           <template v-slot:append>
             <q-icon name="search"/>
           </template>
         </q-input>
-
 
         <q-btn flat round dense :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
                @click="props.toggleFullscreen">
@@ -124,7 +118,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item :clickable="!isDatasetIntegrated(props.row)" @click="integrateRow(props)" :disable="isDatasetIntegrated(props.row)">
+                <q-item :clickable="!isDatasetIntegrated(props.row)" :disable="isDatasetIntegrated(props.row)" @click="integrateRow(props)">
                   <q-item-section horizontal>
                     <div style="display: flex; align-items: center;">
                       <q-icon color="grey" name="join_full" />
@@ -146,7 +140,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable @click="deleteRow(props)">
+                <q-item :clickable="!isDatasetIntegrated(props.row)" :disable="isDatasetIntegrated(props.row)" @click="deleteRow(props)">
                   <q-item-section horizontal>
                     <div style="display: flex; align-items: center;">
                       <q-icon color="grey" name="delete" />
@@ -181,23 +175,181 @@
         </q-td>
       </template>
     </q-table>
+    </div>
 
-    <template>
-      <div>
-        <div v-if="currentStep === 1">
-          <!-- Mostrar el primer formulario -->
-          <StepOneForm @nextStep="nextStep" />
+    <div>
+      <!-- Tabla para datasets integrados -->
+      <h5>Integrated Datasets</h5>
+      <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.datasources.filter(dataset => isDatasetIntegrated(dataset))" :columns="columns" :filter="search"
+             :class="{ 'no-shadow': no_shadow }" row-key="id"
+             no-data-label="I didn't find anything for you. Consider creating a new data source."
+             no-results-label="The filter didn't uncover any results" :visible-columns="visibleColumns">
+
+      <template v-slot:top-left="">
+        <div class="q-table__title">
+          <q-btn label="Integrated schema" dense color="primary" icon="download" @click="storeDS.downloadProjectS"
+                 style="margin-right:10px"></q-btn>
         </div>
-        <div v-else-if="currentStep === 2">
-          <!-- Mostrar el segundo formulario -->
-          <StepTwoForm @previousStep="previousStep" @submitStepTwo="submitStepTwo" />
+      </template>
+
+      <template v-slot:top-right="props">
+        <q-input outlined dense debounce="400" color="primary" v-model="search">
+          <template v-slot:append>
+            <q-icon name="search"/>
+          </template>
+        </q-input>
+
+
+        <q-btn flat round dense :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+               @click="props.toggleFullscreen">
+          <q-tooltip :disable="$q.platform.is.mobile" v-close-popup>
+            {{ props.inFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen" }}
+          </q-tooltip>
+        </q-btn>
+      </template>
+
+      <template v-slot:body-cell-repository="props">
+        <q-td :props="props">
+          {{ getRepositoryName(props.row.id) }}
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-View_triples="props">
+        <q-td :props="props">
+          <q-btn dense round flat color="grey"
+                 icon="mdi-graphql" :to="{name: 'viewTriples', params: {datasourceID: props.row.id}}"></q-btn>
+        </q-td>
+      </template>
+
+      <template v-slot:no-data="{ icon, message, filter }">
+        <div class="full-width row flex-center text-accent q-gutter-sm q-pa-xl" style="flex-direction: column">
+          <svg width="160px" height="88px" viewBox="0 0 216 120" fill="none" xmlns="http://www.w3.org/2000/svg"
+               class="sc-jIkXHa sc-ZOtfp fXAzWm jPTZgW">
+            <g opacity="0.84" clip-path="url(#EmptyDocuments_svg__clip0_1142_57509)">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M189.25 19.646a7.583 7.583 0 010 15.166h-43.333a7.583 7.583 0 010 15.167h23.833a7.583 7.583 0 010 15.167h-11.022c-5.28 0-9.561 3.395-9.561 7.583 0 1.956 1.063 3.782 3.19 5.48 2.017 1.608 4.824 1.817 7.064 3.096a7.583 7.583 0 01-3.754 14.174H65.75a7.583 7.583 0 010-15.166H23.5a7.583 7.583 0 110-15.167h43.333a7.583 7.583 0 100-15.167H39.75a7.583 7.583 0 110-15.166h43.333a7.583 7.583 0 010-15.167H189.25zm0 30.333a7.583 7.583 0 110 15.166 7.583 7.583 0 010-15.166z"
+                    fill="#D9D8FF" fill-opacity="0.8"></path>
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M132.561 19.646l10.077 73.496.906 7.374a4.334 4.334 0 01-3.773 4.829l-63.44 7.789a4.333 4.333 0 01-4.83-3.772l-9.767-79.547a2.166 2.166 0 011.91-2.417l5.262-.59 63.655-7.162zM73.162 26.33l4.97-.557-4.97.557z"
+                    fill="#fff"></path>
+              <path
+                d="M73.162 26.33l4.97-.557m54.429-6.127l10.077 73.496.906 7.374a4.334 4.334 0 01-3.773 4.829l-63.44 7.789a4.333 4.333 0 01-4.83-3.772l-9.767-79.547a2.166 2.166 0 011.91-2.417l5.262-.59 63.655-7.162z"
+                stroke="#7B79FF" stroke-width="2.5"></path>
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M129.818 24.27l9.122 66.608.82 6.682c.264 2.153-1.246 4.11-3.373 4.371l-56.812 6.976c-2.127.261-4.066-1.272-4.33-3.425l-8.83-71.908a2.167 2.167 0 011.887-2.415l7.028-.863"
+                    fill="#F0F0FF"></path>
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M135.331 5.833H85.978a2.97 2.97 0 00-2.107.873A2.97 2.97 0 0083 8.813v82.333c0 .823.333 1.567.872 2.106a2.97 2.97 0 002.107.873h63.917a2.97 2.97 0 002.106-.873 2.97 2.97 0 00.873-2.106V23.367a2.98 2.98 0 00-.873-2.107L137.437 6.705a2.98 2.98 0 00-2.106-.872z"
+                    fill="#fff" stroke="#7B79FF" stroke-width="2.5"></path>
+              <path
+                d="M135.811 7.082v12.564a3.25 3.25 0 003.25 3.25h8.595M94.644 78.146h28.167m-28.167-55.25h28.167-28.167zm0 13h46.584-46.584zm0 14.083h46.584-46.584zm0 14.084h46.584-46.584z"
+                stroke="#7B79FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+            <defs>
+              <clipPath id="EmptyDocuments_svg__clip0_1142_57509">
+                <path fill="#fff" d="M0 0h216v120H0z"></path>
+              </clipPath>
+            </defs>
+          </svg>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">Data sources not found.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate data sources with the project, please add at least two sources.</span>
         </div>
-        <div v-else>
-          <!-- Mostrar el formulario de agregar datasource -->
-          <FormNewDataSource @cancel="previousStep" @submit="handleAddDataSource" />
-        </div>
-      </div>
-    </template>
+      </template>
+
+      <template v-slot:body-cell-isIntegrated="props">
+        <q-td :props="props">
+          {{ isDatasetIntegrated(props.row) ? 'Sí' : 'No' }}
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-timestamp="props">
+        <q-td :props="props">
+          {{ formatTimestamp(props.row.created_at) }}
+        </q-td>
+      </template>
+
+        <template v-if="view === 'datasources'" v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <q-btn dense round flat color="grey" icon="more_vert" label="">
+              <q-menu auto-close>
+                <q-list style="min-width: 100px">
+
+                  <q-item clickable @click="setSelectedGraphical(props)">
+                    <q-item-section horizontal>
+                      <div style="display: flex; align-items: center;">
+                        <q-icon color="grey" name="remove_red_eye" />
+                        <span style="margin-left: 8px;">See schema</span>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item clickable @click="setProjectSchema(props)">
+                    <q-item-section horizontal>
+                      <div style="display: flex; align-items: center;">
+                        <q-icon color="grey" name="bookmark" />
+                        <span style="margin-left: 8px;">Set base schema</span>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item :clickable="!isDatasetIntegrated(props.row)" :disable="isDatasetIntegrated(props.row)" @click="integrateRow(props)">
+                    <q-item-section horizontal>
+                      <div style="display: flex; align-items: center;">
+                        <q-icon color="grey" name="join_full" />
+                        <span style="margin-left: 8px;">Integrate schema</span>
+                      </div>
+                    </q-item-section>
+                    <q-tooltip v-if="!isDatasetIntegrated(props.row)">Integrate with the project</q-tooltip>
+                    <q-tooltip v-else>This schema is already integrated</q-tooltip>
+                  </q-item>
+
+                  <q-separator />
+
+                  <q-item clickable @click="editRow(props)">
+                    <q-item-section horizontal>
+                      <div style="display: flex; align-items: center;">
+                        <q-icon color="grey" name="edit" />
+                        <span style="margin-left: 8px;">Edit dataset</span>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item :clickable="!isDatasetIntegrated(props.row)" :disable="isDatasetIntegrated(props.row)" @click="deleteRow(props)">
+                    <q-item-section horizontal>
+                      <div style="display: flex; align-items: center;">
+                        <q-icon color="grey" name="delete" />
+                        <span style="margin-left: 8px;">Delete dataset</span>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-separator />
+
+                  <q-item clickable @click="storeDS.downloadSource(props.row.id)">
+                    <q-item-section horizontal>
+                      <div style="display: flex; align-items: center;">
+                        <q-icon color="grey" name="download" />
+                        <span style="margin-left: 8px;">Download schema</span>
+                      </div>
+                    </q-item-section>
+                  </q-item>
+
+                </q-list>
+              </q-menu>
+            </q-btn>
+
+            <!--
+            <q-btn dense round flat color="grey" @click="setSelectedGraphical(props)" icon="remove_red_eye"></q-btn>
+            <q-item @click="setSelectedGraphical(props)" icon="remove_red_eye"><q-icon color="grey"  icon="remove_red_eye"></q-icon></q-item>
+            <q-btn dense round flat color="grey" @click="setProjectSchema(props)" icon="bookmark"></q-btn>
+            <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
+            <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
+            <q-btn dense round flat color="grey" @click="integrateRow(props)" icon="join_full"></q-btn>
+            -->
+          </q-td>
+        </template>
+    </q-table>
+    </div>
 
     <FormSelectRepository v-model:show="openSelectRepository" @repository-selected="handleRepositorySelected"></FormSelectRepository>
 
@@ -373,8 +525,6 @@ const columns = [
   {name: 'actions', label: 'Actions', align: 'center', field: 'actions', sortable: false,},
 ];
 
-const showTooltip = true;
-
 onMounted(() => {
   const url = window.location.href; // Get the current URL
   const regex = /project\/(\d+)\//;
@@ -389,7 +539,7 @@ onMounted(() => {
 
 const views = {
   "integration": ['Name', 'Type'],
-  "datasources": ['id','Name', 'isIntegrated', '#Wrappers', 'actions', 'timestamp', 'repository']
+  "datasources": ['id','Name', '#Wrappers', 'actions', 'timestamp', 'repository']
 }
 const title = "Datasets";
 const search = ref("");
@@ -483,6 +633,7 @@ const integrateRow = (props) => {
     else notify.negative("Add another dataset to make an integration.")
   }
 };
+
 </script>
 
 <style lang="css" scoped>
