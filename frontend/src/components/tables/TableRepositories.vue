@@ -84,12 +84,12 @@
 
       <!-- New slot for expandable content -->
       <template v-slot:body-cell-expand="props">
-        
+
         <q-td :props="props">
           <!-- Use q-expansion-item to make rows expandable with datasets -->
           <q-expansion-item :label="'Show datasets'">
             <!-- Content to be displayed when the row is expanded -->
-            <div>
+            <div class="centered-table">
               <table>
                 <thead>
                 <tr>
@@ -195,4 +195,13 @@ const deleteRow = (props2) => {
 </script>
 
 <style lang="css" scoped>
+.centered-table {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente el contenido de la tabla */
+  align-items: center; /* Centra verticalmente el contenido de la tabla */
+}
+
+.centered-table table {
+  width: 100%; /* Asegura que la tabla ocupe todo el ancho disponible */
+}
 </style>
