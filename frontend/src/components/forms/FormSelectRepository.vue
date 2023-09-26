@@ -33,7 +33,8 @@
         <q-card-section>
           <div v-if="showFormButtons" align="right">
             <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup />
-            <q-btn label="Next" type="submit" color="primary" @click="nextStep"/>
+            <q-btn v-if="storeDS.repositories.length === 0" label="Create Repository" color="primary" :to="{name:'repositories'}"/>
+            <q-btn v-else label="Next" type="submit" color="primary" @click="nextStep"/>
           </div>
         </q-card-section>
       </q-form>

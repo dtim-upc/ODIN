@@ -110,17 +110,6 @@
             <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
           </q-card-section>
 
-          <!-- Tipo de origen de datos -->
-          <q-card-section>
-            <!-- Tipo de origen de datos -->
-            <q-select
-              v-model="DataSourceType"
-              :options="options"
-              label="Type"
-              class="q-mt-none"
-            />
-          </q-card-section>
-
           <!-- Descripción del conjunto de datos (opcional) -->
           <q-card-section>
             <!-- Descripción del conjunto de datos (opcional) -->
@@ -237,6 +226,13 @@ onMounted(async () => {
     projectID.value = projectId;
     await storeDS.getRepositories(projectID.value)
   }
+
+  //qué tipo de repositorio es?
+  //llamar a la api aquí.
+  storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)):"NADA";
+  const foundRepository = storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId);
+  console.log(foundRepository,"++++++++++++++++++++++++++++++++++++++++++++++++++++ repo seleccionado");
+
 });
 
 const route = useRoute()
