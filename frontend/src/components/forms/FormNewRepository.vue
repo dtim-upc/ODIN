@@ -122,7 +122,7 @@ const notify = useNotify()
 
 // Variable reactiva para almacenar los tipos de DataRepository
 const dataRepositoryTypes = ref([]);
-
+const DataSourceType = ref();
 // Función para cargar los tipos de DataRepository desde el endpoint
 const fetchDataRepositoryTypes = async () => {
   try {
@@ -131,11 +131,19 @@ const fetchDataRepositoryTypes = async () => {
     console.log(dataRepositoryTypes,"-----------------------------------------------------------------");
     console.log(dataRepositoryTypes.value[0].fields,"-----------------------------------------------------------------");
     formFields.value = dataRepositoryTypes.value[0].fields;
+    DataSourceType.value = dataRepositoryTypes.value[0].name;
   } catch (error) {
     console.error("Error al obtener los tipos de DataRepository:", error);
   }
 };
 
+// Observa los cambios en DataSourceType y actualiza los campos del formulario
+watch(DataSourceType, (newType) => {
+  const selectedType = dataRepositoryTypes.value.find((type) => type.name === newType.name);
+  if (selectedType) {
+    formFields.value = selectedType.fields;
+  }
+});
 
 defineExpose({
   form
@@ -143,26 +151,18 @@ defineExpose({
 
 const formFields = ref([]);
 
-const options = [
-  "Local file/s",
-  "Remote file/s",
-  "SQL Database",
-];
-
 const newDatasource = reactive({
   repositoryName: '',
   datasetName: '',
   datasetDescription: '',
 });
 
-const DataSourceType = ref(options[0]);
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
   newDatasource.repositoryId = null;
   storeDS.selectedRepositoryId = null;
   newDatasource.repositoryName = '';
   newDatasource.datasetName = '';
   newDatasource.datasetDescription = '';
-  DataSourceType.value = options[0];
   databaseHost.value = '';
   databaseUser.value = '';
   databasePassword.value = '';
