@@ -7,20 +7,9 @@
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
           <div class="text-h5">Create new repository</div>
-          <!-- File and Folder Upload Section -->
-          <q-card-section v-if="isLocalFileOptionSelected">
-            <q-input
-              filled
-              v-model="localRepository"
-              label="Repository name"
-              lazy-rules
-              :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
-            />
-          </q-card-section>
-
           <!-- Formulario generado dinámicamente -->
           <q-card-section v-for="field in formFields" :key="field.name">
-            <q-input v-model="field.value" :label="field.label" :rules="field.rules" />
+            <q-input filled autogrow v-model="field.value" :label="field.label" :rules="[(val) => (val && val.length > 0) || 'Mandatory field']" />
           </q-card-section>
 
 
@@ -170,7 +159,6 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 
 const onSubmit = () => {
   const data = new FormData();
-  console.log("Contenido de uploadedItems:", uploadedItems.value);
 
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", localRepository.value);
