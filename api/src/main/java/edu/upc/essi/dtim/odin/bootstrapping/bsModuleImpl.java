@@ -1,11 +1,11 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.nextiabs.SQLBootstrap_with_DataFrame_MM_without_Jena;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
@@ -29,15 +29,10 @@ public class bsModuleImpl implements bsModuleInterface{
      * @return Un grafo que representa el conjunto de datos.
      */
     public Graph convertDatasetToGraph(Dataset dataset) {
-        int bsVersion = 1;
 
         Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
 
-        if(bsVersion == 0) {
-            // Bloque de código deprecado
-            Model bootstrapM = convertDatasetToModel(dataset);
-            bootstrapG.setGraph(bootstrapM);
-        } else if (bsVersion == 1) {
+
             /* TODO: update when new BS is ready*/
             if (dataset.getClass().equals(CsvDataset.class)) {
                 CSVBootstrap_with_DataFrame_MM_without_Jena bootstrap = new CSVBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), ((CsvDataset) dataset).getDatasetName(), ((CsvDataset) dataset).getPath());
@@ -48,14 +43,13 @@ public class bsModuleImpl implements bsModuleInterface{
                 }
             } else if (dataset.getClass().equals(JsonDataset.class)) {
                 JSONBootstrap_with_DataFrame_MM_without_Jena j = new JSONBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), ((JsonDataset) dataset).getDatasetName(), ((JsonDataset) dataset).getPath());
+                //SQLBootstrap_with_DataFrame_MM_without_Jena s = new
                 try {
                     bootstrapG = j.bootstrapSchema();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
-        } else{}
-
         return bootstrapG;
     }
 

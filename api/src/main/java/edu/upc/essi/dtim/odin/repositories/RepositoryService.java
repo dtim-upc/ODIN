@@ -2,13 +2,16 @@ package edu.upc.essi.dtim.odin.repositories;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalDBRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -58,5 +61,16 @@ public class RepositoryService {
 
         // Return the list of DataRepository objects
         return dataRepositories;
+    }
+
+
+    public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
+        List<Class<? extends DataRepository>> dataRepositoryClasses = Arrays.asList(
+                RelationalJDBCRepository.class,
+                LocalRepository.class
+        );
+
+        List<DataRepositoryTypeInfo> dataRepositoryInfoList = DataRepositoryInfoExtractor.extractDataRepositoryInfo(dataRepositoryClasses);
+        return  dataRepositoryInfoList;
     }
 }

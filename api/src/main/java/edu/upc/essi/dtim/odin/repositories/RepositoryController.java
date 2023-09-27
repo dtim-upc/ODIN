@@ -48,5 +48,10 @@ public class RepositoryController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/api/data-repository-types")
+    public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
+        return repositoryService.getAllDataRepositoryTypes();
+    }
 }
 
