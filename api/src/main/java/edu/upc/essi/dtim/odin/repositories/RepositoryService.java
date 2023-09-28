@@ -1,9 +1,7 @@
 package edu.upc.essi.dtim.odin.repositories;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.DataResource;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalDBRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.project.ProjectService;
@@ -53,8 +51,8 @@ public class RepositoryService {
         }
 
         // Create a new RelationalDBRepository and set some properties
-        DataRepository dr = new RelationalDBRepository();
-        ((RelationalDBRepository) dr).setUsername("RAMON DEL REPO");
+        DataRepository dr = new RelationalJDBCRepository();
+        ((RelationalJDBCRepository) dr).setUsername("RAMON DEL REPO");
 
         // Add the DataRepository to the list
         dataRepositories.add(dr);
