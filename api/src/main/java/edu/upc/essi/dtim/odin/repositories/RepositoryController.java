@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class RepositoryController {
@@ -53,5 +54,17 @@ public class RepositoryController {
     public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
         return repositoryService.getAllDataRepositoryTypes();
     }
+
+    @PostMapping("/test-connection")
+    public Boolean testConnection(@RequestBody Map<String, String> requestData) {
+        // Extract data from the request body
+        String port = requestData.get("port");
+        String username = requestData.get("username");
+        String password = requestData.get("password");
+
+        return repositoryService.testConnection(port, username, password);
+    }
+
+
 }
 

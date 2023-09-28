@@ -73,4 +73,20 @@ public class RepositoryService {
         List<DataRepositoryTypeInfo> dataRepositoryInfoList = DataRepositoryInfoExtractor.extractDataRepositoryInfo(dataRepositoryClasses);
         return  dataRepositoryInfoList;
     }
+
+    public boolean testConnection(String url, String user, String password) {
+        // Imprimir los parámetros recibidos por consola
+        System.out.println("URL: " + url);
+        System.out.println("Usuario: " + user);
+        System.out.println("Contraseña: " + password);
+
+        // Comprobar si todos los parámetros tienen valor
+        if (url != null && !url.isEmpty() && user != null && !user.isEmpty() && password != null && !password.isEmpty()) {
+            RelationalJDBCRepository jdbcRepository = new RelationalJDBCRepository(user, password, url);
+            return jdbcRepository.testConnection();
+        } else {
+            return false; // Al menos uno de los parámetros no tiene valor, retornar false
+        }
+    }
+
 }
