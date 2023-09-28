@@ -105,14 +105,22 @@
         </attributes>
     </entity>
 
-    <entity name="RelationalDBRepository" class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalDBRepository">
-        <table name="RelationalDBRepository"/>
+    <entity name="RelationalJDBCRepository" class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository">
+        <table name="RelationalJDBCRepository"/>
         <attributes>
             <basic name="username">
             </basic>
             <basic name="password">
             </basic>
             <basic name="port">
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity name="LocalRepository" class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository">
+        <table name="LocalRepository"/>
+        <attributes>
+            <basic name="path">
             </basic>
         </attributes>
     </entity>
