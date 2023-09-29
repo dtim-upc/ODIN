@@ -16,6 +16,7 @@ import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
+import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,7 @@ public class SourceService {
      * The dependency on the ProjectService class.
      */
     private final ProjectService projectService;
+    private final RepositoryService repositoryService;
     /**
      * The AppConfig dependency for accessing application configuration.
      */
@@ -56,9 +58,11 @@ public class SourceService {
      * @param projectService The ProjectService dependency.
      */
     public SourceService(@Autowired AppConfig appConfig,
-                         @Autowired ProjectService projectService) {
+                         @Autowired ProjectService projectService,
+                         @Autowired RepositoryService repositoryService) {
         this.appConfig = appConfig;
         this.projectService = projectService;
+        this.repositoryService = repositoryService;
         try {
             this.ormDataResource = ORMStoreFactory.getInstance();
         } catch (Exception e) {
@@ -106,7 +110,9 @@ public class SourceService {
             }
 
             String modifiedFilename = repositoryIdAndName + "/" + originalFilename;
+
             System.out.println(originalFilename);
+            System.out.println(modifiedFilename);
 
             // Get the disk path from the app configuration
             Path diskPath = Path.of(appConfig.getDiskPath());
@@ -371,14 +377,7 @@ public class SourceService {
      * @return The created DataRepository.
      */
     public DataRepository createRepository(String repositoryName) {
-        // Create a new DataRepository instance
-        DataRepository dataRepository = new DataRepository();
-
-        // Set the repository name for the DataRepository
-        ((DataRepository) dataRepository).setRepositoryName(repositoryName);
-
-        // Save the DataRepository and return it
-        return (DataRepository) ormDataResource.save(dataRepository);
+        return repositoryService.createRepository(repositoryName);
     }
 
 
@@ -459,11 +458,7 @@ public class SourceService {
      * @param repositoryId The ID of the DataRepository to be added to the project.
      */
     public void addRepositoryToProject(String projectId, String repositoryId) {
-        // Retrieve the DataRepository using its ID
-        DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
-
-        // Call the ProjectService to add the repository to the specified project
-        projectService.addRepositoryToProject(projectId, repositoryId);
+        repositoryService.addRepositoryToProject(projectId, repositoryId);
     }
 
 
