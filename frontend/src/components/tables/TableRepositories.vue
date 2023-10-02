@@ -152,7 +152,7 @@ onBeforeMount(() => {
 
 const title = "Repositories";
 const search = ref("")
-const visibleColumns = ["id", "repositoryName", "expand", "actions"]; // Columns to be displayed
+const visibleColumns = ["id", "repositoryName", "repositoryType", "expand", "actions"]; // Columns to be displayed
 
 const addDataRepository = ref(false)
 
@@ -168,6 +168,7 @@ const rows = computed(() => {
 const columns = [
   {name: "id", label: "ID", align: "center", field: "id", sortable: true},
   {name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true},
+  {name: "repositoryType", label: "Repository Type", align: "center", field: "repositoryType", sortable: true},
   {name: "expand", label: "Datasets", align: "center", field: "expand", sortable: false},
 ];
 

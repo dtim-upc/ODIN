@@ -376,8 +376,8 @@ public class SourceService {
      * @param repositoryName The name of the DataRepository to create.
      * @return The created DataRepository.
      */
-    public DataRepository createRepository(String repositoryName) {
-        return repositoryService.createRepository(repositoryName);
+    public DataRepository createRepository(String repositoryName, String repositoryType) {
+        return repositoryService.createRepository(repositoryName, repositoryType);
     }
 
 

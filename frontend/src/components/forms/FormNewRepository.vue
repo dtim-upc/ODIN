@@ -178,6 +178,7 @@ const onSubmit = () => {
   // Agregar campos comunes
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
+  data.append("repositoryType", DataSourceType.value);
 
   // Agregar campos específicos del tipo de DataRepository seleccionado
   formFields.value.forEach((field) => {

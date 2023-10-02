@@ -70,10 +70,11 @@ public class RepositoryController {
     @PostMapping(value = "/project/{id}/newRepository")
     public ResponseEntity<Object> addRepository(@PathVariable("id") String projectId,
                                                 @RequestParam String repositoryName,
+                                                @RequestParam String repositoryType,
                                                 @RequestParam(required = false) String datasetDescription)
     {
         try{
-            logger.info("POST REPOSITORY RECEIVED FOR " + projectId);
+            logger.info("POST REPOSITORY RECEIVED FOR " + projectId + " with repo name " + repositoryName + " and type " + repositoryType);
             // Validate and authenticate access here
             //future check when adding authentification
 
@@ -81,7 +82,7 @@ public class RepositoryController {
             DataRepository repository;
 
             // Create a new repository and add it to the project
-            repository = repositoryService.createRepository(repositoryName);
+            repository = repositoryService.createRepository(repositoryName, repositoryType);
             repositoryService.addRepositoryToProject(projectId, repository.getId());
 
             // Return success message

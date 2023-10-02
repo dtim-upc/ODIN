@@ -10,6 +10,8 @@ import edu.upc.essi.dtim.odin.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -103,15 +105,26 @@ public class RepositoryService {
      * @param repositoryName The name of the DataRepository to create.
      * @return The created DataRepository.
      */
-    public DataRepository createRepository(String repositoryName) {
+    public DataRepository createRepository(String repositoryName, String repositoryType) {
         // Create a new DataRepository instance
-        DataRepository dataRepository = new DataRepository();
+        DataRepository repository;
+
+        switch (repositoryType){
+            case "RelationalJDBCRepository":
+                repository = new RelationalJDBCRepository();
+                break;
+            case "LocalRepository":
+                repository = new LocalRepository();
+                break;
+            default:
+                repository = new DataRepository();
+        }
 
         // Set the repository name for the DataRepository
-        dataRepository.setRepositoryName(repositoryName);
+        repository.setRepositoryName(repositoryName);
 
         // Save the DataRepository and return it
-        return ormDataResource.save(dataRepository);
+        return ormDataResource.save(repository);
     }
 
     /**

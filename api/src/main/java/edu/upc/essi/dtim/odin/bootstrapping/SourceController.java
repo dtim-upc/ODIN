@@ -115,7 +115,7 @@ public class SourceController {
             DataRepository repository;
             if (createRepo) {
                 // Create a new repository and add it to the project
-                repository = sourceService.createRepository(repositoryName);
+                repository = sourceService.createRepository(repositoryName, "LocalRepository");
                 sourceService.addRepositoryToProject(projectId, repository.getId());
                 createRepo = false;
             } else {
@@ -324,7 +324,7 @@ public class SourceController {
         DataRepository repository;
         if (createRepo) {
             // Create a new repository if repositoryId is empty
-            repository = sourceService.createRepository(repositoryName);
+            repository = sourceService.createRepository(repositoryName, "LocalRepository");
             repositoryId = repository.getId();
 
             // Add the new repository to the project
