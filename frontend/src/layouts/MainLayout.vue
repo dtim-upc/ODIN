@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHr LpR lFr">
     <!-- v-model="drawer" -->
-    <q-drawer show-if-above :mini="miniState" :width="200" :breakpoint="500" bordered>
+    <q-drawer show-if-above :mini="miniState" :width="200" :breakpoint="500" bordered @mouseenter="expandDrawer" @mouseleave="contractDrawer">
       <q-scroll-area class="fit">
         <q-list padding>
 
@@ -181,6 +181,18 @@ import {useAuthStore} from 'stores/auth.store.js'
 // import {outlinedHub as hubi}  from "@quasar/extras/material-icons-outlined"
 const miniState = ref(true)
 const authStore = useAuthStore()
+
+function expandDrawer() {
+  if (miniState.value) {
+    miniState.value = false;
+  }
+}
+
+function contractDrawer() {
+  if (!miniState.value) {
+    miniState.value = true;
+  }
+}
 </script>
 
 <style lang="scss">
