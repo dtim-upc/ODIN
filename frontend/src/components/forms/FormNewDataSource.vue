@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="showS" @hide="props.show=false">
+  <q-dialog v-model="showS" @hide="props.show=false" :key="showS">
     <q-card style="width: 400px; max-width: 80vw">
 
       <q-card-section>
@@ -59,7 +59,7 @@
           </q-card-section>
 
           <!-- File and Folder Upload Section -->
-          <q-card-section v-if="isLocalFileOptionSelected">
+          <q-card-section v-if="isLocalRepository">
             <div
               class="hoverDiv uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
               <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
@@ -82,7 +82,7 @@
           </q-card-section>
 
           <!-- Mostrar campos de input URL si se selecciona "Remote file" -->
-          <q-card-section v-if="isRemoteFileOptionSelected">
+          <q-card-section v-if="isLocalRepository && isRemoteFileOptionSelected">
             <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
             <q-input
               v-if="isRemoteFileOptionSelected"
@@ -98,16 +98,6 @@
               color="primary"
               @click="downloadFile"
             />
-          </q-card-section>
-
-          <!-- Mostrar campos de conexión a la base de datos si se selecciona "SQL Database" -->
-          <q-card-section v-if="!isLocalFileOptionSelected && !isRemoteFileOptionSelected">
-            <q-input filled v-model="databaseHost" label="Database Host" lazy-rules
-                     :rules="[(val) => !!val || 'Please enter the database host']"/>
-            <q-input filled v-model="databaseUser" label="Database User" lazy-rules
-                     :rules="[(val) => !!val || 'Please enter the database user']"/>
-            <q-input filled v-model="databasePassword" label="Database Password" type="password"/>
-            <!-- Agregar más campos según sea necesario para la conexión a la base de datos -->
           </q-card-section>
 
           <!-- Descripción del conjunto de datos (opcional) -->
@@ -132,7 +122,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted, watch, computed} from "vue";
+import {ref, reactive, onMounted, watch, computed, onBeforeMount} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
@@ -212,10 +202,10 @@ const hideSpecialButton = (index) => {
 
 const integrationStore = useIntegrationStore()
 
-const projectID = ref(null)
+const projectID = ref(null);
+const isLocalRepository = ref(false);
 
-// When the component is mounted, fetch the repositories for the current project.
-onMounted(async () => {
+async function initializeComponent() {
   const url = window.location.href; // Get the current URL
   const regex = /project\/(\d+)\//;
   const match = url.match(regex);
@@ -224,15 +214,39 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await storeDS.getRepositories(projectID.value)
+    await storeDS.getRepositories(projectID.value);
+
+    console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+
+    //qué tipo de repositorio es?
+    storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
+    console.log("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+
+    console.log(storeDS.repositories); // Agregar esta línea para depurar
+
+    const foundRepository = await storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId);
+    console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
+
+    console.log(foundRepository, "++++++++++++++++++++++++++++++++++++++++++++++++++++ repo seleccionado");
+    console.log(foundRepository.repositoryType, "++++++++++++++++++++++++++++++++++++++++++++++++++++ repo seleccionado");
+    const repoType = foundRepository.repositoryType;
+    isLocalRepository.value = repoType.toLowerCase() === "localrepository";
+
+    uploadedItems.value.push("BASE DE DATOS");
+
+    if (!isLocalRepository) {
+      uploadedItems.value.push("BASE DE DATOS");
+    }
   }
+}
 
-  //qué tipo de repositorio es?
-  //llamar a la api aquí.
-  storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)):"NADA";
-  const foundRepository = storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId);
-  console.log(foundRepository,"++++++++++++++++++++++++++++++++++++++++++++++++++++ repo seleccionado");
+onBeforeMount(() => {
+  initializeComponent();
+});
 
+// Llama a la función en onMounted
+onMounted(() => {
+  initializeComponent();
 });
 
 const route = useRoute()

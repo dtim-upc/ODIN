@@ -135,7 +135,7 @@ const fetchDataRepositoryTypes = async () => {
     console.log(dataRepositoryTypes,"-----------------------------------------------------------------");
     console.log(dataRepositoryTypes.value[0].fields,"-----------------------------------------------------------------");
     formFields.value = dataRepositoryTypes.value[0].fields;
-    DataSourceType.value = dataRepositoryTypes.value[0].name.toString();
+    DataSourceType.value = dataRepositoryTypes.value[0].name;
   } catch (error) {
     console.error("Error al obtener los tipos de DataRepository:", error);
   }
@@ -178,7 +178,8 @@ const onSubmit = () => {
   // Agregar campos comunes
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
-  data.append("repositoryType", DataSourceType.value);
+  console.log(DataSourceType.value,"++++++++++++++++++++++++++++++++ tipo repo");
+  data.append("repositoryType", DataSourceType.value.name);
 
   // Agregar campos específicos del tipo de DataRepository seleccionado
   formFields.value.forEach((field) => {

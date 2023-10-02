@@ -52,7 +52,7 @@ const props = defineProps({
   showFormButtons: { type: Boolean, default: true },
 });
 
-const emit = defineEmits(["update:show"]);
+const emit = defineEmits(["update:show", "repository-selected"]);
 const showS = computed({
   get() {
     return props.show
