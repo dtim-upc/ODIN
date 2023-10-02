@@ -23,6 +23,8 @@
                       @click="miniState = !miniState"/>
             </q-item-section>
           </q-item>
+
+          <div class="top-buttons-wrapper">
           <q-item exact manual-focus>
             <q-item-section avatar>
               <!-- <q-icon name="o_cottage"/> -->
@@ -123,6 +125,7 @@
               Query
             </q-item-section>
           </q-item>
+          </div>
 
           <div class="fixed-bottom">
 
@@ -315,5 +318,10 @@ body.dark-mode .mode-toggle .toggle #dark-mode:before {
   height: 85%;
   left: 40%;
   transform: translate(-10%, -40%), rotate(-35deg);
+}
+
+.top-buttons-wrapper {
+  max-height: calc(100vh - 275px); /* Ajusta la altura máxima según tus necesidades */
+  overflow-y: auto; /* Agrega la barra de desplazamiento vertical cuando sea necesario */
 }
 </style>
