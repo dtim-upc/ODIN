@@ -101,7 +101,16 @@
             />
           </q-card-section>
 
-          
+          <!-- Tipo de origen de datos -->
+          <q-card-section>
+            <!-- Tipo de origen de datos -->
+            <q-select
+              v-model="DataSourceType"
+              :options="options"
+              label="Type"
+              class="q-mt-none"
+            />
+          </q-card-section>
 
           <!-- Descripción del conjunto de datos (opcional) -->
           <q-card-section>
@@ -258,7 +267,6 @@ defineExpose({
 const options = [
   "Local file/s",
   "Remote file/s",
-  "SQL Database",
 ];
 
 const newDatasource = reactive({
