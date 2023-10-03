@@ -18,9 +18,8 @@
             </q-list>
           </q-expansion-item>
 
-          <q-expansion-item label="Integrated schemas" expand-icon="arrow_drop_down">
+          <q-expansion-item :label="'Integrated schemas (' + integratedSchemasLength + ' items)'" expand-icon="arrow_drop_down" :disable="integratedSchemasLength === 0">
             <q-list dense>
-
               <q-item v-for="ds in storeDS.project.integratedDatasets" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
                        :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
@@ -30,7 +29,7 @@
             </q-list>
           </q-expansion-item>
 
-          <q-expansion-item label="Local schema" expand-icon="arrow_drop_down">
+          <q-expansion-item :label="'Local schemas (' + localSchemasLength + ' items)'" expand-icon="arrow_drop_down" :disable="localSchemasLength ===0">
             <q-list dense>
               <q-item v-for="ds in storeDS.datasources" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
@@ -59,9 +58,8 @@
   </q-page>
 </template>
 
-
 <script setup>
-import {ref, onMounted} from "vue";
+import {ref, onMounted, computed} from "vue";
 import Graph from 'components/graph/Graph.vue'
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 
@@ -71,7 +69,6 @@ onBeforeMount(() => {
   document.title = "Schema"; // Título de la pestaña
 });
 
-const miniState = ref(true)
 const storeDS = useDataSourceStore()
 
 const graphical = ref('');
@@ -104,10 +101,14 @@ onMounted(async () => {
     if (storeDS.datasources.length > 0) {
       setGlobalSchema();
     }
+
   } catch (error) {
     console.error("Error al cargar los datos de datasources desde la API:", error);
   }
 });
+
+const integratedSchemasLength = computed(() => storeDS.project.integratedDatasets ? storeDS.project.integratedDatasets.length : 0);
+const localSchemasLength = computed(() => storeDS.datasources ? storeDS.datasources.length : 0);
 </script>
 
 
