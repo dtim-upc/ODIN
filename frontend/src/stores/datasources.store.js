@@ -17,6 +17,8 @@ export const useDataSourceStore = defineStore('datasource', {
     datasources: [],
     repositories: [],
     selectedRepositoryId: null,
+    selectedRepositoryType: null,
+    selectedRepositoryName: null,
   }),
 
   getters: {
@@ -36,6 +38,9 @@ export const useDataSourceStore = defineStore('datasource', {
     getRepos(state) {
       return state.repositories
     },
+    getSelectedRepositoryId(state){
+      return state.selectedRepositoryId;
+    },
   },
   actions: {
 
@@ -45,10 +50,11 @@ export const useDataSourceStore = defineStore('datasource', {
     setSelectedRepositoryId(repositoryId) {
       this.selectedRepositoryId = repositoryId;
       this.setSelectedRepositoryName(repositoryId);
+      this.selectedRepositoryType = this.repositories.some(repository => repository.id === this.selectedRepositoryId) ? this.repositories.find(repository => repository.id === this.selectedRepositoryId).repositoryType : "ERROR 404 No type";
     },
 
     setSelectedRepositoryName(repositoryId){
-      this.selectedRepositoryName = repositoryId;
+      this.selectedRepositoryName = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId).repositoryName : "ERROR 404 No name";
     },
 
     async setProject(proj) {

@@ -7,7 +7,8 @@
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
           <div class="text-h4">Create new dataset</div>
-          <div class="text-h5">Parent Repository: {{ storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId).repositoryName : "ERROR 404" }}</div>
+          <div class="text-h5">Parent Repository: {{ storeDS.selectedRepositoryName }}</div>
+          <div class="text-h6">Repository Type: {{ storeDS.selectedRepositoryType }}</div>
 
           <!-- Sección 2: Información del Conjunto de Datos -->
           <q-card-section v-if="uploadedItems.length > 0">
@@ -59,7 +60,7 @@
           </q-card-section>
 
           <!-- File and Folder Upload Section -->
-          <q-card-section v-if="isLocalRepository">
+          <q-card-section v-if="isLocalRepository && !isRemoteFileOptionSelected">
             <div
               class="hoverDiv uploader__empty-state uploader__empty-state--with-display-name uploader__empty-state--with-directories-selector">
               <svg viewBox="0 0 72 72" role="img" aria-label="Upload files" @click="triggerFileUpload">
@@ -99,6 +100,8 @@
               @click="downloadFile"
             />
           </q-card-section>
+
+          
 
           <!-- Descripción del conjunto de datos (opcional) -->
           <q-card-section>
@@ -220,19 +223,8 @@ async function initializeComponent() {
 
     //qué tipo de repositorio es?
     storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
-    console.log("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
 
-    console.log(storeDS.repositories); // Agregar esta línea para depurar
-
-    const foundRepository = await storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId);
-    console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM");
-
-    console.log(foundRepository, "++++++++++++++++++++++++++++++++++++++++++++++++++++ repo seleccionado");
-    console.log(foundRepository.repositoryType, "++++++++++++++++++++++++++++++++++++++++++++++++++++ repo seleccionado");
-    const repoType = foundRepository.repositoryType;
-    isLocalRepository.value = repoType.toLowerCase() === "localrepository";
-
-    uploadedItems.value.push("BASE DE DATOS");
+    isLocalRepository.value = storeDS.selectedRepositoryType.toLowerCase() === "localrepository";
 
     if (!isLocalRepository) {
       uploadedItems.value.push("BASE DE DATOS");
@@ -240,11 +232,12 @@ async function initializeComponent() {
   }
 }
 
-onBeforeMount(() => {
-  initializeComponent();
+watch(() => showS.value, (newValue) => {
+  if (newValue) {
+    initializeComponent();
+  }
 });
 
-// Llama a la función en onMounted
 onMounted(() => {
   initializeComponent();
 });

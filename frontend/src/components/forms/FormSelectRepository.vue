@@ -90,8 +90,10 @@ const onSubmit = () => {
 const nextStep = () => {
   // Emitir un evento personalizado con los datos seleccionados
   const selectedRepositoryId = newDatasource.repositoryId;
-  console.log(selectedRepositoryId,"----------------------------");
+  console.log(selectedRepositoryId,"---------------------------- REPOOOOOOOOOOO IDDDD SEEEEND");
   storeDS.selectedRepositoryId = selectedRepositoryId;
+
+  storeDS.setSelectedRepositoryId(selectedRepositoryId);
 
   emit("repository-selected", selectedRepositoryId);
 };
