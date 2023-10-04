@@ -172,4 +172,15 @@ public class RepositoryService {
         return ormDataResource.save(repository);
     }
 
+    public List<String> getDatabaseTables(String repositoryId) {
+        DataRepository repository = ormDataResource.findById(DataRepository.class, repositoryId);
+
+        if (repository != null && repository instanceof RelationalJDBCRepository) {
+            return ((RelationalJDBCRepository) repository).retrieveTables();
+        } else {
+            System.out.println("No se pudo obtener la lista de tablas de la base de datos.");
+            return new ArrayList<>(); // Devolver una lista vacía o manejar el error de manera apropiada.
+        }
+    }
+
 }

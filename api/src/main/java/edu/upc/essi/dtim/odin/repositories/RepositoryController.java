@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -61,11 +60,26 @@ public class RepositoryController {
     @PostMapping("/test-connection")
     public Boolean testConnection(@RequestBody Map<String, String> requestData) {
         // Extract data from the request body
-        String port = requestData.get("port");
+        String url = requestData.get("url");
         String username = requestData.get("username");
         String password = requestData.get("password");
 
-        return repositoryService.testConnection(port, username, password);
+        return repositoryService.testConnection(url, username, password);
+    }
+
+    @GetMapping(value = "/{id}/tables")
+    public ResponseEntity<Object> retrieveDBtables(@PathVariable("id") String repositoryId)
+    {
+        logger.info("GET TABLES RECEIVED FOR REPOSITORY: "+repositoryId);
+
+        try{
+            List<String> tables = repositoryService.getDatabaseTables(repositoryId);
+            // Devuelve los resultados como una respuesta JSON
+            return ResponseEntity.ok(tables);
+        } catch (Exception e) {
+            // Maneja cualquier excepción que pueda ocurrir durante la consulta
+            return ResponseEntity.status(500).body("Error al obtener las tablas de la base de datos");
+        }
     }
 
     @PostMapping(value = "/project/{id}/newRepository")

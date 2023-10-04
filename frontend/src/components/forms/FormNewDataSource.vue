@@ -26,8 +26,8 @@
                   </q-button>
                 </div>
 
-                <template v-if="item.files === undefined">
-                  <div>{{ item.name }}</div>
+                <template v-if="item.files === undefined && item.name !== undefined">
+                  <div v-if="item.name !== undefined">{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
                       {{ formatFileSize(item.size) }} ·
@@ -38,7 +38,7 @@
                   </div>
                 </template>
 
-                <template v-else>
+                <template v-if="item.files !== undefined">
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -53,6 +53,15 @@
                       </span>
                     </span>
                     <span class="file-system-entry__detail">{{ item.files.length }} elements</span>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <div>{{ item }}</div>
+                  <div class="file-system-entry__details">
+                    <span class="file-system-entry__detail">
+                      SQL table
+                    </span>
                   </div>
                 </template>
               </div>
@@ -231,12 +240,33 @@ async function initializeComponent() {
     console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
 
     //qué tipo de repositorio es?
-    storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
+    //storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
 
-    isLocalRepository.value = storeDS.selectedRepositoryType.toLowerCase() === "localrepository";
+    isLocalRepository.value = storeDS.selectedRepositoryType.toLowerCase() === "localrepository" ? true : false;
+    console.log(isLocalRepository);
+    if (!isLocalRepository.value) {
+      console.log("no es local repository");
 
-    if (!isLocalRepository) {
-      uploadedItems.value.push("BASE DE DATOS");
+      //call backend end point for retrieving db information and adding the response to uploadedItems
+      try {
+        const repositoryId = storeDS.selectedRepositoryId;
+
+        // Realiza la solicitud GET al punto final del backend con el repositoryId como parámetro
+        const response = await odinApi.get(`/`+repositoryId+`/tables`);
+
+        // Verifica si la solicitud se realizó con éxito
+        if (response.status === 200) {
+          const tablesData = response.data; // Esto debería contener la información de las tablas
+          uploadedItems.value.push(tablesData);
+          console.log(tablesData);
+        } else {
+          // Maneja el caso en el que la solicitud no se realizó con éxito (por ejemplo, un código de estado no 200)
+          console.error('Error en la solicitud al obtener información de tablas');
+        }
+      } catch (error) {
+        // Maneja cualquier error que pueda ocurrir durante la solicitud
+        console.error('Error al obtener información de tablas:', error);
+      }
     }
   }
 }
