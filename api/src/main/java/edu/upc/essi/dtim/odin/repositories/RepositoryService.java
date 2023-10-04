@@ -92,7 +92,18 @@ public class RepositoryService {
         // Comprobar si todos los parámetros tienen valor
         if (url != null && !url.isEmpty() && user != null && !user.isEmpty() && password != null && !password.isEmpty()) {
             RelationalJDBCRepository jdbcRepository = new RelationalJDBCRepository(user, password, url);
-            return jdbcRepository.testConnection();
+            List<String> tables = jdbcRepository.retrieveTables();
+
+            if (jdbcRepository.testConnection()) {
+                // Imprimir los nombres de las tablas
+                System.out.println("Tablas en la base de datos:");
+                for (String tableName : tables) {
+                    System.out.println(tableName);
+                }
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false; // Al menos uno de los parámetros no tiene valor, retornar false
         }
@@ -148,7 +159,7 @@ public class RepositoryService {
                 RelationalJDBCRepository jdbcRepository = (RelationalJDBCRepository) repository;
                 jdbcRepository.setUsername(requestData.get("username"));
                 jdbcRepository.setPassword(requestData.get("password"));
-                jdbcRepository.setPort(requestData.get("port"));
+                jdbcRepository.setUrl(requestData.get("url"));
             } else if (repository instanceof LocalRepository) {
                 ((LocalRepository) repository).setPath(requestData.get("path"));
             } else {

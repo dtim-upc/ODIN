@@ -121,7 +121,7 @@
             </basic>
             <basic name="password">
             </basic>
-            <basic name="port">
+            <basic name="url">
             </basic>
         </attributes>
     </entity>
