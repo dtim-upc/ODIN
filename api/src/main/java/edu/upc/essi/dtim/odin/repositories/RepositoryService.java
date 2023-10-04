@@ -10,11 +10,10 @@ import edu.upc.essi.dtim.odin.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RepositoryService {
@@ -140,4 +139,26 @@ public class RepositoryService {
         // Call the ProjectService to add the repository to the specified project
         projectService.addRepositoryToProject(projectId, repositoryId);
     }
+
+    public DataRepository addRepositoryParameters(String repositoryId, Map<String, String> requestData) {
+        DataRepository repository = ormDataResource.findById(DataRepository.class, repositoryId);
+
+        if (repository != null) {
+            if (repository instanceof RelationalJDBCRepository) {
+                RelationalJDBCRepository jdbcRepository = (RelationalJDBCRepository) repository;
+                jdbcRepository.setUsername(requestData.get("username"));
+                jdbcRepository.setPassword(requestData.get("password"));
+                jdbcRepository.setPort(requestData.get("port"));
+            } else if (repository instanceof LocalRepository) {
+                ((LocalRepository) repository).setPath(requestData.get("path"));
+            } else {
+                System.out.println("NO SE HAN PODIDO ASIGNAR LOS PARÁMETROS");
+            }
+        } else {
+            System.out.println("REPOSITORIO NO ENCONTRADO");
+        }
+
+        return ormDataResource.save(repository);
+    }
+
 }

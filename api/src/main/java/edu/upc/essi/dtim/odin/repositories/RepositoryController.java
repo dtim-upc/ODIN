@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -69,11 +70,14 @@ public class RepositoryController {
 
     @PostMapping(value = "/project/{id}/newRepository")
     public ResponseEntity<Object> addRepository(@PathVariable("id") String projectId,
-                                                @RequestParam String repositoryName,
-                                                @RequestParam String repositoryType,
-                                                @RequestParam(required = false) String datasetDescription)
+                                                @RequestBody Map<String, String> requestData)
     {
         try{
+            // Accede a los campos específicos del objeto JSON
+            String datasetDescription = requestData.get("datasetDescription");
+            String repositoryName = requestData.get("repositoryName");
+            String repositoryType = requestData.get("repositoryType");
+
             logger.info("POST REPOSITORY RECEIVED FOR " + projectId + " with repo name " + repositoryName + " and type " + repositoryType);
             // Validate and authenticate access here
             //future check when adding authentification
@@ -83,6 +87,7 @@ public class RepositoryController {
 
             // Create a new repository and add it to the project
             repository = repositoryService.createRepository(repositoryName, repositoryType);
+            repository = repositoryService.addRepositoryParameters(repository.getId(), requestData);
             repositoryService.addRepositoryToProject(projectId, repository.getId());
 
             // Return success message

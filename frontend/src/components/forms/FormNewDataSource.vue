@@ -102,7 +102,7 @@
           </q-card-section>
 
           <!-- Tipo de origen de datos -->
-          <q-card-section>
+          <q-card-section v-if="isLocalRepository">
             <!-- Tipo de origen de datos -->
             <q-select
               v-model="DataSourceType"

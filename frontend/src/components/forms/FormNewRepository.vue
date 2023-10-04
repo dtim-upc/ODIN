@@ -29,7 +29,7 @@
             </q-input>
           </q-card-section>
 
-          <q-card-section v-if="DataSourceType !== 'LocalRepository'">
+          <q-card-section v-if="!isLocalRepository">
             <!-- Contenido del botón -->
             <q-btn label="Test connection" @click="testConnection" />
           </q-card-section>
@@ -68,7 +68,7 @@ import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
 import {odinApi} from "../../boot/axios";
 const isPwd = ref(true);
-const localRepository = ref(""); // Variable para almacenar la URL del archivo remoto
+const isLocalRepository = ref(false);
 // -------------------------------------------------------------
 //                         PROPS & EMITS
 // -------------------------------------------------------------
@@ -146,6 +146,15 @@ watch(DataSourceType, (newType) => {
   const selectedType = dataRepositoryTypes.value.find((type) => type.name === newType.name);
   if (selectedType) {
     formFields.value = selectedType.fields;
+    console.log(newType.name+" COMPARAAAAAAAAAAAAAAAAAAAAAA");
+    isLocalRepository.value = 'LocalRepository' === newType.name.toString() ? true : false;
+  }
+});
+
+watch(() => showS.value, (newValue) => {
+  if (newValue) {
+    fetchDataRepositoryTypes();
+    isLocalRepository.value = DataSourceType.value === 'LocalRepository';
   }
 });
 
@@ -173,9 +182,9 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 }
 
 const onSubmit = () => {
+  // deprecat
+  /*
   const data = new FormData();
-
-  // Agregar campos comunes
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
   console.log(DataSourceType.value,"++++++++++++++++++++++++++++++++ tipo repo");
@@ -188,6 +197,24 @@ const onSubmit = () => {
       data.append(field.name, field.value);
     }
   });
+   */
+
+  const data = {};
+
+  data["datasetDescription"] = newDatasource.datasetDescription;
+  data["repositoryName"]= newDatasource.repositoryName;
+  console.log(DataSourceType.value,"++++++++++++++++++++++++++++++++ tipo repo");
+  data["repositoryType"] = DataSourceType.value;
+
+  // Agregar campos específicos del tipo de DataRepository seleccionado
+  // Add specific fields from formFields to the data object
+  formFields.value.forEach((field) => {
+    if (field.value !== null && field.value !== undefined) {
+      data[field.name.toString()] = field.value.toString();
+      notify.positive(field.name.toString() + " has been added as: " + field.value.toString());
+    }
+  });
+
 
   integrationStore.addDataRepository(route.params.id, data, successCallback);
 
@@ -237,7 +264,6 @@ const successCallback = (datasource) => {
 const databaseHost = ref('');
 const databaseUser = ref('');
 const databasePassword = ref('');
-
 </script>
 
 
