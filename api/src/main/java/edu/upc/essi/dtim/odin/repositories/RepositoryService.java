@@ -202,7 +202,9 @@ public class RepositoryService {
         List<TableInfo> tableList = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
-             Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement();
+             Statement statementSize = connection.createStatement();
+             Statement statementLines = connection.createStatement();) {
 
             // Consulta para obtener los nombres de las tablas
             String tableQuery = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
@@ -213,18 +215,24 @@ public class RepositoryService {
 
                     // Consulta para obtener el número de filas de la tabla
                     String rowCountQuery = "SELECT COUNT(*) FROM " + tableName + ";";
-                    try (ResultSet rowCountResultSet = statement.executeQuery(rowCountQuery)) {
+                    try (ResultSet rowCountResultSet = statementLines.executeQuery(rowCountQuery)) {
                         if (rowCountResultSet.next()) {
                             int tableRowCount = rowCountResultSet.getInt(1);
 
+                            // Cerrar el rowCountResultSet después de obtener el número de filas
+                            rowCountResultSet.close();
+
                             // Consulta para obtener el tamaño de la tabla
                             String tableSizeQuery = "SELECT pg_size_pretty(pg_total_relation_size('" + tableName + "')) AS total_size;";
-                            try (ResultSet sizeResultSet = statement.executeQuery(tableSizeQuery)) {
+                            try (ResultSet sizeResultSet = statementSize.executeQuery(tableSizeQuery)) {
                                 if (sizeResultSet.next()) {
                                     String tableSize = sizeResultSet.getString("total_size");
 
+                                    sizeResultSet.close();
+
                                     TableInfo tableInfo = new TableInfo(tableName, tableSize, String.valueOf(tableRowCount));
                                     tableList.add(tableInfo);
+                                    System.out.println(tableName + " TABLA AÑADIDA " + tableSize + " " + tableRowCount + " lineas");
                                 }
                             }
                         }
@@ -237,4 +245,5 @@ public class RepositoryService {
 
         return tableList;
     }
+
 }
