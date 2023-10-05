@@ -10,6 +10,10 @@ import edu.upc.essi.dtim.odin.project.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -187,27 +191,50 @@ public class RepositoryService {
         DataRepository repository = ormDataResource.findById(DataRepository.class, repositoryId);
 
         if (repository != null && repository instanceof RelationalJDBCRepository) {
-            List<TableInfo> t = new ArrayList<>(); // Create an empty list of TableInfo objects
-
-            // Populate the t list with TableInfo objects
-            for (String tableName : getDatabaseTables(repositoryId)) {
-                TableInfo tableInfo = new TableInfo(tableName, getSize(tableName), getOtherInfo(tableName));
-                t.add(tableInfo);
-            }
-            return t;
+            return retrieveTablesInfo(((RelationalJDBCRepository) repository).getUrl(), ((RelationalJDBCRepository) repository).getUsername(), ((RelationalJDBCRepository) repository).getPassword());
         } else {
             System.out.println("No se pudo obtener la lista de tablas de la base de datos.");
             return new ArrayList<>(); // Devolver una lista vacía o manejar el error de manera apropiada.
         }
     }
 
-    private String getOtherInfo(String tableName) {
-        return "8 filas";
+    public List<TableInfo> retrieveTablesInfo(String url, String username, String password) {
+        List<TableInfo> tableList = new ArrayList<>();
+
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             Statement statement = connection.createStatement()) {
+
+            // Consulta para obtener los nombres de las tablas
+            String tableQuery = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
+            try (ResultSet resultSet = statement.executeQuery(tableQuery)) {
+                while (resultSet.next()) {
+                    String tableName = resultSet.getString("table_name");
+                    System.out.println(tableName + " NOMBRE DE TABLA SQL EN EL REPO POSTGRESQL");
+
+                    // Consulta para obtener el número de filas de la tabla
+                    String rowCountQuery = "SELECT COUNT(*) FROM " + tableName + ";";
+                    try (ResultSet rowCountResultSet = statement.executeQuery(rowCountQuery)) {
+                        if (rowCountResultSet.next()) {
+                            int tableRowCount = rowCountResultSet.getInt(1);
+
+                            // Consulta para obtener el tamaño de la tabla
+                            String tableSizeQuery = "SELECT pg_size_pretty(pg_total_relation_size('" + tableName + "')) AS total_size;";
+                            try (ResultSet sizeResultSet = statement.executeQuery(tableSizeQuery)) {
+                                if (sizeResultSet.next()) {
+                                    String tableSize = sizeResultSet.getString("total_size");
+
+                                    TableInfo tableInfo = new TableInfo(tableName, tableSize, String.valueOf(tableRowCount));
+                                    tableList.add(tableInfo);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return tableList;
     }
-
-    private long getSize(String tableName) {
-        return 0;
-    }
-
-
 }

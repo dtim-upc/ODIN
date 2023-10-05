@@ -68,20 +68,20 @@ public class RepositoryController {
     }
 
     @GetMapping(value = "/{id}/tables")
-    public ResponseEntity<List<TableInfo>> retrieveDBtables(@PathVariable("id") String repositoryId)
+    public ResponseEntity<Object> retrieveDBtables(@PathVariable("id") String repositoryId)
     {
         logger.info("GET TABLES RECEIVED FOR REPOSITORY: "+repositoryId);
 
         try{
             List<String> tables = repositoryService.getDatabaseTables(repositoryId);
 
-            List<TableInfo> t = repositoryService.getDatabaseTablesInfo(repositoryId);
+            List<TableInfo> table = repositoryService.getDatabaseTablesInfo(repositoryId);
 
             // Devuelve los resultados como una respuesta JSON
-            return ResponseEntity.ok(t);
+            return ResponseEntity.ok(table);
         } catch (Exception e) {
             // Maneja cualquier excepción que pueda ocurrir durante la consulta
-            return (ResponseEntity<List<TableInfo>>) ResponseEntity.notFound();
+            return ResponseEntity.status(500).body("");
         }
     }
 

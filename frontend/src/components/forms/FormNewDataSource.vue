@@ -60,18 +60,18 @@
                   <div>{{ item[index].name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
-                      <svg viewBox="0 0 9 7" width="9" height="7" xmlns="http://www.w3.org/2000/svg">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
                         <path
-                          d="M0 6.14285714V.85714286C0 .38375593.38375593 0 .85714286 0h2.26447876c1.33783784 0 .74324324 1.23673511 2.08108108 1.23673511h2.94015444C8.61624407 1.23673511 9 1.62049104 9 2.09387797v4.04897917C9 6.61624407 8.61624407 7 8.14285714 7H.85714286C.38375593 7 0 6.61624407 0 6.14285714z"
-                          fill="#6a6d70">
-                        </path>
+                          d="M22 18.055v2.458c0 1.925-4.655 3.487-10 3.487-5.344 0-10-1.562-10-3.487v-2.458c2.418 1.738 7.005 2.256 10 2.256 3.006 0 7.588-.523 10-2.256zm-10-3.409c-3.006 0-7.588-.523-10-2.256v2.434c0 1.926 4.656 3.487 10 3.487 5.345 0 10-1.562 10-3.487v-2.434c-2.418 1.738-7.005 2.256-10 2.256zm0-14.646c-5.344 0-10 1.562-10 3.488s4.656 3.487 10 3.487c5.345 0 10-1.562 10-3.487 0-1.926-4.655-3.488-10-3.488zm0 8.975c-3.006 0-7.588-.523-10-2.256v2.44c0 1.926 4.656 3.487 10 3.487 5.345 0 10-1.562 10-3.487v-2.44c-2.418 1.738-7.005 2.256-10 2.256z"
+                          fill="#6a6d70"
+                        />
                       </svg>
                       <span class="directory__type-detail">
                         SQL table ·
                       </span>
                     </span>
                     <span class="file-system-entry__detail">{{ item[index].otherInfo }} lines · </span>
-                    <span class="file-system-entry__detail">({{ formatFileSize(item[index].size) }}) </span>
+                    <span class="file-system-entry__detail">({{ item[index].size }}) </span>
                   </div>
                 </template>
               </div>

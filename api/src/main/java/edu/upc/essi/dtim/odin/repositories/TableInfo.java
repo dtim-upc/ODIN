@@ -11,11 +11,11 @@ public class TableInfo {
 
     private String name;  // Nombre de la tabla
 
-    public long getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(String size) {
         this.size = size;
     }
 
@@ -27,13 +27,13 @@ public class TableInfo {
         this.otherInfo = otherInfo;
     }
 
-    private long size;    // Tamaño de la tabla (puedes cambiar el tipo de dato según tus necesidades)
+    private String size;    // Tamaño de la tabla (puedes cambiar el tipo de dato según tus necesidades)
     private String otherInfo;  // Otra información relevante
 
     // Constructores, getters y setters
 
     // Constructor principal
-    public TableInfo(String name, long size, String otherInfo) {
+    public TableInfo(String name, String size, String otherInfo) {
         this.name = name;
         this.size = size;
         this.otherInfo = otherInfo;
