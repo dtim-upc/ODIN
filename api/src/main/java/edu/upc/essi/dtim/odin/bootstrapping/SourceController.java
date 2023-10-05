@@ -102,7 +102,7 @@ public class SourceController {
                                             @RequestParam String repositoryName,
                                             @RequestParam String datasetName,
                                             @RequestParam(required = false) String datasetDescription,
-                                            @RequestPart("attach_files") List<MultipartFile> attachFiles) {
+                                            @RequestPart(required = false) List<MultipartFile> attachFiles) {
         try{
             logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here

@@ -147,6 +147,7 @@ watch(DataSourceType, (newType) => {
   if (selectedType) {
     formFields.value = selectedType.fields;
     console.log(newType.name+" COMPARAAAAAAAAAAAAAAAAAAAAAA");
+    DataSourceType.value = newType.name.toString();
     isLocalRepository.value = 'LocalRepository' === newType.name.toString() ? true : false;
   }
 });

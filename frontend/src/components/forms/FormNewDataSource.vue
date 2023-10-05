@@ -361,12 +361,12 @@ const onSubmit = () => {
     console.log("Archivo que se va a agregar:", item);
 
     //si item.files === undefined es un fichero individual
-    if (item.files === undefined) data.append('attach_files', item);
+    if (item.files === undefined) data.append('attachFiles', item);
 
     //si item.files !== undefined es una carpeta, accedemos a item.files
     else {
       item.files.forEach((file) => {
-        data.append('attach_files', file);
+        data.append('attachFiles', file);
       });
     }
   });
