@@ -26,9 +26,15 @@
                   </q-button>
                 </div>
 
-                <template v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined">
+                <template v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined && isLocalRepository">
                   <div v-if="item.name !== undefined">{{ item.name }}</div>
                   <div class="file-system-entry__details">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="13" viewBox="0 0 24 24">
+                      <path
+                        d="M13.744 8s1.522-8-3.335-8h-8.409v24h20v-13c0-3.419-5.247-3.745-8.256-3zm4.256 11h-12v-1h12v1zm0-3h-12v-1h12v1zm0-3h-12v-1h12v1zm-3.432-12.925c2.202 1.174 5.938 4.883 7.432 6.881-1.286-.9-4.044-1.657-6.091-1.179.222-1.468-.185-4.534-1.341-5.702z"
+                        fill="#6a6d70">
+                      </path>
+                    </svg>
                     <span class="file-system-entry__detail">
                       {{ formatFileSize(item.size) }} ·
                     </span>
@@ -38,11 +44,11 @@
                   </div>
                 </template>
 
-                <template v-if="item.files !== undefined">
+                <template v-if="item.files !== undefined && isLocalRepository">
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
-                      <svg viewBox="0 0 9 7" width="9" height="7" xmlns="http://www.w3.org/2000/svg">
+                      <svg viewBox="0 0 9 9" width="10" height="10" xmlns="http://www.w3.org/2000/svg">
                         <path
                           d="M0 6.14285714V.85714286C0 .38375593.38375593 0 .85714286 0h2.26447876c1.33783784 0 .74324324 1.23673511 2.08108108 1.23673511h2.94015444C8.61624407 1.23673511 9 1.62049104 9 2.09387797v4.04897917C9 6.61624407 8.61624407 7 8.14285714 7H.85714286C.38375593 7 0 6.61624407 0 6.14285714z"
                           fill="#6a6d70">
@@ -56,15 +62,15 @@
                   </div>
                 </template>
 
-                <template v-else>
+                <template v-else-if="!isLocalRepository">
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
                       <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
                         <path
                           d="M22 18.055v2.458c0 1.925-4.655 3.487-10 3.487-5.344 0-10-1.562-10-3.487v-2.458c2.418 1.738 7.005 2.256 10 2.256 3.006 0 7.588-.523 10-2.256zm-10-3.409c-3.006 0-7.588-.523-10-2.256v2.434c0 1.926 4.656 3.487 10 3.487 5.345 0 10-1.562 10-3.487v-2.434c-2.418 1.738-7.005 2.256-10 2.256zm0-14.646c-5.344 0-10 1.562-10 3.488s4.656 3.487 10 3.487c5.345 0 10-1.562 10-3.487 0-1.926-4.655-3.488-10-3.488zm0 8.975c-3.006 0-7.588-.523-10-2.256v2.44c0 1.926 4.656 3.487 10 3.487 5.345 0 10-1.562 10-3.487v-2.44c-2.418 1.738-7.005 2.256-10 2.256z"
-                          fill="#6a6d70"
-                        />
+                          fill="#6a6d70">
+                        </path>
                       </svg>
                       <span class="directory__type-detail">
                         SQL table ·
