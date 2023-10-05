@@ -57,7 +57,7 @@
                 </template>
 
                 <template v-else>
-                  <div>{{ item }}</div>
+                  <div>{{ item[index] }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
                       SQL table
