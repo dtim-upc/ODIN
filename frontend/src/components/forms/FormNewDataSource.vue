@@ -26,7 +26,7 @@
                   </q-button>
                 </div>
 
-                <template v-if="item.files === undefined && item.name !== undefined">
+                <template v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined">
                   <div v-if="item.name !== undefined">{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -57,7 +57,7 @@
                 </template>
 
                 <template v-else>
-                  <div>{{ item[index].name }}</div>
+                  <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
                       <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24">
@@ -70,8 +70,8 @@
                         SQL table ·
                       </span>
                     </span>
-                    <span class="file-system-entry__detail">{{ item[index].otherInfo }} lines · </span>
-                    <span class="file-system-entry__detail">({{ item[index].size }}) </span>
+                    <span class="file-system-entry__detail">{{ item.otherInfo }} lines · </span>
+                    <span class="file-system-entry__detail">({{ item.size }}) </span>
                   </div>
                 </template>
               </div>
@@ -267,7 +267,11 @@ async function initializeComponent() {
         // Verifica si la solicitud se realizó con éxito
         if (response.status === 200) {
           const tablesData = response.data; // Esto debería contener la información de las tablas
-          uploadedItems.value.push(tablesData);
+
+          for (const table of tablesData) {
+            uploadedItems.value.push(table); // Agregar cada objeto individual a uploadedItems
+          }
+
           console.log(tablesData);
         } else {
           // Maneja el caso en el que la solicitud no se realizó con éxito (por ejemplo, un código de estado no 200)
