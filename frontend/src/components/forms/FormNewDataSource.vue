@@ -57,11 +57,21 @@
                 </template>
 
                 <template v-else>
-                  <div>{{ item[index] }}</div>
+                  <div>{{ item[index].name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
-                      SQL table
+                      <svg viewBox="0 0 9 7" width="9" height="7" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M0 6.14285714V.85714286C0 .38375593.38375593 0 .85714286 0h2.26447876c1.33783784 0 .74324324 1.23673511 2.08108108 1.23673511h2.94015444C8.61624407 1.23673511 9 1.62049104 9 2.09387797v4.04897917C9 6.61624407 8.61624407 7 8.14285714 7H.85714286C.38375593 7 0 6.61624407 0 6.14285714z"
+                          fill="#6a6d70">
+                        </path>
+                      </svg>
+                      <span class="directory__type-detail">
+                        SQL table ·
+                      </span>
                     </span>
+                    <span class="file-system-entry__detail">{{ item[index].otherInfo }} lines · </span>
+                    <span class="file-system-entry__detail">({{ formatFileSize(item[index].size) }}) </span>
                   </div>
                 </template>
               </div>

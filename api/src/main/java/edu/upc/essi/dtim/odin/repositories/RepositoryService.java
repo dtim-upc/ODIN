@@ -183,4 +183,31 @@ public class RepositoryService {
         }
     }
 
+    public List<TableInfo> getDatabaseTablesInfo(String repositoryId) {
+        DataRepository repository = ormDataResource.findById(DataRepository.class, repositoryId);
+
+        if (repository != null && repository instanceof RelationalJDBCRepository) {
+            List<TableInfo> t = new ArrayList<>(); // Create an empty list of TableInfo objects
+
+            // Populate the t list with TableInfo objects
+            for (String tableName : getDatabaseTables(repositoryId)) {
+                TableInfo tableInfo = new TableInfo(tableName, getSize(tableName), getOtherInfo(tableName));
+                t.add(tableInfo);
+            }
+            return t;
+        } else {
+            System.out.println("No se pudo obtener la lista de tablas de la base de datos.");
+            return new ArrayList<>(); // Devolver una lista vacía o manejar el error de manera apropiada.
+        }
+    }
+
+    private String getOtherInfo(String tableName) {
+        return "8 filas";
+    }
+
+    private long getSize(String tableName) {
+        return 0;
+    }
+
+
 }
