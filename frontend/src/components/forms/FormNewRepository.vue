@@ -14,6 +14,17 @@
             <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
           </q-card-section>
 
+          <!-- Tipo de origen de datos -->
+          <q-card-section>
+            <!-- Tipo de origen de datos -->
+            <q-select
+              v-model="DataSourceType"
+              :options="dataRepositoryTypes"
+              label="Type"
+              class="q-mt-none"
+            />
+          </q-card-section>
+
           <!-- Formulario generado dinámicamente -->
           <q-card-section v-for="field in formFields" :key="field.name">
 
@@ -32,17 +43,6 @@
           <q-card-section v-if="!isLocalRepository">
             <!-- Contenido del botón -->
             <q-btn label="Test connection" @click="testConnection" />
-          </q-card-section>
-
-          <!-- Tipo de origen de datos -->
-          <q-card-section>
-            <!-- Tipo de origen de datos -->
-            <q-select
-              v-model="DataSourceType"
-              :options="dataRepositoryTypes"
-              label="Type"
-              class="q-mt-none"
-            />
           </q-card-section>
         </div>
       </q-card-section>
