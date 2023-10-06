@@ -162,6 +162,15 @@
         </attributes>
     </entity>
 
-
+    <entity name="SQLDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset">
+        <table name="SQLDataset"/>
+        <attributes>
+            <basic name="tableName"/>
+            <basic name="hostname"/>
+            <basic name="port"/>
+            <basic name="username"/>
+            <basic name="password"/>
+        </attributes>
+    </entity>
 
 </entity-mappings>

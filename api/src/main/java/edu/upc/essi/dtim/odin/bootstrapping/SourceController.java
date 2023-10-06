@@ -7,6 +7,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.odin.NextiaGraphy.NextiaGraphy;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.project.Project;
+import edu.upc.essi.dtim.odin.repositories.TableInfo;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -102,7 +103,8 @@ public class SourceController {
                                             @RequestParam String repositoryName,
                                             @RequestParam String datasetName,
                                             @RequestParam(required = false) String datasetDescription,
-                                            @RequestPart(required = false) List<MultipartFile> attachFiles) {
+                                            @RequestPart(required = false) List<MultipartFile> attachFiles,
+                                            @RequestParam(required = false) List<Object> attachTables) {
         try{
             logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here
@@ -125,43 +127,49 @@ public class SourceController {
             repositoryId = repository.getId();
             String directoryName = repositoryId.toString() + repository.getRepositoryName().toString();
 
-            // Iterate through the list of MultipartFiles to handle each file
-            for (MultipartFile attachFile : attachFiles) {
-                // Get the original filename of the uploaded file
-                String originalFileName = attachFile.getOriginalFilename();
+            if (attachFiles == null || attachFiles.isEmpty()){
+                for (Object tableName : attachTables){
+                    System.out.println(tableName);
+                }
+            } else {
+                // Iterate through the list of MultipartFiles to handle each file
+                for (MultipartFile attachFile : attachFiles) {
+                    // Get the original filename of the uploaded file
+                    String originalFileName = attachFile.getOriginalFilename();
 
-                // Use the original filename as the datasetName
-                assert originalFileName != null;
-                int slashIndex = originalFileName.lastIndexOf("/");
-                datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex+1:0, originalFileName.lastIndexOf('.'));
+                    // Use the original filename as the datasetName
+                    assert originalFileName != null;
+                    int slashIndex = originalFileName.lastIndexOf("/");
+                    datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, originalFileName.lastIndexOf('.'));
 
-                // Reconstruct file from Multipart file
-                String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());
+                    // Reconstruct file from Multipart file
+                    String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());
 
-                // Extract data from datasource file and save it
-                Dataset savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
+                    // Extract data from datasource file and save it
+                    Dataset savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
 
-                // Transform datasource into graph
-                Graph graph = sourceService.transformToGraph(savedDataset);
+                    // Transform datasource into graph
+                    Graph graph = sourceService.transformToGraph(savedDataset);
 
-                // Generating visual schema for frontend
-                String visualSchema = sourceService.generateVisualSchema(graph);
-                graph.setGraphicalSchema(visualSchema);
+                    // Generating visual schema for frontend
+                    String visualSchema = sourceService.generateVisualSchema(graph);
+                    graph.setGraphicalSchema(visualSchema);
 
-                // Create the relation with dataset adding the graph generated to generate an id
-                Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
-                graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-                // Get the disk path from the app configuration
-                Path diskPath = Path.of(appConfig.getDiskPath());
-                graph.write(diskPath.toString()+"/"+directoryName+"/"+datasetWithGraph.getId()+datasetName+".ttl");
+                    // Create the relation with dataset adding the graph generated to generate an id
+                    Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
+                    graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
+                    // Get the disk path from the app configuration
+                    Path diskPath = Path.of(appConfig.getDiskPath());
+                    graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
 
-                // Save graph into the database
-                sourceService.saveGraphToDatabase(graph);
+                    // Save graph into the database
+                    sourceService.saveGraphToDatabase(graph);
 
-                // Add the dataset to the repository and delete the reference from others if exists
-                sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
+                    // Add the dataset to the repository and delete the reference from others if exists
+                    sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
 
-                //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
+                    //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
+                }
             }
 
             // Return success message

@@ -362,20 +362,27 @@ const onSubmit = () => {
   data.append("repositoryName", newDatasource.repositoryName);
   data.append("repositoryId", storeDS.selectedRepositoryId); // Set as empty string if repositoryId is null
   console.log(newDatasource.repositoryId,"++++++++++++++++++++++++++");
+
+  const attachTables = [];
+
   // Append all files as an array under the key 'attach_files'
   uploadedItems.value.forEach((item) => {
     console.log("Archivo que se va a agregar:", item);
 
-    //si item.files === undefined es un fichero individual
-    if (item.files === undefined) data.append('attachFiles', item);
-
-    //si item.files !== undefined es una carpeta, accedemos a item.files
-    else {
+    if (item.files === undefined && isLocalRepository.value) {
+      data.append('attachFiles', item);
+    } else if (item.files !== undefined && isLocalRepository.value) {
       item.files.forEach((file) => {
         data.append('attachFiles', file);
       });
+    } else {
+      console.log("attachTables: " + item.name);
+      attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
     }
+    console.log(attachTables + " --------------");
   });
+
+  data.append('attachTables', JSON.stringify(attachTables));
 
   integrationStore.addDataSource(route.params.id, data, successCallback);
 
