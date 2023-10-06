@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
@@ -148,6 +149,7 @@ public class SourceService {
      * @throws IllegalArgumentException if the file format is not supported.
      */
     public Dataset extractData(String filePath, String datasetName, String datasetDescription) {
+        if(filePath == null) filePath = "table.sql";
         // Extract the extension of the file from the file path
         String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
 
@@ -162,6 +164,10 @@ public class SourceService {
             case "json":
                 // Create a JsonDataset object for JSON files
                 dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
+                break;
+            case "sql":
+                // Create a JsonDataset object for JSON files
+                dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, "dtim.essi.upc.edu", "5432", "vasenjo", "jBGRfEu");
                 break;
             default:
                 // Throw an exception for unsupported file formats

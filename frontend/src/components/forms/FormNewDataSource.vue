@@ -382,7 +382,7 @@ const onSubmit = () => {
     console.log(attachTables + " --------------");
   });
 
-  data.append('attachTables', JSON.stringify(attachTables));
+  data.append('attachTables', attachTables);
 
   integrationStore.addDataSource(route.params.id, data, successCallback);
 

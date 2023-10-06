@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
@@ -104,7 +105,7 @@ public class SourceController {
                                             @RequestParam String datasetName,
                                             @RequestParam(required = false) String datasetDescription,
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
-                                            @RequestParam(required = false) List<Object> attachTables) {
+                                            @RequestParam(required = false) List<String> attachTables) {
         try{
             logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here
@@ -127,9 +128,38 @@ public class SourceController {
             repositoryId = repository.getId();
             String directoryName = repositoryId.toString() + repository.getRepositoryName().toString();
 
+
             if (attachFiles == null || attachFiles.isEmpty()){
-                for (Object tableName : attachTables){
-                    System.out.println(tableName);
+                System.out.println(attachTables);
+                for (String tableName : attachTables){
+                    System.out.println(tableName + " ++++++++++ table name");
+                    // Get the original filename of the uploaded file
+                    String originalFileName = tableName;
+                    datasetName = originalFileName;
+
+                    // Extract data from datasource file and save it
+                    Dataset savedDataset = sourceService.extractData(null, datasetName, datasetDescription);
+
+                    // Transform datasource into graph
+                    Graph graph = sourceService.transformToGraph(savedDataset);
+
+                    // Generating visual schema for frontend
+                    String visualSchema = sourceService.generateVisualSchema(graph);
+                    graph.setGraphicalSchema(visualSchema);
+
+                    // Create the relation with dataset adding the graph generated to generate an id
+                    Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
+                    graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
+                    // Get the disk path from the app configuration
+                    Path diskPath = Path.of(appConfig.getDiskPath());
+                    graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
+
+                    // Save graph into the database
+                    sourceService.saveGraphToDatabase(graph);
+
+                    // Add the dataset to the repository and delete the reference from others if exists
+                    sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
+
                 }
             } else {
                 // Iterate through the list of MultipartFiles to handle each file
