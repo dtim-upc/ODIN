@@ -150,10 +150,7 @@ public class SourceController {
                     // Create the relation with dataset adding the graph generated to generate an id
                     Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
                     graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-                    // Get the disk path from the app configuration
-                    Path diskPath = Path.of(appConfig.getDiskPath());
-                    graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
-
+                    
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
 
