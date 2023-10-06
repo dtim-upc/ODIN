@@ -182,46 +182,6 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
   databasePassword.value = '';
 }
 
-const onSubmit = () => {
-  // deprecat
-  /*
-  const data = new FormData();
-  data.append("datasetDescription", newDatasource.datasetDescription);
-  data.append("repositoryName", newDatasource.repositoryName);
-  console.log(DataSourceType.value,"++++++++++++++++++++++++++++++++ tipo repo");
-  data.append("repositoryType", DataSourceType.value.name);
-
-  // Agregar campos específicos del tipo de DataRepository seleccionado
-  formFields.value.forEach((field) => {
-    // Verificar si el campo tiene un valor válido antes de agregarlo
-    if (field.value !== null && field.value !== undefined) {
-      data.append(field.name, field.value);
-    }
-  });
-   */
-
-  const data = {};
-
-  data["datasetDescription"] = newDatasource.datasetDescription;
-  data["repositoryName"]= newDatasource.repositoryName;
-  console.log(DataSourceType.value,"++++++++++++++++++++++++++++++++ tipo repo");
-  data["repositoryType"] = DataSourceType.value;
-
-  // Agregar campos específicos del tipo de DataRepository seleccionado
-  // Add specific fields from formFields to the data object
-  formFields.value.forEach((field) => {
-    if (field.value !== null && field.value !== undefined) {
-      data[field.name.toString()] = field.value.toString();
-      notify.positive(field.name.toString() + " has been added as: " + field.value.toString());
-    }
-  });
-
-
-  integrationStore.addDataRepository(route.params.id, data, successCallback);
-
-  onReset();
-}
-
 const testConnection = async () => {
   const data = {};
 
@@ -229,7 +189,7 @@ const testConnection = async () => {
   formFields.value.forEach((field) => {
     if (field.value !== null && field.value !== undefined) {
       data[field.name.toString()] = field.value.toString();
-      notify.positive(field.name.toString() + " has been added as: " + field.value.toString());
+      //notify.positive(field.name.toString() + " has been added as: " + field.value.toString());
     }
   });
 
@@ -238,22 +198,56 @@ const testConnection = async () => {
     const response = await odinApi.post('/test-connection', data);
 
     if (response.data === true) {
-      notify.positive('Conexión establecida correctamente');
+      notify.positive('Connection established successfully.');
+      return true;
     } else {
-      notify.negative('No se pudo establecer la conexión con la base de datos');
+      notify.negative("Error connecting with the provided database.");
+      return false;
     }
   } catch (error) {
     console.error('Error al intentar establecer conexión con la base de datos:', error);
     notify.negative('Error al intentar establecer conexión con la base de datos:', error);
+    return false;
   }
 }
 
+const onSubmit = async () => {
+  const data = {};
+
+  data["datasetDescription"] = newDatasource.datasetDescription;
+  data["repositoryName"] = newDatasource.repositoryName;
+  console.log(DataSourceType.value, "++++++++++++++++++++++++++++++++ tipo repo");
+  data["repositoryType"] = DataSourceType.value;
+
+  // Add specific fields from formFields to the data object
+  formFields.value.forEach((field) => {
+    if (field.value !== null && field.value !== undefined) {
+      data[field.name.toString()] = field.value.toString();
+    }
+  });
+
+  if (!isLocalRepository.value) {
+    try {
+      // Await the result of the testConnection function
+      const isConnected = await testConnection();
+
+      if (isConnected) {
+        integrationStore.addDataRepository(route.params.id, data, successCallback);
+        onReset();
+      } else {
+      }
+    } catch (error) {
+      console.error("Error connecting with the database:", error);
+      notify.negative("Error connecting with the database:", error);
+    }
+  }
+};
 
 const successCallback = (datasource) => {
 
   console.log("success callback")
 
-  notify.positive(`Data Source ${datasource.id} successfully uploaded`)
+  notify.positive(`Repository successfully created`)
   onReset()
   form.value.resetValidation()
 

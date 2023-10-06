@@ -393,7 +393,7 @@ const successCallback = (datasource) => {
 
   console.log("success callback")
 
-  notify.positive(`Data Source ${datasource.id} successfully uploaded`)
+  notify.positive(`Dataset/s successfully uploaded`)
   onReset()
   form.value.resetValidation()
 
