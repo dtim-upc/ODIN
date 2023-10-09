@@ -41,7 +41,6 @@
             </basic>
 
             <one-to-many orphan-removal="true" name="repositories" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
-                <join-column name="PROJECTID"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>
 
