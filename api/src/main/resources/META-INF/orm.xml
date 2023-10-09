@@ -93,6 +93,7 @@
             <column-name>id</column-name>
         </unique-constraint>
         </table>
+        <inheritance strategy="JOINED"/>
         <attributes>
             <id name="id">
                 <generated-value strategy="AUTO"/>
@@ -170,6 +171,13 @@
             <basic name="port"/>
             <basic name="username"/>
             <basic name="password"/>
+        </attributes>
+    </entity>
+
+    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset">
+        <table name="XmlDataset"/>
+        <attributes>
+            <basic name="path"/>
         </attributes>
     </entity>
 

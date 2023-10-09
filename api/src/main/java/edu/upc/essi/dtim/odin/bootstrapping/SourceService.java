@@ -1,10 +1,7 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
@@ -169,6 +166,10 @@ public class SourceService {
                 // Create a JsonDataset object for JSON files
                 dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, "dtim.essi.upc.edu", "5432", "vasenjo", "jBGRfEu");
                 break;
+            case "xml":
+                // Create a JsonDataset object for JSON files
+                dataset = new XmlDataset(null, datasetName, datasetDescription, filePath);
+                break;
             default:
                 // Throw an exception for unsupported file formats
                 throw new IllegalArgumentException("Unsupported file format: " + extension);
@@ -197,6 +198,8 @@ public class SourceService {
             ((JsonDataset) dataset).setPath(datasetPath);
         } else if (dataset instanceof CsvDataset) {
             ((CsvDataset) dataset).setPath(datasetPath);
+        } else if (dataset instanceof XmlDataset) {
+            ((XmlDataset) dataset).setPath(datasetPath);
         }
 
         // Rename the file on disk with the updated datasetPath
@@ -420,13 +423,17 @@ public class SourceService {
 
         // Add the dataset to the new repository
         List<Dataset> newRepoDatasets = new ArrayList<>(newRepository.getDatasets());
+
         newRepoDatasets.add(dataset);
+
         newRepository.setDatasets(newRepoDatasets);
 
         // Save both repositories
-        ormDataResource.save(newRepository);
+        DataRepository savedRepository = ormDataResource.save(newRepository);
 
-        return newRepository;
+
+
+        return savedRepository;
     }
 
 

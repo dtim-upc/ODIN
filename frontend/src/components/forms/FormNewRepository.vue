@@ -241,6 +241,9 @@ const onSubmit = async () => {
       notify.negative("Error connecting with the database:", error);
     }
   }
+  else {
+    integrationStore.addDataRepository(route.params.id, data, successCallback);
+  }
 };
 
 const successCallback = (datasource) => {
