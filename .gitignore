@@ -10,6 +10,9 @@ ODINwhiteboard/odin/src/main/resources/credentials.properties
 *.lock
 *.db
 *.json
+*.xml
+!orm.xml
+!persistence.xml
 !N85A9SX4TX2SkZ25_enfermedades.json
 !jsonTestFile.json
 !corruptJsonTestFile.json
