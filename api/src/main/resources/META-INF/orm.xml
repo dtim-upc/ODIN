@@ -98,11 +98,10 @@
                 <generated-value strategy="AUTO"/>
             </id>
             <basic name="repositoryName"/>
-
-            <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+            <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset" mapped-by="repository">
                 <cascade><cascade-all/></cascade>
             </one-to-many>
-
+            <transient name="datasets"/>
         </attributes>
     </entity>
 
@@ -142,6 +141,8 @@
             <basic name="created_at">
                 <temporal>TIMESTAMP</temporal>
             </basic>
+            <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+            </many-to-one>
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
                 <cascade><cascade-all/></cascade>
             </one-to-one>
@@ -162,6 +163,13 @@
         </attributes>
     </entity>
 
+    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset">
+        <table name="XmlDataset"/>
+        <attributes>
+            <basic name="path"/>
+        </attributes>
+    </entity>
+
     <entity name="SQLDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset">
         <table name="SQLDataset"/>
         <attributes>
@@ -173,11 +181,6 @@
         </attributes>
     </entity>
 
-    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset">
-        <table name="XmlDataset"/>
-        <attributes>
-            <basic name="path"/>
-        </attributes>
-    </entity>
+
 
 </entity-mappings>

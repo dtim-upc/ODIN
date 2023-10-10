@@ -431,8 +431,6 @@ public class SourceService {
         // Save both repositories
         DataRepository savedRepository = ormDataResource.save(newRepository);
 
-
-
         return savedRepository;
     }
 
@@ -656,6 +654,28 @@ public class SourceService {
 
     public Project deleteIntegratedDatasets(String projectID) {
         return projectService.deleteIntegratedDatasets(projectID);
+    }
+
+    public Dataset addRepositoryToDataset(String datasetId, String repositoryId) {
+        // Find the new repository and dataset by their respective IDs
+        DataRepository newRepository = ormDataResource.findById(DataRepository.class, repositoryId);
+        Dataset dataset = getDatasetById(datasetId);
+
+        // Check if the new repository and dataset were found
+        if (newRepository == null) {
+            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
+        }
+
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
+        }
+
+        dataset.setRepository(newRepository);
+
+        // Save both repositories
+        Dataset savedDataset = ormDataResource.save(dataset);
+
+        return savedDataset;
     }
 }
 

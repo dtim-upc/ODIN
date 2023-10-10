@@ -193,6 +193,8 @@ public class SourceController {
                     sourceService.saveGraphToDatabase(graph);
 
                     // Add the dataset to the repository and delete the reference from others if exists
+                    sourceService.addRepositoryToDataset(datasetWithGraph.getId(), repositoryId);
+
                     sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
 
                     //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
