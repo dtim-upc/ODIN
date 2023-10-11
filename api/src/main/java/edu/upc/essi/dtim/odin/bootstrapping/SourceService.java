@@ -163,12 +163,16 @@ public class SourceService {
                 dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
                 break;
             case "sql":
-                // Create a JsonDataset object for JSON files
+                // Create a SqlDataset object for JSON files
                 dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, "dtim.essi.upc.edu", "5432", "vasenjo", "jBGRfEu");
                 break;
             case "xml":
-                // Create a JsonDataset object for JSON files
+                // Create a XmlDataset object for JSON files
                 dataset = new XmlDataset(null, datasetName, datasetDescription, filePath);
+                break;
+            case "parquet":
+                // Create a ParquetDataset object for JSON files
+                dataset = new ParquetDataset(null, datasetName, datasetDescription, filePath);
                 break;
             default:
                 // Throw an exception for unsupported file formats
