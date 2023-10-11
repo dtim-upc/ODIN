@@ -98,10 +98,9 @@
                 <generated-value strategy="AUTO"/>
             </id>
             <basic name="repositoryName"/>
-            <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset" mapped-by="repository">
+            <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
                 <cascade><cascade-all/></cascade>
             </one-to-many>
-            <transient name="datasets"/>
         </attributes>
     </entity>
 
@@ -165,6 +164,13 @@
 
     <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset">
         <table name="XmlDataset"/>
+        <attributes>
+            <basic name="path"/>
+        </attributes>
+    </entity>
+
+    <entity name="ParquetDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.ParquetDataset">
+        <table name="ParquetDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>

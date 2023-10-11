@@ -204,6 +204,8 @@ public class SourceService {
             ((CsvDataset) dataset).setPath(datasetPath);
         } else if (dataset instanceof XmlDataset) {
             ((XmlDataset) dataset).setPath(datasetPath);
+        } else if (dataset instanceof ParquetDataset) {
+            ((ParquetDataset) dataset).setPath(datasetPath);
         }
 
         // Rename the file on disk with the updated datasetPath
@@ -217,7 +219,7 @@ public class SourceService {
 
         // Save the dataset again with the updated datasetPath
         dataset = saveDataset(dataset);
-
+        System.out.println(dataset.getId());
 
         return dataset;
     }
@@ -644,7 +646,9 @@ public class SourceService {
             throw new RuntimeException(e);
         }
         assert graphStore != null;
-        Graph datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
+
+        Graph datasetGraph = null;
+        if (dataset.getLocalGraph() != null && dataset.getLocalGraph().getGraphName() != null) datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
 
         // Set the local graph of the dataset to the retrieved graph
         dataset.setLocalGraph((LocalGraphJenaImpl) datasetGraph);

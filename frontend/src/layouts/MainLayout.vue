@@ -58,24 +58,6 @@
 
           <q-item manual-focus>
             <q-item-section avatar>
-              <!--      o_file_copy o_spoke   o_category  workspaces   category spoke-->
-              <!-- <q-icon size="sm" name="o_bubble_chart "/> -->
-              <q-btn flat padding="xs" icon="o_hub" :to="{name: 'schema'}"
-                     :color="$route.name === 'schema' ? 'primary600': 'neutral500' "
-                     :class="{ activebg: $route.name === 'schema' }">
-                <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade"
-                           transition-hide="fade">
-                  Schema
-                </q-tooltip>
-              </q-btn>
-            </q-item-section>
-            <q-item-section>
-              Schema
-            </q-item-section>
-          </q-item>
-
-          <q-item manual-focus>
-            <q-item-section avatar>
               <q-btn flat padding="xs" icon="mdi-database" :to="{name:'repositories'}"
                      :color=" ['repositories', 'dsIntegration'].includes($route.name) ? 'primary600': 'neutral500' "
                      :class="{ activebg:  ['repositories', 'dsIntegration'].includes($route.name) }">
@@ -107,6 +89,24 @@
               Datasets
             </q-item-section>
           </q-item>
+
+            <q-item manual-focus>
+              <q-item-section avatar>
+                <!--      o_file_copy o_spoke   o_category  workspaces   category spoke-->
+                <!-- <q-icon size="sm" name="o_bubble_chart "/> -->
+                <q-btn flat padding="xs" icon="o_hub" :to="{name: 'schema'}"
+                       :color="$route.name === 'schema' ? 'primary600': 'neutral500' "
+                       :class="{ activebg: $route.name === 'schema' }">
+                  <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade"
+                             transition-hide="fade">
+                    Schema
+                  </q-tooltip>
+                </q-btn>
+              </q-item-section>
+              <q-item-section>
+                Schema
+              </q-item-section>
+            </q-item>
 
 
           <q-item manual-focus>

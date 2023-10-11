@@ -140,6 +140,10 @@ public class SourceController {
                     // Extract data from datasource file and save it
                     Dataset savedDataset = sourceService.extractData(null, datasetName, datasetDescription);
 
+                    // Add the dataset to the repository and delete the reference from others if exists
+                    savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
+                    repository = sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
+
                     // Transform datasource into graph
                     Graph graph = sourceService.transformToGraph(savedDataset);
 
@@ -153,10 +157,6 @@ public class SourceController {
                     
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
-
-                    // Add the dataset to the repository and delete the reference from others if exists
-                    sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
-
                 }
             } else {
                 // Iterate through the list of MultipartFiles to handle each file
@@ -175,6 +175,10 @@ public class SourceController {
                     // Extract data from datasource file and save it
                     Dataset savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
 
+                    // Add the dataset to the repository and delete the reference from others if exists
+                    sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
+                    sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
+
                     // Transform datasource into graph
                     Graph graph = sourceService.transformToGraph(savedDataset);
 
@@ -191,11 +195,6 @@ public class SourceController {
 
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
-
-                    // Add the dataset to the repository and delete the reference from others if exists
-                    sourceService.addRepositoryToDataset(datasetWithGraph.getId(), repositoryId);
-
-                    sourceService.addDatasetToRepository(datasetWithGraph.getId(), repositoryId);
 
                     //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
                 }
