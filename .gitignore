@@ -27,3 +27,4 @@ api/dbFiles/ttl/integrated
 *.bak_002d
 *.html
 *.png
+*.parquet
