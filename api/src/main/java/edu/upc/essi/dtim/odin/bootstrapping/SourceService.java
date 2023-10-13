@@ -1,6 +1,8 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
@@ -406,7 +408,7 @@ public class SourceService {
      */
     public DataRepository addDatasetToRepository(String datasetId, String repositoryId) throws IllegalArgumentException {
         // Find the new repository and dataset by their respective IDs
-        DataRepository newRepository = ormDataResource.findById(DataRepository.class, repositoryId);
+        DataRepository newRepository = findRepositoryById(repositoryId);
         Dataset dataset = getDatasetById(datasetId);
 
         // Check if the new repository and dataset were found
@@ -418,26 +420,29 @@ public class SourceService {
             throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
         }
 
-        // Remove the dataset from the old repository if it exists
-        DataRepository oldRepository = findRepositoryContainingDataset(datasetId);
-        if (oldRepository != null) {
-            List<Dataset> oldRepoDatasets = new ArrayList<>(oldRepository.getDatasets());
-            oldRepoDatasets.removeIf(d -> d.getId().equals(datasetId));
-            oldRepository.setDatasets(oldRepoDatasets);
-            ormDataResource.save(oldRepository);
+        if (datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)){
+            // Remove the dataset from the old repository if it exists
+            DataRepository oldRepository = findRepositoryContainingDataset(datasetId);
+            if (oldRepository != null) {
+                List<Dataset> oldRepoDatasets = new ArrayList<>(oldRepository.getDatasets());
+                oldRepoDatasets.removeIf(d -> d.getId().equals(datasetId));
+                oldRepository.setDatasets(oldRepoDatasets);
+                ormDataResource.save(oldRepository);
+            }
+
+            // Add the dataset to the new repository
+            List<Dataset> newRepoDatasets = new ArrayList<>(newRepository.getDatasets());
+
+            newRepoDatasets.add(dataset);
+
+            newRepository.setDatasets(newRepoDatasets);
+
+            // Save both repositories
+            DataRepository savedRepository = ormDataResource.save(newRepository);
+
+            return savedRepository;
         }
-
-        // Add the dataset to the new repository
-        List<Dataset> newRepoDatasets = new ArrayList<>(newRepository.getDatasets());
-
-        newRepoDatasets.add(dataset);
-
-        newRepository.setDatasets(newRepoDatasets);
-
-        // Save both repositories
-        DataRepository savedRepository = ormDataResource.save(newRepository);
-
-        return savedRepository;
+        return null;
     }
 
 
@@ -499,7 +504,7 @@ public class SourceService {
      */
     public boolean editDataset(Dataset dataset) {
         // Retrieve the original dataset from the database using its ID
-        Dataset originalDataset = ormDataResource.findById(Dataset.class, dataset.getId());
+        Dataset originalDataset = getDatasetById(dataset.getId());
         Dataset savedDS = null;
 
         // Check if any attribute has changed
@@ -666,7 +671,7 @@ public class SourceService {
 
     public Dataset addRepositoryToDataset(String datasetId, String repositoryId) {
         // Find the new repository and dataset by their respective IDs
-        DataRepository newRepository = ormDataResource.findById(DataRepository.class, repositoryId);
+        DataRepository newRepository = findRepositoryById(repositoryId);
         Dataset dataset = getDatasetById(datasetId);
 
         // Check if the new repository and dataset were found
@@ -678,13 +683,45 @@ public class SourceService {
             throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
         }
 
-        dataset.setRepository(newRepository);
+        if(datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)){
+            dataset.setRepository(newRepository);
 
-        // Save both repositories
-        Dataset savedDataset = ormDataResource.save(dataset);
+            // Save both repositories
+            Dataset savedDataset = saveDataset(dataset);
 
-        return savedDataset;
+            return savedDataset;
+        }
+        return null;
     }
+
+    private boolean datasetIsTypeOfRepositoryRestriction(String datasetId, String repositoryId) {
+        // Find the new repository and dataset by their respective IDs
+        DataRepository repository = findRepositoryById(repositoryId);
+        Dataset dataset = getDatasetById(datasetId);
+
+        // Check if the new repository and dataset were found
+        if (repository == null) {
+            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
+        }
+
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
+        }
+
+        // Check if the dataset type matches the repository type
+        if (repository instanceof RelationalJDBCRepository && dataset instanceof SQLDataset) {
+            return true; // DatasetSQL can be added to RepositorySQL
+        } else if (repository instanceof LocalRepository &&
+                        (dataset instanceof JsonDataset ||
+                        dataset instanceof CsvDataset ||
+                        dataset instanceof ParquetDataset ||
+                        dataset instanceof XmlDataset)) {
+            return true; // LocalDataset can be added to LocalRepository
+        } else {
+            return false; // Incompatible dataset and repository types
+        }
+    }
+
 }
 
 
