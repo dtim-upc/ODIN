@@ -44,39 +44,42 @@
         </div>
 
 
-          <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
-            <div class="text-h5">Create new repository</div>
+        <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
+          <div class="text-h5">Create new repository</div>
           <q-card-section>
-            <q-input filled autogrow v-model="newDatasource.repositoryName" label="Repository name" :rules="[(val) => (val && val.length > 0) || 'Mandatory field']" />
+            <q-input filled autogrow v-model="newDatasource.repositoryName" label="Repository name"
+                     :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
             <!--Descripción del conjunto de datos (opcional) -->
             <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
           </q-card-section>
 
+          <!-- Tipo de origen de datos -->
+          <q-card-section>
             <!-- Tipo de origen de datos -->
-            <q-card-section>
-              <!-- Tipo de origen de datos -->
-              <q-select
-                v-model="DataSourceType"
-                :options="dataRepositoryTypes"
-                label="Type"
-                class="q-mt-none"
-              />
-            </q-card-section>
+            <q-select
+              v-model="DataSourceType"
+              :options="dataRepositoryTypes"
+              label="Type"
+              class="q-mt-none"
+            />
+          </q-card-section>
 
-            <!-- Formulario generado dinámicamente -->
-            <q-card-section v-for="field in formFields" :key="field.name">
+          <!-- Formulario generado dinámicamente -->
+          <q-card-section v-for="field in formFields" :key="field.name">
 
-              <q-input v-if="field.name !== 'password'" filled autogrow v-model="field.value" :label="field.label" :rules="[(val) => (val && val.length > 0) || 'Mandatory field']" />
-              <q-input v-if="field.name.toLowerCase() === 'password'" v-model="field.value" filled :type="isPwd ? 'password' : 'text'" :label="field.label">
-                <template v-slot:append>
-                  <q-icon
-                    :name="isPwd ? 'visibility_off' : 'visibility'"
-                    class="cursor-pointer"
-                    @click="isPwd = !isPwd"
-                  />
-                </template>
-              </q-input>
-            </q-card-section>
+            <q-input v-if="field.name !== 'password'" filled autogrow v-model="field.value" :label="field.label"
+                     :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
+            <q-input v-if="field.name.toLowerCase() === 'password'" v-model="field.value" filled
+                     :type="isPwd ? 'password' : 'text'" :label="field.label">
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
+          </q-card-section>
 
 
           <q-card-section v-if="!isLocalRepository">
