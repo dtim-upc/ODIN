@@ -1,14 +1,11 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.odin.NextiaGraphy.NextiaGraphy;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.project.Project;
-import edu.upc.essi.dtim.odin.repositories.TableInfo;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -460,6 +457,5 @@ public class SourceController {
 
         return new ResponseEntity<>(visualSchemaIntegration, HttpStatus.OK);
     }
-
 }
 

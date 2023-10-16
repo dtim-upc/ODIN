@@ -1,0 +1,29 @@
+{
+  "formTitle": "Create new repository",
+  "type": "object",
+
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "edad": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 120
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "botonEnviar": {
+      "type": "button",
+      "text": "Enviar"
+    },
+    "toggleActivo": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["nombre", "email"]
+}

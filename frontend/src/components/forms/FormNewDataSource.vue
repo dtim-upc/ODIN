@@ -20,13 +20,14 @@
               <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item"
                    @mouseover="showSpecialButton(index)" @mouseleave="hideSpecialButton(index)">
 
-                <div class="special-button special-button-hidden" >
+                <div class="special-button special-button-hidden">
                   <q-button @click="removeUploadedItem(index)" flat round>
                     <q-icon name="close" size="1.25em"/>
                   </q-button>
                 </div>
 
-                <template v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined && isLocalRepository">
+                <template
+                  v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined && isLocalRepository">
                   <div v-if="item.name !== undefined">{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="13" viewBox="0 0 24 24">
@@ -268,7 +269,7 @@ async function initializeComponent() {
         const repositoryId = storeDS.selectedRepositoryId;
 
         // Realiza la solicitud GET al punto final del backend con el repositoryId como parámetro
-        const response = await odinApi.get(`/`+repositoryId+`/tables`);
+        const response = await odinApi.get(`/` + repositoryId + `/tables`);
 
         // Verifica si la solicitud se realizó con éxito
         if (response.status === 200) {
@@ -290,6 +291,7 @@ async function initializeComponent() {
     }
   }
 }
+
 
 watch(() => showS.value, (newValue) => {
   if (newValue) {
@@ -361,7 +363,7 @@ const onSubmit = () => {
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
   data.append("repositoryId", storeDS.selectedRepositoryId); // Set as empty string if repositoryId is null
-  console.log(newDatasource.repositoryId,"++++++++++++++++++++++++++");
+  console.log(newDatasource.repositoryId, "++++++++++++++++++++++++++");
 
   const attachTables = [];
 

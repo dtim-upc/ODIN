@@ -1,6 +1,5 @@
 *.csv
 !csvTestFile.csv
-ODINwhiteboard/odin/src/main/resources/credentials.properties
 *.bpt
 *.dat
 *.idn
@@ -11,6 +10,7 @@ ODINwhiteboard/odin/src/main/resources/credentials.properties
 *.db
 *.json
 *.xml
+!api/src/main/resources/frontend-schemas/*.json
 !orm.xml
 !persistence.xml
 !N85A9SX4TX2SkZ25_enfermedades.json
