@@ -105,7 +105,7 @@
 
 
                   <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                    Model: "{{ DataSourceType }}"
+                    SELECT: "{{ DataSourceType }}"
                   </q-badge>
 
                   <q-select
@@ -119,10 +119,12 @@
 
                   <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
 
-
+                  <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
+                    TOGGLE: "{{ connectBy }}"
+                  </q-badge>
                   <q-btn-toggle
                     v-if="field.type === 'toggle'"
-                    v-model="fieldName.value"
+                    v-model="connectBy"
                     spread
                     class="my-custom-toggle"
                     no-caps
@@ -172,7 +174,7 @@
 
 
                     <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      Model: "{{ DataSourceType }}"
+                      SELECT: "{{ DataSourceType }}"
                     </q-badge>
 
                     <q-select
@@ -186,10 +188,12 @@
 
                     <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
 
-
+                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
+                      TOGGLE: "{{ connectBy }}"
+                    </q-badge>
                     <q-btn-toggle
                       v-if="field.type === 'toggle'"
-                      v-model="fieldName.value"
+                      v-model="connectBy"
                       spread
                       class="my-custom-toggle"
                       no-caps
@@ -240,7 +244,7 @@
 
 
                     <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      Model: "{{ DataSourceType }}"
+                      SELECT: "{{ DataSourceType }}"
                     </q-badge>
 
                     <q-select
@@ -254,10 +258,12 @@
 
                     <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
 
-
+                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
+                      TOGGLE: "{{ connectBy }}"
+                    </q-badge>
                     <q-btn-toggle
                       v-if="field.type === 'toggle'"
-                      v-model="fieldName.value"
+                      v-model="connectBy"
                       spread
                       class="my-custom-toggle"
                       no-caps
@@ -275,6 +281,145 @@
 
               </div>
 
+              <div v-else-if="field.dependsOn.field === 'connectBy'
+                              && field.dependsOn.value === 'connectByHost'
+                              && connectBy === 'connectByHost'">
+                44444444
+                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
+
+                  <div>
+                    <q-input v-if="fieldName.value !== 'password'
+                                && field.type === 'string'
+                                "
+                             filled
+                             autogrow
+                             v-model="field.value"
+                             :label="field.label"
+                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
+
+
+                    <q-input v-if="fieldName.value === 'password'"
+                             v-model="fieldName.value"
+                             filled
+                             :type="isPwd ? 'password' : 'text'"
+                             :label=field.label>
+                      <template v-slot:append>
+                        <q-icon
+                          :name="isPwd ? 'visibility_off' : 'visibility'"
+                          class="cursor-pointer"
+                          @click="isPwd = !isPwd"
+                        />
+                      </template>
+                    </q-input>
+
+
+                    <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
+                      SELECT: "{{ DataSourceType }}"
+                    </q-badge>
+
+                    <q-select
+                      v-if="field.type === 'select'"
+                      v-model="DataSourceType"
+                      :options="field.options"
+                      :label="field.label"
+                      class="q-mt-none"
+                    />
+
+
+                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+
+                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
+                      TOGGLE: "{{ connectBy }}"
+                    </q-badge>
+                    <q-btn-toggle
+                      v-if="field.type === 'toggle'"
+                      v-model="connectBy"
+                      spread
+                      class="my-custom-toggle"
+                      no-caps
+                      rounded
+                      unelevated
+                      toggle-color="primary"
+                      color="white"
+                      text-color="primary"
+                      :options="field.options"
+                    />
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div v-else-if="field.dependsOn.field === 'connectBy'
+                              && field.dependsOn.value === 'connectByUrl'
+                              && connectBy === 'connectByUrl'">
+                555555555
+                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
+
+                  <div>
+                    <q-input v-if="fieldName.value !== 'password'
+                                && field.type === 'string'
+                                "
+                             filled
+                             autogrow
+                             v-model="field.value"
+                             :label="field.label"
+                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
+
+
+                    <q-input v-if="fieldName.value === 'password'"
+                             v-model="fieldName.value"
+                             filled
+                             :type="isPwd ? 'password' : 'text'"
+                             :label=field.label>
+                      <template v-slot:append>
+                        <q-icon
+                          :name="isPwd ? 'visibility_off' : 'visibility'"
+                          class="cursor-pointer"
+                          @click="isPwd = !isPwd"
+                        />
+                      </template>
+                    </q-input>
+
+
+                    <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
+                      SELECT: "{{ DataSourceType }}"
+                    </q-badge>
+
+                    <q-select
+                      v-if="field.type === 'select'"
+                      v-model="DataSourceType"
+                      :options="field.options"
+                      :label="field.label"
+                      class="q-mt-none"
+                    />
+
+
+                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+
+                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
+                      TOGGLE: "{{ connectBy }}"
+                    </q-badge>
+                    <q-btn-toggle
+                      v-if="field.type === 'toggle'"
+                      v-model="connectBy"
+                      spread
+                      class="my-custom-toggle"
+                      no-caps
+                      rounded
+                      unelevated
+                      toggle-color="primary"
+                      color="white"
+                      text-color="primary"
+                      :options="field.options"
+                    />
+
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
           </q-card-section>
@@ -398,6 +543,7 @@ const integrationStore = useIntegrationStore()
 
 const projectID = ref(null);
 const formSchema = ref("");
+const connectBy = ref("");
 
 // When the component is mounted, fetch the repositories for the current project.
 onMounted(async () => {
@@ -462,6 +608,7 @@ watch(() => showS.value, (newValue) => {
     formSchema.value = response.data;
     console.log(formSchema);
     DataSourceType.value = '';
+    connectBy.value = formSchema.properties.jdbcRepositoryDetails.properties.connectBy.default;
   })
     .catch(error => {
       console.error('Error al obtener el JSON Schema', error);

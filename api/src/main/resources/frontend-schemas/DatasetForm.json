@@ -50,6 +50,10 @@
         "connectBy": {
           "type": "toggle",
           "label": "Connect by",
+          "default": {
+            "label": "Connect by URL",
+            "value": "connectByUrl"
+          },
           "options": [
             {
               "label": "Connect by URL",
@@ -60,29 +64,66 @@
               "value": "connectByHost"
             }
           ]
+        }
+      }
+    },
+    "connectByUrl": {
+      "type": "section",
+      "label": "Connect by URL Details",
+      "dependsOn": {
+        "field": "connectBy",
+        "value": "connectByUrl"
+      },
+      "properties": {
+        "url": {
+          "type": "string",
+          "label": "URL",
+          "maxLength": 50
+        }
+      }
+    },
+    "connectByHost": {
+      "type": "section",
+      "label": "Connect by Host Details",
+      "dependsOn": {
+        "field": "connectBy",
+        "value": "connectByHost"
+      },
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "label": "Hostname"
         },
-        "authentication": {
-          "type": "section",
-          "label": "Authentication",
-          "dependsOn": {
-            "field": "connectBy",
-            "value": "connectByHost"
-          },
-          "properties": {
-            "username": {
-              "type": "string",
-              "label": "Username"
-            },
-            "password": {
-              "type": "string",
-              "label": "Password"
-            },
-            "botonTestConnection": {
-              "type": "button",
-              "label": "Test connection",
-              "action": ""
-            }
-          }
+        "port": {
+          "type": "string",
+          "label": "Port"
+        },
+        "databasename": {
+          "type": "string",
+          "label": "Database name"
+        }
+      }
+    },
+    "authentication": {
+      "type": "section",
+      "label": "Authentication",
+      "dependsOn": {
+        "field": "repositoryType",
+        "value": "jdbcRepository"
+      },
+      "properties": {
+        "username": {
+          "type": "string",
+          "label": "Username"
+        },
+        "password": {
+          "type": "string",
+          "label": "Password"
+        },
+        "botonTestConnection": {
+          "type": "button",
+          "label": "Test connection",
+          "action": ""
         }
       }
     }
