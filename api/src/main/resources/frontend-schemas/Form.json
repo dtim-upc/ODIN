@@ -2,13 +2,20 @@
   "formTitle": "Create new repository",
   "type": "object",
   "properties": {
-    "repositoryName": {
-      "type": "string",
-      "label": "Repository name"
-    },
-    "repositoryDescription": {
-      "type": "string",
-      "label": "Repository description"
+
+    "commonRepositoryFields": {
+      "type": "section",
+      "label": "",
+      "properties": {
+        "Repository name": {
+          "type": "string",
+          "label": "Repository name"
+        },
+        "Repository description": {
+          "type": "string",
+          "label": "Repository description"
+        }
+      }
     },
     "repositoryType": {
       "type": "select",
@@ -32,7 +39,7 @@
         "value": "localRepository"
       },
       "properties": {
-        "path": {
+        "Path": {
           "type": "string",
           "label": "Path",
           "maxLength": 50
@@ -76,15 +83,29 @@
             "password": {
               "type": "string",
               "label": "Password"
-            },
-            "botonTestConnection": {
-              "type": "button",
-              "label": "Test connection",
-              "action": ""
             }
           }
         }
       }
+    },
+    "botonEnviar": {
+      "type": "button",
+      "text": "Enviar"
+    },
+    "toggleActivo": {
+      "type": "toggle",
+      "label": "Connect by",
+      "options": [
+        {
+          "label": "Connect by URL",
+          "value": "connectByUrl"
+        },
+        {
+          "label": "Connect by Host",
+          "value": "connectByHost"
+        }
+      ]
     }
-  }
+  },
+  "required": ["nombre", "email"]
 }

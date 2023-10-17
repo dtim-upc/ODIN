@@ -77,16 +77,6 @@ public class RepositoryService {
         return dataRepositories;
     }
 
-
-    public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
-        List<Class<? extends DataRepository>> dataRepositoryClasses = Arrays.asList(
-                RelationalJDBCRepository.class,
-                LocalRepository.class
-        );
-
-        return DataRepositoryInfoExtractor.extractDataRepositoryInfo(dataRepositoryClasses);
-    }
-
     public boolean testConnection(String url, String user, String password) {
         // Imprimir los parámetros recibidos por consola
         System.out.println("URL: " + url);

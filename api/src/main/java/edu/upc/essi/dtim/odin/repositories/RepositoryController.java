@@ -52,11 +52,6 @@ public class RepositoryController {
         }
     }
 
-    @GetMapping("/api/data-repository-types")
-    public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
-        return repositoryService.getAllDataRepositoryTypes();
-    }
-
     @PostMapping("/test-connection")
     public Boolean testConnection(@RequestBody Map<String, String> requestData) {
         // Extract data from the request body
