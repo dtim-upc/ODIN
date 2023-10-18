@@ -105,12 +105,12 @@
 
 
                   <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                    SELECT: "{{ DataSourceType }}"
+                    SELECT: "{{ RepositoryType }}"
                   </q-badge>
 
                   <q-select
                     v-if="field.type === 'select'"
-                    v-model="DataSourceType"
+                    v-model="RepositoryType"
                     :options="field.options"
                     :label="field.label"
                     class="q-mt-none"
@@ -143,7 +143,7 @@
 
               <div v-else-if="field.dependsOn.field === 'repositoryType'
                               && field.dependsOn.value === 'localRepository'
-                              && DataSourceType.value === 'localRepository'">
+                              && RepositoryType.value === 'localRepository'">
                 2222222222222
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
@@ -174,12 +174,12 @@
 
 
                     <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ DataSourceType }}"
+                      SELECT: "{{ RepositoryType }}"
                     </q-badge>
 
                     <q-select
                       v-if="field.type === 'select'"
-                      v-model="DataSourceType"
+                      v-model="RepositoryType"
                       :options="field.options"
                       :label="field.label"
                       class="q-mt-none"
@@ -213,7 +213,7 @@
 
               <div v-else-if="field.dependsOn.field === 'repositoryType'
                               && field.dependsOn.value === 'jdbcRepository'
-                              && DataSourceType.value === 'jdbcRepository'">
+                              && RepositoryType.value === 'jdbcRepository'">
                 33333333
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
@@ -244,12 +244,12 @@
 
 
                     <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ DataSourceType }}"
+                      SELECT: "{{ RepositoryType }}"
                     </q-badge>
 
                     <q-select
                       v-if="field.type === 'select'"
-                      v-model="DataSourceType"
+                      v-model="RepositoryType"
                       :options="field.options"
                       :label="field.label"
                       class="q-mt-none"
@@ -314,12 +314,12 @@
 
 
                     <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ DataSourceType }}"
+                      SELECT: "{{ RepositoryType }}"
                     </q-badge>
 
                     <q-select
                       v-if="field.type === 'select'"
-                      v-model="DataSourceType"
+                      v-model="RepositoryType"
                       :options="field.options"
                       :label="field.label"
                       class="q-mt-none"
@@ -384,12 +384,12 @@
 
 
                     <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ DataSourceType }}"
+                      SELECT: "{{ RepositoryType }}"
                     </q-badge>
 
                     <q-select
                       v-if="field.type === 'select'"
-                      v-model="DataSourceType"
+                      v-model="RepositoryType"
                       :options="field.options"
                       :label="field.label"
                       class="q-mt-none"
@@ -440,7 +440,7 @@
           <q-card-section>
             <!-- Tipo de origen de datos -->
             <q-select
-              v-model="DataSourceType"
+              v-model="RepositoryType"
               :options="dataRepositoryTypes"
               label="Type"
               class="q-mt-none"
@@ -571,7 +571,7 @@ const notify = useNotify()
 
 // Variable reactiva para almacenar los tipos de DataRepository
 const dataRepositoryTypes = ref([]);
-const DataSourceType = ref();
+const RepositoryType = ref();
 // Función para cargar los tipos de DataRepository desde el endpoint
 const fetchDataRepositoryTypes = async () => {
   try {
@@ -587,12 +587,12 @@ const fetchDataRepositoryTypes = async () => {
 };
 
 // Observa los cambios en DataSourceType y actualiza los campos del formulario
-watch(DataSourceType, (newType) => {
+watch(RepositoryType, (newType) => {
   const selectedType = dataRepositoryTypes.value.find((type) => type.name === newType.name);
   if (selectedType) {
     formFields.value = selectedType.fields;
     console.log(newType.name + " COMPARAAAAAAAAAAAAAAAAAAAAAA");
-    DataSourceType.value = newType.name.toString();
+    RepositoryType.value = newType.name.toString();
     isLocalRepository.value = 'LocalRepository' === newType.name.toString() ? true : false;
   }
 });
@@ -600,14 +600,14 @@ watch(DataSourceType, (newType) => {
 watch(() => showS.value, (newValue) => {
   if (newValue) {
     fetchDataRepositoryTypes();
-    isLocalRepository.value = DataSourceType.value === 'LocalRepository';
+    isLocalRepository.value = RepositoryType.value === 'LocalRepository';
   }
 
   // Realiza la solicitud GET al punto final del backend
   const response = odinApi.get(`/formSchema`).then(response => {
     formSchema.value = response.data;
     console.log(formSchema);
-    DataSourceType.value = '';
+    RepositoryType.value = '';
     connectBy.value = formSchema.properties.jdbcRepositoryDetails.properties.connectBy.default;
   })
     .catch(error => {
@@ -672,8 +672,8 @@ const onSubmit = async () => {
 
   data["datasetDescription"] = newDatasource.datasetDescription;
   data["repositoryName"] = newDatasource.repositoryName;
-  console.log(DataSourceType.value, "++++++++++++++++++++++++++++++++ tipo repo");
-  data["repositoryType"] = DataSourceType.value;
+  console.log(RepositoryType.value, "++++++++++++++++++++++++++++++++ tipo repo");
+  data["repositoryType"] = RepositoryType.value;
 
   // Add specific fields from formFields to the data object
   formFields.value.forEach((field) => {
