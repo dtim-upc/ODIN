@@ -608,7 +608,8 @@ watch(() => showS.value, (newValue) => {
     formSchema.value = response.data;
     console.log(formSchema);
     RepositoryType.value = '';
-    connectBy.value = formSchema.properties.jdbcRepositoryDetails.properties.connectBy.default;
+    connectBy.value = response.data.properties.jdbcRepositoryDetails.properties.connectBy.default.value;
+
   })
     .catch(error => {
       console.error('Error al obtener el JSON Schema', error);
@@ -684,6 +685,7 @@ const onSubmit = async () => {
 
   formSchema.value.forEach((field) => {
     if (field.value !== null && field.value !== undefined) {
+      notify.positive(field.name.toString()+": "+field.value.toString());
       data[field.name.toString()] = field.value.toString();
     }
   });
