@@ -79,7 +79,7 @@
               <div v-if="field.type !== undefined && field.dependsOn === undefined">
                 11111111111111
                 <div>
-                  <q-input v-if="fieldName.value !== 'password'
+                  <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
                                 "
                            filled
@@ -89,8 +89,8 @@
                            :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
 
 
-                  <q-input v-if="fieldName.value === 'password'"
-                           v-model="fieldName.value"
+                  <q-input v-if="fieldName.toLowerCase() === 'password'"
+                           v-model="field.value"
                            filled
                            :type="isPwd ? 'password' : 'text'"
                            :label=field.label>
@@ -148,7 +148,7 @@
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
                   <div>
-                    <q-input v-if="fieldName.value !== 'password'
+                    <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
                                 "
                              filled
@@ -158,8 +158,8 @@
                              :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
 
 
-                    <q-input v-if="fieldName.value === 'password'"
-                             v-model="fieldName.value"
+                    <q-input v-if="fieldName.toLowerCase() === 'password'"
+                             v-model="field.value"
                              filled
                              :type="isPwd ? 'password' : 'text'"
                              :label=field.label>
@@ -218,7 +218,7 @@
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
                   <div>
-                    <q-input v-if="fieldName.value !== 'password'
+                    <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
                                 "
                              filled
@@ -228,8 +228,8 @@
                              :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
 
 
-                    <q-input v-if="fieldName.value === 'password'"
-                             v-model="fieldName.value"
+                    <q-input v-if="fieldName.toLowerCase() === 'password'"
+                             v-model="field.value"
                              filled
                              :type="isPwd ? 'password' : 'text'"
                              :label=field.label>
@@ -288,7 +288,7 @@
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
                   <div>
-                    <q-input v-if="fieldName.value !== 'password'
+                    <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
                                 "
                              filled
@@ -298,8 +298,8 @@
                              :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
 
 
-                    <q-input v-if="fieldName.value === 'password'"
-                             v-model="fieldName.value"
+                    <q-input v-if="fieldName.toLowerCase() === 'password'"
+                             v-model="field.value"
                              filled
                              :type="isPwd ? 'password' : 'text'"
                              :label=field.label>
@@ -358,7 +358,7 @@
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
                   <div>
-                    <q-input v-if="fieldName.value !== 'password'
+                    <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
                                 "
                              filled
@@ -368,8 +368,8 @@
                              :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
 
 
-                    <q-input v-if="fieldName.value === 'password'"
-                             v-model="fieldName.value"
+                    <q-input v-if="fieldName.toLowerCase() === 'password'"
+                             v-model="field.value"
                              filled
                              :type="isPwd ? 'password' : 'text'"
                              :label=field.label>
