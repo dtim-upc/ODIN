@@ -683,14 +683,26 @@ const onSubmit = async () => {
     }
   });
 
-  formSchema.value.forEach((field) => {
-    if (field.value !== null && field.value !== undefined) {
-      notify.positive(field.name.toString()+": "+field.value.toString());
-      data[field.name.toString()] = field.value.toString();
-    }
-  });
+  notify.positive("LLEGO AQUI 1");
 
-  if (!isLocalRepository.value) {
+  for (const fieldName in formSchema.value.properties) {
+    notify.positive("LLEGO AQUI 2");
+
+    if (formSchema.value.properties.hasOwnProperty(fieldName)) {
+      notify.positive("LLEGO AQUI 3");
+
+      const field = formSchema.value.properties[fieldName];
+
+      if (field.value !== null && field.value !== undefined) {
+        notify.positive(fieldName + ": " + field.value.toString());
+        data[fieldName] = field.value.toString();
+      }
+    }
+  }
+
+
+
+  /*if (!isLocalRepository.value) {
     try {
       // Await the result of the testConnection function
       const isConnected = await testConnection();
@@ -706,7 +718,9 @@ const onSubmit = async () => {
     }
   } else {
     integrationStore.addDataRepository(route.params.id, data, successCallback);
-  }
+  }*/
+  integrationStore.addDataRepository(route.params.id, data, successCallback);
+
 };
 
 const successCallback = (datasource) => {
