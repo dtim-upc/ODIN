@@ -31,7 +31,7 @@ Before running the backend project, it is necessary to create your own profile w
 
 You will need also to generate or download the Nextia's libs and paste them into lib directory in ODIN/api. Or you can also download the Nextia's dependencies, configure them and generate their JARs using the task "uberJar" and finally, from ODIN project execute the task "importExternalJar" of the build.gradle file.
 
-Then, for running the project you can use the terminal command `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class.
+Then, for running the project you can use the terminal command `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class "OdinApplication.java".
 
 #### Useful links
 
