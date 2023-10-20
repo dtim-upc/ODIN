@@ -49,3 +49,11 @@ https://www.arquitecturajava.com/spring-autowired-y-la-inyeccion-de-dependencias
 #### Set up
 
 The first time running the frontend, dependencies must be installed using the command `yarn install` under the frontend folder directory. Once dependencies are installed, the frontend server can be started using the command `quasar dev` which creates a server at 8080 or the close available port.
+
+If it's not working, try this:
+llega a la carpeta del frontend: cd .../frontend
+mira si está el fichero .json: dir package.json
+instalalo: npm init -y
+ejecuta: quasar dev
+
+IF STILL NOT WORKING CHECK THE package.json and ensure to have installed the Node.js, etc.
