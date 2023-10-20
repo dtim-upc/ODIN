@@ -29,7 +29,7 @@
 
 Before running the backend project, it is necessary to create your own profile which specifies the paths needed for the application. Properties files must be created under api/src/main/resources using the following name syntax: “application-<Profile name>.properties”. To enable a profile properties you need to modify the property  profiles.active: <Profile name> in the file application.properties in the same directory 
 
-You will need also to generate or download the Nextia's libs and paste them into lib directory in ODIN/api. Or you can also download the Nextia's dependencies, configure them and from ODIN project execute the task "importExternalJar" of the build.gradle file.
+You will need also to generate or download the Nextia's libs and paste them into lib directory in ODIN/api. Or you can also download the Nextia's dependencies, configure them and generate their JARs using the task "uberJar" and finally, from ODIN project execute the task "importExternalJar" of the build.gradle file.
 
 Then, for running the project you can use the terminal command `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class.
 
