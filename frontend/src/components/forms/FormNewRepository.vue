@@ -508,7 +508,6 @@ import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
 import {odinApi} from "../../boot/axios";
-import AutomaticFormField from "./AutomaticFormField.vue";
 
 const isPwd = ref(true);
 const isLocalRepository = ref(false);
