@@ -19,6 +19,7 @@ import org.apache.jena.tdb.TDBFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,7 +32,17 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
     public GraphStoreJenaImpl(@Autowired AppConfig appConfig) {
         this.directory = appConfig.getJenaPath();
 
-        //Open TDB Dataset
+        // Verificar si el directorio no existe y crearlo si es necesario
+        File directoryFile = new File(directory);
+        if (!directoryFile.exists()) {
+            if (directoryFile.mkdirs()) {
+                System.out.println("Directorio creado con éxito: " + directory);
+            } else {
+                System.err.println("No se pudo crear el directorio: " + directory);
+            }
+        }
+
+        // Open TDB Dataset
         dataset = TDBFactory.createDataset(directory);
     }
 
