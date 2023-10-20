@@ -674,13 +674,16 @@ const onSubmit = async () => {
   data["repositoryName"] = newDatasource.repositoryName;
   console.log(RepositoryType.value, "++++++++++++++++++++++++++++++++ tipo repo");
   data["repositoryType"] = RepositoryType.value;
+  data["connectBy"] = connectBy.value;
 
   // Add specific fields from formFields to the data object
+  /*
   formFields.value.forEach((field) => {
     if (field.value !== null && field.value !== undefined) {
       data[field.name.toString()] = field.value.toString();
     }
   });
+   */
 
   notify.positive("LLEGO AQUI 1");
 
