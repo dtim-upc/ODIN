@@ -26,7 +26,7 @@ public class FormController {
         logger.info("FORMSCHEMA ASKED");
         try {
             // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "C:\\Users\\victo\\Documents\\GitHub\\ODIN\\api\\src\\main\\resources\\frontend-schemas\\DatasetForm.json";
+            String filePath = "../api/src/main/resources/frontend-schemas/DatasetForm.json";
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {
