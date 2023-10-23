@@ -1,0 +1,42 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/55/id>
+        rdf:type     rdf:Property ;
+        rdfs:domain  <http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades> ;
+        rdfs:label   "id" ;
+        rdfs:range   <http://www.w3.org/2001/XMLSchema#int> .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/55/fundacion_anio>
+        rdf:type     rdf:Property ;
+        rdfs:domain  <http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades> ;
+        rdfs:label   "fundacion_anio" ;
+        rdfs:range   <http://www.w3.org/2001/XMLSchema#int> .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/53/edad>
+        rdf:type     rdf:Property ;
+        rdfs:domain  <http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades> ;
+        rdfs:label   "edad" ;
+        rdfs:range   <http://www.w3.org/2001/XMLSchema#int> .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades>
+        rdf:type    <http://www.essi.upc.edu/DTIM/NextiaDI/IntegratedClass> ;
+        rdfs:label  "personas_universidades" .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/53/id>
+        rdf:type     rdf:Property ;
+        rdfs:domain  <http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades> ;
+        rdfs:label   "id" ;
+        rdfs:range   <http://www.w3.org/2001/XMLSchema#int> .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/55/nombre_universidad>
+        rdf:type     rdf:Property ;
+        rdfs:domain  <http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades> ;
+        rdfs:label   "nombre_universidad" ;
+        rdfs:range   <http://www.w3.org/2001/XMLSchema#String> .
+
+<http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/53/nombre>
+        rdf:type     rdf:Property ;
+        rdfs:domain  <http://www.essi.upc.edu/DTIM/NextiaDI/personas_universidades> ;
+        rdfs:label   "nombre" ;
+        rdfs:range   <http://www.w3.org/2001/XMLSchema#String> .
