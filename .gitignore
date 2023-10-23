@@ -16,6 +16,7 @@
 !N85A9SX4TX2SkZ25_enfermedades.json
 !jsonTestFile.json
 !corruptJsonTestFile.json
+!globalGraph.ttl
 
 *.txt
 api/lib/NextiaBS-1.0-SNAPSHOT-uber.jar
