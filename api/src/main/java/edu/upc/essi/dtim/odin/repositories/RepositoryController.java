@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.repositories;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

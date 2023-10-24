@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.repositories;
+package edu.upc.essi.dtim.odin.repositories.POJOs;
 
 public class TableInfo {
     public String getName() {

@@ -7,6 +7,7 @@ import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.project.ProjectService;
+import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
