@@ -140,6 +140,7 @@
             <basic name="created_at">
                 <temporal>TIMESTAMP</temporal>
             </basic>
+            <basic name="wrapper"/>
             <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
             </many-to-one>
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">

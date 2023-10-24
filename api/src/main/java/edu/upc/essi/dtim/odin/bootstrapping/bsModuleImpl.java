@@ -1,8 +1,8 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.*;
+import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 
 
 /**
@@ -16,7 +16,7 @@ public class bsModuleImpl implements bsModuleInterface{
      * @param dataset El conjunto de datos que se va a convertir.
      * @return Un grafo que representa el conjunto de datos.
      */
-    public Graph convertDatasetToGraph(Dataset dataset) {
+    public BootstrapResult bootstrapDataset(Dataset dataset) {
         NextiaBootstrapInterface bootstrapInterface = null;
 
         try {

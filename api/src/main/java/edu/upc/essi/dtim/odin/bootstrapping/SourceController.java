@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.NextiaGraphy.NextiaGraphy;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.apache.jena.rdf.model.Model;
@@ -141,8 +142,9 @@ public class SourceController {
                     savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
                     repository = sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
 
-                    // Transform datasource into graph
-                    Graph graph = sourceService.transformToGraph(savedDataset);
+                    // Transform datasource into graph and generate the wrapper
+                    BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
+                    Graph graph = bsResult.getGraph();
 
                     // Generating visual schema for frontend
                     String visualSchema = sourceService.generateVisualSchema(graph);
@@ -151,7 +153,11 @@ public class SourceController {
                     // Create the relation with dataset adding the graph generated to generate an id
                     Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
                     graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-                    
+
+                    //Set wrapper to the dataset
+                    String wrapper = bsResult.getWrapper();
+                    sourceService.setWrapperToDataset(datasetWithGraph.getId(), wrapper);
+
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
                 }
@@ -177,7 +183,8 @@ public class SourceController {
                     sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
 
                     // Transform datasource into graph
-                    Graph graph = sourceService.transformToGraph(savedDataset);
+                    BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
+                    Graph graph = bsResult.getGraph();
 
                     // Generating visual schema for frontend
                     String visualSchema = sourceService.generateVisualSchema(graph);
@@ -189,6 +196,10 @@ public class SourceController {
                     // Get the disk path from the app configuration
                     Path diskPath = Path.of(appConfig.getDiskPath());
                     graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
+
+                    //Set wrapper to the dataset
+                    String wrapper = bsResult.getWrapper();
+                    sourceService.setWrapperToDataset(datasetWithGraph.getId(), wrapper);
 
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);

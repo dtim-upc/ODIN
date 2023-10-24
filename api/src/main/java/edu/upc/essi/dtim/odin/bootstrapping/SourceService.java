@@ -7,6 +7,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
@@ -233,13 +234,13 @@ public class SourceService {
      * @return A GraphModelPair object containing the transformed Graph and the corresponding Model.
      * @throws UnsupportedOperationException if the dataset type is not supported or an error occurs during the transformation.
      */
-    public Graph transformToGraph(Dataset dataset) {
+    public BootstrapResult bootstrapDataset(Dataset dataset) {
         try {
             // Create an instance of the bsModuleImpl class that implements the bsModuleInterface
             bsModuleInterface bsInterface = new bsModuleImpl();
 
             // Use the bsInterface to convert the dataset to a Graph object
-            return bsInterface.convertDatasetToGraph(dataset);
+            return bsInterface.bootstrapDataset(dataset);
         } catch (UnsupportedOperationException e) {
             // Throw an exception if the dataset type is not supported or an error occurs during the transformation
             throw new UnsupportedOperationException("Dataset type not supported. Something went wrong during the bootstrap process generating the schema.");
@@ -722,6 +723,13 @@ public class SourceService {
         }
     }
 
+    public Dataset setWrapperToDataset(String datasetId, String wrapper) {
+        Dataset dataset = getDatasetById(datasetId);
+        dataset.setWrapper(wrapper);
+
+        // Save the updated Dataset and return it
+        return saveDataset(dataset);
+    }
 }
 
 

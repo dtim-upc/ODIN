@@ -53,7 +53,7 @@ public class SourceControllerTest {
         when(sourceService.reconstructFile(any(MultipartFile.class))).thenReturn("mockedFilePath");
         when(sourceService.extractData(anyString(), anyString(), anyString())).thenReturn(new Dataset());
         when(sourceService.saveDataset(any(Dataset.class))).thenReturn(new Dataset());
-        when(sourceService.transformToGraph(any(Dataset.class))).thenReturn(CoreGraphFactory.createLocalGraph());
+        when(sourceService.bootstrapDataset(any(Dataset.class))).thenReturn(CoreGraphFactory.createLocalGraph());
         when(sourceService.generateVisualSchema(any(Graph.class))).thenReturn("Mocked Visual Schema");
         when(sourceService.setLocalGraphToDataset(any(Dataset.class), any(Graph.class))).thenReturn(new Dataset());
         when(sourceService.findRepositoryById(anyString())).thenReturn(new DataRepository());
