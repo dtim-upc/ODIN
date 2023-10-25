@@ -144,7 +144,7 @@ public class SourceController {
 
                     // Transform datasource into graph and generate the wrapper
                     BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-                    Graph graph = sourceService.bootstrapDatasetG(savedDataset);
+                    Graph graph = bsResult.getGraph();
 
                     // Generating visual schema for frontend
                     String visualSchema = sourceService.generateVisualSchema(graph);
@@ -184,7 +184,7 @@ public class SourceController {
 
                     // Transform datasource into graph
                     BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-                    Graph graph = sourceService.bootstrapDatasetG(savedDataset);
+                    Graph graph = bsResult.getGraph();
 
                     // Generating visual schema for frontend
                     String visualSchema = sourceService.generateVisualSchema(graph);
