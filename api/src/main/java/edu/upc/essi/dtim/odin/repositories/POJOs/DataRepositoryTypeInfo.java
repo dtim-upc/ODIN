@@ -1,23 +1,23 @@
 package edu.upc.essi.dtim.odin.repositories.POJOs;
 
 public class DataRepositoryTypeInfo {
-    private String name;
+    private String label;
     private String value;
 
-    public DataRepositoryTypeInfo(String name, String value) {
-        this.name = name;
+    public DataRepositoryTypeInfo(String label, String value) {
+        this.label = label;
         this.value = value;
     }
 
     public DataRepositoryTypeInfo() {
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getValue() {

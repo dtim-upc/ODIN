@@ -5,436 +5,17 @@
       <q-card-section>
         <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
-          <!-- Sección 1: Título form -->
-          <div class="text-h5">{{ formSchema.formTitle }}</div>
-          <q-card-section>
-            <div v-for="(field, fieldName) in formSchema.properties" :key="fieldName">
-              <!--
-              <form-field v-if="field.type === 'section'" :field="field.properties" :name="''" v-model="fieldName.value"/>
-              <form-field v-else :field="field" :name="''"/>
-
-              <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
-
-                <div>
-                  <q-input v-if="fieldName.value !== 'password'
-                                && field.type === 'string'
-                                "
-                           filled
-                           autogrow
-                           v-model="field.value"
-                           :label="field.label"
-                           :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                  <q-input v-if="fieldName.value === 'password'"
-                           v-model="fieldName.value"
-                           filled
-                           :type="isPwd ? 'password' : 'text'"
-                           :label=field.label>
-                    <template v-slot:append>
-                      <q-icon
-                        :name="isPwd ? 'visibility_off' : 'visibility'"
-                        class="cursor-pointer"
-                        @click="isPwd = !isPwd"
-                      />
-                    </template>
-                  </q-input>
-
-
-                  <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                    Model: "{{ DataSourceType }}"
-                  </q-badge>
-
-                  <q-select
-                    v-if="field.type === 'select'"
-                    v-model="DataSourceType"
-                    :options="field.options"
-                    :label="field.label"
-                    class="q-mt-none"
-                  />
-
-
-                  <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-
-                  <q-btn-toggle
-                    v-if="field.type === 'toggle'"
-                    v-model="fieldName.value"
-                    spread
-                    class="my-custom-toggle"
-                    no-caps
-                    rounded
-                    unelevated
-                    toggle-color="primary"
-                    color="white"
-                    text-color="primary"
-                    :options="field.options"
-                  />
-
-                </div>
-
-              </div>
-              -->
-
-              <div v-if="field.type !== undefined && field.dependsOn === undefined">
-                11111111111111
-                <div>
-                  <q-input v-if="fieldName.toLowerCase() !== 'password'
-                                && field.type === 'string'
-                                "
-                           filled
-                           autogrow
-                           v-model="field.value"
-                           :label="field.label"
-                           :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                  <q-input v-if="fieldName.toLowerCase() === 'password'"
-                           v-model="field.value"
-                           filled
-                           :type="isPwd ? 'password' : 'text'"
-                           :label=field.label>
-                    <template v-slot:append>
-                      <q-icon
-                        :name="isPwd ? 'visibility_off' : 'visibility'"
-                        class="cursor-pointer"
-                        @click="isPwd = !isPwd"
-                      />
-                    </template>
-                  </q-input>
-
-
-                  <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                    SELECT: "{{ RepositoryType }}"
-                  </q-badge>
-
-                  <q-select
-                    v-if="field.type === 'select'"
-                    v-model="RepositoryType"
-                    :options="field.options"
-                    :label="field.label"
-                    class="q-mt-none"
-                  />
-
-
-                  <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-                  <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
-                    TOGGLE: "{{ connectBy }}"
-                  </q-badge>
-                  <q-btn-toggle
-                    v-if="field.type === 'toggle'"
-                    v-model="connectBy"
-                    spread
-                    class="my-custom-toggle"
-                    no-caps
-                    rounded
-                    unelevated
-                    toggle-color="primary"
-                    color="white"
-                    text-color="primary"
-                    :options="field.options"
-                  />
-
-                </div>
-
-              </div>
-
-
-              <div v-else-if="field.dependsOn.field === 'repositoryType'
-                              && field.dependsOn.value === 'localRepository'
-                              && RepositoryType.value === 'localRepository'">
-                2222222222222
-                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
-
-                  <div>
-                    <q-input v-if="fieldName.toLowerCase() !== 'password'
-                                && field.type === 'string'
-                                "
-                             filled
-                             autogrow
-                             v-model="field.value"
-                             :label="field.label"
-                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                    <q-input v-if="fieldName.toLowerCase() === 'password'"
-                             v-model="field.value"
-                             filled
-                             :type="isPwd ? 'password' : 'text'"
-                             :label=field.label>
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd = !isPwd"
-                        />
-                      </template>
-                    </q-input>
-
-
-                    <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ RepositoryType }}"
-                    </q-badge>
-
-                    <q-select
-                      v-if="field.type === 'select'"
-                      v-model="RepositoryType"
-                      :options="field.options"
-                      :label="field.label"
-                      class="q-mt-none"
-                    />
-
-
-                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
-                      TOGGLE: "{{ connectBy }}"
-                    </q-badge>
-                    <q-btn-toggle
-                      v-if="field.type === 'toggle'"
-                      v-model="connectBy"
-                      spread
-                      class="my-custom-toggle"
-                      no-caps
-                      rounded
-                      unelevated
-                      toggle-color="primary"
-                      color="white"
-                      text-color="primary"
-                      :options="field.options"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div v-else-if="field.dependsOn.field === 'repositoryType'
-                              && field.dependsOn.value === 'jdbcRepository'
-                              && RepositoryType.value === 'jdbcRepository'">
-                33333333
-                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
-
-                  <div>
-                    <q-input v-if="fieldName.toLowerCase() !== 'password'
-                                && field.type === 'string'
-                                "
-                             filled
-                             autogrow
-                             v-model="field.value"
-                             :label="field.label"
-                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                    <q-input v-if="fieldName.toLowerCase() === 'password'"
-                             v-model="field.value"
-                             filled
-                             :type="isPwd ? 'password' : 'text'"
-                             :label=field.label>
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd = !isPwd"
-                        />
-                      </template>
-                    </q-input>
-
-
-                    <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ RepositoryType }}"
-                    </q-badge>
-
-                    <q-select
-                      v-if="field.type === 'select'"
-                      v-model="RepositoryType"
-                      :options="field.options"
-                      :label="field.label"
-                      class="q-mt-none"
-                    />
-
-
-                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
-                      TOGGLE: "{{ connectBy }}"
-                    </q-badge>
-                    <q-btn-toggle
-                      v-if="field.type === 'toggle'"
-                      v-model="connectBy"
-                      spread
-                      class="my-custom-toggle"
-                      no-caps
-                      rounded
-                      unelevated
-                      toggle-color="primary"
-                      color="white"
-                      text-color="primary"
-                      :options="field.options"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div v-else-if="field.dependsOn.field === 'connectBy'
-                              && field.dependsOn.value === 'connectByHost'
-                              && connectBy === 'connectByHost'">
-                44444444
-                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
-
-                  <div>
-                    <q-input v-if="fieldName.toLowerCase() !== 'password'
-                                && field.type === 'string'
-                                "
-                             filled
-                             autogrow
-                             v-model="field.value"
-                             :label="field.label"
-                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                    <q-input v-if="fieldName.toLowerCase() === 'password'"
-                             v-model="field.value"
-                             filled
-                             :type="isPwd ? 'password' : 'text'"
-                             :label=field.label>
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd = !isPwd"
-                        />
-                      </template>
-                    </q-input>
-
-
-                    <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ RepositoryType }}"
-                    </q-badge>
-
-                    <q-select
-                      v-if="field.type === 'select'"
-                      v-model="RepositoryType"
-                      :options="field.options"
-                      :label="field.label"
-                      class="q-mt-none"
-                    />
-
-
-                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
-                      TOGGLE: "{{ connectBy }}"
-                    </q-badge>
-                    <q-btn-toggle
-                      v-if="field.type === 'toggle'"
-                      v-model="connectBy"
-                      spread
-                      class="my-custom-toggle"
-                      no-caps
-                      rounded
-                      unelevated
-                      toggle-color="primary"
-                      color="white"
-                      text-color="primary"
-                      :options="field.options"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div v-else-if="field.dependsOn.field === 'connectBy'
-                              && field.dependsOn.value === 'connectByUrl'
-                              && connectBy === 'connectByUrl'">
-                555555555
-                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
-
-                  <div>
-                    <q-input v-if="fieldName.toLowerCase() !== 'password'
-                                && field.type === 'string'
-                                "
-                             filled
-                             autogrow
-                             v-model="field.value"
-                             :label="field.label"
-                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                    <q-input v-if="fieldName.toLowerCase() === 'password'"
-                             v-model="field.value"
-                             filled
-                             :type="isPwd ? 'password' : 'text'"
-                             :label=field.label>
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd = !isPwd"
-                        />
-                      </template>
-                    </q-input>
-
-
-                    <q-badge v-if="field.type === 'select'" color="secondary" multi-line>
-                      SELECT: "{{ RepositoryType }}"
-                    </q-badge>
-
-                    <q-select
-                      v-if="field.type === 'select'"
-                      v-model="RepositoryType"
-                      :options="field.options"
-                      :label="field.label"
-                      class="q-mt-none"
-                    />
-
-
-                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-                    <q-badge v-if="field.type === 'toggle'" color="secondary" multi-line>
-                      TOGGLE: "{{ connectBy }}"
-                    </q-badge>
-                    <q-btn-toggle
-                      v-if="field.type === 'toggle'"
-                      v-model="connectBy"
-                      spread
-                      class="my-custom-toggle"
-                      no-caps
-                      rounded
-                      unelevated
-                      toggle-color="primary"
-                      color="white"
-                      text-color="primary"
-                      :options="field.options"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-          </q-card-section>
-
-        </div>
-
-
-        <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <div class="text-h5">Create new repository</div>
           <q-card-section>
-            <q-input filled autogrow v-model="newDatasource.repositoryName" label="Repository name"
+            <q-input filled autogrow v-model="formData['repositoryName']" label="Repository name"
                      :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
             <!--Descripción del conjunto de datos (opcional) -->
-            <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
+            <q-input v-model="formData['repositoryDescription']" filled autogrow label="Description (Optional)"/>
           </q-card-section>
+
+          <q-badge color="secondary" multi-line>
+            FORMDATA: {{ formData }}
+          </q-badge>
 
           <!-- Tipo de origen de datos -->
           <q-card-section>
@@ -447,29 +28,191 @@
             />
           </q-card-section>
 
-          <!-- Formulario generado dinámicamente -->
-          <q-card-section v-for="field in formFields" :key="field.name">
+          <q-card-section>
+            <div v-for="(field, fieldName) in formSchema.properties" :key="fieldName">
+              <div v-if="field.type !== undefined && field.dependsOn === undefined">
 
-            <q-input v-if="field.name !== 'password'" filled autogrow v-model="field.value" :label="field.label"
-                     :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-            <q-input v-if="field.name.toLowerCase() === 'password'" v-model="field.value" filled
-                     :type="isPwd ? 'password' : 'text'" :label="field.label">
-              <template v-slot:append>
-                <q-icon
-                  :name="isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
-                />
-              </template>
-            </q-input>
-          </q-card-section>
+                11111111111111
+                <div>
+                  <q-input v-if="fieldName.toLowerCase() !== 'password'
+                                && field.type === 'string'
+                                "
+                           filled
+                           autogrow
+                           v-model="formData[fieldName]"
+                           :label="field.label"
+                           :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
 
 
-          <q-card-section v-if="!isLocalRepository">
-            <!-- Contenido del botón -->
-            <q-btn label="Test connection" @click="testConnection"/>
+                  <q-input v-if="fieldName.toLowerCase() === 'password'"
+                           v-model="formData[fieldName]"
+                           filled
+                           :type="isPwd ? 'password' : 'text'"
+                           :label=field.label>
+                    <template v-slot:append>
+                      <q-icon
+                        :name="isPwd ? 'visibility_off' : 'visibility'"
+                        class="cursor-pointer"
+                        @click="isPwd = !isPwd"
+                      />
+                    </template>
+                  </q-input>
+
+                  <q-select
+                    v-if="field.type === 'select'"
+                    v-model="formData[fieldName]"
+                    :options="field.options"
+                    :label="field.label"
+                    class="q-mt-none"
+                  />
+
+
+                  <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+
+                  <q-btn-toggle
+                    v-if="field.type === 'toggle'"
+                    v-model="formData[fieldName]"
+                    spread
+                    class="my-custom-toggle"
+                    no-caps
+                    rounded
+                    unelevated
+                    toggle-color="primary"
+                    color="white"
+                    text-color="primary"
+                    :options="field.options"
+                  />
+
+                </div>
+
+              </div>
+
+              <div v-else-if="field.dependsOn.field === 'repositoryType'
+                              && isJDBC(field.dependsOn.value)">
+                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
+
+                  2222222
+                  <div>
+                    <q-input v-if="fieldName.toLowerCase() !== 'password'
+                                && field.type === 'string'
+                                "
+                             filled
+                             autogrow
+                             v-model="formData[fieldName]"
+                             :label="field.label"
+                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
+
+
+                    <q-input v-if="fieldName.toLowerCase() === 'password'"
+                             v-model="formData[fieldName]"
+                             filled
+                             :type="isPwd ? 'password' : 'text'"
+                             :label=field.label>
+                      <template v-slot:append>
+                        <q-icon
+                          :name="isPwd ? 'visibility_off' : 'visibility'"
+                          class="cursor-pointer"
+                          @click="isPwd = !isPwd"
+                        />
+                      </template>
+                    </q-input>
+
+                    <q-select
+                      v-if="field.type === 'select'"
+                      v-model="formData[fieldName]"
+                      :options="field.options"
+                      :label="field.label"
+                      class="q-mt-none"
+                    />
+
+
+                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+
+                    <q-btn-toggle
+                      v-if="field.type === 'toggle'"
+                      v-model="formData[fieldName]"
+                      spread
+                      class="my-custom-toggle"
+                      no-caps
+                      rounded
+                      unelevated
+                      toggle-color="primary"
+                      color="white"
+                      text-color="primary"
+                      :options="field.options"
+                    />
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div v-else-if="field.dependsOn.field === 'connectBy'
+                              && field.dependsOn.value === formData['connectBy']
+                              && isJDBC(null)">
+                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
+
+                  33333333
+                  <div>
+                    <q-input v-if="fieldName.toLowerCase() !== 'password'
+                                && field.type === 'string'
+                                "
+                             filled
+                             autogrow
+                             v-model="formData[fieldName]"
+                             :label="field.label"
+                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
+
+
+                    <q-input v-if="fieldName.toLowerCase() === 'password'"
+                             v-model="formData[fieldName]"
+                             filled
+                             :type="isPwd ? 'password' : 'text'"
+                             :label=field.label>
+                      <template v-slot:append>
+                        <q-icon
+                          :name="isPwd ? 'visibility_off' : 'visibility'"
+                          class="cursor-pointer"
+                          @click="isPwd = !isPwd"
+                        />
+                      </template>
+                    </q-input>
+
+                    <q-select
+                      v-if="field.type === 'select'"
+                      v-model="formData[fieldName]"
+                      :options="field.options"
+                      :label="field.label"
+                      class="q-mt-none"
+                    />
+
+
+                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+
+                    <q-btn-toggle
+                      v-if="field.type === 'toggle'"
+                      v-model="formData[fieldName]"
+                      spread
+                      class="my-custom-toggle"
+                      no-caps
+                      rounded
+                      unelevated
+                      toggle-color="primary"
+                      color="white"
+                      text-color="primary"
+                      :options="field.options"
+                    />
+
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
           </q-card-section>
         </div>
+
       </q-card-section>
 
       <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
@@ -486,7 +229,6 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -543,6 +285,11 @@ const integrationStore = useIntegrationStore()
 const projectID = ref(null);
 const formSchema = ref("");
 const connectBy = ref("");
+const formData = ref({
+  repositoryDescription: '',
+  repositoryName: '',
+  connectBy:'connectByUrl'
+});
 
 // When the component is mounted, fetch the repositories for the current project.
 onMounted(async () => {
@@ -568,17 +315,16 @@ const router = useRouter()
 const form = ref(null)
 const notify = useNotify()
 
+
 // Variable reactiva para almacenar los tipos de DataRepository
 const dataRepositoryTypes = ref([]);
 const RepositoryType = ref();
+
 // Función para cargar los tipos de DataRepository desde el endpoint
 const fetchDataRepositoryTypes = async () => {
   try {
     const response = await odinApi.get("/api/data-repository-types");
     dataRepositoryTypes.value = response.data; // Asigna la respuesta a la variable reactiva
-    console.log(dataRepositoryTypes, "-----------------------------------------------------------------");
-    console.log(dataRepositoryTypes.value[0].fields, "-----------------------------------------------------------------");
-    formFields.value = dataRepositoryTypes.value[0].fields;
     //DataSourceType.value = dataRepositoryTypes.value[0].name;
   } catch (error) {
     console.error("Error al obtener los tipos de DataRepository:", error);
@@ -587,13 +333,28 @@ const fetchDataRepositoryTypes = async () => {
 
 // Observa los cambios en DataSourceType y actualiza los campos del formulario
 watch(RepositoryType, (newType) => {
-  const selectedType = dataRepositoryTypes.value.find((type) => type.name === newType.name);
-  if (selectedType) {
-    formFields.value = selectedType.fields;
-    console.log(newType.name + " COMPARAAAAAAAAAAAAAAAAAAAAAA");
-    RepositoryType.value = newType.name.toString();
-    isLocalRepository.value = 'LocalRepository' === newType.name.toString() ? true : false;
-  }
+  const fileName = newType.value;
+
+  // Realiza la solicitud GET al punto final del backend
+  const response = odinApi.get(`/formSchema/`+fileName).then(response => {
+    const responseData = response.data;
+    formSchema.value = response.data;
+    console.log(formSchema);
+
+    if (responseData.properties) {
+      const properties = responseData.properties;
+      for (const attributeName in properties) {
+        // Añade dinámicamente los atributos al objeto formData
+        formData[attributeName] = properties[attributeName]; // Utiliza el valor por defecto o el que prefieras
+      }
+    }
+
+    formData["connectBy"]= connectBy;
+  })
+    .catch(error => {
+      notify.negative('Error al obtener el JSON Schema'+error);
+      console.error('Error al obtener el JSON Schema', error);
+    });
 });
 
 watch(() => showS.value, (newValue) => {
@@ -601,18 +362,6 @@ watch(() => showS.value, (newValue) => {
     fetchDataRepositoryTypes();
     isLocalRepository.value = RepositoryType.value === 'LocalRepository';
   }
-
-  // Realiza la solicitud GET al punto final del backend
-  const response = odinApi.get(`/formSchema`).then(response => {
-    formSchema.value = response.data;
-    console.log(formSchema);
-    RepositoryType.value = '';
-    connectBy.value = response.data.properties.jdbcRepositoryDetails.properties.connectBy.default.value;
-
-  })
-    .catch(error => {
-      console.error('Error al obtener el JSON Schema', error);
-    });
 });
 
 defineExpose({
@@ -621,21 +370,19 @@ defineExpose({
 
 const formFields = ref([]);
 
-const newDatasource = reactive({
-  repositoryName: '',
-  datasetName: '',
-  datasetDescription: '',
-});
-
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
-  newDatasource.repositoryId = null;
   storeDS.selectedRepositoryId = null;
-  newDatasource.repositoryName = '';
-  newDatasource.datasetName = '';
-  newDatasource.datasetDescription = '';
-  databaseHost.value = '';
-  databaseUser.value = '';
-  databasePassword.value = '';
+}
+
+function isJDBC(type) {
+  const typeC = "jdbcRepository";
+    //formData.value["repositoryType"].value;
+  if(type === null){
+    return typeC === 'jdbcRepository';
+  }
+  else {
+    return typeC === type;
+  }
 }
 
 const testConnection = async () => {
@@ -670,11 +417,10 @@ const testConnection = async () => {
 const onSubmit = async () => {
   const data = {};
 
-  data["datasetDescription"] = newDatasource.datasetDescription;
-  data["repositoryName"] = newDatasource.repositoryName;
-  console.log(RepositoryType.value, "++++++++++++++++++++++++++++++++ tipo repo");
-  data["repositoryType"] = RepositoryType.value;
-  data["connectBy"] = connectBy.value;
+  data["repositoryName"] = formData.value["repositoryName"];
+  data["datasetDescription"] = formData.value["repositoryDescription"];
+  data["repositoryType"] = formSchema.value.class;
+  data["connectBy"] = formData.value["connectBy"];
 
   // Add specific fields from formFields to the data object
   /*
@@ -685,24 +431,15 @@ const onSubmit = async () => {
   });
    */
 
-  notify.positive("LLEGO AQUI 1");
-
-  for (const fieldName in formSchema.value.properties) {
-    notify.positive("LLEGO AQUI 2");
-
-    if (formSchema.value.properties.hasOwnProperty(fieldName)) {
-      notify.positive("LLEGO AQUI 3");
-
-      const field = formSchema.value.properties[fieldName];
-
-      if (field.value !== null && field.value !== undefined) {
-        notify.positive(fieldName + ": " + field.value.toString());
-        data[fieldName] = field.value.toString();
-      }
+  if (formSchema.value.attributes) {
+    const formAttributes = formSchema.value.attributes;
+    for (const attributeName in formAttributes) {
+      // Añade dinámicamente los atributos al objeto formData
+      data[attributeName] = formData.value[attributeName];
     }
   }
 
-
+  console.log(data);
 
   /*if (!isLocalRepository.value) {
     try {

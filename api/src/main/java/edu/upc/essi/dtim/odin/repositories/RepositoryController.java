@@ -87,8 +87,8 @@ public class RepositoryController {
     {
         try{
             // Accede a los campos específicos del objeto JSON
-            String datasetDescription = requestData.get("datasetDescription");
             String repositoryName = requestData.get("repositoryName");
+            String repositoryDescription = requestData.get("repositoryDescription");
             String repositoryType = requestData.get("repositoryType");
 
             logger.info("POST REPOSITORY RECEIVED FOR " + projectId + " with repo name " + repositoryName + " and type " + repositoryType);
