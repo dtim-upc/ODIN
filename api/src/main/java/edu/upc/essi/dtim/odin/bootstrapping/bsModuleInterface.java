@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 
 public interface bsModuleInterface {
@@ -11,4 +12,6 @@ public interface bsModuleInterface {
      * @return The resulting graph representing the dataset.
      */
     BootstrapResult bootstrapDataset(Dataset dataset);
+
+    Graph bootstrapGraph(Dataset dataset);
 }

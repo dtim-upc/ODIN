@@ -87,70 +87,8 @@
 
               </div>
 
-              <div v-else-if="field.dependsOn.field === 'repositoryType'
-                              && isJDBC(field.dependsOn.value)">
-                <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
-
-                  2222222
-                  <div>
-                    <q-input v-if="fieldName.toLowerCase() !== 'password'
-                                && field.type === 'string'
-                                "
-                             filled
-                             autogrow
-                             v-model="formData[fieldName]"
-                             :label="field.label"
-                             :rules="[(val) => (val && val.length > 0) || 'Mandatory field']"/>
-
-
-                    <q-input v-if="fieldName.toLowerCase() === 'password'"
-                             v-model="formData[fieldName]"
-                             filled
-                             :type="isPwd ? 'password' : 'text'"
-                             :label=field.label>
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd = !isPwd"
-                        />
-                      </template>
-                    </q-input>
-
-                    <q-select
-                      v-if="field.type === 'select'"
-                      v-model="formData[fieldName]"
-                      :options="field.options"
-                      :label="field.label"
-                      class="q-mt-none"
-                    />
-
-
-                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
-
-                    <q-btn-toggle
-                      v-if="field.type === 'toggle'"
-                      v-model="formData[fieldName]"
-                      spread
-                      class="my-custom-toggle"
-                      no-caps
-                      rounded
-                      unelevated
-                      toggle-color="primary"
-                      color="white"
-                      text-color="primary"
-                      :options="field.options"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
               <div v-else-if="field.dependsOn.field === 'connectBy'
-                              && field.dependsOn.value === formData['connectBy']
-                              && isJDBC(null)">
+                              && field.dependsOn.value === formData['connectBy']">
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
                   33333333
@@ -421,15 +359,6 @@ const onSubmit = async () => {
   data["datasetDescription"] = formData.value["repositoryDescription"];
   data["repositoryType"] = formSchema.value.class;
   data["connectBy"] = formData.value["connectBy"];
-
-  // Add specific fields from formFields to the data object
-  /*
-  formFields.value.forEach((field) => {
-    if (field.value !== null && field.value !== undefined) {
-      data[field.name.toString()] = field.value.toString();
-    }
-  });
-   */
 
   if (formSchema.value.attributes) {
     const formAttributes = formSchema.value.attributes;

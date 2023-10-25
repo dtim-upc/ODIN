@@ -247,6 +247,19 @@ public class SourceService {
         }
     }
 
+    public Graph bootstrapDatasetG(Dataset dataset) {
+        try {
+            // Create an instance of the bsModuleImpl class that implements the bsModuleInterface
+            bsModuleInterface bsInterface = new bsModuleImpl();
+
+            // Use the bsInterface to convert the dataset to a Graph object
+            return bsInterface.bootstrapGraph(dataset);
+        } catch (UnsupportedOperationException e) {
+            // Throw an exception if the dataset type is not supported or an error occurs during the transformation
+            throw new UnsupportedOperationException("Dataset type not supported. Something went wrong during the bootstrap process generating the schema.");
+        }
+    }
+
     /**
      * Generates a visual representation of a Graph using the NextiaGraphy library.
      *

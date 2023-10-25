@@ -144,19 +144,19 @@ public class SourceController {
 
                     // Transform datasource into graph and generate the wrapper
                     BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-                    Graph graph = bsResult.getGraph();
+                    Graph graph = sourceService.bootstrapDatasetG(savedDataset);
 
                     // Generating visual schema for frontend
                     String visualSchema = sourceService.generateVisualSchema(graph);
                     graph.setGraphicalSchema(visualSchema);
 
+                    //Set wrapper to the dataset
+                    String wrapper = bsResult.getWrapper();
+                    savedDataset.setWrapper(wrapper);
+
                     // Create the relation with dataset adding the graph generated to generate an id
                     Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
                     graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-
-                    //Set wrapper to the dataset
-                    String wrapper = bsResult.getWrapper();
-                    sourceService.setWrapperToDataset(datasetWithGraph.getId(), wrapper);
 
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
@@ -184,11 +184,14 @@ public class SourceController {
 
                     // Transform datasource into graph
                     BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-                    Graph graph = bsResult.getGraph();
+                    Graph graph = sourceService.bootstrapDatasetG(savedDataset);
 
                     // Generating visual schema for frontend
                     String visualSchema = sourceService.generateVisualSchema(graph);
                     graph.setGraphicalSchema(visualSchema);
+
+                    String wrapper = bsResult.getWrapper();
+                    savedDataset.setWrapper(wrapper);
 
                     // Create the relation with dataset adding the graph generated to generate an id
                     Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
@@ -196,10 +199,6 @@ public class SourceController {
                     // Get the disk path from the app configuration
                     Path diskPath = Path.of(appConfig.getDiskPath());
                     graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
-
-                    //Set wrapper to the dataset
-                    String wrapper = bsResult.getWrapper();
-                    sourceService.setWrapperToDataset(datasetWithGraph.getId(), wrapper);
 
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
