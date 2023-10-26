@@ -1,11 +1,10 @@
 {
   "type": "object",
-  "class": "LocalRepository",
+  "class": "ClassThatIsMappingThisJSON",
   "properties": {
     "path": {
       "type": "string",
-      "label": "Path",
-      "maxLength": 50
+      "label": "Text to be displayed"
     }
   },
   "attributes": {

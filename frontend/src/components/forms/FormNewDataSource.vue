@@ -127,6 +127,26 @@
             />
           </q-card-section>
 
+          <q-card-section v-if="isAPIRepository">
+            <q-badge color="secondary" multi-line>
+              GET
+              {{  }}
+            </q-badge>
+            <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
+            <q-input
+              filled
+              v-model="remoteFileUrl"
+              label="API request endpoint"
+              lazy-rules
+              :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
+            />
+            <q-btn
+              label="Make request"
+              color="primary"
+              @click="makeRequest"
+            />
+          </q-card-section>
+
           <!-- Tipo de origen de datos -->
           <q-card-section v-if="isLocalRepository">
             <!-- Tipo de origen de datos -->
@@ -200,6 +220,36 @@ async function downloadFile() {
   }
 }
 
+async function makeRequest() {
+  let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
+  try {
+    const response = await odinApi.get(`/download?url=${encodeURIComponent(url)}`, {
+      responseType: 'arraybuffer', // Cambia el tipo de respuesta a 'arraybuffer'
+    });
+
+    const contentDisposition = response.headers['content-disposition'];
+    let filename;
+
+    if (contentDisposition) {
+      // Si el encabezado content-disposition existe, obtén el nombre del archivo
+      filename = contentDisposition.split(';')[1].trim().split('=')[1];
+    } else {
+      // Si el encabezado no existe, intenta obtener el nombre del archivo de la URL
+      const urlParts = url.split('/');
+      filename = urlParts[urlParts.length - 1];
+    }
+
+    // Crea un nuevo objeto File a partir de la respuesta
+    const blob = new Blob([response.data], {type: 'application/octet-stream'});
+    const file = new File([blob], filename, {type: 'application/octet-stream'});
+
+    // Agrega el archivo a la lista uploadedItems
+    uploadedItems.value.push(file);
+  } catch (error) {
+    console.error('Error al descargar el archivo:', error);
+  }
+}
+
 // -------------------------------------------------------------
 //                         PROPS & EMITS
 // -------------------------------------------------------------
@@ -242,6 +292,8 @@ const integrationStore = useIntegrationStore()
 
 const projectID = ref(null);
 const isLocalRepository = ref(false);
+const isJDBCRepository = ref(false);
+const isAPIRepository = ref(false);
 
 async function initializeComponent() {
   const url = window.location.href; // Get the current URL
@@ -259,9 +311,12 @@ async function initializeComponent() {
     //qué tipo de repositorio es?
     //storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
 
-    isLocalRepository.value = storeDS.selectedRepositoryType.toLowerCase() === "localrepository" ? true : false;
+    isLocalRepository.value = storeDS.selectedRepositoryType === "LocalRepository";
+    isJDBCRepository.value = storeDS.selectedRepositoryType === "RelationalJDBCRepository";
+    isAPIRepository.value = storeDS.selectedRepositoryType === "ApiRepository";
     console.log(isLocalRepository);
-    if (!isLocalRepository.value) {
+
+    if (isJDBCRepository.value) {
       console.log("no es local repository");
 
       //call backend end point for retrieving db information and adding the response to uploadedItems
@@ -289,6 +344,7 @@ async function initializeComponent() {
         console.error('Error al obtener información de tablas:', error);
       }
     }
+
   }
 }
 

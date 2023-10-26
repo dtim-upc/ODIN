@@ -13,9 +13,7 @@
             <q-input v-model="formData['repositoryDescription']" filled autogrow label="Description (Optional)"/>
           </q-card-section>
 
-          <q-badge color="secondary" multi-line>
-            FORMDATA: {{ formData }}
-          </q-badge>
+
 
           <!-- Tipo de origen de datos -->
           <q-card-section>
@@ -32,7 +30,6 @@
             <div v-for="(field, fieldName) in formSchema.properties" :key="fieldName">
               <div v-if="field.type !== undefined && field.dependsOn === undefined">
 
-                11111111111111
                 <div>
                   <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
@@ -67,7 +64,7 @@
                   />
 
 
-                  <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+                  <q-btn v-if="field.type === 'button'" @click="testConnection">{{ field.label }}</q-btn>
 
                   <q-btn-toggle
                     v-if="field.type === 'toggle'"
@@ -91,7 +88,6 @@
                               && field.dependsOn.value === formData['connectBy']">
                 <div v-if="field.type === 'section'" v-for="(field, fieldName) in field.properties" :key="fieldName">
 
-                  33333333
                   <div>
                     <q-input v-if="fieldName.toLowerCase() !== 'password'
                                 && field.type === 'string'
@@ -126,7 +122,7 @@
                     />
 
 
-                    <q-btn v-if="field.type === 'button'">{{ field.label }}</q-btn>
+                    <q-btn v-if="field.type === 'button'" @click="testConnection">{{ field.label }}</q-btn>
 
                     <q-btn-toggle
                       v-if="field.type === 'toggle'"
@@ -152,6 +148,10 @@
         </div>
 
       </q-card-section>
+
+      <q-badge color="secondary" multi-line>
+        FORMDATA: {{ formData }}
+      </q-badge>
 
       <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <!-- Botones del formulario -->
@@ -190,7 +190,6 @@ import {useDataSourceStore} from "../../stores/datasources.store";
 import {odinApi} from "../../boot/axios";
 
 const isPwd = ref(true);
-const isLocalRepository = ref(false);
 // -------------------------------------------------------------
 //                         PROPS & EMITS
 // -------------------------------------------------------------
@@ -298,15 +297,12 @@ watch(RepositoryType, (newType) => {
 watch(() => showS.value, (newValue) => {
   if (newValue) {
     fetchDataRepositoryTypes();
-    isLocalRepository.value = RepositoryType.value === 'LocalRepository';
   }
 });
 
 defineExpose({
   form
 })
-
-const formFields = ref([]);
 
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
   storeDS.selectedRepositoryId = null;
@@ -326,13 +322,13 @@ function isJDBC(type) {
 const testConnection = async () => {
   const data = {};
 
-  // Add specific fields from formFields to the data object
-  formFields.value.forEach((field) => {
-    if (field.value !== null && field.value !== undefined) {
-      data[field.name.toString()] = field.value.toString();
-      //notify.positive(field.name.toString() + " has been added as: " + field.value.toString());
+  if (formSchema.value.attributes) {
+    const formAttributes = formSchema.value.attributes;
+    for (const attributeName in formAttributes) {
+      // Añade dinámicamente los atributos al objeto formData
+      data[attributeName] = formData.value[attributeName];
     }
-  });
+  }
 
   try {
     // Make a POST request to the backend endpoint
@@ -370,7 +366,7 @@ const onSubmit = async () => {
 
   console.log(data);
 
-  /*if (!isLocalRepository.value) {
+  if (formSchema.value.class === 'RelationalJDBCRepository') {
     try {
       // Await the result of the testConnection function
       const isConnected = await testConnection();
@@ -386,9 +382,7 @@ const onSubmit = async () => {
     }
   } else {
     integrationStore.addDataRepository(route.params.id, data, successCallback);
-  }*/
-  integrationStore.addDataRepository(route.params.id, data, successCallback);
-
+  }
 };
 
 const successCallback = (datasource) => {
@@ -403,10 +397,6 @@ const successCallback = (datasource) => {
 
   storeDS.getRepositories(route.params.id);
 }
-
-const databaseHost = ref('');
-const databaseUser = ref('');
-const databasePassword = ref('');
 </script>
 
 

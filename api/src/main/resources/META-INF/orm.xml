@@ -112,6 +112,14 @@
         </attributes>
     </entity>
 
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository">
+        <table name="ApiRepository"/>
+        <attributes>
+            <basic name="url">
+            </basic>
+        </attributes>
+    </entity>
+
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository">
         <table name="RelationalJDBCRepository"/>
         <attributes>

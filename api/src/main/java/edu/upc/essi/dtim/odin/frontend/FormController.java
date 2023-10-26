@@ -26,7 +26,7 @@ public class FormController {
         logger.info("FORMSCHEMA ASKED");
         try {
             // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "../api/src/main/resources/frontend-schemas/RepositoryForms/DatasetForm.json";
+            String filePath = "../api/src/main/resources/frontend-schemas/RepositoryForms/Template_Repository.json";
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {

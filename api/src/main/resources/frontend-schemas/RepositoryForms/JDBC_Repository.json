@@ -1,25 +1,14 @@
 {
-  "formTitle": "Create new repository",
   "type": "object",
   "class": "RelationalJDBCRepository",
   "properties": {
-    "authentication": {
-      "type": "section",
-      "label": "Authentication",
-      "dependsOn": {
-        "field": "repositoryType",
-        "value": "jdbcRepository"
-      },
-      "properties": {
-        "username": {
-          "type": "string",
-          "label": "Username"
-        },
-        "password": {
-          "type": "string",
-          "label": "Password"
-        }
-      }
+    "username": {
+      "type": "string",
+      "label": "Username"
+    },
+    "password": {
+      "type": "string",
+      "label": "Password"
     },
 
     "connectBy": {
@@ -51,8 +40,7 @@
       "properties": {
         "url": {
           "type": "string",
-          "label": "URL",
-          "maxLength": 50
+          "label": "URL"
         }
       }
     },
@@ -73,16 +61,20 @@
           "type": "string",
           "label": "Port"
         },
-        "databasename": {
+        "databaseName": {
           "type": "string",
           "label": "Database name"
+        },
+        "databaseType": {
+          "type": "string",
+          "label": "Database Type (postgresql, etc.)"
         }
       }
     },
     "botonTestConnection": {
       "type": "button",
       "label": "Test connection",
-      "action": ""
+      "action": "testConnection"
     }
   },
   "attributes": {
@@ -90,6 +82,7 @@
     "port": "",
     "databaseName": "",
     "url": "",
+    "databaseType": "",
     "username": "",
     "password": ""
   }

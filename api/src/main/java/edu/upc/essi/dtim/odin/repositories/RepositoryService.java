@@ -1,5 +1,7 @@
 package edu.upc.essi.dtim.odin.repositories;
 
+import com.google.protobuf.Api;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
@@ -122,6 +124,9 @@ public class RepositoryService {
             case "LocalRepository":
                 repository = new LocalRepository();
                 break;
+            case "ApiRepository":
+                repository = new ApiRepository();
+                break;
             default:
                 repository = new DataRepository();
         }
@@ -152,12 +157,26 @@ public class RepositoryService {
 
         if (repository != null) {
             if (repository instanceof RelationalJDBCRepository) {
-                RelationalJDBCRepository jdbcRepository = (RelationalJDBCRepository) repository;
-                jdbcRepository.setUsername(requestData.get("username"));
-                jdbcRepository.setPassword(requestData.get("password"));
-                jdbcRepository.setUrl(requestData.get("url"));
+                String url = requestData.get("url");
+                String username = requestData.get("username");
+                String password = requestData.get("password");
+
+                String port = requestData.get("port");
+                String hostname = requestData.get("hostname");
+                String databasename = requestData.get("databaseName");
+                String databaseType = requestData.get("databaseType");
+
+                String customUrl = "jdbc:"+databaseType+"://" + hostname + ":" + port + "/" + databasename;
+
+                ((RelationalJDBCRepository) repository).setUsername(username);
+                ((RelationalJDBCRepository) repository).setPassword(password);
+
+                if(testConnection(url, username, password)) ((RelationalJDBCRepository) repository).setUrl(url);
+                else if(testConnection(customUrl, username, password)) ((RelationalJDBCRepository) repository).setUrl(customUrl);
             } else if (repository instanceof LocalRepository) {
                 ((LocalRepository) repository).setPath(requestData.get("path"));
+            } else if (repository instanceof ApiRepository) {
+                ((ApiRepository) repository).setUrl(requestData.get("url"));
             } else {
                 System.out.println("NO SE HAN PODIDO ASIGNAR LOS PARÁMETROS");
             }

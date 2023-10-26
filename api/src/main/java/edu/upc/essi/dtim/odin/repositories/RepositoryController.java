@@ -59,8 +59,15 @@ public class RepositoryController {
         String url = requestData.get("url");
         String username = requestData.get("username");
         String password = requestData.get("password");
+        String port = requestData.get("port");
+        String hostname = requestData.get("hostname");
+        String databasename = requestData.get("databaseName");
+        String databaseType = requestData.get("databaseType");
 
-        return repositoryService.testConnection(url, username, password);
+        // Crear una URL de conexión personalizada con hostname, port y databasename
+        String customUrl = "jdbc:"+databaseType+"://" + hostname + ":" + port + "/" + databasename;
+
+        return repositoryService.testConnection(url, username, password) || repositoryService.testConnection(customUrl, username, password);
     }
 
     @GetMapping(value = "/{id}/tables")
