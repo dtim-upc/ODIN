@@ -132,6 +132,21 @@
         </attributes>
     </entity>
 
+    <entity name="Attribute" class="edu.upc.essi.dtim.NextiaCore.discovery.Attribute">
+        <table name="Attribute"/>
+        <unique-constraint>
+            <column-name>id</column-name>
+        </unique-constraint>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="AUTO"/>
+            </id>
+            <basic name="name"/>
+            <basic name="type"/>
+            <transient name="alignment"/>
+        </attributes>
+    </entity>
+
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
         <table name="Dataset">
         <unique-constraint>
@@ -151,10 +166,10 @@
             <basic name="wrapper"/>
             <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
             </many-to-one>
+            <one-to-many name="attributes" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
                 <cascade><cascade-all/></cascade>
             </one-to-one>
-            <transient name="attributes"/>
         </attributes>
     </entity>
 
@@ -196,7 +211,5 @@
             <basic name="password"/>
         </attributes>
     </entity>
-
-
 
 </entity-mappings>
