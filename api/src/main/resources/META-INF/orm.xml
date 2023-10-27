@@ -154,6 +154,7 @@
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
                 <cascade><cascade-all/></cascade>
             </one-to-one>
+            <transient name="attributes"/>
         </attributes>
     </entity>
 
