@@ -27,7 +27,7 @@
                 </div>
 
                 <template
-                  v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined && isLocalRepository">
+                  v-if="item.files === undefined && item.name !== undefined && item.otherInfo === undefined && isLocalRepository || isAPIRepository">
                   <div v-if="item.name !== undefined">{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="13" viewBox="0 0 24 24">
@@ -63,7 +63,7 @@
                   </div>
                 </template>
 
-                <template v-else-if="!isLocalRepository">
+                <template v-else-if="isJDBCRepository">
                   <div>{{ item.name }}</div>
                   <div class="file-system-entry__details">
                     <span class="file-system-entry__detail">
@@ -221,32 +221,51 @@ async function downloadFile() {
 }
 
 async function makeRequest() {
-  let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
-  try {
-    const response = await odinApi.get(`/download?url=${encodeURIComponent(url)}`, {
-      responseType: 'arraybuffer', // Cambia el tipo de respuesta a 'arraybuffer'
-    });
+  let endpoint = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
 
-    const contentDisposition = response.headers['content-disposition'];
-    let filename;
+  let id_buscar = storeDS.getSelectedRepositoryId; // Define el ID que deseas buscar
 
-    if (contentDisposition) {
-      // Si el encabezado content-disposition existe, obtén el nombre del archivo
-      filename = contentDisposition.split(';')[1].trim().split('=')[1];
-    } else {
-      // Si el encabezado no existe, intenta obtener el nombre del archivo de la URL
-      const urlParts = url.split('/');
-      filename = urlParts[urlParts.length - 1];
+  let repositorio_encontrado = null; // Inicializa con null, no con None
+
+  // Supongamos que storeDS.repositories es una lista de objetos con propiedades "id" y "url"
+  for (const repo of storeDS.repositories) {
+    if (repo.id === id_buscar) {
+      repositorio_encontrado = repo;
+      break;
     }
+  }
 
-    // Crea un nuevo objeto File a partir de la respuesta
-    const blob = new Blob([response.data], {type: 'application/octet-stream'});
-    const file = new File([blob], filename, {type: 'application/octet-stream'});
+  if (repositorio_encontrado) {
+    notify.positive("REQUEST MADE: "+repositorio_encontrado.url+endpoint);
 
-    // Agrega el archivo a la lista uploadedItems
-    uploadedItems.value.push(file);
-  } catch (error) {
-    console.error('Error al descargar el archivo:', error);
+    try {
+      const response = await odinApi.get(`/makeRequest?url=${encodeURIComponent(repositorio_encontrado.url+endpoint)}`, {
+        responseType: 'arraybuffer', // Cambia el tipo de respuesta a 'arraybuffer'
+      });
+
+      const contentDisposition = response.headers['content-disposition'];
+      let filename;
+
+      if (contentDisposition) {
+        // If the content-disposition header exists, get the filename
+        filename = contentDisposition.split(';')[1].trim().split('=')[1];
+      } else {
+        // If the header doesn't exist, try to get the filename from the URL
+        const urlParts = repositorio_encontrado.url.split('/'); // Use repositorio_encontrado.url
+        filename = urlParts[urlParts.length - 1];
+      }
+
+      // Crea un nuevo objeto File a partir de la respuesta
+      const blob = new Blob([response.data], {type: 'application/octet-stream'});
+      const file = new File([blob], filename, {type: 'application/octet-stream'});
+
+      // Agrega el archivo a la lista uploadedItems
+      uploadedItems.value.push(file);
+    } catch (error) {
+      console.error('Error al descargar el archivo:', error);
+    }
+  } else {
+    notify.negative("REPOSITORY NOT FOUND");
   }
 }
 
@@ -433,6 +452,8 @@ const onSubmit = () => {
       item.files.forEach((file) => {
         data.append('attachFiles', file);
       });
+    } else if (item.files === undefined && !isLocalRepository.value) {
+      data.append('attachFiles', item);
     } else {
       console.log("attachTables: " + item.name);
       attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables

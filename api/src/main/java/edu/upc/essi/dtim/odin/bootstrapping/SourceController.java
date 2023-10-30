@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -85,6 +86,31 @@ public class SourceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("/makeRequest")
+    public ResponseEntity<String> makeRequestFromURL(@RequestParam String url) {
+        logger.info("make request to url received: "+url);
+        try {
+            // Realiza la solicitud HTTP y obtén el contenido de la respuesta en formato byte[]
+            byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
+
+            if (responseBytes != null && responseBytes.length > 0) {
+                // Transforma el contenido de byte[] a una cadena de caracteres
+                String responseBody = new String(responseBytes, StandardCharsets.UTF_8);
+
+                // Puedes hacer cualquier procesamiento necesario en el JSON aquí
+                // Por ejemplo, puedes validar o modificar el JSON según tus necesidades
+                // Si necesitas devolverlo como JSON, puedes hacer lo siguiente:
+                return ResponseEntity.ok(responseBody);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró contenido en la URL especificada.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en la solicitud: " + e.getMessage());
+        }
+    }
+
 
 
     /**
