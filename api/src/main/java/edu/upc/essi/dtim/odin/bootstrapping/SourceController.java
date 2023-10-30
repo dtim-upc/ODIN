@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
@@ -88,8 +89,8 @@ public class SourceController {
     }
 
     @GetMapping("/makeRequest")
-    public ResponseEntity<String> makeRequestFromURL(@RequestParam String url) {
-        logger.info("make request to url received: "+url);
+    public ResponseEntity<Object> makeRequestFromURL(@RequestParam String url) {
+        logger.info("make request to url received: " + url);
         try {
             // Realiza la solicitud HTTP y obtén el contenido de la respuesta en formato byte[]
             byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
@@ -98,10 +99,13 @@ public class SourceController {
                 // Transforma el contenido de byte[] a una cadena de caracteres
                 String responseBody = new String(responseBytes, StandardCharsets.UTF_8);
 
-                // Puedes hacer cualquier procesamiento necesario en el JSON aquí
-                // Por ejemplo, puedes validar o modificar el JSON según tus necesidades
-                // Si necesitas devolverlo como JSON, puedes hacer lo siguiente:
-                return ResponseEntity.ok(responseBody);
+                // You can parse and process the JSON here as needed
+                // For example, you can create a JSON object or use a library like Jackson to parse it.
+                ObjectMapper objectMapper = new ObjectMapper();
+                Object responseObject = objectMapper.readValue(responseBody, Object.class);
+
+                // Return the parsed JSON response
+                return ResponseEntity.ok(responseObject);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró contenido en la URL especificada.");
             }
@@ -196,7 +200,8 @@ public class SourceController {
                     // Use the original filename as the datasetName
                     assert originalFileName != null;
                     int slashIndex = originalFileName.lastIndexOf("/");
-                    datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, originalFileName.lastIndexOf('.'));
+                    int dotIndex = originalFileName.lastIndexOf('.');
+                    datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
 
                     // Reconstruct file from Multipart file
                     String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());
