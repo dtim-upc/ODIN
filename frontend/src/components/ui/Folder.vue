@@ -118,10 +118,10 @@ const router = useRouter()
 const activeFolder = ref("")
 
 const folderBackColor = computed(() => {
-  return 'background:' + colors.lighten(props.folderColor, -10) + ';'
+  return 'background:' + colors.lighten(props.row.projectColor, -10) + ';'
 })
 
-const folderFrontColor = computed(() => 'background:' + props.folderColor + ';')
+const folderFrontColor = computed(() => 'background:' + props.row.projectColor + ';')
 
 const openFolder = (project) => {
   router.push({name: 'home', params: {id: project.projectId}})

@@ -41,6 +41,8 @@ const projectsStore = useProjectsStore();
 const emit = defineEmits(["submitSuccess", "cancelForm"]);
 const form = ref(null);
 const notify = useNotify();
+const optionsPrivacy = ["private", "public"];
+const optionsColor = ['#3dbb94', '#ff5733', '#8866aa', '#f0c342', '#47a1e6', '#b547e6'];
 
 // Inicializamos project con los datos recibidos a través de las props
 const project = reactive({
@@ -48,18 +50,15 @@ const project = reactive({
   projectName: props.projectData ? props.projectData.projectName : "",
   projectDescription: props.projectData ? props.projectData.projectDescription : "",
   projectPrivacy: props.projectData ? props.projectData.projectPrivacy : "private",
-  projectColor: props.projectData ? props.projectData.projectColor : "#dbe2e7",
+  projectColor: props.projectData ? props.projectData.projectColor : optionsColor[0],
 });
-
-const optionsPrivacy = ["private", "public"];
-const optionsColor = ["#dbe2e7", "#4e68f5"];
 
 const onReset = () => {
   project.projectId = null;
   project.projectName = "";
   project.projectDescription = "";
   project.projectPrivacy = "private";
-  project.projectColor = "#dbe2e7";
+  project.projectColor = optionsColor[0];
 };
 
 const success = () => {
