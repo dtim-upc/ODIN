@@ -87,7 +87,7 @@ public class SourceController {
 
     @GetMapping(value = "/makeRequest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
-        logger.info("make request to URL received: " + url);
+        logger.info("Make request to URL received: " + url);
         try {
             // Realiza la solicitud HTTP y obtén el contenido de la respuesta en formato byte[]
             byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
