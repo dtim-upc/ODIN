@@ -14,7 +14,11 @@
 
     <q-select v-model="project.projectPrivacy" :options="optionsPrivacy" label="Privacy" class="q-mt-none"/>
 
-    <q-select v-model="project.projectColor" :options="optionsColor" label="Color" class="q-mt-none"/>
+    <q-select v-model="project.projectColor" :options="optionsColor" label="Color" class="q-mt-none">
+      <template v-slot:prepend>
+        <q-icon name="folder" :style="{ color: project.projectColor }"/>
+      </template>
+    </q-select>
 
     <div v-if="showFormButtons">
       <q-btn
