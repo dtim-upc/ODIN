@@ -12,11 +12,13 @@ import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.bootstrapping.SourceService;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationData;
 import edu.upc.essi.dtim.odin.integration.pojos.JoinAlignment;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
+import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -349,4 +351,291 @@ public class IntegrationService {
     public Project addIntegratedDataset(String projectId, String id) {
         return projectService.addIntegratedDataset(projectId, id);
     }
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////// TODO: IMPLEMENT //////////////////////////////////////////////////
+    double similarity = 0.8;
+
+    List<Alignment> ds1_ds2;
+    List<Alignment> ds1_ds2_ds3;
+    List<Alignment> ds1_ds2_ds3_ds4;
+
+    public void aligments_ds1_ds2_ds3_ds4_new() {
+        ds1_ds2_ds3_ds4 = new ArrayList<>();
+        Alignment a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_artworks");
+        a.setIriB("Object_2");
+        a.setType("class");
+        a.setL("I_artworks");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_Artist");
+        a.setIriB("Object_3");
+        a.setType("class");
+        a.setL("I_Artist");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_medium");
+        a.setIriB("medium");
+        a.setType("datatype");
+        a.setL("I_medium");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("url");
+        a.setIriB("url");
+        a.setType("datatype");
+        a.setL("I_url");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_title");
+        a.setIriB("title");
+        a.setType("datatype");
+        a.setL("I_title");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_date_acquired");
+        a.setIriB("acquisitionYear");
+        a.setType("datatype");
+        a.setL("I_date_acquired");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_classification");
+        a.setIriB("classification");
+        a.setType("datatype");
+        a.setL("I_classification");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("role");
+        a.setIriB("role");
+        a.setType("datatype");
+        a.setL("I_role");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_birthYear");
+        a.setIriB("birthYear");
+        a.setType("datatype");
+        a.setL("I_birthYear");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_gender");
+        a.setIriB("gender");
+        a.setType("datatype");
+        a.setL("I_gender");
+        ds1_ds2_ds3_ds4.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_name");
+        a.setIriB("name");
+        a.setType("datatype");
+        a.setL("I_name");
+        ds1_ds2_ds3_ds4.add(a);
+    }
+
+    public void aligments_ds1_ds2_ds3_new(){
+        ds1_ds2_ds3 = new ArrayList<>();
+        Alignment a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_Artist");
+        a.setIriB("Object_2");
+        a.setType("class");
+        a.setL("I_Artist");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/I_name");
+        a.setIriB("full_name");
+        a.setType("datatype");
+        a.setL("I_name");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("Object_1");
+        a.setIriB("Object_1");
+        a.setType("class");
+        a.setL("I_artworks");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("title");
+        a.setIriB("title");
+        a.setType("datatype");
+        a.setL("I_title");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("url");
+        a.setIriB("web_url");
+        a.setType("datatype");
+        a.setL("I_url");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("medium");
+        a.setIriB("medium");
+        a.setType("datatype");
+        a.setL("I_medium");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("width");
+        a.setIriB("item_width");
+        a.setType("datatype");
+        a.setL("I_width");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("depth");
+        a.setIriB("item_depth");
+        a.setType("datatype");
+        a.setL("I_depth");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("creditLine");
+        a.setIriB("credit_line");
+        a.setType("datatype");
+        a.setL("I_creditLine");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("classification");
+        a.setIriB("classification");
+        a.setType("datatype");
+        a.setL("I_classification");
+        ds1_ds2_ds3.add(a);
+        a = new Alignment();
+        a.setIriA("acquisitionYear");
+        a.setIriB("date_acquired");
+        a.setType("datatype");
+        a.setL("I_date_acquired");
+        ds1_ds2_ds3.add(a);
+    }
+
+    public void alignments_ds1_ds2_new(){
+        ds1_ds2 = new ArrayList<>();
+        Alignment a = new Alignment();
+        a.setIriA("Object_3");
+        a.setIriB("Object_1");
+        a.setL("I_Artist");
+        a.setType("class");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriA("id");
+        a.setIriB("id");
+        a.setType("datatype");
+        a.setL("I_id");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriA("fc");
+        a.setIriB("fc");
+        a.setType("datatype");
+        a.setL("I_name");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriA("gender");
+        a.setIriB("gender");
+        a.setType("datatype");
+        a.setL("I_gender");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriA("mda");
+        a.setIriB("mda");
+        a.setType("datatype");
+        a.setL("I_mda");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriA("birthYear");
+        a.setIriB("birthYear");
+        a.setType("datatype");
+        a.setL("I_birthYear");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriA("startLetter");
+        a.setIriB("startLetter");
+        a.setType("datatype");
+        a.setL("I_startLetter");
+        ds1_ds2.add(a);
+    }
+
+    public void alignments_ds2_ds1_new(){
+        ds1_ds2 = new ArrayList<>();
+        Alignment a = new Alignment();
+        a.setIriB("Object_3");
+        a.setIriA("Object_1");
+        a.setL("I_Artist");
+        a.setType("class");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriB("id");
+        a.setIriA("id");
+        a.setType("datatype");
+        a.setL("I_id");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriB("fc");
+        a.setIriA("fc");
+        a.setType("datatype");
+        a.setL("I_name");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriB("gender");
+        a.setIriA("gender");
+        a.setType("datatype");
+        a.setL("I_gender");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriB("mda");
+        a.setIriA("mda");
+        a.setType("datatype");
+        a.setL("I_mda");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriB("birthYear");
+        a.setIriA("birthYear");
+        a.setType("datatype");
+        a.setL("I_birthYear");
+        ds1_ds2.add(a);
+        a = new Alignment();
+        a.setIriB("startLetter");
+        a.setIriA("startLetter");
+        a.setType("datatype");
+        a.setL("I_startLetter");
+        ds1_ds2.add(a);
+    }
+
+    public List<Alignment> getAlignments(String projectId, String datasetId){
+        SourceService sourceService = new SourceService(appConfig, projectService, new RepositoryService(appConfig, projectService));
+        Dataset dsB = sourceService.getDatasetById(datasetId);
+
+        Project project = getProject(projectId);
+        List<Dataset> dsAs = project.getIntegratedDatasets();
+
+        List<Alignment> alignments = new ArrayList<>();
+
+        Graph graphA = project.getIntegratedGraph();
+
+        Graph graphB = dsB.getLocalGraph();
+
+        switch (dsAs.size()){
+            case 1:
+                if(graphA.getGraphName().length()>graphB.getGraphName().length()){
+                    //dsA is  tate artworks
+                    System.out.println("alignments for tate artworks");
+                    alignments_ds1_ds2_new();
+                } else {
+                    //dsA is tate artist
+                    System.out.println("alignments for tate artist");
+                    alignments_ds2_ds1_new();
+                }
+                return ds1_ds2;
+            case 2:
+                aligments_ds1_ds2_ds3_new();
+                return ds1_ds2_ds3;
+            case 3:
+                aligments_ds1_ds2_ds3_ds4_new();
+                return ds1_ds2_ds3_ds4;
+            default:
+                System.out.println("switch default");
+        }
+
+        jdModuleInterface jdInterface = new jdModuleImpl();
+        alignments = jdInterface.getAlignments(dsAs.get(0), dsB);
+        return  alignments;
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }

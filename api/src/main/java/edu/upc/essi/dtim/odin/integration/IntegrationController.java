@@ -3,10 +3,7 @@ package edu.upc.essi.dtim.odin.integration;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
-import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
-import edu.upc.essi.dtim.NextiaDI;
+import edu.upc.essi.dtim.nextiadi.models.Alignment;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationData;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationTemporalResponse;
 import edu.upc.essi.dtim.odin.integration.pojos.JoinAlignment;
@@ -161,6 +158,14 @@ public class IntegrationController {
         // TODO: Delete this call
         // Currently, this method returns the input Dataset without performing any actual persistence logic.
         return new ResponseEntity<>(dataSource, HttpStatus.CREATED);
+    }
+
+
+    @PostMapping(value = "/project/{id}/integration/survey")
+    public ResponseEntity<List<Alignment>> getSurveyAlignments(@PathVariable("id") String projectId, @RequestBody String datasetId){
+        List<Alignment> alignments  = integrationService.getAlignments(projectId, datasetId);
+
+        return new ResponseEntity(alignments, HttpStatus.OK);
     }
 
 }
