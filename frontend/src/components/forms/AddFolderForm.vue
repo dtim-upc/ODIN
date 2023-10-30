@@ -12,7 +12,25 @@
 
     <q-input v-model="project.projectDescription" filled autogrow label="Description (Optional)"/>
 
-    <q-select v-model="project.projectPrivacy" :options="optionsPrivacy" label="Privacy" class="q-mt-none"/>
+    <q-select v-model="project.projectPrivacy"
+              :options="optionsPrivacy"
+              label="Privacy"
+              class="q-mt-none">
+      <template v-slot:prepend>
+        <q-icon :name="project.projectPrivacy.icon"/>
+      </template>
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section avatar>
+            <q-icon :name="scope.opt.icon" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ scope.opt.label }}</q-item-label>
+            <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
 
     <q-select v-model="project.projectColor"
               :options="optionsColor"
@@ -60,7 +78,20 @@ const projectsStore = useProjectsStore();
 const emit = defineEmits(["submitSuccess", "cancelForm"]);
 const form = ref(null);
 const notify = useNotify();
-const optionsPrivacy = ["private", "public"];
+const optionsPrivacy = [
+  {
+    label: 'Private',
+    value: 'private',
+    description: 'Only you can see this project',
+    icon: 'lock'
+  },
+  {
+    label: 'Public',
+    value: 'public',
+    description: 'Everyone can see this project',
+    icon: 'public'
+  }
+];
 const optionsColor = ['#3dbb94', '#ff5733', '#8866aa', '#f0c342', '#47a1e6', '#b547e6'];
 
 // Inicializamos project con los datos recibidos a través de las props
@@ -68,7 +99,7 @@ const project = reactive({
   projectId: props.projectData ? props.projectData.projectId : null,
   projectName: props.projectData ? props.projectData.projectName : "",
   projectDescription: props.projectData ? props.projectData.projectDescription : "",
-  projectPrivacy: props.projectData ? props.projectData.projectPrivacy : "private",
+  projectPrivacy: props.projectData ? optionsPrivacy.find(option => option.value === props.projectData.projectPrivacy) : optionsPrivacy[0],
   projectColor: props.projectData ? props.projectData.projectColor : optionsColor[0],
 });
 
@@ -76,7 +107,7 @@ const onReset = () => {
   project.projectId = null;
   project.projectName = "";
   project.projectDescription = "";
-  project.projectPrivacy = "private";
+  project.projectPrivacy = optionsPrivacy[0];
   project.projectColor = optionsColor[0];
 };
 
@@ -91,6 +122,7 @@ const cancelForm = () => {
 };
 
 const onSubmit = () => {
+  project.projectPrivacy = project.projectPrivacy.value;
   if (props.projectData) {
     // If projectData is available, it means we are editing an existing project
     // Perform edit logic here
