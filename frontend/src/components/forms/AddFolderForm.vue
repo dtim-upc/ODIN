@@ -14,9 +14,24 @@
 
     <q-select v-model="project.projectPrivacy" :options="optionsPrivacy" label="Privacy" class="q-mt-none"/>
 
-    <q-select v-model="project.projectColor" :options="optionsColor" label="Color" class="q-mt-none">
+    <q-select v-model="project.projectColor"
+              :options="optionsColor"
+              label="Color"
+              class="q-mt-none"
+              options-selected-class="text-deep-orange"
+    >
       <template v-slot:prepend>
         <q-icon name="folder" :style="{ color: project.projectColor }"/>
+      </template>
+      <template v-slot:option="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section avatar>
+            <q-icon name="fiber_manual_record" :style="{ color: scope.opt }"/>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ scope.opt }}</q-item-label>
+          </q-item-section>
+        </q-item>
       </template>
     </q-select>
 
