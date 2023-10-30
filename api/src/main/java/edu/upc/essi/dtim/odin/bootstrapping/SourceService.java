@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
@@ -731,6 +732,12 @@ public class SourceService {
                         dataset instanceof ParquetDataset ||
                         dataset instanceof XmlDataset)) {
             return true; // LocalDataset can be added to LocalRepository
+        } else if (repository instanceof ApiRepository &&
+                (dataset instanceof JsonDataset ||
+                        dataset instanceof CsvDataset ||
+                        dataset instanceof ParquetDataset ||
+                        dataset instanceof XmlDataset)) {
+            return true; // LocalDataset can be added to ApiRepository
         } else {
             return false; // Incompatible dataset and repository types
         }

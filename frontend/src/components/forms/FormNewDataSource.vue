@@ -239,31 +239,33 @@ async function makeRequest() {
     notify.positive("REQUEST MADE: "+repositorio_encontrado.url+endpoint);
 
     try {
-      const response = await odinApi.get(`/makeRequest?url=${encodeURIComponent(repositorio_encontrado.url+endpoint)}`, {
-        responseType: 'arraybuffer', // Cambia el tipo de respuesta a 'arraybuffer'
+      const response = await odinApi.get(`/makeRequest?url=${encodeURIComponent(repositorio_encontrado.url + endpoint)}`, {
+        responseType: 'arraybuffer',
       });
 
       const contentDisposition = response.headers['content-disposition'];
       let filename;
 
       if (contentDisposition) {
-        // If the content-disposition header exists, get the filename
-        filename = contentDisposition.split(';')[1].trim().split('=')[1];
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match) {
+          filename = match[1];
+        }
       } else {
-        // If the header doesn't exist, try to get the filename from the URL
-        const urlParts = repositorio_encontrado.url.split('/'); // Use repositorio_encontrado.url
-        filename = urlParts[urlParts.length - 1];
+        // Si no se encuentra Content-Disposition, intenta obtener el nombre del archivo del URL
+        const urlParts = repositorio_encontrado.url.split('/');
+        filename = urlParts[urlParts.length - 1]+".json";
       }
 
       // Crea un nuevo objeto File a partir de la respuesta
-      const blob = new Blob([response.data], {type: 'application/octet-stream'});
-      const file = new File([blob], filename, {type: 'application/octet-stream'});
+      const blob = new Blob([response.data], { type: 'application/json' });
+      const file = new File([blob], filename, { type: 'application/json' });
 
-      // Agrega el archivo a la lista uploadedItems
       uploadedItems.value.push(file);
     } catch (error) {
       console.error('Error al descargar el archivo:', error);
     }
+
   } else {
     notify.negative("REPOSITORY NOT FOUND");
   }

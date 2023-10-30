@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,32 +85,28 @@ public class SourceController {
         }
     }
 
-    @GetMapping("/makeRequest")
-    public ResponseEntity<Object> makeRequestFromURL(@RequestParam String url) {
-        logger.info("make request to url received: " + url);
+    @GetMapping(value = "/makeRequest", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
+        logger.info("make request to URL received: " + url);
         try {
             // Realiza la solicitud HTTP y obtén el contenido de la respuesta en formato byte[]
             byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
 
             if (responseBytes != null && responseBytes.length > 0) {
-                // Transforma el contenido de byte[] a una cadena de caracteres
-                String responseBody = new String(responseBytes, StandardCharsets.UTF_8);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
 
-                // You can parse and process the JSON here as needed
-                // For example, you can create a JSON object or use a library like Jackson to parse it.
-                ObjectMapper objectMapper = new ObjectMapper();
-                Object responseObject = objectMapper.readValue(responseBody, Object.class);
-
-                // Return the parsed JSON response
-                return ResponseEntity.ok(responseObject);
+                // Devuelve el archivo JSON
+                return ResponseEntity.ok().headers(headers).body(responseBytes);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró contenido en la URL especificada.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró contenido en la URL especificada.".getBytes());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en la solicitud: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error en la solicitud: " + e.getMessage()).getBytes());
         }
     }
+
 
 
 
@@ -258,7 +251,7 @@ public class SourceController {
      */
     @DeleteMapping("/project/{projectId}/datasource/{id}")
     public ResponseEntity<Boolean> deleteDatasource(@PathVariable("projectId") String projectId,
-                                                 @PathVariable("id") String id) {
+                                                    @PathVariable("id") String id) {
         // Print a message to indicate that the delete request was received
         logger.info("DELETE A DATASOURCE from project: {}" ,projectId);
         logger.info("DELETE A DATASOURCE RECEIVED: {}" ,id);
@@ -473,11 +466,11 @@ public class SourceController {
             @PathVariable("datasetID") String datasetID
     ) {
         logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
-            sourceService.setProjectSchemasBase(projectID,datasetID);
-            sourceService.deleteIntegratedDatasets(projectID);
-            sourceService.addIntegratedDataset(projectID,datasetID);
+        sourceService.setProjectSchemasBase(projectID,datasetID);
+        sourceService.deleteIntegratedDatasets(projectID);
+        sourceService.addIntegratedDataset(projectID,datasetID);
 
-            return ResponseEntity.ok("Dataset schema set as project schema.");
+        return ResponseEntity.ok("Dataset schema set as project schema.");
 
 
         //return ResponseEntity.notFound().build();
