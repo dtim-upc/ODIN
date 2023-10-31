@@ -70,8 +70,10 @@
               {{ props.row.repositories.reduce((total, repo) => total + repo.datasets.length, 0) }} files
             </q-chip>
             <q-space/>
-            <span>{{ props.row.projectPrivacy }}</span>
-            optionsPrivacy.find(option => option.value === props.projectData.projectPrivacy)
+            <q-icon
+              :name="optionsPrivacy.find(option => option.value === props.row.projectPrivacy).icon"
+              color="primary"
+            />
           </div>
         </div>
       </div>
@@ -105,6 +107,7 @@ import {useRouter} from "vue-router";
 import {colors} from 'quasar'
 import {useProjectsStore} from "stores/projects.store";
 import AddFolderForm from 'components/forms/AddFolderForm.vue';
+import {optionsPrivacy} from "./PrivacyOptions";
 
 const showEditDialog = ref(false);
 const selectedProject = ref(null);

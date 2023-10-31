@@ -68,6 +68,7 @@
 import {ref, reactive, defineProps} from "vue";
 import {useNotify} from 'src/use/useNotify.js';
 import {useProjectsStore} from 'stores/projects.store.js';
+import {optionsPrivacy} from "../ui/PrivacyOptions";
 
 const props = defineProps({
   showFormButtons: {type: Boolean, default: true},
@@ -78,20 +79,6 @@ const projectsStore = useProjectsStore();
 const emit = defineEmits(["submitSuccess", "cancelForm"]);
 const form = ref(null);
 const notify = useNotify();
-const optionsPrivacy = [
-  {
-    label: 'Private',
-    value: 'private',
-    description: 'Only you can see this project',
-    icon: 'lock'
-  },
-  {
-    label: 'Public',
-    value: 'public',
-    description: 'Everyone can see this project',
-    icon: 'public'
-  }
-];
 const optionsColor = ['#3dbb94', '#ff5733', '#8866aa', '#f0c342', '#47a1e6', '#b547e6'];
 
 // Inicializamos project con los datos recibidos a través de las props
