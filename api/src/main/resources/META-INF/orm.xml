@@ -164,6 +164,7 @@
                 <temporal>TIMESTAMP</temporal>
             </basic>
             <basic name="wrapper"/>
+            <basic name="dataLayerPath"/>
             <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
             </many-to-one>
             <one-to-many name="attributes" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>

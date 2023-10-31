@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.upc.essi.dtim.DataLayer;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -224,6 +226,17 @@ public class SourceService {
         // Save the dataset again with the updated datasetPath
         dataset = saveDataset(dataset);
         System.out.println(dataset.getId());
+
+        //TODO IMPORT NextiaDatalayer
+        //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
+        String dataLayerPath = null;
+        if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
+            //DataLayerMaterialized dlm = new DLMSpark();
+            //dataLayerPath = dlm.uploadToFormattedZone(dataset, dataset.getId());
+            dataset.setDataLayerPath(dataLayerPath);
+        }
+
+        dataset = saveDataset(dataset);
 
         return dataset;
     }
