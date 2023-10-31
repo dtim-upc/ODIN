@@ -26,7 +26,7 @@
 
             <q-item clickable v-close-popup @click="integrationStore.getAlignmentsSurvey()">
               <q-item-section>
-                <q-item-label>Automatic survey</q-item-label>
+                <q-item-label>Automatic alignments</q-item-label>
               </q-item-section>
             </q-item>
 

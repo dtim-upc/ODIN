@@ -70,7 +70,8 @@
               {{ props.row.repositories.reduce((total, repo) => total + repo.datasets.length, 0) }} files
             </q-chip>
             <q-space/>
-            <span>{{ props.row.privacy }}</span>
+            <span>{{ props.row.projectPrivacy }}</span>
+            optionsPrivacy.find(option => option.value === props.projectData.projectPrivacy)
           </div>
         </div>
       </div>
