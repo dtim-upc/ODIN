@@ -1,13 +1,16 @@
 package edu.upc.essi.dtim.odin.integration;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
-import edu.upc.essi.dtim.nextiadi.models.Alignment;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMSpark;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
+//import edu.upc.essi.dtim.NextiaJD.Discovery;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
@@ -607,6 +610,22 @@ public class IntegrationService {
         Graph graphA = project.getIntegratedGraph();
 
         Graph graphB = dsB.getLocalGraph();
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // TODO review
+/*
+        String datalayerPath = "C:\\Users\\victor.asenjo\\Documents\\GitHub\\ODIN\\api\\dbFiles\\dataLayer";
+        DataLayerMaterialized dlm = new DLMSpark(datalayerPath);
+        Discovery discovery = new Discovery(dlm);
+        try {
+            List<Alignment> alignmentsJD = discovery.getAlignments(project.getIntegratedDatasets().get(0), dsB);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+ */
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         switch (dsAs.size()){
             case 1:

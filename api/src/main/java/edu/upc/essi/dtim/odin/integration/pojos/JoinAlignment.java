@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.integration.pojos;
 
-import edu.upc.essi.dtim.nextiadi.models.Alignment;
+import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import lombok.Getter;
 import lombok.Setter;
 

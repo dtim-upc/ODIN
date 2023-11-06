@@ -1,7 +1,7 @@
 package edu.upc.essi.dtim.odin.integration;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.nextiadi.models.Alignment;
+import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 
 import java.util.List;
 
