@@ -8,6 +8,9 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMSpark;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
+import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
@@ -30,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,7 +189,8 @@ public class SourceService {
 
         // Assign an ID to the dataset
         dataset = saveDataset(dataset);
-        String datasetId = dataset.getId();
+        String id = dataset.getId();
+        String datasetId = id;
 
         // Modify the datasetPath to include the ID
         String datasetPath;
@@ -223,14 +228,27 @@ public class SourceService {
 
         // Save the dataset again with the updated datasetPath
         dataset = saveDataset(dataset);
-        System.out.println(dataset.getId());
+        System.out.println(id);
 
         //TODO IMPORT NextiaDatalayer
         //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
-        String dataLayerPath = null;
+        String dataLayerPath = "C:\\Users\\victor.asenjo\\Documents\\GitHub\\ODIN\\api\\dbFiles\\dataLayer";
         if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
-            //DataLayerMaterialized dlm = new DLMSpark();
-            //dataLayerPath = dlm.uploadToFormattedZone(dataset, dataset.getId());
+            /*
+            DataLoading dl = new DataLoading(dataLayerPath);
+
+            dl.uploadToLandingZone(dataset);
+            dl.close();
+
+            DataLayerMaterialized dlm = new DLMSpark(dataLayerPath);
+            try {
+                dlm.uploadToFormattedZone(dataset, id);
+                dlm.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+             */
             dataset.setDataLayerPath(dataLayerPath);
         }
 
