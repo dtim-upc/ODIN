@@ -1,0 +1,39 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "A Quasar Project",
+  "main": "postcss.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.0.0",
+    "@roma219/vue-jsonschema-form": "^0.1.14",
+    "axios": "^0.21.1",
+    "components": "^0.1.0",
+    "d3": "^7.6.1",
+    "downloadjs": "^1.4.7",
+    "pinia": "^2.0.11",
+    "quasar": "^2.6.0",
+    "tsparticles": "^2.3.2",
+    "vue": "^3.0.0",
+    "vue-json-viewer": "^2.2.22",
+    "vue-router": "^4.0.0",
+    "vue2-dropzone": "^3.6.0",
+    "vue3-dropzone": "^2.1.2",
+    "vue3-particles": "^2.3.2"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "^1.0.0",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.14"
+  },
+  "engines": {
+    "node": "^18 || ^16 || ^14.19",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
