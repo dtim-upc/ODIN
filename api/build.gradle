@@ -70,8 +70,8 @@ dependencies {
 
 
 	////////////////////////////////////////// NextiaDI //////////////////////////////////////////
-	implementation fileTree(dir: 'lib', include: ['nextiadi.jar'])
-	runtimeOnly(fileTree(dir: 'lib', include: ['nextiadi.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaDI.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDI.jar']))
 
 	//implementation 'edu.upc.essi.dtim:nextiadi:0.1.0-SNAPSHOT'
 
@@ -88,6 +88,11 @@ dependencies {
 	implementation fileTree(dir: 'lib', include: ['NextiaBS.jar'])
 	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS.jar']))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	implementation fileTree(dir: 'lib', include: ['NextiaJD.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaJD.jar']))
+
+	//implementation fileTree(dir: 'lib', include: ['*.jar'])
 
 }
 
@@ -127,19 +132,23 @@ tasks['sonarqube'].dependsOn test
 
 //para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
 def nextiaCoreJarPath = '../../NextiaCore/build/libs/nextiacore-0.0.2-SNAPSHOT-uber.jar'
-def nextiaDIJarPath ='../../NextiaDI/source/build/libs/nextiadi-0.1.0-SNAPSHOT-uber.jar'
+def nextiaDIJarPath ='../../NextiaDI/source/build/libs/NextiaDI.jar'
 def nextiaBSJarPath ='../../NextiaBS/build/libs/NextiaBS-1.0-SNAPSHOT-uber.jar'
+def nextiaDLJarPath ='../../NextiaDataLayer/build/libs/NextiaDataLayer-0.0.1-SNAPSHOT-uber.jar'
 
 task importExternalJar {
 	doLast {
 		def nextiaCorePath = project(':NextiaCore')
 		def nextiaDIPath = project(':NextiaDI')
 		def nextiaBSPath = project(':NextiaBS')
+		def nextiaDLPath = project(':NextiaDataLayer-gradle')
 
 		// Verifica si los archivos JAR existen en las rutas especificadas
 		def nextiaCoreJar = file(nextiaCoreJarPath)
 		def nextiaDIJar = file(nextiaDIJarPath)
 		def nextiaBSJar = file(nextiaBSJarPath)
+		def nextiaDLJar = file(nextiaDLJarPath)
+
 
 		if (!nextiaCoreJar.exists()) {
 			nextiaCorePath.tasks.uberJar.dependsOn {
@@ -177,6 +186,18 @@ task importExternalJar {
 			}
 		}
 
+		if (!nextiaDLJar.exists()) {
+			nextiaDLPath.tasks.uberJar.dependsOn {
+				println "Ejecutando uberJar para NextiaDL..."
+			}
+			nextiaDLPath.tasks.uberJar.execute()
+			nextiaDLPath.tasks.uberJar.get()
+
+			if (!nextiaDLJar.exists()) {
+				throw new GradleException("No se pudo generar el archivo JAR para NextiaDL.")
+			}
+		}
+
 		// Copiar los JAR después de asegurarse de que existen
 		copy {
 			from nextiaCoreJarPath
@@ -187,13 +208,19 @@ task importExternalJar {
 		copy {
 			from nextiaDIJarPath
 			into "../api/lib"
-			rename { 'nextiadi.jar' }
+			rename { 'NextiaDI.jar' }
 		}
 
 		copy {
 			from nextiaBSJarPath
 			into "../api/lib"
 			rename { 'NextiaBS.jar' }
+		}
+
+		copy {
+			from nextiaDLJarPath
+			into "../api/lib"
+			rename { 'NextiaDataLayer.jar' }
 		}
 	}
 }
