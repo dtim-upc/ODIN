@@ -1,12 +1,12 @@
-package edu.upc.essi.dtim.odin.integration;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI;
 
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaDI;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
-import edu.upc.essi.dtim.odin.NextiaGraphy.vocabulary.Namespaces;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary.Namespaces;
 import edu.upc.essi.dtim.odin.integration.pojos.JoinAlignment;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;

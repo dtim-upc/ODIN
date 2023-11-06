@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.NextiaGraphy.graphy;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.graphy;
 
 import lombok.Data;
 

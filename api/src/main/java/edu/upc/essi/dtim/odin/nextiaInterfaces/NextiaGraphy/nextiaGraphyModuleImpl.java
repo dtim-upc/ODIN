@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.NextiaGraphy;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy;
 
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import org.apache.commons.lang3.StringEscapeUtils;

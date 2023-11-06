@@ -1,6 +1,6 @@
-package edu.upc.essi.dtim.odin.NextiaGraphy.graphy;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.graphy;
 
-import edu.upc.essi.dtim.odin.NextiaGraphy.vocabulary.Vocabulary;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary.Vocabulary;
 import lombok.Data;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;

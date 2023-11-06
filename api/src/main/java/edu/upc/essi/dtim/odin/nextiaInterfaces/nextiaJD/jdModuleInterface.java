@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.integration;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;

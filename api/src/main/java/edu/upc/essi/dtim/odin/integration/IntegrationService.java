@@ -8,17 +8,18 @@ import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
-import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMSpark;
-import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
-//import edu.upc.essi.dtim.NextiaJD.Discovery;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.bootstrapping.SourceService;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationData;
 import edu.upc.essi.dtim.odin.integration.pojos.JoinAlignment;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleInterface;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleInterface;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
@@ -613,18 +614,8 @@ public class IntegrationService {
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // TODO review
-/*
-        String datalayerPath = "C:\\Users\\victor.asenjo\\Documents\\GitHub\\ODIN\\api\\dbFiles\\dataLayer";
-        DataLayerMaterialized dlm = new DLMSpark(datalayerPath);
-        Discovery discovery = new Discovery(dlm);
-        try {
-            List<Alignment> alignmentsJD = discovery.getAlignments(project.getIntegratedDatasets().get(0), dsB);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
- */
+        jdModuleInterface jdInterface = new jdModuleImpl();
+        jdInterface.getAlignments(project.getIntegratedDatasets().get(0), dsB);
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         switch (dsAs.size()){
@@ -649,8 +640,6 @@ public class IntegrationService {
                 System.out.println("switch default");
         }
 
-        jdModuleInterface jdInterface = new jdModuleImpl();
-        alignments = jdInterface.getAlignments(dsAs.get(0), dsB);
         return  alignments;
 
     }

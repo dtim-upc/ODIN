@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.integration;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI;
 
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;

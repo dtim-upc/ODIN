@@ -1,11 +1,11 @@
-package edu.upc.essi.dtim.odin.NextiaGraphy;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy;
 
 import com.google.gson.Gson;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.odin.NextiaGraphy.graphy.Graphy;
-import edu.upc.essi.dtim.odin.NextiaGraphy.graphy.Links;
-import edu.upc.essi.dtim.odin.NextiaGraphy.graphy.Nodes;
-import edu.upc.essi.dtim.odin.NextiaGraphy.vocabulary.SourceGraph;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.graphy.Graphy;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.graphy.Links;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.graphy.Nodes;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary.SourceGraph;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static edu.upc.essi.dtim.odin.NextiaGraphy.vocabulary.Namespaces.GLOBALSCHEMA;
-import static edu.upc.essi.dtim.odin.NextiaGraphy.vocabulary.Namespaces.SCHEMAINTEGRATION;
+import static edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary.Namespaces.GLOBALSCHEMA;
+import static edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary.Namespaces.SCHEMAINTEGRATION;
 
 /**
  * Class for generating a visual graph representation from RDF data using NextiaGraphy.

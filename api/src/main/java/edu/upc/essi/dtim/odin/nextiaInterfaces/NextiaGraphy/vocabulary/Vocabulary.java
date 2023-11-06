@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.NextiaGraphy.vocabulary;
+package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary;
 
 public enum Vocabulary {
 
