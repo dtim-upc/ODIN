@@ -27,6 +27,8 @@ import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -599,7 +601,7 @@ public class IntegrationService {
         ds1_ds2.add(a);
     }
 
-    public List<Alignment> getAlignments(String projectId, String datasetId){
+    public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
         SourceService sourceService = new SourceService(appConfig, projectService, new RepositoryService(appConfig, projectService));
         Dataset dsB = sourceService.getDatasetById(datasetId);
 
@@ -615,7 +617,10 @@ public class IntegrationService {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // TODO review
         jdModuleInterface jdInterface = new jdModuleImpl();
-        jdInterface.getAlignments(project.getIntegratedDatasets().get(0), dsB);
+        alignments = jdInterface.getAlignments(project.getIntegratedDatasets().get(0), dsB);
+        for (Alignment a: alignments) {
+            System.out.println(a.getSimilarity());
+        }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         switch (dsAs.size()){

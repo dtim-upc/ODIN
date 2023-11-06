@@ -8,6 +8,10 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMDuckDB;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMSpark;
+import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
+import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
@@ -32,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,7 +156,7 @@ public class SourceService {
      * @return A Dataset object with the extracted data.
      * @throws IllegalArgumentException if the file format is not supported.
      */
-    public Dataset extractData(String filePath, String datasetName, String datasetDescription) {
+    public Dataset extractData(String filePath, String datasetName, String datasetDescription) throws SQLException, IOException, ClassNotFoundException {
         if(filePath == null) filePath = "table.sql";
         // Extract the extension of the file from the file path
         String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
@@ -230,23 +235,20 @@ public class SourceService {
 
         //TODO IMPORT NextiaDatalayer
         //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
-        String dataLayerPath = "C:\\Users\\victor.asenjo\\Documents\\GitHub\\ODIN\\api\\dbFiles\\dataLayer";
+        String dataLayerPath = "C:\\temp";
         if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
-            /*
             DataLoading dl = new DataLoading(dataLayerPath);
 
             dl.uploadToLandingZone(dataset);
             dl.close();
 
-            DataLayerMaterialized dlm = new DLMSpark(dataLayerPath);
+            DataLayerMaterialized dlm = new DLMDuckDB(dataLayerPath);
             try {
-                dlm.uploadToFormattedZone(dataset, id);
-                dlm.close();
+                dlm.uploadToFormattedZone(dataset, dataset.getDatasetName());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
 
-             */
             dataset.setDataLayerPath(dataLayerPath);
         }
 

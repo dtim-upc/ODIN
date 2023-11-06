@@ -40,7 +40,7 @@ dependencies {
 
 	/////////////////////////////////////// ORM DEPENDENCIES ///////////////////////////////////////
 	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
-	implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.2.2.Final'
+	implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.0.0.Final'
 
 	// https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api
 	implementation 'org.eclipse.persistence:javax.persistence:2.0.0'
@@ -50,6 +50,9 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/com.h2database/h2
 	runtimeOnly group: 'com.h2database', name: 'h2', version: '2.1.214'
+
+	// https://mvnrepository.com/artifact/io.delta/delta-spark
+	implementation group: 'io.delta', name: 'delta-core_2.13', version: '2.3.0'
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////// JENA DEPENDENCIES ///////////////////////////////////////
@@ -131,17 +134,17 @@ tasks['sonarqube'].dependsOn test
 
 
 //para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
-def nextiaCoreJarPath = '../../NextiaCore/build/libs/nextiacore-0.0.2-SNAPSHOT-uber.jar'
-def nextiaDIJarPath ='../../NextiaDI/source/build/libs/NextiaDI.jar'
-def nextiaBSJarPath ='../../NextiaBS/build/libs/NextiaBS-1.0-SNAPSHOT-uber.jar'
-def nextiaDLJarPath ='../../NextiaDataLayer/build/libs/NextiaDataLayer-0.0.1-SNAPSHOT-uber.jar'
+def nextiaCoreJarPath = "C:\\Projects\\NextiaCore\\build\\libs"
+def nextiaDIJarPath = "C:\\Projects\\NextiaDI\\surce\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar"
+def nextiaBSJarPath = "C:\\Projects\\NextiaBS\\build\\libs"
+def nextiaDLJarPath = "C:\\Projects\\NextiaDataLayer\\build\\libs"
 
 task importExternalJar {
 	doLast {
 		def nextiaCorePath = project(':NextiaCore')
 		def nextiaDIPath = project(':NextiaDI')
 		def nextiaBSPath = project(':NextiaBS')
-		def nextiaDLPath = project(':NextiaDataLayer-gradle')
+		def nextiaDLPath = project(':NextiaDataLayer')
 
 		// Verifica si los archivos JAR existen en las rutas especificadas
 		def nextiaCoreJar = file(nextiaCoreJarPath)

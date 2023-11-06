@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,7 +164,7 @@ public class IntegrationController {
 
 
     @PostMapping(value = "/project/{id}/integration/survey")
-    public ResponseEntity<List<Alignment>> getSurveyAlignments(@PathVariable("id") String projectId, @RequestBody String datasetId){
+    public ResponseEntity<List<Alignment>> getSurveyAlignments(@PathVariable("id") String projectId, @RequestBody String datasetId) throws SQLException, IOException, ClassNotFoundException {
         List<Alignment> alignments  = integrationService.getAlignments(projectId, datasetId);
 
         return new ResponseEntity(alignments, HttpStatus.OK);
