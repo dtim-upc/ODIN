@@ -2,7 +2,6 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
-import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMDuckDB;
 import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaJD.Discovery;
@@ -31,7 +30,6 @@ public class jdModuleImpl implements jdModuleInterface {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        new DLMDuckDB(dataLayerPath);
         Discovery discovery = new Discovery(dlm);
         try {
             List<Alignment> alignmentsJD = discovery.getAlignments(dataset, dsB);
