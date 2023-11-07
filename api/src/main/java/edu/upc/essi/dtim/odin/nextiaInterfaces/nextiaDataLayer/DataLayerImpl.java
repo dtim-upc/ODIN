@@ -34,7 +34,7 @@ public class DataLayerImpl implements DataLayerInterace{
             throw new RuntimeException(e);
         }
         try {
-            dlm.uploadToFormattedZone(dataset, dataset.getDatasetName());
+            dlm.uploadToFormattedZone(dataset, dataset.getDataLayerPath());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

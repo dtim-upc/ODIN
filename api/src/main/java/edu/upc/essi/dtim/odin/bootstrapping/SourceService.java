@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,17 +94,6 @@ public class SourceService {
             if (multipartFile.isEmpty()) {
                 throw new RuntimeException("Failed to store empty file.");
             }
-
-            // Generate a random 16-character string as part of the filename
-            /*
-            final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            StringBuilder sb = new StringBuilder(16);
-            SecureRandom random = new SecureRandom();
-            for (int i = 0; i < 16; i++) {
-                int randomIndex = random.nextInt(characters.length());
-                sb.append(characters.charAt(randomIndex));
-            }
-             */
 
             String originalFilename = multipartFile.getOriginalFilename();
 
@@ -239,12 +229,26 @@ public class SourceService {
         //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
         if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
             DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
+            dataset.setDataLayerPath(generateUUID());
             dlInterface.uploadToDataLayer(dataset);
         }
 
         dataset = saveDataset(dataset);
 
         return dataset;
+    }
+
+    private String generateUUID() {
+        // Generate a random 16-character string as part of the filename
+        final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder(16);
+        SecureRandom random = new SecureRandom();
+        for (int i = 0; i < 16; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            sb.append(characters.charAt(randomIndex));
+        }
+
+        return sb.toString();
     }
 
     /**
