@@ -243,6 +243,7 @@ public class SourceService {
         final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder(16);
         SecureRandom random = new SecureRandom();
+        sb.append("PREFIX");
         for (int i = 0; i < 16; i++) {
             int randomIndex = random.nextInt(characters.length());
             sb.append(characters.charAt(randomIndex));
