@@ -616,7 +616,7 @@ public class IntegrationService {
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // TODO review
-        jdModuleInterface jdInterface = new jdModuleImpl();
+        jdModuleInterface jdInterface = new jdModuleImpl(appConfig);
         alignments = jdInterface.getAlignments(project.getIntegratedDatasets().get(0), dsB);
         for (Alignment a: alignments) {
             System.out.println(a.getSimilarity());

@@ -238,7 +238,7 @@ public class SourceService {
         //TODO IMPORT NextiaDatalayer
         //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
         if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
-            DataLayerInterace dlInterface = new DataLayerImpl();
+            DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
             dlInterface.uploadToDataLayer(dataset);
         }
 

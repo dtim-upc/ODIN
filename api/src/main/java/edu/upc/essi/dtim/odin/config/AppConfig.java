@@ -37,4 +37,7 @@ public class AppConfig {
      */
     @Value("${dataStorage.JenaPath}")
     private String JenaPath;
+
+    @Value("${dataStorage.DataLayerPath}")
+    private String DataLayerPath;
 }
