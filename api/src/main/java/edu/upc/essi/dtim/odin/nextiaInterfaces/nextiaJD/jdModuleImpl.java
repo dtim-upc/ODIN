@@ -3,7 +3,6 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMDuckDB;
-import edu.upc.essi.dtim.NextiaDataLayer.materialized.DLMSpark;
 import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaJD.Discovery;
