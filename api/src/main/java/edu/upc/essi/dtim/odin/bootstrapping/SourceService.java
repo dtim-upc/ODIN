@@ -767,9 +767,8 @@ public class SourceService {
             DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
             dataset.setDataLayerPath(generateUUID());
             dlInterface.uploadToDataLayer(dataset);
+            saveDataset(dataset);
         }
-
-        saveDataset(dataset);
     }
 }
 
