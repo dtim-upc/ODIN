@@ -360,21 +360,21 @@ public class IntegrationService {
 
     public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
         SourceService sourceService = new SourceService(appConfig, projectService, new RepositoryService(appConfig, projectService));
-        Dataset dsB = sourceService.getDatasetById(datasetId);
-
         Project project = getProject(projectId);
-        List<Dataset> dsAs = project.getIntegratedDatasets();
+
+        Dataset datasetB = sourceService.getDatasetById(datasetId);
+        Dataset datasetA = sourceService.getDatasetById(project.getIntegratedDatasets().get(0).getId());
 
         Graph graphA = project.getIntegratedGraph();
 
-        Graph graphB = dsB.getLocalGraph();
+        Graph graphB = datasetB.getLocalGraph();
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // TODO review
         jdModuleInterface jdInterface = new jdModuleImpl(appConfig);
 
         List<Alignment> alignments = new ArrayList<>();
-        alignments = jdInterface.getAlignments(project.getIntegratedDatasets().get(0), dsB);
+        alignments = jdInterface.getAlignments(datasetA, datasetB);
 
         List<Alignment> alignmentsWithFilter = new ArrayList<>();
         float minSimilarity = 0.3F;
@@ -386,8 +386,8 @@ public class IntegrationService {
                 a.setL(a.getAttributeA().getName()+"_"+a.getAttributeB().getName());
                 a.setType("datatype");
                 a.setIdentifier(true);
-                a.setIriA(a.getAttributeA().getName());
-                a.setIriB(a.getAttributeB().getName());
+                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/"+datasetA.getId()+"/"+a.getAttributeA().getName());
+                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/"+datasetB.getId()+"/"+a.getAttributeB().getName());
                 alignmentsWithFilter.add(a);
             }
         }

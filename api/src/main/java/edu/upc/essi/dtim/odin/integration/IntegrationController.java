@@ -52,6 +52,15 @@ public class IntegrationController {
                                                                  @RequestBody IntegrationData iData) {
         logger.info("INTEGRATING temporal with project: "+projectId);
 
+        for(Alignment a : iData.getAlignments()){
+            System.out.println(a.getIriA()); //http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/201/col7
+            System.out.println(a.getIriB()); //http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/153/col2
+            System.out.println(a.getL()); //col7_col2
+            System.out.println(a.getLabelA()); //col7
+            System.out.println(a.getLabelB()); //col2
+            System.out.println(a.getIriL()); //http://www.essi.upc.edu/DTIM/NextiaDI/col7_col2
+        }
+
         Project project = integrationService.getProject(projectId);
 
         int totalDatasets = 0;
