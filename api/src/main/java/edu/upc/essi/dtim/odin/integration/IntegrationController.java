@@ -164,7 +164,7 @@ public class IntegrationController {
 
 
     @PostMapping(value = "/project/{id}/integration/survey")
-    public ResponseEntity<List<Alignment>> getSurveyAlignments(@PathVariable("id") String projectId, @RequestBody String datasetId) throws SQLException, IOException, ClassNotFoundException {
+    public ResponseEntity<List<Alignment>> getAutomaticAlignments(@PathVariable("id") String projectId, @RequestBody String datasetId) throws SQLException, IOException, ClassNotFoundException {
         List<Alignment> alignments  = integrationService.getAlignments(projectId, datasetId);
 
         return new ResponseEntity(alignments, HttpStatus.OK);
