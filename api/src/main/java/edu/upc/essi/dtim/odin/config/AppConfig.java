@@ -40,4 +40,7 @@ public class AppConfig {
 
     @Value("${dataStorage.DataLayerPath}")
     private String DataLayerPath;
+
+    @Value("${dataStorage.DataLayerTechnology}")
+    private String DataLayerTechnology;
 }
