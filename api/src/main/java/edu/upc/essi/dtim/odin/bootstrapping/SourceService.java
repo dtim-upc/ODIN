@@ -221,16 +221,6 @@ public class SourceService {
         dataset = saveDataset(dataset);
         System.out.println(id);
 
-        //TODO IMPORT NextiaDatalayer
-        //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
-        if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
-            DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
-            dataset.setDataLayerPath(generateUUID());
-            dlInterface.uploadToDataLayer(dataset);
-        }
-
-        dataset = saveDataset(dataset);
-
         return dataset;
     }
 
@@ -769,6 +759,17 @@ public class SourceService {
 
         // Save the updated Dataset and return it
         return saveDataset(dataset);
+    }
+
+    public void uploadToDataLayer(Dataset dataset) {
+        //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
+        if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
+            DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
+            dataset.setDataLayerPath(generateUUID());
+            dlInterface.uploadToDataLayer(dataset);
+        }
+
+        saveDataset(dataset);
     }
 }
 

@@ -181,6 +181,8 @@ public class SourceController {
 
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
+
+                    sourceService.uploadToDataLayer(datasetWithGraph);
                 }
             } else {
                 // Iterate through the list of MultipartFiles to handle each file
@@ -224,6 +226,8 @@ public class SourceController {
 
                     // Save graph into the database
                     sourceService.saveGraphToDatabase(graph);
+
+                    sourceService.uploadToDataLayer(datasetWithGraph);
 
                     //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
                 }
