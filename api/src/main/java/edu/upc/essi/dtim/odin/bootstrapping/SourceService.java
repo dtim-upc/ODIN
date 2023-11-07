@@ -22,6 +22,8 @@ import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleInterface;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterace;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
@@ -235,21 +237,9 @@ public class SourceService {
 
         //TODO IMPORT NextiaDatalayer
         //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
-        String dataLayerPath = "C:\\temp";
         if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
-            DataLoading dl = new DataLoading(dataLayerPath);
-
-            dl.uploadToLandingZone(dataset);
-            dl.close();
-
-            DataLayerMaterialized dlm = new DLMDuckDB(dataLayerPath);
-            try {
-                dlm.uploadToFormattedZone(dataset, dataset.getDatasetName());
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
-            dataset.setDataLayerPath(dataLayerPath);
+            DataLayerInterace dlInterface = new DataLayerImpl();
+            dlInterface.uploadToDataLayer(dataset);
         }
 
         dataset = saveDataset(dataset);
