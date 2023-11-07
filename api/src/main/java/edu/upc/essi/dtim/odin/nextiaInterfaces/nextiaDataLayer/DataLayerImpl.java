@@ -18,10 +18,9 @@ public class DataLayerImpl implements DataLayerInterace{
 
     @Override
     public void uploadToDataLayer(Dataset dataset) {
-        DataLoading dl = new DataLoading(dataLayerPath);
+        DataLoading dl = DataLoadingSingleton.getInstance(dataLayerPath);
 
         dl.uploadToLandingZone(dataset);
-        dl.close();
 
         DataLayerMaterialized dlm = null;
         try {
