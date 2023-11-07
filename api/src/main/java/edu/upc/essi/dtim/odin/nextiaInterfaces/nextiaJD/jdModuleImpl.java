@@ -23,7 +23,7 @@ public class jdModuleImpl implements jdModuleInterface {
     }
 
     @Override
-    public List<Alignment> getAlignments(Dataset dataset, Dataset dsB) throws SQLException, IOException, ClassNotFoundException {
+    public List<Alignment> getAlignments(Dataset dataset, Dataset dsB) {
         DataLayerMaterialized dlm = null;
         try {
             dlm = DataLayerFactory.getInstance(technology, dataLayerPath);
