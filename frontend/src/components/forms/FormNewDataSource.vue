@@ -3,8 +3,10 @@
     <q-card style="width: 400px; max-width: 80vw">
 
       <q-card-section>
+        <q-spinner-facebook v-if="loading" color="light-blue" size="25em" align="center"/>
+
         <!-- Resto del contenido con desplazamiento -->
-        <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
+        <div v-else style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
           <div class="text-h4">Create new dataset</div>
           <div class="text-h5">Parent Repository: {{ storeDS.selectedRepositoryName }}</div>
@@ -388,6 +390,7 @@ const router = useRouter()
 
 const form = ref(null)
 const notify = useNotify()
+const loading = ref(false); // Variable para controlar la carga
 
 defineExpose({
   form
@@ -425,6 +428,8 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 }
 
 const onSubmit = () => {
+  loading.value = true; // Activa la carga
+
   // Check if uploadedItems is empty
   if (uploadedItems.value.length === 0) {
     // Display a notification indicating that at least one file should be added
@@ -471,6 +476,7 @@ const onSubmit = () => {
 }
 
 const successCallback = (datasource) => {
+  loading.value = false; // Desactiva la carga después de la operación
 
   console.log("success callback")
 

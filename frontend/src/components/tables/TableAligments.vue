@@ -1,6 +1,7 @@
 <template>
+  <q-spinner-pie v-if="isLoading" color="orange" size="51em"/>
 
-  <q-table :rows="integrationStore.alignments" :columns="columns" :class="{ 'no-shadow': no_shadow }"
+  <q-table v-else :rows="integrationStore.alignments" :columns="columns" :class="{ 'no-shadow': no_shadow }"
            :visible-columns="visibleCols" id="TableAlignments"
            row-key="uriA"
            virtual-scroll
@@ -24,7 +25,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="integrationStore.getAlignmentsSurvey()">
+            <q-item clickable v-close-popup @click="getAutomaticAlignments">
               <q-item-section>
                 <q-item-label>Automatic alignments</q-item-label>
               </q-item-section>
@@ -143,6 +144,9 @@ onMounted(() => {
   integrationStore.init()
 })
 
+const isLoading = ref(false);
+
+
 // -------------------------------------------------------------
 //                          C
 // -------------------------------------------------------------
@@ -204,6 +208,19 @@ const setManualView = (view) => {
   alignmentView.value = view
   show_dialog.value = true
 }
+const getAutomaticAlignments = async () => {
+  isLoading.value = true; // Set loading state to true
+
+  try {
+    // Make your asynchronous request here
+    await integrationStore.getAlignmentsSurvey();
+  } catch (error) {
+    // Handle any errors here
+  } finally {
+    isLoading.value = false; // Set loading state back to false
+  }
+};
+
 </script>
 
 <style lang="scss">
