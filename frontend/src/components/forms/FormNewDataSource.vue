@@ -3,7 +3,7 @@
     <q-card style="width: 400px; max-width: 80vw">
 
       <q-card-section>
-        <q-spinner-facebook v-if="loading" color="light-blue" size="25em" align="center"/>
+        <q-spinner-pie v-if="loading" color="light-blue" size="5em" align="center"/>
 
         <!-- Resto del contenido con desplazamiento -->
         <div v-else style="overflow-y: auto; max-height: calc(80vh - 140px);">
