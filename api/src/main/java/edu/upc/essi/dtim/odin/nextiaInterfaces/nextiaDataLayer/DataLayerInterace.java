@@ -7,4 +7,6 @@ public interface DataLayerInterace {
      * @param dataset The dataset to upload to DataLayer
      */
     void uploadToDataLayer(Dataset dataset);
+
+    void deleteDataset(String dataLayerPath);
 }

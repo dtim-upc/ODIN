@@ -770,6 +770,34 @@ public class SourceService {
             saveDataset(dataset);
         }
     }
+
+    public void deleteDatasetFromDataLayer(String id) {
+        Dataset datasetToDelete = getDatasetById(id);
+        if(datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset){
+            //delete from datalayer
+            DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
+            dlInterface.deleteDataset(datasetToDelete.getDataLayerPath());
+        }
+    }
+
+    public void deleteDatasetFile(String id) {
+        Dataset datasetToDelete = getDatasetById(id);
+        String filePath = null;
+        if(datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset){
+            //delete from the given path
+            if (datasetToDelete instanceof CsvDataset) filePath = ((CsvDataset) datasetToDelete).getPath(); // Replace with the actual file path
+            if (datasetToDelete instanceof JsonDataset) filePath = ((JsonDataset) datasetToDelete).getPath(); // Replace with the actual file path
+            
+            Path path = Paths.get(filePath);
+
+            try {
+                Files.delete(path);
+                System.out.println("File deleted successfully.");
+            } catch (IOException e) {
+                System.err.println("Failed to delete the file: " + e.getMessage());
+            }
+        }
+    }
 }
 
 

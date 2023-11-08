@@ -39,4 +39,10 @@ public class DataLayerImpl implements DataLayerInterace{
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void deleteDataset(String dataLayerPath) {
+        //todo
+
+    }
 }
