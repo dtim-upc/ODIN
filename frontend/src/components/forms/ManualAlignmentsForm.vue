@@ -125,6 +125,7 @@ const alignment = reactive({
   trueType: '',
   shortType: '',
   integratedLabel: '',
+  similarity:1.0,
   resourceA: {
     name: '',
     label: '',
@@ -137,24 +138,6 @@ const alignment = reactive({
   }
 
 })
-
-
-// const resourceA =  reactive({
-//     dsID: '',
-//     name:'',
-//     label: '',
-//     iri: '',
-//     type: ''
-// })
-
-// const resourceB =  reactive({
-//     dsID: '',
-//     name:'',
-//     label: '',
-//     iri: '',
-//     type: ''
-// })
-
 
 const alertAlignmentType = ref(false)
 const fullscreen = ref(false)
@@ -197,24 +180,16 @@ const resetRB = () => {
   if (alignment.resourceA.iri == '') {
     alignment.type = ''
     alignment.trueType = '',
-      alignment.shortType = '',
-      alignment.integratedLabel = ''
+    alignment.shortType = '',
+    alignment.integratedLabel = ''
   }
 }
 
 
 const addAlignment = () => {
-
   integrationStore.addAligment(alignment, true)
   resetRA()
   resetRB()
-
-  //   this.$emit("add-alignment", {
-  //     row: {iriA: this.selectedA_iri, iriB: this.selectedB_iri, l: this.integratedLabel, type: this.selectedA_type, identifier:this.identifier}
-  //   })
-  //   this.resetLabelsA()
-  //   this.resetLabelsB()
-
 }
 
 

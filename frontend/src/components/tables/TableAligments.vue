@@ -153,7 +153,15 @@ const columns = [
   {name: "labelB", label: "Label B", align: "center", field: "labelB", sortable: true,},
   {name: "labelIntegrated", label: "Integrated name", align: "center", field: "l", sortable: true,},
   {name: "type", label: "Type", align: "center", field: "type", sortable: true,},
-  {name: "similarity", label: "Similarity", align: "center", field: "similarity", sortable: true,},
+  {name: "similarity",
+    label: "Similarity",
+    align: "center",
+    field: "similarity",
+    sortable: true,
+    format: (value) => {
+      return `${(value * 100).toFixed(2)}%`;
+    },
+  },
   {name: "shortType", label: "ShortType", align: "center", field: "shortType", sortable: true,},
   // {name: "identifier", label: "Identifier", align: "center", field: "identifier", sortable: true,},
   {name: "actions", label: "Actions", align: "center", field: "actions", sortable: false,},

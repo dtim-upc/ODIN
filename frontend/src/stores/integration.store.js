@@ -324,6 +324,7 @@ export const useIntegrationStore = defineStore('integration', {
         a.labelB = aligment.resourceB.label
         a.l = aligment.integratedLabel
         a.type = aligment.type
+        a.similarity = aligment.similarity
 
       } else {
         a = aligment
