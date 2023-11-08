@@ -43,6 +43,8 @@ public class DataLayerImpl implements DataLayerInterace{
     @Override
     public void deleteDataset(String dataLayerPath) {
         //todo
+        DataLoading dl = DataLoadingSingleton.getInstance(dataLayerPath);
 
+        //dl.deleteFromLandingZone(dataLayerPath);
     }
 }
