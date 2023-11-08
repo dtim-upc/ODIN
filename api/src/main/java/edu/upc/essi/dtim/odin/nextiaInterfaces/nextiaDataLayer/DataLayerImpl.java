@@ -1,7 +1,7 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaDataLayer.materialized.DataLayerMaterialized;
+import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
 import edu.upc.essi.dtim.odin.config.AppConfig;
@@ -21,14 +21,15 @@ public class DataLayerImpl implements DataLayerInterace{
 
     @Override
     public void uploadToDataLayer(Dataset dataset) {
-        DataLoading dl = DataLoadingSingleton.getInstance(dataLayerPath);
+        DataLoading dloading = DataLoadingSingleton.getInstance(dataLayerPath);
 
-        dl.uploadToLandingZone(dataset);
+        System.out.println(dataset.getWrapper());
+        dloading.uploadToLandingZone(dataset);
 
-        DataLayerMaterialized dlm = null;
+        DataLayer dl = null;
         try {
-            dlm = DataLayerFactory.getInstance(technology,dataLayerPath);
-            dlm.uploadToFormattedZone(dataset, dataset.getDataLayerPath());
+            dl = DataLayerFactory.getInstance(technology,dataLayerPath);
+            dl.uploadToFormattedZone(dataset, dataset.getDataLayerPath());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {

@@ -135,9 +135,10 @@ tasks['sonarqube'].dependsOn test
 
 //para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
 def nextiaCoreJarPath = "C:\\Projects\\NextiaCore\\build\\libs"
-def nextiaDIJarPath = "C:\\Projects\\NextiaDI\\surce\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar"
+def nextiaDIJarPath = "C:\\Projects\\NextiaDI\\source\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar"
 def nextiaBSJarPath = "C:\\Projects\\NextiaBS\\build\\libs"
 def nextiaDLJarPath = "C:\\Projects\\NextiaDataLayer\\build\\libs"
+//def nextiaJDJarPath = "C:\\Projects\\NextiaJD2\\build\\libs"
 
 task importExternalJar {
 	doLast {
@@ -145,12 +146,14 @@ task importExternalJar {
 		def nextiaDIPath = project(':NextiaDI')
 		def nextiaBSPath = project(':NextiaBS')
 		def nextiaDLPath = project(':NextiaDataLayer')
+//		def nextiaJDPath = project(':NextiaJD')
 
 		// Verifica si los archivos JAR existen en las rutas especificadas
 		def nextiaCoreJar = file(nextiaCoreJarPath)
 		def nextiaDIJar = file(nextiaDIJarPath)
 		def nextiaBSJar = file(nextiaBSJarPath)
 		def nextiaDLJar = file(nextiaDLJarPath)
+//		def nextiaJDJar = file(nextiaJDJarPath)
 
 
 		if (!nextiaCoreJar.exists()) {
@@ -201,6 +204,18 @@ task importExternalJar {
 			}
 		}
 
+//		if (!nextiaJDJar.exists()) {
+//			nextiaJDPath.tasks.uberJar.dependsOn {
+//				println "Ejecutando uberJar para NextiaJD..."
+//			}
+//			nextiaJDPath.tasks.uberJar.execute()
+//			nextiaJDPath.tasks.uberJar.get()
+//
+//			if (!nextiaJDar.exists()) {
+//				throw new GradleException("No se pudo generar el archivo JAR para NextiaJD.")
+//			}
+//		}
+
 		// Copiar los JAR después de asegurarse de que existen
 		copy {
 			from nextiaCoreJarPath
@@ -225,5 +240,11 @@ task importExternalJar {
 			into "../api/lib"
 			rename { 'NextiaDataLayer.jar' }
 		}
+
+//		copy {
+//			from nextiaJDJarPath
+//			into "../api/lib"
+//			rename { 'NextiaJD.jar' }
+//		}
 	}
 }
