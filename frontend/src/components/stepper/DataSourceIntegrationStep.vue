@@ -11,7 +11,7 @@
 
     <!-- v-if="integrationStore.project.numberOfDS == '0'" -->
     <!-- <div> -->
-    <q-step :name="2" title="Preview data source" icon="settings" :done="step > 1" style="min-height: 70vh;height: 1px"
+    <q-step :name="2" title="Preview dataset" icon="settings" :done="step > 1" style="min-height: 70vh;height: 1px"
             id="previewSourceStep">
       <!-- For each ad campaign that you create, you can control how much you're willing to -->
       <!-- spend on clicks and conversions, which networks and geographical locations you want -->

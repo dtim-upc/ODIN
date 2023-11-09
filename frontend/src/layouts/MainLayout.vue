@@ -59,8 +59,8 @@
           <q-item manual-focus>
             <q-item-section avatar>
               <q-btn flat padding="xs" icon="mdi-database" :to="{name:'repositories'}"
-                     :color=" ['repositories', 'dsIntegration'].includes($route.name) ? 'primary600': 'neutral500' "
-                     :class="{ activebg:  ['repositories', 'dsIntegration'].includes($route.name) }">
+                     :color=" ['repositories'].includes($route.name) ? 'primary600': 'neutral500' "
+                     :class="{ activebg:  ['repositories'].includes($route.name) }">
                 <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade"
                            transition-hide="fade">
                   Repositories
