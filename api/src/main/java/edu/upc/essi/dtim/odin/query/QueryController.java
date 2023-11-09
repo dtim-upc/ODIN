@@ -28,10 +28,25 @@ public class QueryController {
     @PostMapping(value="/query/{id}/graphical")
     public ResponseEntity<RDFSResult> queryFromGraphicalToSPARQL(@PathVariable("id") String id,
                                                                  @RequestBody QueryDataSelection body) {
-
         LOGGER.info("[POST /query/fromGraphicalToSPARQL/]");
 
-        RDFSResult res = queryService.getQueryResult();
+        System.out.println(body.getGraphID());
+        System.out.println(body.getGraphType());
+
+        System.out.println("CLASS 0");
+        System.out.println(body.getClasses().get(0).getIri());
+        System.out.println(body.getClasses().get(0).getType());
+        System.out.println(body.getClasses().get(0).getIsIntegrated());
+
+        System.out.println("PROPERTY 0");
+        System.out.println(body.getProperties().get(0).getDomain());
+        System.out.println(body.getProperties().get(0).getRange());
+        System.out.println(body.getProperties().get(0).getIri());
+        System.out.println(body.getProperties().get(0).getIsIntegrated());
+        System.out.println(body.getProperties().get(0).getType());
+
+
+        RDFSResult res = queryService.getQueryResult(body);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

@@ -167,7 +167,7 @@ const rows = ref([]);
 
 
 const showResultQuery = (columnsQ, rowsQ) => {
-  notify.positive(columnsQ);
+  notify.positive("Query done");
   const qcol = []
   for (const col in columnsQ) {
     var c = new Object();
