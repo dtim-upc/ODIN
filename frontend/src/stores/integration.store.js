@@ -21,7 +21,8 @@ export const useIntegrationStore = defineStore('integration', {
     datasources: [], // these ds are in temporal landing
     selectedDS: [], //selected ds. It is an array because of table requirement input, but it will always contain only one element
     alignments: [],
-    joinAlignments: []
+    joinAlignments: [],
+    chargingAlignments:false
     // {"domainLabelA":"person", "domainLabelB":"country", "rightArrow":"true" ,"iriA": "A", "iriB": "B", "labelA": "lA", "labelB": "lB", "l": "i2", "type":"property" }]
   }),
 
@@ -448,6 +449,7 @@ export const useIntegrationStore = defineStore('integration', {
 
         if (response.status === 200) {
           this.alignments = response.data
+          this.chargingAlignments = false
         }
       }).catch((error) => {
         console.log("error alignments survye ", error)

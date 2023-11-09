@@ -1,6 +1,7 @@
 <template>
-  <q-spinner-pie v-if="isLoading" color="orange" size="51em"/>
-
+  <div v-if="integrationStore.chargingAlignments" class="center">
+    <q-spinner-pie v-if="integrationStore.chargingAlignments" color="primary" size="25em" align="center"/>
+  </div>
   <q-table v-else :rows="integrationStore.alignments" :columns="columns" :class="{ 'no-shadow': no_shadow }"
            :visible-columns="visibleCols" id="TableAlignments"
            row-key="uriA"
@@ -144,9 +145,6 @@ onMounted(() => {
   integrationStore.init()
 })
 
-const isLoading = ref(false);
-
-
 // -------------------------------------------------------------
 //                          C
 // -------------------------------------------------------------
@@ -209,7 +207,7 @@ const setManualView = (view) => {
   show_dialog.value = true
 }
 const getAutomaticAlignments = async () => {
-  isLoading.value = true; // Set loading state to true
+  integrationStore.chargingAlignments = true;
 
   try {
     // Make your asynchronous request here
@@ -217,7 +215,6 @@ const getAutomaticAlignments = async () => {
   } catch (error) {
     // Handle any errors here
   } finally {
-    isLoading.value = false; // Set loading state back to false
   }
 };
 
@@ -228,5 +225,13 @@ const getAutomaticAlignments = async () => {
   .q-table__middle {
     flex: unset !important;
   }
+}
+
+.center {
+  margin: auto;
+  text-align: center;
+  align-items: center;
+  vertical-align: middle;
+  padding: 90px 0px;
 }
 </style>
