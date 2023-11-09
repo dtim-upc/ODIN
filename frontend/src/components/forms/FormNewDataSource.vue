@@ -1,12 +1,11 @@
 <template>
   <q-dialog v-model="showS" @hide="props.show=false" :key="showS">
-    <q-card style="width: 400px; max-width: 80vw">
+    <q-spinner-pie v-if="loading" color="light-blue" size="5em" align="center"/>
 
-      <q-card-section>
-        <q-spinner-pie v-if="loading" color="light-blue" size="5em" align="center"/>
-
+    <q-card v-else style="width: 400px; max-width: 80vw">
+      <q-card-section >
         <!-- Resto del contenido con desplazamiento -->
-        <div v-else style="overflow-y: auto; max-height: calc(80vh - 140px);">
+        <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
           <div class="text-h4">Create new dataset</div>
           <div class="text-h5">Parent Repository: {{ storeDS.selectedRepositoryName }}</div>
@@ -482,7 +481,6 @@ const successCallback = (datasource) => {
 
   notify.positive(`Dataset/s successfully uploaded`)
   onReset()
-  form.value.resetValidation()
 
   showS.value = false;
 
