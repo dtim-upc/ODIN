@@ -177,7 +177,9 @@ public class IntegrationController {
         logger.info("AUTOMATIC ALIGNMENTS PETITION RECEIVED");
         List<Alignment> alignments  = integrationService.getAlignments(projectId, datasetId);
         logger.info("AUTOMATIC ALIGNMENTS SENT");
-        return new ResponseEntity(alignments, HttpStatus.OK);
+
+        if(alignments.size() == 0) return new ResponseEntity(alignments, HttpStatus.NO_CONTENT);
+        else return new ResponseEntity(alignments, HttpStatus.OK);
     }
 
 }

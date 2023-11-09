@@ -449,7 +449,11 @@ export const useIntegrationStore = defineStore('integration', {
 
         if (response.status === 200) {
           this.alignments = response.data
+          notify.positive(response.data.length + " automatic alignments found")
           this.chargingAlignments = false
+        } else if (response.status === 204){
+          this.chargingAlignments = false
+          notify.negative("No automatic alignments found")
         }
       }).catch((error) => {
         console.log("error alignments survye ", error)
