@@ -13,15 +13,15 @@
 
 
     <q-btn-group spread style="flex-direction: column;position:absolute;" class="fixed-bottom-right q-ma-md">
-      <q-btn v-if="props.enableQuery" color="white" text-color="black" icon="o_search" @click="querySelection"
+      <q-btn v-if="props.enableQuery" color="white" text-color="black" icon="o_search" @click="querySelection" label="SEND QUERY"
              style="padding: 4px 8px"/>
-      <q-btn v-if="props.enableSelection" color="white" text-color="black" icon="o_highlight_alt"
+      <q-btn v-if="props.enableSelection" color="white" text-color="black" icon="o_highlight_alt" label="DRAW SELECTION"
              @click="enableSelection" style="padding: 4px 8px"/>
-      <q-btn color="white" text-color="black" :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+      <q-btn color="white" text-color="black" :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" :label="$q.fullscreen.isActive ? 'SKIP FULLSCREEN' : 'fullscreen'"
              @click="toggleFullscreen" style="padding: 4px 8px"/>
-      <q-btn color="white" text-color="black" icon="filter_center_focus" @click="center" style="padding: 4px 8px"/>
-      <q-btn color="white" text-color="black" icon="add" @click="zoomIn" style="padding: 4px 8px"/>
-      <q-btn color="white" text-color="black" icon="remove" @click="zoomOut" style="padding: 4px 8px"/>
+      <q-btn color="white" text-color="black" icon="filter_center_focus" @click="center" style="padding: 4px 8px" label="Center schema"/>
+      <q-btn color="white" text-color="black" icon="add" @click="zoomIn" style="padding: 4px 8px" label="ZOOM IN"/>
+      <q-btn color="white" text-color="black" icon="remove" @click="zoomOut" style="padding: 4px 8px" label="ZOOM OUT"/>
     </q-btn-group>
 
     <!-- </div> -->
