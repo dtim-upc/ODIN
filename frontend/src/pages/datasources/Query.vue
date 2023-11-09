@@ -167,15 +167,17 @@ const rows = ref([]);
 
 
 const showResultQuery = (columnsQ, rowsQ) => {
-
+  notify.positive(columnsQ);
   const qcol = []
   for (const col in columnsQ) {
     var c = new Object();
+
     c.name = columnsQ[col];
     c.label = columnsQ[col];
     c.field = columnsQ[col];
     c.align = "center"
     c.sortable = true;
+
     qcol.push(c)
   }
   columns.value = qcol;
