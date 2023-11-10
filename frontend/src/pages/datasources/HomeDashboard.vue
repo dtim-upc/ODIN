@@ -76,7 +76,7 @@
                 </q-item-section>
 
                 <q-item-section>
-                  <q-item-label>Upload a second data source</q-item-label>
+                  <q-item-label>Upload a second dataset</q-item-label>
                   <q-item-label caption>This will automatically define an schema</q-item-label>
                 </q-item-section>
 
