@@ -155,7 +155,7 @@ const columns = [
   {
     name: "datasets",
     required: true,
-    label: "# Datasources",
+    label: "# Datasets",
     align: "center",
     field: "datasets",
     sortable: true,
