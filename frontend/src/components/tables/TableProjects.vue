@@ -159,7 +159,7 @@ const columns = [
     align: "center",
     field: "datasets",
     sortable: true,
-    format: (value, row) => value.length
+    format: (value, row) => row.repositories.reduce((total, repo) => total + repo.datasets.length, 0)
   },
   {name: "createdBy", required: true, label: "Created by", align: "center", field: "createdBy", sortable: true,},
   {name: "privacy", required: true, label: "Privacy", align: "center", field: "projectPrivacy", sortable: true,}
