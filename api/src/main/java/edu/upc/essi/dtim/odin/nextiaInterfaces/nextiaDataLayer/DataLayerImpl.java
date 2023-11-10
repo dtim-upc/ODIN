@@ -19,6 +19,16 @@ public class DataLayerImpl implements DataLayerInterace{
         this.technology = appConfig.getDataLayerTechnology();
     }
 
+    private DataLayer getDataLayer() {
+        DataLayer dl;
+        try {
+            dl = DataLayerFactory.getInstance(technology,dataLayerPath);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return dl;
+    }
+
     @Override
     public void uploadToDataLayer(Dataset dataset) {
         DataLoading dloading = DataLoadingSingleton.getInstance(dataLayerPath);
@@ -26,26 +36,21 @@ public class DataLayerImpl implements DataLayerInterace{
         System.out.println(dataset.getWrapper());
         dloading.uploadToLandingZone(dataset);
 
-        DataLayer dl = null;
+        DataLayer dl = getDataLayer();
         try {
-            dl = DataLayerFactory.getInstance(technology,dataLayerPath);
             dl.uploadToFormattedZone(dataset, dataset.getDataLayerPath());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public void deleteDataset(String dataLayerPath) {
-        //todo
-        DataLoading dl = DataLoadingSingleton.getInstance(dataLayerPath);
-
-        //dl.deleteFromLandingZone(dataLayerPath);
+        DataLayer dl = getDataLayer();
+        try {
+            dl.RemoveFromFormattedZone(dataLayerPath);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
