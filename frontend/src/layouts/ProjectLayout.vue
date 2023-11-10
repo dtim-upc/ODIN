@@ -4,10 +4,8 @@
     <q-header bordered class="header_bg text-black">
       <q-toolbar>
         <q-toolbar-title>
-          <!-- <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-          </q-avatar> -->
-          ODIN
+          <q-img src="~assets/ODIN.svg" style="max-width: 180px; max-height: 35px; " fit="contain"/>
+
         </q-toolbar-title>
         <q-space/>
         <div class="q-gutter-sm row items-center no-wrap">
