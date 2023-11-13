@@ -1,7 +1,5 @@
 package edu.upc.essi.dtim.odin.query;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
 import edu.upc.essi.dtim.odin.query.pojos.RDFSResult;
 import org.slf4j.Logger;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-
 @RestController
 public class QueryController {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryController.class);
@@ -25,7 +21,7 @@ public class QueryController {
     private QueryService queryService;
 
     //    fromGraphicalToSPARQL
-    @PostMapping(value="/query/{id}/graphical")
+    @PostMapping(value = "/query/{id}/graphical")
     public ResponseEntity<RDFSResult> queryFromGraphicalToSPARQL(@PathVariable("id") String id,
                                                                  @RequestBody QueryDataSelection body) {
         LOGGER.info("[POST /query/fromGraphicalToSPARQL/]");

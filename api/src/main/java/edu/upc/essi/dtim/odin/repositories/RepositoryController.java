@@ -65,17 +65,16 @@ public class RepositoryController {
         String databaseType = requestData.get("databaseType");
 
         // Crear una URL de conexión personalizada con hostname, port y databasename
-        String customUrl = "jdbc:"+databaseType+"://" + hostname + ":" + port + "/" + databasename;
+        String customUrl = "jdbc:" + databaseType + "://" + hostname + ":" + port + "/" + databasename;
 
         return repositoryService.testConnection(url, username, password) || repositoryService.testConnection(customUrl, username, password);
     }
 
     @GetMapping(value = "/{id}/tables")
-    public ResponseEntity<Object> retrieveDBtables(@PathVariable("id") String repositoryId)
-    {
-        logger.info("GET TABLES RECEIVED FOR REPOSITORY: "+repositoryId);
+    public ResponseEntity<Object> retrieveDBtables(@PathVariable("id") String repositoryId) {
+        logger.info("GET TABLES RECEIVED FOR REPOSITORY: " + repositoryId);
 
-        try{
+        try {
             List<String> tables = repositoryService.getDatabaseTables(repositoryId);
 
             List<TableInfo> table = repositoryService.getDatabaseTablesInfo(repositoryId);
@@ -90,9 +89,8 @@ public class RepositoryController {
 
     @PostMapping(value = "/project/{id}/newRepository")
     public ResponseEntity<Object> addRepository(@PathVariable("id") String projectId,
-                                                @RequestBody Map<String, String> requestData)
-    {
-        try{
+                                                @RequestBody Map<String, String> requestData) {
+        try {
             // Accede a los campos específicos del objeto JSON
             String repositoryName = requestData.get("repositoryName");
             String repositoryDescription = requestData.get("repositoryDescription");

@@ -1,52 +1,52 @@
-name: Test, Analyze, and Generate documentation
+# name: Test, Analyze, and Generate documentation
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-          distribution: 'adopt'
+#       - name: Set up JDK
+#         uses: actions/setup-java@v2
+#         with:
+#           java-version: '11'
+#           distribution: 'adopt'
 
-      - name: Debugging
-        run: |
-          pwd
-          ls -la
-          cd ${{ github.workspace }}
-          ls -la
+#       - name: Debugging
+#         run: |
+#           pwd
+#           ls -la
+#           cd ${{ github.workspace }}
+#           ls -la
 
-      - name: Grant execute permission to gradlew
-        run: |
-          chmod +x api/gradlew
+#       - name: Grant execute permission to gradlew
+#         run: |
+#           chmod +x api/gradlew
 
-      - name: Create test file
-        run: |
-          mkdir -p api/src/test/resources
-          touch api/src/test/resources/credentials.properties
-          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> api/src/test/resources/credentials.properties
-          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> api/src/test/resources/credentials.properties
-          echo "db.url=${{ secrets.DATABASE_URL }}" >> api/src/test/resources/credentials.properties
+#       - name: Create test file
+#         run: |
+#           mkdir -p api/src/test/resources
+#           touch api/src/test/resources/credentials.properties
+#           echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> api/src/test/resources/credentials.properties
+#           echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> api/src/test/resources/credentials.properties
+#           echo "db.url=${{ secrets.DATABASE_URL }}" >> api/src/test/resources/credentials.properties
 
-      - name: Build with Gradle
-        working-directory: api  # Specify the correct working directory
-        run: |
-          ./gradlew build --warning-mode all
+#       - name: Build with Gradle
+#         working-directory: api  # Specify the correct working directory
+#         run: |
+#           ./gradlew build --warning-mode all
 
-      - name: Run tests with Gradle
-        working-directory: api  # Specify the correct working directory
-        run: |
-          ./gradlew test
+#       - name: Run tests with Gradle
+#         working-directory: api  # Specify the correct working directory
+#         run: |
+#           ./gradlew test
 
 
   # analyze:

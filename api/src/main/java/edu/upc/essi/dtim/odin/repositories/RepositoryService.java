@@ -1,6 +1,5 @@
 package edu.upc.essi.dtim.odin.repositories;
 
-import com.google.protobuf.Api;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
@@ -116,8 +115,7 @@ public class RepositoryService {
         DataRepository repository;
 
 
-
-        switch (repositoryType){
+        switch (repositoryType) {
             case "RelationalJDBCRepository":
                 repository = new RelationalJDBCRepository();
                 break;
@@ -166,13 +164,14 @@ public class RepositoryService {
                 String databasename = requestData.get("databaseName");
                 String databaseType = requestData.get("databaseType");
 
-                String customUrl = "jdbc:"+databaseType+"://" + hostname + ":" + port + "/" + databasename;
+                String customUrl = "jdbc:" + databaseType + "://" + hostname + ":" + port + "/" + databasename;
 
                 ((RelationalJDBCRepository) repository).setUsername(username);
                 ((RelationalJDBCRepository) repository).setPassword(password);
 
-                if(testConnection(url, username, password)) ((RelationalJDBCRepository) repository).setUrl(url);
-                else if(testConnection(customUrl, username, password)) ((RelationalJDBCRepository) repository).setUrl(customUrl);
+                if (testConnection(url, username, password)) ((RelationalJDBCRepository) repository).setUrl(url);
+                else if (testConnection(customUrl, username, password))
+                    ((RelationalJDBCRepository) repository).setUrl(customUrl);
             } else if (repository instanceof LocalRepository) {
                 ((LocalRepository) repository).setPath(requestData.get("path"));
             } else if (repository instanceof ApiRepository) {

@@ -8,7 +8,7 @@ import edu.upc.essi.dtim.odin.query.pojos.RDFSResult;
 
 import java.util.*;
 
-public class qrModuleImpl implements qrModuleInterface{
+public class qrModuleImpl implements qrModuleInterface {
     @Override
     public RDFSResult makeQuery(QueryDataSelection body) {
         // Crear una instancia de RDFSResult
@@ -40,7 +40,7 @@ public class qrModuleImpl implements qrModuleInterface{
         for (Property property : properties) {
             Map<String, String> rowMap = new HashMap<>();
             for (int i = 0; i < res.getColumns().size(); i++) {
-                if(i == 0) {
+                if (i == 0) {
                     String iri = property.getIri();
                     String ultimaParte = iri;
                     // Encuentra la última posición del símbolo '#'
@@ -59,9 +59,8 @@ public class qrModuleImpl implements qrModuleInterface{
                     }
 
                     rowMap.put(res.getColumns().get(i), ultimaParte);
-                }
-                else {
-                    rowMap.put(res.getColumns().get(i), hardCodedRows.get(rowCounter%hardcodedModule).get(i));
+                } else {
+                    rowMap.put(res.getColumns().get(i), hardCodedRows.get(rowCounter % hardcodedModule).get(i));
                 }
             }
 

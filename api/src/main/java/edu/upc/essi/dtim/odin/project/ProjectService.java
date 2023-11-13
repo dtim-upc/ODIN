@@ -4,7 +4,6 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.IntegratedGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
@@ -193,9 +192,8 @@ public class ProjectService {
     /**
      * Checks if a project contains a dataset with the given ID.
      *
-     * @param projectId The ID of the project to check.
-     * @param
-     * dataresourceId The ID of the dataset to check.
+     * @param projectId      The ID of the project to check.
+     * @param dataresourceId The ID of the dataset to check.
      * @return true if the project contains the dataset, false otherwise.
      */
     public boolean projectContains(String projectId, String dataresourceId) {
@@ -252,7 +250,7 @@ public class ProjectService {
         List<Dataset> datasets = new ArrayList<>();
 
         // Iterate through the repositories in the project and collect their datasets
-        for (DataRepository repository : project.getRepositories()){
+        for (DataRepository repository : project.getRepositories()) {
             datasets.addAll(repository.getDatasets());
         }
 
@@ -300,7 +298,7 @@ public class ProjectService {
     public Project cloneProject(Project projectToClone) {
         // Reset the project ID to null to create a new project
         projectToClone.setProjectId(null);
-        projectToClone.setProjectName(projectToClone.getProjectName()+" - Copy");
+        projectToClone.setProjectName(projectToClone.getProjectName() + " - Copy");
 
         // Get the list of repositories from the original project
         List<DataRepository> repositoriesToClone = projectToClone.getRepositories();
@@ -431,7 +429,7 @@ public class ProjectService {
         if (project != null) {
             // 2. Comprueba si el dataset ya está en la lista de datasets integrados del proyecto
             List<Dataset> integratedDatasets = project.getIntegratedDatasets();
-            if (isDatasetIntegrated(integratedDatasets, datasetID)){
+            if (isDatasetIntegrated(integratedDatasets, datasetID)) {
                 return project;
             } else {
                 // 3. Recupera el dataset por su ID

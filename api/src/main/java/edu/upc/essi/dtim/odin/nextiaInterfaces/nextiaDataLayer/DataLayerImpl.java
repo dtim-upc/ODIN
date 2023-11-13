@@ -7,10 +7,9 @@ import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
-public class DataLayerImpl implements DataLayerInterace{
+public class DataLayerImpl implements DataLayerInterace {
     private final String dataLayerPath;
     private final String technology;
 
@@ -22,7 +21,7 @@ public class DataLayerImpl implements DataLayerInterace{
     private DataLayer getDataLayer() {
         DataLayer dl;
         try {
-            dl = DataLayerFactory.getInstance(technology,dataLayerPath);
+            dl = DataLayerFactory.getInstance(technology, dataLayerPath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

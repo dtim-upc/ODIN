@@ -8,8 +8,6 @@ import edu.upc.essi.dtim.NextiaJD.Discovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 public class jdModuleImpl implements jdModuleInterface {

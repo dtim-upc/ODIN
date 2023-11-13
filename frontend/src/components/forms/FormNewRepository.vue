@@ -14,7 +14,6 @@
           </q-card-section>
 
 
-
           <!-- Tipo de origen de datos -->
           <q-card-section>
             <!-- Tipo de origen de datos -->
@@ -149,9 +148,11 @@
 
       </q-card-section>
 
-      <q-badge color="secondary" multi-line>
-        FORMDATA: {{ formData }}
-      </q-badge>
+      <!--
+            <q-badge color="secondary" multi-line>
+              FORMDATA: {{ formData }}
+            </q-badge>
+            -->
 
       <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <!-- Botones del formulario -->
@@ -225,7 +226,7 @@ const connectBy = ref("");
 const formData = ref({
   repositoryDescription: '',
   repositoryName: '',
-  connectBy:'connectByUrl'
+  connectBy: 'connectByUrl'
 });
 
 // When the component is mounted, fetch the repositories for the current project.
@@ -273,7 +274,7 @@ watch(RepositoryType, (newType) => {
   const fileName = newType.value;
 
   // Realiza la solicitud GET al punto final del backend
-  const response = odinApi.get(`/formSchema/`+fileName).then(response => {
+  const response = odinApi.get(`/formSchema/` + fileName).then(response => {
     const responseData = response.data;
     formSchema.value = response.data;
     console.log(formSchema);
@@ -286,10 +287,10 @@ watch(RepositoryType, (newType) => {
       }
     }
 
-    formData["connectBy"]= connectBy;
+    formData["connectBy"] = connectBy;
   })
     .catch(error => {
-      notify.negative('Error al obtener el JSON Schema'+error);
+      notify.negative('Error al obtener el JSON Schema' + error);
       console.error('Error al obtener el JSON Schema', error);
     });
 });
@@ -310,11 +311,10 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 
 function isJDBC(type) {
   const typeC = "jdbcRepository";
-    //formData.value["repositoryType"].value;
-  if(type === null){
+  //formData.value["repositoryType"].value;
+  if (type === null) {
     return typeC === 'jdbcRepository';
-  }
-  else {
+  } else {
     return typeC === type;
   }
 }

@@ -9,7 +9,7 @@ import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 /**
  * Implementación de la interfaz para realizar la conversión de un conjunto de datos a un grafo.
  */
-public class bsModuleImpl implements bsModuleInterface{
+public class bsModuleImpl implements bsModuleInterface {
 
     /**
      * Convierte un conjunto de datos en un grafo.

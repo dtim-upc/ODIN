@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,9 +49,9 @@ public class IntegrationController {
     @PostMapping(value = "/project/{id}/integration")
     public ResponseEntity<IntegrationTemporalResponse> integrate(@PathVariable("id") String projectId,
                                                                  @RequestBody IntegrationData iData) {
-        logger.info("INTEGRATING temporal with project: "+projectId);
+        logger.info("INTEGRATING temporal with project: " + projectId);
 
-        for(Alignment a : iData.getAlignments()){
+        for (Alignment a : iData.getAlignments()) {
             System.out.println(a.getIriA()); //http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/201/col7
             System.out.println(a.getIriB()); //http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/153/col2
             System.out.println(a.getL()); //col7_col2
@@ -80,7 +79,7 @@ public class IntegrationController {
             Project projectToSave = integrationService.updateIntegratedGraphProject(project, integratedGraph);
 
             Graph globalGraph = integrationService.generateGlobalGraph(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
-            projectToSave=integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
+            projectToSave = integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
 
             Project project1 = integrationService.saveProject(projectToSave);
             logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
@@ -88,34 +87,33 @@ public class IntegrationController {
 
             Project project2 = integrationService.getProject(project1.getProjectId());
 
-            List<JoinAlignment> joinProperties =  integrationService.generateJoinAlignments(project.getIntegratedGraph(), (Graph) iData.getDsB().getLocalGraph(), iData);
+            List<JoinAlignment> joinProperties = integrationService.generateJoinAlignments(project.getIntegratedGraph(), (Graph) iData.getDsB().getLocalGraph(), iData);
             System.out.println(joinProperties);
-            for(int i = 0; i < joinProperties.size(); ++i){
+            for (int i = 0; i < joinProperties.size(); ++i) {
                 System.out.println(joinProperties.get(i));
             }
 
             return new ResponseEntity<>(new IntegrationTemporalResponse(project2, joinProperties), HttpStatus.OK);
-        }
-        else{
+        } else {
             // If there are not enough datasets to integrate, return a bad request status
-            return new ResponseEntity<>(new IntegrationTemporalResponse(null,null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new IntegrationTemporalResponse(null, null), HttpStatus.BAD_REQUEST);
         }
     }
 
     /**
      * Handles the integration of join alignments into the project's integrated graph.
      *
-     * @param id     The ID of the project.
-     * @param joinA  The list of JoinAlignment objects representing the join alignments to integrate.
+     * @param id    The ID of the project.
+     * @param joinA The list of JoinAlignment objects representing the join alignments to integrate.
      * @return A ResponseEntity containing the updated Project with integrated joins or an error status.
      */
     @PostMapping(value = "/project/{id}/integration/join")
-    public ResponseEntity<Project> integrateJoins(@PathVariable("id") String id, @RequestBody List<JoinAlignment> joinA){
+    public ResponseEntity<Project> integrateJoins(@PathVariable("id") String id, @RequestBody List<JoinAlignment> joinA) {
 
         logger.info("INTEGRATING joins...");
 
         Project project = integrationService.getProject(id);
-        System.out.println(project.getIntegratedGraph().getGlobalGraph().getGraphicalSchema()+"DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+        System.out.println(project.getIntegratedGraph().getGlobalGraph().getGraphicalSchema() + "DDDDDDDDDDDDDDDDDDDDDDDDDDD");
 
         // Integrate the join alignments into the integrated graph
         Graph integratedSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
@@ -175,10 +173,10 @@ public class IntegrationController {
     @PostMapping(value = "/project/{id}/integration/survey")
     public ResponseEntity<List<Alignment>> getAutomaticAlignments(@PathVariable("id") String projectId, @RequestBody String datasetId) throws SQLException, IOException, ClassNotFoundException {
         logger.info("AUTOMATIC ALIGNMENTS PETITION RECEIVED");
-        List<Alignment> alignments  = integrationService.getAlignments(projectId, datasetId);
+        List<Alignment> alignments = integrationService.getAlignments(projectId, datasetId);
         logger.info("AUTOMATIC ALIGNMENTS SENT");
 
-        if(alignments.size() == 0) return new ResponseEntity(alignments, HttpStatus.NO_CONTENT);
+        if (alignments.size() == 0) return new ResponseEntity(alignments, HttpStatus.NO_CONTENT);
         else return new ResponseEntity(alignments, HttpStatus.OK);
     }
 

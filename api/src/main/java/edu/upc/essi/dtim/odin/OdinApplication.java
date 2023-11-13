@@ -15,26 +15,26 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @PropertySource("classpath:credentials.properties")
 public class OdinApplication {
-	private static final Logger logger = LoggerFactory.getLogger(OdinApplication.class);
-	private static AppConfig appConfig;
+    private static final Logger logger = LoggerFactory.getLogger(OdinApplication.class);
+    private static AppConfig appConfig;
 
-	public OdinApplication(@Autowired AppConfig appConfig) {
-		this.appConfig = appConfig;
-	}
+    public OdinApplication(@Autowired AppConfig appConfig) {
+        this.appConfig = appConfig;
+    }
 
-	public static void main(String[] args) {
-		// Inicia la aplicación Spring Boot
-		SpringApplication.run(OdinApplication.class, args);
+    public static void main(String[] args) {
+        // Inicia la aplicación Spring Boot
+        SpringApplication.run(OdinApplication.class, args);
 
-		//INICIALIZA DATALAYER
-		DataLoading dl = DataLoadingSingleton.getInstance(appConfig.getDataLayerPath());
+        //INICIALIZA DATALAYER
+        DataLoading dl = DataLoadingSingleton.getInstance(appConfig.getDataLayerPath());
 
-		// Registra un mensaje en el registro de eventos cuando la aplicación se inicia correctamente
-		logger.info("Application started. Ready to receive API requests.");
-	}
+        // Registra un mensaje en el registro de eventos cuando la aplicación se inicia correctamente
+        logger.info("Application started. Ready to receive API requests.");
+    }
 
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 }

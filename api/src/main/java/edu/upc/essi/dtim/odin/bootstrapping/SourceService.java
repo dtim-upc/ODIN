@@ -134,7 +134,6 @@ public class SourceService {
     }
 
 
-
     /**
      * Extracts data from a file and returns a Dataset object with the extracted data.
      *
@@ -145,7 +144,7 @@ public class SourceService {
      * @throws IllegalArgumentException if the file format is not supported.
      */
     public Dataset extractData(String filePath, String datasetName, String datasetDescription) throws SQLException, IOException, ClassNotFoundException {
-        if(filePath == null) filePath = "table.sql";
+        if (filePath == null) filePath = "table.sql";
         // Extract the extension of the file from the file path
         String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
 
@@ -445,7 +444,7 @@ public class SourceService {
             throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
         }
 
-        if (datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)){
+        if (datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)) {
             // Remove the dataset from the old repository if it exists
             DataRepository oldRepository = findRepositoryContainingDataset(datasetId);
             if (oldRepository != null) {
@@ -545,7 +544,7 @@ public class SourceService {
             savedDS = saveDataset(originalDataset);
         }
 
-        if(savedDS.getId() != null) return true;
+        if (savedDS.getId() != null) return true;
 
         // No changes detected, return false
         return false;
@@ -678,7 +677,8 @@ public class SourceService {
         assert graphStore != null;
 
         Graph datasetGraph = null;
-        if (dataset.getLocalGraph() != null && dataset.getLocalGraph().getGraphName() != null) datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
+        if (dataset.getLocalGraph() != null && dataset.getLocalGraph().getGraphName() != null)
+            datasetGraph = graphStore.getGraph(dataset.getLocalGraph().getGraphName());
 
         // Set the local graph of the dataset to the retrieved graph
         dataset.setLocalGraph((LocalGraphJenaImpl) datasetGraph);
@@ -708,7 +708,7 @@ public class SourceService {
             throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
         }
 
-        if(datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)){
+        if (datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)) {
             dataset.setRepository(newRepository);
 
             // Save both repositories
@@ -737,7 +737,7 @@ public class SourceService {
         if (repository instanceof RelationalJDBCRepository && dataset instanceof SQLDataset) {
             return true; // DatasetSQL can be added to RepositorySQL
         } else if (repository instanceof LocalRepository &&
-                        (dataset instanceof JsonDataset ||
+                (dataset instanceof JsonDataset ||
                         dataset instanceof CsvDataset ||
                         dataset instanceof ParquetDataset ||
                         dataset instanceof XmlDataset)) {
@@ -763,7 +763,7 @@ public class SourceService {
 
     public void uploadToDataLayer(Dataset dataset) {
         //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
-        if(dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
+        if (dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
             DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
             dataset.setDataLayerPath(generateUUID());
             dlInterface.uploadToDataLayer(dataset);
@@ -773,7 +773,7 @@ public class SourceService {
 
     public void deleteDatasetFromDataLayer(String id) {
         Dataset datasetToDelete = getDatasetById(id);
-        if(datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset){
+        if (datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset) {
             //delete from datalayer
             DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
             dlInterface.deleteDataset(datasetToDelete.getDataLayerPath());
@@ -783,11 +783,13 @@ public class SourceService {
     public void deleteDatasetFile(String id) {
         Dataset datasetToDelete = getDatasetById(id);
         String filePath = null;
-        if(datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset){
+        if (datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset) {
             //delete from the given path
-            if (datasetToDelete instanceof CsvDataset) filePath = ((CsvDataset) datasetToDelete).getPath(); // Replace with the actual file path
-            if (datasetToDelete instanceof JsonDataset) filePath = ((JsonDataset) datasetToDelete).getPath(); // Replace with the actual file path
-            
+            if (datasetToDelete instanceof CsvDataset)
+                filePath = ((CsvDataset) datasetToDelete).getPath(); // Replace with the actual file path
+            if (datasetToDelete instanceof JsonDataset)
+                filePath = ((JsonDataset) datasetToDelete).getPath(); // Replace with the actual file path
+
             Path path = Paths.get(filePath);
 
             try {

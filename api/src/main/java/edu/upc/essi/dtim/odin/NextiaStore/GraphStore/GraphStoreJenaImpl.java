@@ -94,7 +94,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
 
         //miramos qué tipo de grafo es para constuir la interficie
         ORMStoreInterface ormInterface = ORMStoreFactory.getInstance();
-        if(ormInterface.findById(LocalGraphJenaImpl.class, modelName) != null){
+        if (ormInterface.findById(LocalGraphJenaImpl.class, modelName) != null) {
             graph = CoreGraphFactory.createLocalGraph();
         } else if (ormInterface.findById(IntegratedGraphJenaImpl.class, modelName) != null) {
             graph = CoreGraphFactory.createIntegratedGraph();
@@ -111,7 +111,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
             String graphicalSchema = visualLibInterface.generateVisualGraph(graph);
             graph.setGraphicalSchema(graphicalSchema);
 
-            if (graph.getClass().equals(IntegratedGraphJenaImpl.class)){
+            if (graph.getClass().equals(IntegratedGraphJenaImpl.class)) {
                 integrationModuleInterface integrationInterface = new integrationModuleImpl();
                 Graph globalGraph = integrationInterface.generateGlobalGraph(graph);
                 ((IntegratedGraphJenaImpl) graph).setGlobalGraph((GlobalGraphJenaImpl) globalGraph);
@@ -123,7 +123,6 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         }
         return graph;
     }
-
 
 
     /**
@@ -147,7 +146,6 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         }
     }
     */
-
 
 
     /**

@@ -2,8 +2,8 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary;
 
 public enum GlobalGraph {
 
-    FEATURE(Namespaces.G.val()+"Feature"),
-    HAS_FEATURE(Namespaces.G.val()+"hasFeature");
+    FEATURE(Namespaces.G.val() + "Feature"),
+    HAS_FEATURE(Namespaces.G.val() + "hasFeature");
 
     private String element;
 

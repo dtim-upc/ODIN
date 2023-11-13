@@ -51,7 +51,7 @@ public class IntegrationService {
      *
      * @param appConfig The application configuration.
      */
-    public IntegrationService(@Autowired AppConfig appConfig, @Autowired ProjectService projectService){
+    public IntegrationService(@Autowired AppConfig appConfig, @Autowired ProjectService projectService) {
         this.appConfig = appConfig;
         this.projectService = projectService;
     }
@@ -132,9 +132,9 @@ public class IntegrationService {
     /**
      * Generates a list of JoinAlignments based on the provided graphs and integration data.
      *
-     * @param graphA   The first graph for alignment comparison.
-     * @param graphB   The second graph for alignment comparison.
-     * @param iData    The integration data containing alignments.
+     * @param graphA The first graph for alignment comparison.
+     * @param graphB The second graph for alignment comparison.
+     * @param iData  The integration data containing alignments.
      * @return A list of JoinAlignment objects representing potential join alignments.
      */
     public List<JoinAlignment> generateJoinAlignments(Graph graphA, Graph graphB, IntegrationData iData) {
@@ -186,8 +186,8 @@ public class IntegrationService {
     /**
      * Retrieves the domain of a property IRI from the specified graph.
      *
-     * @param graph        The graph to query for the property's domain.
-     * @param propertyIRI  The IRI (Internationalized Resource Identifier) of the property.
+     * @param graph       The graph to query for the property's domain.
+     * @param propertyIRI The IRI (Internationalized Resource Identifier) of the property.
      * @return The domain of the property if found, or null if not found.
      */
     private String getDomainOfProperty(Graph graph, String propertyIRI) {
@@ -210,8 +210,8 @@ public class IntegrationService {
     /**
      * Retrieves the RDFS label of a resource IRI from the specified graph.
      *
-     * @param graph        The graph to query for the resource's RDFS label.
-     * @param resourceIRI  The IRI (Internationalized Resource Identifier) of the resource.
+     * @param graph       The graph to query for the resource's RDFS label.
+     * @param resourceIRI The IRI (Internationalized Resource Identifier) of the resource.
      * @return The RDFS label of the resource if found, or null if not found.
      */
     private String getRDFSLabel(Graph graph, String resourceIRI) {
@@ -234,8 +234,8 @@ public class IntegrationService {
     /**
      * Updates the integrated graph within a project with a new integrated graph.
      *
-     * @param project          The project whose integrated graph is being updated.
-     * @param integratedGraph  The new integrated graph to be set in the project.
+     * @param project         The project whose integrated graph is being updated.
+     * @param integratedGraph The new integrated graph to be set in the project.
      * @return The updated project with the new integrated graph.
      */
     public Project updateIntegratedGraphProject(Project project, Graph integratedGraph) {
@@ -258,8 +258,8 @@ public class IntegrationService {
     /**
      * Updates the global graph within an integrated project with a new global graph.
      *
-     * @param project      The project containing the integrated graph and the global graph to be updated.
-     * @param globalGraph  The new global graph to be set within the project's integrated graph.
+     * @param project     The project containing the integrated graph and the global graph to be updated.
+     * @param globalGraph The new global graph to be set within the project's integrated graph.
      * @return The updated project with the new global graph.
      */
     public Project updateGlobalGraphProject(Project project, Graph globalGraph) {
@@ -373,26 +373,26 @@ public class IntegrationService {
         // TODO review
         jdModuleInterface jdInterface = new jdModuleImpl(appConfig);
 
-        List<Alignment> alignments = new ArrayList<>();
+        List<Alignment> alignments;
         alignments = jdInterface.getAlignments(datasetA, datasetB);
 
         List<Alignment> alignmentsWithFilter = new ArrayList<>();
         float minSimilarity = 0.3F;
-        for (Alignment a: alignments) {
+        for (Alignment a : alignments) {
             System.out.println(a.getSimilarity());
-            if(a.getSimilarity() >= minSimilarity) {
+            if (a.getSimilarity() >= minSimilarity) {
                 a.setLabelA(a.getAttributeA().getName());
                 a.setLabelB(a.getAttributeB().getName());
-                a.setL(a.getAttributeA().getName()+"_"+a.getAttributeB().getName());
+                a.setL(a.getAttributeA().getName() + "_" + a.getAttributeB().getName());
                 a.setType("datatype");
                 a.setIdentifier(true);
-                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/"+datasetA.getId()+"/"+a.getAttributeA().getName());
-                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/"+datasetB.getId()+"/"+a.getAttributeB().getName());
+                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getId() + "/" + a.getAttributeA().getName());
+                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getId() + "/" + a.getAttributeB().getName());
                 alignmentsWithFilter.add(a);
             }
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        return  alignmentsWithFilter;
+        return alignmentsWithFilter;
     }
 }
