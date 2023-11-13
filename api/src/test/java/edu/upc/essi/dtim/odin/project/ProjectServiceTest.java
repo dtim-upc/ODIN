@@ -136,7 +136,7 @@ class ProjectServiceTest {
     void testFindById() {
         projectService.saveProject(testProject);
 
-        Project foundProject = projectService.findById(testProject.getProjectId());
+        Project foundProject = projectService.getProjectById(testProject.getProjectId());
 
         Assertions.assertEquals(testProject.getProjectId(), foundProject.getProjectId());
         Assertions.assertEquals(testProject.getProjectName(), foundProject.getProjectName());

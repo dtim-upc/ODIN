@@ -1,14 +1,14 @@
 <template>
 
 
-<!-- bg-light-green -->
+  <!-- bg-light-green -->
   <div class="animated-bg  fullscreen row justify-center items-center">
 
     <Particles
-                id="tsparticles"
-                :particlesInit="particlesInit"
-                :particlesLoaded="particlesLoaded"
-                :options='{
+      id="tsparticles"
+      :particlesInit="particlesInit"
+      :particlesLoaded="particlesLoaded"
+      :options='{
   particles: {
     number: {
       value: 80,
@@ -114,52 +114,55 @@
   },
   fpsLimit: 30,
   detectRetina: true
-}' ></Particles>
+}'></Particles>
     <div class="column">
       <div class="row">
         <h5 class="text-h5 text-white q-my-md"> ODIN 2</h5>
       </div>
       <div class="row">
         <q-card square bordered class="q-pa-lg shadow-1">
-            <div v-if="loginView">
-                <q-card-section>
-                    <q-form class="q-gutter-md">
-                    <q-input square filled v-model="credentials.username" type="text" label="username" autocomplete="current-password" />
-                     <q-input square filled  v-model="credentials.password" type="password" label="password" autocomplete="current-password" v-on:keyup.enter="login" />
-                    <!-- <q-input square filled v-model="credentials.password" type="password" label="password" /> -->
-                    </q-form>
-                </q-card-section>
-                <q-card-actions class="q-px-md">
-                    <q-btn unelevated color="light-green-7" size="lg" class="full-width" label="Login" @click="login"/>
-                </q-card-actions>
-                <q-card-section class="text-center q-pa-none">
-                    <p class="text-grey-6 cursor-pointer" @click="loginView=!loginView" >Not registered? Created an Account</p>
-                </q-card-section>
-                    
-            </div>
-            <div v-else>
+          <div v-if="loginView">
+            <q-card-section>
+              <q-form class="q-gutter-md">
+                <q-input square filled v-model="credentials.username" type="text" label="username"
+                         autocomplete="current-password"/>
+                <q-input square filled v-model="credentials.password" type="password" label="password"
+                         autocomplete="current-password" v-on:keyup.enter="login"/>
+                <!-- <q-input square filled v-model="credentials.password" type="password" label="password" /> -->
+              </q-form>
+            </q-card-section>
+            <q-card-actions class="q-px-md">
+              <q-btn unelevated color="light-green-7" size="lg" class="full-width" label="Login" @click="login"/>
+            </q-card-actions>
+            <q-card-section class="text-center q-pa-none">
+              <p class="text-grey-6 cursor-pointer" @click="loginView=!loginView">Not registered? Created an Account</p>
+            </q-card-section>
 
-                <q-card-section>
-                    <q-form class="q-gutter-md">
-                    <q-input square filled v-model="user.firstName" type="text" label="first name" />
-                    <q-input square filled v-model="user.lastName" type="text" label="last name" />
-                    <q-input square filled v-model="user.username" type="text" label="username"  autocomplete="current-password" :error-message="errorM" :error="errorUserName"/>
-                    <q-input square filled v-model="user.password" type="password" label="password" autocomplete="current-password"/>
-  
-                    <!-- v-on:keyup.enter="props.row.edit = false;" -->
-                    </q-form>
-                </q-card-section>
-                <q-card-actions class="q-px-md">
-                    <q-btn unelevated color="light-green-7" size="lg" class="full-width" label="SIGN-UP" @click="signUp()" />
-                </q-card-actions>
-                <q-card-section class="text-center q-pa-none">
-                    <p class="text-grey-6 cursor-pointer" @click="loginView=!loginView">Already an account? sign in</p>
-                </q-card-section>
+          </div>
+          <div v-else>
 
-            </div>
+            <q-card-section>
+              <q-form class="q-gutter-md">
+                <q-input square filled v-model="user.firstName" type="text" label="first name"/>
+                <q-input square filled v-model="user.lastName" type="text" label="last name"/>
+                <q-input square filled v-model="user.username" type="text" label="username"
+                         autocomplete="current-password" :error-message="errorM" :error="errorUserName"/>
+                <q-input square filled v-model="user.password" type="password" label="password"
+                         autocomplete="current-password"/>
+
+                <!-- v-on:keyup.enter="props.row.edit = false;" -->
+              </q-form>
+            </q-card-section>
+            <q-card-actions class="q-px-md">
+              <q-btn unelevated color="light-green-7" size="lg" class="full-width" label="SIGN-UP" @click="signUp()"/>
+            </q-card-actions>
+            <q-card-section class="text-center q-pa-none">
+              <p class="text-grey-6 cursor-pointer" @click="loginView=!loginView">Already an account? sign in</p>
+            </q-card-section>
+
+          </div>
 
 
-          
         </q-card>
       </div>
     </div>
@@ -168,23 +171,22 @@
 </template>
 
 
-
 <script setup>
 import {ref, reactive, onMounted} from "vue";
 // import api from "src/api/dataSourcesAPI.js";
-// import {useNotify} from 'src/use/useNotify.js' 
-import { useAuthStore } from 'stores/auth.store.js'
+// import {useNotify} from 'src/use/useNotify.js'
+import {useAuthStore} from 'stores/auth.store.js'
 
 // import Particles from "vue3-particles";
-import { loadFull } from "tsparticles";
+import {loadFull} from "tsparticles";
 
 
 const particlesInit = async (engine) => {
-    await loadFull(engine);
+  await loadFull(engine);
 }
 
 const particlesLoaded = async (container) => {
-    console.log("Particles container loaded", container);
+  console.log("Particles container loaded", container);
 }
 // const notify = useNotify()
 const authStore = useAuthStore()
@@ -193,19 +195,19 @@ const authStore = useAuthStore()
 const loginView = ref(true)
 
 const credentials = reactive({
-    username : "",
-    password : ""
+  username: "",
+  password: ""
 })
 
 const user = reactive({
-    username : "",
-    firstName: "",
-    lastName: "",
-    password : ""
+  username: "",
+  firstName: "",
+  lastName: "",
+  password: ""
 })
 
 const login = () => {
-    authStore.login(credentials)
+  authStore.login(credentials)
 }
 
 const successSignUp = () => {
@@ -214,8 +216,8 @@ const successSignUp = () => {
 
 const signUp = () => {
 
-    
-    authStore.registerUser(user, successSignUp, userNameTaken)
+
+  authStore.registerUser(user, successSignUp, userNameTaken)
 
 
 }
@@ -223,23 +225,21 @@ const signUp = () => {
 const errorM = ref('')
 const errorUserName = ref(false)
 
-const userNameTaken = (message) =>{
+const userNameTaken = (message) => {
 
-    errorM.value = message;
-    errorUserName.value = true
+  errorM.value = message;
+  errorUserName.value = true
 
 }
 
-onMounted( () => {
+onMounted(() => {
 //     authStore.init()
 
 
 })
 
 
-
 </script>
-
 
 
 <style>
@@ -260,51 +260,50 @@ onMounted( () => {
 }
 
 
-.animated-bg{
-    background: linear-gradient(253deg, #0cc898, #1797d2, #864fe1);
-    background-size: 300% 300%;
-    -webkit-animation: Background 25s ease infinite;
-    -moz-animation: Background 25s ease infinite;
-    animation: Background 25s ease infinite;
+.animated-bg {
+  background: linear-gradient(253deg, #0cc898, #1797d2, #864fe1);
+  background-size: 300% 300%;
+  -webkit-animation: Background 25s ease infinite;
+  -moz-animation: Background 25s ease infinite;
+  animation: Background 25s ease infinite;
 }
 
 
 @-webkit-keyframes Background {
-    0% {
-      background-position: 0% 50%
-    }
-    50% {
-      background-position: 100% 50%
-    }
-    100% {
-      background-position: 0% 50%
-    }
+  0% {
+    background-position: 0% 50%
   }
-  
-  @-moz-keyframes Background {
-    0% {
-      background-position: 0% 50%
-    }
-    50% {
-      background-position: 100% 50%
-    }
-    100% {
-      background-position: 0% 50%
-    }
+  50% {
+    background-position: 100% 50%
   }
-  
-  @keyframes Background {
-    0% {
-      background-position: 0% 50%
-    }
-    50% {
-      background-position: 100% 50%
-    }
-    100% {
-      background-position: 0% 50%
-    }
+  100% {
+    background-position: 0% 50%
   }
-  
+}
+
+@-moz-keyframes Background {
+  0% {
+    background-position: 0% 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+@keyframes Background {
+  0% {
+    background-position: 0% 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0% 50%
+  }
+}
 
 
 </style>

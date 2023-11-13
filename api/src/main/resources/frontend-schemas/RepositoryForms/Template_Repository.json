@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "class": "ClassThatIsMappingThisJSON",
+  "properties": {
+    "path": {
+      "type": "string",
+      "label": "Text to be displayed"
+    }
+  },
+  "attributes": {
+    "path": ""
+  }
+}

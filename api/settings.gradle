@@ -6,3 +6,9 @@ pluginManagement {
 	}
 }
 rootProject.name = 'odin'
+
+include 'NextiaCore'
+include 'NextiaDI'
+include 'NextiaBS'
+include 'NextiaDataLayer'
+

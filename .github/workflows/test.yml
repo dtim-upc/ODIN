@@ -1,14 +1,17 @@
-name: Test, Analyze and Generate documentation
+name: Test, Analyze, and Generate documentation
 
-on: 
+on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
-jobs:  
+jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -16,39 +19,35 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/ODINwhiteboard/odin/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+      - name: Debugging
+        run: |
+          pwd
+          ls -la
+          cd ${{ github.workspace }}
+          ls -la
 
       - name: Grant execute permission to gradlew
         run: |
-          cd ODINwhiteboard
-          cd odin
-          chmod +x ./gradlew
+          chmod +x api/gradlew
 
       - name: Create test file
         run: |
-          cd ODINwhiteboard
-          cd odin
-          mkdir -p src/test/resources
-          touch src/test/resources/credentials.properties
-          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> src/test/resources/credentials.properties
-          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> src/test/resources/credentials.properties
-          echo "db.url=${{ secrets.DATABASE_URL }}" >> src/test/resources/credentials.properties
+          mkdir -p api/src/test/resources
+          touch api/src/test/resources/credentials.properties
+          echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> api/src/test/resources/credentials.properties
+          echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> api/src/test/resources/credentials.properties
+          echo "db.url=${{ secrets.DATABASE_URL }}" >> api/src/test/resources/credentials.properties
 
       - name: Build with Gradle
+        working-directory: api  # Specify the correct working directory
         run: |
-          cd ODINwhiteboard
-          cd odin
           ./gradlew build --warning-mode all
 
       - name: Run tests with Gradle
+        working-directory: api  # Specify the correct working directory
         run: |
-          cd ODINwhiteboard
-          cd odin
           ./gradlew test
+
 
   # analyze:
   #   runs-on: ubuntu-latest
@@ -93,7 +92,7 @@ jobs:
     #     - uses: actions/checkout@v2         
     #     - name: Generate and Publish documentation
     #       run: |
-    #         cd ODINwhiteboard
+    #         cd ODIN
     #         cd odin 
     #         chmod +x ./gradlew
     #         ./gradlew build

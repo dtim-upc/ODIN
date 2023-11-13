@@ -1,10 +1,10 @@
 <template>
   <div class="q-pa-md">
     <!-- :filter="search" -->
-    <q-table :rows="rows" :columns="columns" 
+    <q-table :rows="rows" :columns="columns"
              row-key="name" no-data-label="No result."
              no-results-label="The filter didn't uncover any results" :class="{ 'no-shadow': no_shadow }"
->
+    >
       <template v-slot:top-left="">
         <div class="q-table__title">
           {{ title }}
@@ -40,65 +40,65 @@
 </template>
 
 
-<script setup >
-import { ref, onMounted} from "vue";
-import { exportFile } from 'quasar'
+<script setup>
+import {ref, onMounted} from "vue";
+import {exportFile} from 'quasar'
 
-  const props = defineProps({
-        no_shadow: {type: Boolean, default: false},
-        view: {type: String, default: "datasources"},
-        columns: {type: Array},
-        rows: {type:Array},
-        enableExport: {type: Boolean, default: true}
-  });
+const props = defineProps({
+  no_shadow: {type: Boolean, default: false},
+  view: {type: String, default: "datasources"},
+  columns: {type: Array},
+  rows: {type: Array},
+  enableExport: {type: Boolean, default: true}
+});
 
 const title = "Query result";
 
 
-   const wrapCsvValue = (val, formatFn, row) => {
-      let formatted = formatFn !== void 0
-        ? formatFn(val, row)
-        : val
+const wrapCsvValue = (val, formatFn, row) => {
+  let formatted = formatFn !== void 0
+    ? formatFn(val, row)
+    : val
 
-      formatted = formatted === void 0 || formatted === null
-        ? ''
-        : String(formatted)
+  formatted = formatted === void 0 || formatted === null
+    ? ''
+    : String(formatted)
 
-      formatted = formatted.split('"').join('""')
-      /**
-       * Excel accepts \n and \r in strings, but some other CSV parsers do not
-       * Uncomment the next two lines to escape new lines
-       */
-      // .split('\n').join('\\n')
-      // .split('\r').join('\\r')
+  formatted = formatted.split('"').join('""')
+  /**
+   * Excel accepts \n and \r in strings, but some other CSV parsers do not
+   * Uncomment the next two lines to escape new lines
+   */
+  // .split('\n').join('\\n')
+  // .split('\r').join('\\r')
 
-      return `"${formatted}"`
-    }
+  return `"${formatted}"`
+}
 
-    onMounted(wrapCsvValue)
+onMounted(wrapCsvValue)
 
 const exportTable = () => {
-        // naive encoding to csv format
-        const content = [props.columns.map(col => wrapCsvValue(col.label))].concat(
-          props.rows.map(row => props.columns.map(col => wrapCsvValue(
-            typeof col.field === 'function'
-              ? col.field(row)
-              : row[ col.field === void 0 ? col.name : col.field ],
-            col.format,
-            row
-          )).join(','))
-        ).join('\r\n')
+  // naive encoding to csv format
+  const content = [props.columns.map(col => wrapCsvValue(col.label))].concat(
+    props.rows.map(row => props.columns.map(col => wrapCsvValue(
+      typeof col.field === 'function'
+        ? col.field(row)
+        : row[col.field === void 0 ? col.name : col.field],
+      col.format,
+      row
+    )).join(','))
+  ).join('\r\n')
 
-        const status = exportFile(
-          'table-export.csv',
-          content,
-          'text/csv'
-        )
+  const status = exportFile(
+    'table-export.csv',
+    content,
+    'text/csv'
+  )
 
-        if (status !== true) {
-          notify.negative("Browser denied file download.")
-        }
-      }
+  if (status !== true) {
+    notify.negative("Browser denied file download.")
+  }
+}
 </script>
 
 <style lang="css" scoped>

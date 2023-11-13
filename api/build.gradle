@@ -40,7 +40,7 @@ dependencies {
 
 	/////////////////////////////////////// ORM DEPENDENCIES ///////////////////////////////////////
 	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
-	implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.2.2.Final'
+	implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.0.0.Final'
 
 	// https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api
 	implementation 'org.eclipse.persistence:javax.persistence:2.0.0'
@@ -50,6 +50,9 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/com.h2database/h2
 	runtimeOnly group: 'com.h2database', name: 'h2', version: '2.1.214'
+
+	// https://mvnrepository.com/artifact/io.delta/delta-spark
+	implementation group: 'io.delta', name: 'delta-core_2.13', version: '2.3.0'
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////// JENA DEPENDENCIES ///////////////////////////////////////
@@ -63,9 +66,15 @@ dependencies {
 	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaCore.jar']))
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
+	////////////////////////////////////////// NextiaDataLayer //////////////////////////////////////////
+	implementation fileTree(dir: 'lib', include: ['NextiaDataLayer.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDataLayer.jar']))
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	////////////////////////////////////////// NextiaDI //////////////////////////////////////////
-	implementation fileTree(dir: 'lib', include: ['nextiadi.jar'])
-	runtimeOnly(fileTree(dir: 'lib', include: ['nextiadi.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaDI.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDI.jar']))
 
 	//implementation 'edu.upc.essi.dtim:nextiadi:0.1.0-SNAPSHOT'
 
@@ -79,7 +88,14 @@ dependencies {
 	////////////////////////////////////////// OLD BOOTSTRAPPING LIB //////////////////////////////////////////
 	implementation fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar'])
 	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS-1.0-SNAPSHOT-uber.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaBS.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaBS.jar']))
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	implementation fileTree(dir: 'lib', include: ['NextiaJD.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaJD.jar']))
+
+	//implementation fileTree(dir: 'lib', include: ['*.jar'])
 
 }
 
@@ -118,30 +134,117 @@ tasks['sonarqube'].dependsOn test
 
 
 //para copiar la versión actualizada de NextiaCore y NextiaDI (modificar segun ruta propia)
-def nextiaCoreJarPath = 'ruta\\NextiaCore\\build\\libs\\nextiacore-0.0.2-SNAPSHOT-uber.jar'
-def nextiaDIJarPath ='ruta\\NextiaDI\\source\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar'
+def nextiaCoreJarPath = "C:\\Projects\\NextiaCore\\build\\libs"
+def nextiaDIJarPath = "C:\\Projects\\NextiaDI\\source\\build\\libs\\nextiadi-0.1.0-SNAPSHOT-uber.jar"
+def nextiaBSJarPath = "C:\\Projects\\NextiaBS\\build\\libs"
+def nextiaDLJarPath = "C:\\Projects\\NextiaDataLayer\\build\\libs"
+//def nextiaJDJarPath = "C:\\Projects\\NextiaJD2\\build\\libs"
+
 task importExternalJar {
 	doLast {
-		configurations.compileClasspath.files.find { it.name == 'nextiacore-0.0.2-SNAPSHOT-uber.jar' }?.delete()
-		configurations.compileClasspath.files.find { it.name == 'NextiaCore.jar' }?.delete()
+		def nextiaCorePath = project(':NextiaCore')
+		def nextiaDIPath = project(':NextiaDI')
+		def nextiaBSPath = project(':NextiaBS')
+		def nextiaDLPath = project(':NextiaDataLayer')
+//		def nextiaJDPath = project(':NextiaJD')
 
+		// Verifica si los archivos JAR existen en las rutas especificadas
+		def nextiaCoreJar = file(nextiaCoreJarPath)
+		def nextiaDIJar = file(nextiaDIJarPath)
+		def nextiaBSJar = file(nextiaBSJarPath)
+		def nextiaDLJar = file(nextiaDLJarPath)
+//		def nextiaJDJar = file(nextiaJDJarPath)
+
+
+		if (!nextiaCoreJar.exists()) {
+			nextiaCorePath.tasks.uberJar.dependsOn {
+				println "Ejecutando uberJar para NextiaCore..."
+			}
+			nextiaCorePath.tasks.uberJar.execute()
+			nextiaCorePath.tasks.uberJar.get()
+
+			if (!nextiaCoreJar.exists()) {
+				throw new GradleException("No se pudo generar el archivo JAR para NextiaCore.")
+			}
+		}
+
+		if (!nextiaDIJar.exists()) {
+			nextiaDIPath.tasks.uberJar.dependsOn {
+				println "Ejecutando uberJar para NextiaDI..."
+			}
+			nextiaDIPath.tasks.uberJar.execute()
+			nextiaDIPath.tasks.uberJar.get()
+
+			if (!nextiaDIJar.exists()) {
+				throw new GradleException("No se pudo generar el archivo JAR para NextiaDI.")
+			}
+		}
+
+		if (!nextiaBSJar.exists()) {
+			nextiaBSPath.tasks.uberJar.dependsOn {
+				println "Ejecutando uberJar para NextiaBS..."
+			}
+			nextiaBSPath.tasks.uberJar.execute()
+			nextiaBSPath.tasks.uberJar.get()
+
+			if (!nextiaBSJar.exists()) {
+				throw new GradleException("No se pudo generar el archivo JAR para NextiaBS.")
+			}
+		}
+
+		if (!nextiaDLJar.exists()) {
+			nextiaDLPath.tasks.uberJar.dependsOn {
+				println "Ejecutando uberJar para NextiaDL..."
+			}
+			nextiaDLPath.tasks.uberJar.execute()
+			nextiaDLPath.tasks.uberJar.get()
+
+			if (!nextiaDLJar.exists()) {
+				throw new GradleException("No se pudo generar el archivo JAR para NextiaDL.")
+			}
+		}
+
+//		if (!nextiaJDJar.exists()) {
+//			nextiaJDPath.tasks.uberJar.dependsOn {
+//				println "Ejecutando uberJar para NextiaJD..."
+//			}
+//			nextiaJDPath.tasks.uberJar.execute()
+//			nextiaJDPath.tasks.uberJar.get()
+//
+//			if (!nextiaJDar.exists()) {
+//				throw new GradleException("No se pudo generar el archivo JAR para NextiaJD.")
+//			}
+//		}
+
+		// Copiar los JAR después de asegurarse de que existen
 		copy {
 			from nextiaCoreJarPath
-			into "..\\api\\lib"
+			into "../api/lib"
 			rename { 'NextiaCore.jar' }
 		}
 
-		configurations.compileClasspath.files.find { it.name == 'nextiadi-0.1.0-SNAPSHOT-uber.jar' }?.delete()
-		configurations.compileClasspath.files.find { it.name == 'nextiadi.jar' }?.delete()
-
 		copy {
 			from nextiaDIJarPath
-			into "..\\api\\lib"
-			rename { 'nextiadi.jar' }
+			into "../api/lib"
+			rename { 'NextiaDI.jar' }
 		}
+
+		copy {
+			from nextiaBSJarPath
+			into "../api/lib"
+			rename { 'NextiaBS.jar' }
+		}
+
+		copy {
+			from nextiaDLJarPath
+			into "../api/lib"
+			rename { 'NextiaDataLayer.jar' }
+		}
+
+//		copy {
+//			from nextiaJDJarPath
+//			into "../api/lib"
+//			rename { 'NextiaJD.jar' }
+//		}
 	}
 }
-
-compileJava.dependsOn importExternalJar
-
-

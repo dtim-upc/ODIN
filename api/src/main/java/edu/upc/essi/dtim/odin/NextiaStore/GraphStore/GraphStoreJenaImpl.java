@@ -5,14 +5,13 @@ import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleImpl;
-import edu.upc.essi.dtim.odin.NextiaGraphy.nextiaGraphyModuleInterface;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.integration.integrationModuleImpl;
-import edu.upc.essi.dtim.odin.integration.integrationModuleInterface;
-import org.apache.hadoop.shaded.javax.xml.bind.SchemaOutputResolver;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleInterface;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.*;
@@ -20,6 +19,7 @@ import org.apache.jena.tdb.TDBFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,7 +32,17 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
     public GraphStoreJenaImpl(@Autowired AppConfig appConfig) {
         this.directory = appConfig.getJenaPath();
 
-        //Open TDB Dataset
+        // Verificar si el directorio no existe y crearlo si es necesario
+        File directoryFile = new File(directory);
+        if (!directoryFile.exists()) {
+            if (directoryFile.mkdirs()) {
+                System.out.println("Directorio creado con éxito: " + directory);
+            } else {
+                System.err.println("No se pudo crear el directorio: " + directory);
+            }
+        }
+
+        // Open TDB Dataset
         dataset = TDBFactory.createDataset(directory);
     }
 

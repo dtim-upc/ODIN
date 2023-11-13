@@ -1,7 +1,7 @@
 <template>
-  <q-page padding >
+  <q-page padding>
     <!-- <p>hola 2</p> -->
-    <DataSourceIntegrationStep />
+    <DataSourceIntegrationStep/>
   </q-page>
 </template>
 

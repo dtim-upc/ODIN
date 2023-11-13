@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "class": "LocalRepository",
+  "properties": {
+    "path": {
+      "type": "string",
+      "label": "Path",
+      "maxLength": 50
+    }
+  },
+  "attributes": {
+    "path": ""
+  }
+}

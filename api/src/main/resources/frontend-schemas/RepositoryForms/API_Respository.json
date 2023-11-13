@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "class": "ApiRepository",
+  "properties": {
+    "url": {
+      "type": "string",
+      "label": "Base URL"
+    }
+  },
+  "attributes": {
+    "url": ""
+  }
+}

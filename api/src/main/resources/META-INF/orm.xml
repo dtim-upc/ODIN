@@ -39,17 +39,17 @@
             <basic name="createdBy">
                 <column name="CREATED_BY"/>
             </basic>
-            <one-to-many orphan-removal="true" name="datasets" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+
+            <one-to-many orphan-removal="true" name="repositories" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+
+            <one-to-many orphan-removal="false" name="integratedDatasets" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
                 <join-column name="PROJECTID"/>
-                <cascade>
-                    <cascade-all/>
-                </cascade>
             </one-to-many>
 
             <one-to-one name="integratedGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
-                <cascade>
-                    <cascade-all/>
-                </cascade>
+                <cascade><cascade-all/></cascade>
             </one-to-one>
             <!--> element-collections, transient and other properties here <-->
         </attributes>
@@ -75,8 +75,7 @@
 
     <entity class="edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl">
         <table name="LOCALGRAPH"/>
-        <attributes>
-        </attributes>
+        <attributes/>
     </entity>
 
     <entity class="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
@@ -87,15 +86,76 @@
     </entity>
 
     <!--> MAPPING DATASET CLASS<-->
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
-        <table name="Dataset">
-            <unique-constraint>
-                <column-name>datasetId</column-name>
-            </unique-constraint>
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+        <table name="DataRepository">
+        <unique-constraint>
+            <column-name>id</column-name>
+        </unique-constraint>
         </table>
         <inheritance strategy="JOINED"/>
         <attributes>
-            <id name="datasetId">
+            <id name="id">
+                <generated-value strategy="AUTO"/>
+            </id>
+            <basic name="repositoryName"/>
+            <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository">
+        <table name="LocalRepository"/>
+        <attributes>
+            <basic name="path">
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository">
+        <table name="ApiRepository"/>
+        <attributes>
+            <basic name="url">
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository">
+        <table name="RelationalJDBCRepository"/>
+        <attributes>
+            <basic name="username">
+            </basic>
+            <basic name="password">
+            </basic>
+            <basic name="url">
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity name="Attribute" class="edu.upc.essi.dtim.NextiaCore.discovery.Attribute">
+        <table name="Attribute"/>
+        <unique-constraint>
+            <column-name>id</column-name>
+        </unique-constraint>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="AUTO"/>
+            </id>
+            <basic name="name"/>
+            <basic name="type"/>
+            <transient name="alignment"/>
+        </attributes>
+    </entity>
+
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+        <table name="Dataset">
+        <unique-constraint>
+            <column-name>id</column-name>
+        </unique-constraint>
+        </table>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="id">
                 <generated-value strategy="AUTO"/>
             </id>
             <basic name="datasetName"/>
@@ -103,7 +163,11 @@
             <basic name="created_at">
                 <temporal>TIMESTAMP</temporal>
             </basic>
-
+            <basic name="wrapper"/>
+            <basic name="dataLayerPath"/>
+            <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+            </many-to-one>
+            <one-to-many name="attributes" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
                 <cascade><cascade-all/></cascade>
             </one-to-one>
@@ -124,6 +188,29 @@
         </attributes>
     </entity>
 
+    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset">
+        <table name="XmlDataset"/>
+        <attributes>
+            <basic name="path"/>
+        </attributes>
+    </entity>
 
+    <entity name="ParquetDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.ParquetDataset">
+        <table name="ParquetDataset"/>
+        <attributes>
+            <basic name="path"/>
+        </attributes>
+    </entity>
+
+    <entity name="SQLDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset">
+        <table name="SQLDataset"/>
+        <attributes>
+            <basic name="tableName"/>
+            <basic name="hostname"/>
+            <basic name="port"/>
+            <basic name="username"/>
+            <basic name="password"/>
+        </attributes>
+    </entity>
 
 </entity-mappings>

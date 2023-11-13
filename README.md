@@ -29,9 +29,9 @@
 
 Before running the backend project, it is necessary to create your own profile which specifies the paths needed for the application. Properties files must be created under api/src/main/resources using the following name syntax: “application-<Profile name>.properties”. To enable a profile properties you need to modify the property  profiles.active: <Profile name> in the file application.properties in the same directory 
 
-You will need also to generate or download the Nextia's libs and paste them into lib directory in ODIN/api.
+You will need also to generate or download the Nextia's libs and paste them into lib directory in ODIN/api. Or you can also download the Nextia's dependencies, configure them and generate their JARs using the task "uberJar" and finally, from ODIN project execute the task "importExternalJar" of the build.gradle file.
 
-Then, for running the project you can use the terminal command `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class.
+Then, for running the project you can use the terminal command `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class "OdinApplication.java".
 
 #### Useful links
 
@@ -49,3 +49,11 @@ https://www.arquitecturajava.com/spring-autowired-y-la-inyeccion-de-dependencias
 #### Set up
 
 The first time running the frontend, dependencies must be installed using the command `yarn install` under the frontend folder directory. Once dependencies are installed, the frontend server can be started using the command `quasar dev` which creates a server at 8080 or the close available port.
+
+If it's not working, try this:
+llega a la carpeta del frontend: cd .../frontend
+mira si está el fichero .json: dir package.json
+instalalo: npm init -y
+ejecuta: quasar dev
+
+IF STILL NOT WORKING CHECK THE package.json and ensure to have installed the Node.js, etc.

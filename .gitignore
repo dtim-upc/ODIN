@@ -1,6 +1,5 @@
 *.csv
 !csvTestFile.csv
-ODINwhiteboard/odin/src/main/resources/credentials.properties
 *.bpt
 *.dat
 *.idn
@@ -10,6 +9,11 @@ ODINwhiteboard/odin/src/main/resources/credentials.properties
 *.lock
 *.db
 *.json
+*.xml
+!api/src/main/resources/frontend-schemas/RepositoryForms/*.json
+!orm.xml
+!package.json
+!persistence.xml
 !N85A9SX4TX2SkZ25_enfermedades.json
 !jsonTestFile.json
 !corruptJsonTestFile.json
@@ -22,3 +26,6 @@ api/lib/NextiaBS-1.0-SNAPSHOT-uber.jar
 api/dbFiles/ttl/integrated
 *.lck
 *.bak_002d
+*.html
+*.png
+*.parquet

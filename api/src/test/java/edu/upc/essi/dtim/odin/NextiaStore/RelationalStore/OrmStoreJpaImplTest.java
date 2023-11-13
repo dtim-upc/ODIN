@@ -55,7 +55,7 @@ class OrmStoreJpaImplTest {
         tx.commit();
         em.close();
 
-        // Call the findById method
+        // Call the getProjectById method
         Project foundEntity = ormImplementation.findById(Project.class, entity.getProjectId());
 
         // Verify if the object is found successfully
@@ -67,7 +67,7 @@ class OrmStoreJpaImplTest {
     @Test
     void testFindById_error() {
 
-        // Call the findById method
+        // Call the getProjectById method
         Project foundEntity = ormImplementation.findById(Project.class, "invented");
 
         // Verify if the object is found successfully
