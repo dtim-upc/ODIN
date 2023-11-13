@@ -22,8 +22,10 @@
 
 * Gradle >= v6.8
 * NextiaCore.jar
+* NextiaDataLayer.jar
 * NextiaDI.jar
 * NextiaBS.jar
+* NextiaJD.jar
 
 #### Set up
 
