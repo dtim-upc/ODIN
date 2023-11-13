@@ -3,7 +3,7 @@
     <q-spinner-pie v-if="loading" color="light-blue" size="5em" align="center"/>
 
     <q-card v-else style="width: 400px; max-width: 80vw">
-      <q-card-section >
+      <q-card-section>
         <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
@@ -131,7 +131,7 @@
           <q-card-section v-if="isAPIRepository">
             <q-badge color="secondary" multi-line>
               GET
-              {{  }}
+              {{ }}
             </q-badge>
             <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
             <q-input
@@ -237,7 +237,7 @@ async function makeRequest() {
   }
 
   if (repositorio_encontrado) {
-    notify.positive("REQUEST MADE: "+repositorio_encontrado.url+endpoint);
+    notify.positive("REQUEST MADE: " + repositorio_encontrado.url + endpoint);
 
     try {
       const response = await odinApi.get(`/makeRequest?url=${encodeURIComponent(repositorio_encontrado.url + endpoint)}`, {
@@ -255,12 +255,12 @@ async function makeRequest() {
       } else {
         // Si no se encuentra Content-Disposition, intenta obtener el nombre del archivo del URL
         const urlParts = repositorio_encontrado.url.split('/');
-        filename = urlParts[urlParts.length - 1]+".json";
+        filename = urlParts[urlParts.length - 1] + ".json";
       }
 
       // Crea un nuevo objeto File a partir de la respuesta
-      const blob = new Blob([response.data], { type: 'application/json' });
-      const file = new File([blob], filename, { type: 'application/json' });
+      const blob = new Blob([response.data], {type: 'application/json'});
+      const file = new File([blob], filename, {type: 'application/json'});
 
       uploadedItems.value.push(file);
     } catch (error) {

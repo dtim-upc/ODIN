@@ -21,10 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -131,15 +133,14 @@ public class SourceController {
             //future check when adding authentification
 
             // Check if a new repository should be created or an existing one should be used
-            boolean createRepo = (repositoryId == null) || (repositoryId.equals(""));
+            boolean haveToCreateRepository = (repositoryId == null) || (repositoryId.equals(""));
 
             // Find/create repository
             DataRepository repository;
-            if (createRepo) {
+            if (haveToCreateRepository) {
                 // Create a new repository and add it to the project
                 repository = sourceService.createRepository(repositoryName, "LocalRepository");
                 sourceService.addRepositoryToProject(projectId, repository.getId());
-                createRepo = false;
             } else {
                 // Find the existing repository using the provided repositoryId
                 repository = sourceService.findRepositoryById(repositoryId);
@@ -149,88 +150,9 @@ public class SourceController {
 
 
             if (attachFiles == null || attachFiles.isEmpty()){
-                System.out.println(attachTables);
-                for (String tableName : attachTables){
-                    System.out.println(tableName + " ++++++++++ table name");
-                    // Get the original filename of the uploaded file
-                    String originalFileName = tableName;
-                    datasetName = originalFileName;
-
-                    // Extract data from datasource file and save it
-                    Dataset savedDataset = sourceService.extractData(null, datasetName, datasetDescription);
-
-                    // Add the dataset to the repository and delete the reference from others if exists
-                    savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
-                    repository = sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
-
-                    // Transform datasource into graph and generate the wrapper
-                    BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-                    Graph graph = bsResult.getGraph();
-
-                    // Generating visual schema for frontend
-                    String visualSchema = sourceService.generateVisualSchema(graph);
-                    graph.setGraphicalSchema(visualSchema);
-
-                    //Set wrapper to the dataset
-                    String wrapper = bsResult.getWrapper();
-                    savedDataset.setWrapper(wrapper);
-
-                    // Create the relation with dataset adding the graph generated to generate an id
-                    Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
-                    graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-
-                    // Save graph into the database
-                    sourceService.saveGraphToDatabase(graph);
-
-                    sourceService.uploadToDataLayer(datasetWithGraph);
-                }
+                handleAttachTables(attachTables, datasetName, datasetDescription, repositoryId);
             } else {
-                // Iterate through the list of MultipartFiles to handle each file
-                for (MultipartFile attachFile : attachFiles) {
-                    // Get the original filename of the uploaded file
-                    String originalFileName = attachFile.getOriginalFilename();
-
-                    // Use the original filename as the datasetName
-                    assert originalFileName != null;
-                    int slashIndex = originalFileName.lastIndexOf("/");
-                    int dotIndex = originalFileName.lastIndexOf('.');
-                    datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
-
-                    // Reconstruct file from Multipart file
-                    String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());
-
-                    // Extract data from datasource file and save it
-                    Dataset savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
-
-                    // Add the dataset to the repository and delete the reference from others if exists
-                    sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
-                    sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
-
-                    // Transform datasource into graph
-                    BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-                    Graph graph = bsResult.getGraph();
-
-                    // Generating visual schema for frontend
-                    String visualSchema = sourceService.generateVisualSchema(graph);
-                    graph.setGraphicalSchema(visualSchema);
-
-                    String wrapper = bsResult.getWrapper();
-                    savedDataset.setWrapper(wrapper);
-
-                    // Create the relation with dataset adding the graph generated to generate an id
-                    Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
-                    graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-                    // Get the disk path from the app configuration
-                    Path diskPath = Path.of(appConfig.getDiskPath());
-                    graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
-
-                    // Save graph into the database
-                    sourceService.saveGraphToDatabase(graph);
-
-                    sourceService.uploadToDataLayer(datasetWithGraph);
-
-                    //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
-                }
+                handleAttachFiles(attachFiles, datasetName, datasetDescription, directoryName, repositoryId);
             }
 
             // Return success message
@@ -241,6 +163,111 @@ public class SourceController {
             e.printStackTrace();
             logger.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
+        }
+    }
+
+    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetName, String datasetDescription, String directoryName, String repositoryId) {
+        // Iterate through the list of MultipartFiles to handle each file
+        for (MultipartFile attachFile : attachFiles) {
+            // Get the original filename of the uploaded file
+            String originalFileName = attachFile.getOriginalFilename();
+
+            // Use the original filename as the datasetName
+            assert originalFileName != null;
+            int slashIndex = originalFileName.lastIndexOf("/");
+            int dotIndex = originalFileName.lastIndexOf('.');
+            datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
+
+            // Reconstruct file from Multipart file
+            String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());
+
+            // Extract data from datasource file and save it
+            Dataset savedDataset = null;
+            try {
+                savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Add the dataset to the repository and delete the reference from others if exists
+            sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
+            sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
+
+            // Transform datasource into graph
+            BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
+            Graph graph = bsResult.getGraph();
+
+            // Generating visual schema for frontend
+            String visualSchema = sourceService.generateVisualSchema(graph);
+            graph.setGraphicalSchema(visualSchema);
+
+            String wrapper = bsResult.getWrapper();
+            savedDataset.setWrapper(wrapper);
+
+            // Create the relation with dataset adding the graph generated to generate an id
+            Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
+            graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
+            // Get the disk path from the app configuration
+            Path diskPath = Path.of(appConfig.getDiskPath());
+            graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
+
+            // Save graph into the database
+            sourceService.saveGraphToDatabase(graph);
+
+            sourceService.uploadToDataLayer(datasetWithGraph);
+
+            //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
+        }
+    }
+
+    private void handleAttachTables(List<String> attachTables, String datasetName, String datasetDescription, String repositoryId) {
+        System.out.println(attachTables);
+        for (String tableName : attachTables){
+            System.out.println(tableName + " ++++++++++ table name");
+            // Get the original filename of the uploaded file
+            String originalFileName = tableName;
+            datasetName = originalFileName;
+
+            // Extract data from datasource file and save it
+            Dataset savedDataset = null;
+            try {
+                savedDataset = sourceService.extractData(null, datasetName, datasetDescription);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Add the dataset to the repository and delete the reference from others if exists
+            savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
+            sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
+
+            // Transform datasource into graph and generate the wrapper
+            BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
+            Graph graph = bsResult.getGraph();
+
+            // Generating visual schema for frontend
+            String visualSchema = sourceService.generateVisualSchema(graph);
+            graph.setGraphicalSchema(visualSchema);
+
+            //Set wrapper to the dataset
+            String wrapper = bsResult.getWrapper();
+            savedDataset.setWrapper(wrapper);
+
+            // Create the relation with dataset adding the graph generated to generate an id
+            Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
+            graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
+
+            // Save graph into the database
+            sourceService.saveGraphToDatabase(graph);
+
+            sourceService.uploadToDataLayer(datasetWithGraph);
         }
     }
 
