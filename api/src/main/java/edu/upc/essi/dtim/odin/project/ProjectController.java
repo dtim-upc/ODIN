@@ -26,7 +26,7 @@ public class ProjectController {
      *
      * @param projectService The ProjectService to be used.
      */
-    ProjectController(@Autowired ProjectService projectService){
+    ProjectController(@Autowired ProjectService projectService) {
         this.projectService = projectService;
     }
 
@@ -48,7 +48,7 @@ public class ProjectController {
      *
      * @param id The ID of the project to retrieve.
      * @return A ResponseEntity containing the retrieved project and HTTP status 200 (OK) if found,
-     *         or HTTP status 404 (Not Found) if not found.
+     * or HTTP status 404 (Not Found) if not found.
      */
     @GetMapping("/projects/{id}")
     public ResponseEntity<Project> getProject(@PathVariable("id") String id) {
@@ -78,7 +78,7 @@ public class ProjectController {
      *
      * @param id The ID of the project to delete.
      * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was deleted,
-     *         or HTTP status 404 (Not Found) if the project was not found.
+     * or HTTP status 404 (Not Found) if the project was not found.
      */
     @DeleteMapping("/deleteProject/{id}")
     public ResponseEntity<Boolean> deleteProject(@PathVariable("id") String id) {
@@ -102,7 +102,7 @@ public class ProjectController {
      *
      * @param project The project to edit.
      * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was edited,
-     *         or HTTP status 404 (Not Found) if the project was not found.
+     * or HTTP status 404 (Not Found) if the project was not found.
      */
     @PostMapping("/editProject")
     public ResponseEntity<Boolean> editProject(@RequestBody Project project) {
@@ -127,7 +127,7 @@ public class ProjectController {
      *
      * @param id The ID of the project to clone.
      * @return A ResponseEntity containing the cloned project and HTTP status 201 (Created) if successful,
-     *         or HTTP status 304 (Not Modified) if the project was not cloned.
+     * or HTTP status 304 (Not Modified) if the project was not cloned.
      */
     @PostMapping("/cloneProject/{id}")
     public ResponseEntity<Project> cloneProject(@PathVariable("id") String id) {

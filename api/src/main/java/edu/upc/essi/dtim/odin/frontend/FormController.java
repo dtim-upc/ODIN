@@ -1,6 +1,5 @@
 package edu.upc.essi.dtim.odin.frontend;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.odin.repositories.POJOs.DataRepositoryTypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +47,10 @@ public class FormController {
 
     @GetMapping("/formSchema/{fileName}")
     public String getConcreteFormSchema(@PathVariable("fileName") String fileName) {
-        logger.info("FORMSCHEMA ASKED: "+fileName);
+        logger.info("FORMSCHEMA ASKED: " + fileName);
         try {
             // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "../api/src/main/resources/frontend-schemas/RepositoryForms/"+fileName;
+            String filePath = "../api/src/main/resources/frontend-schemas/RepositoryForms/" + fileName;
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {

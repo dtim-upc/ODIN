@@ -40,16 +40,23 @@
                 <column name="CREATED_BY"/>
             </basic>
 
-            <one-to-many orphan-removal="true" name="repositories" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
-                <cascade><cascade-all/></cascade>
+            <one-to-many orphan-removal="true" name="repositories"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
             </one-to-many>
 
-            <one-to-many orphan-removal="false" name="integratedDatasets" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+            <one-to-many orphan-removal="false" name="integratedDatasets"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
                 <join-column name="PROJECTID"/>
             </one-to-many>
 
-            <one-to-one name="integratedGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
-                <cascade><cascade-all/></cascade>
+            <one-to-one name="integratedGraph"
+                        target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
             </one-to-one>
             <!--> element-collections, transient and other properties here <-->
         </attributes>
@@ -65,7 +72,9 @@
         </table>
         <inheritance strategy="JOINED"/>
         <attributes>
-            <id name="graphName"><generated-value strategy="AUTO"/></id>
+            <id name="graphName">
+                <generated-value strategy="AUTO"/>
+            </id>
             <basic name="graphicalSchema">
                 <column name="GRAPHICALSCHEMA"/>
             </basic>
@@ -88,9 +97,9 @@
     <!--> MAPPING DATASET CLASS<-->
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
         <table name="DataRepository">
-        <unique-constraint>
-            <column-name>id</column-name>
-        </unique-constraint>
+            <unique-constraint>
+                <column-name>id</column-name>
+            </unique-constraint>
         </table>
         <inheritance strategy="JOINED"/>
         <attributes>
@@ -98,8 +107,11 @@
                 <generated-value strategy="AUTO"/>
             </id>
             <basic name="repositoryName"/>
-            <one-to-many name="datasets" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
-                <cascade><cascade-all/></cascade>
+            <one-to-many name="datasets" orphan-removal="true"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
             </one-to-many>
         </attributes>
     </entity>
@@ -149,9 +161,9 @@
 
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
         <table name="Dataset">
-        <unique-constraint>
-            <column-name>id</column-name>
-        </unique-constraint>
+            <unique-constraint>
+                <column-name>id</column-name>
+            </unique-constraint>
         </table>
         <inheritance strategy="JOINED"/>
         <attributes>
@@ -165,11 +177,15 @@
             </basic>
             <basic name="wrapper"/>
             <basic name="dataLayerPath"/>
-            <many-to-one name="repository" target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+            <many-to-one name="repository"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
             </many-to-one>
-            <one-to-many name="attributes" orphan-removal="true" target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>
+            <one-to-many name="attributes" orphan-removal="true"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>
             <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
-                <cascade><cascade-all/></cascade>
+                <cascade>
+                    <cascade-all/>
+                </cascade>
             </one-to-one>
         </attributes>
     </entity>

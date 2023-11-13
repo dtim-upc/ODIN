@@ -4,8 +4,8 @@ public enum Vocabulary {
 
 
     IntegrationClass(Namespaces.NEXTIADI.val() + "IntegratedClass"),
-    IntegrationDProperty( Namespaces.NEXTIADI.val() + "IntegratedDatatypeProperty"),
-    IntegrationOProperty( Namespaces.NEXTIADI.val() + "IntegratedObjectProperty"),
+    IntegrationDProperty(Namespaces.NEXTIADI.val() + "IntegratedDatatypeProperty"),
+    IntegrationOProperty(Namespaces.NEXTIADI.val() + "IntegratedObjectProperty"),
 
     JoinProperty(Namespaces.NEXTIADI.val() + "JoinProperty"),
     JoinObjectProperty(Namespaces.NEXTIADI.val() + "JoinObjectProperty");
@@ -19,7 +19,6 @@ public enum Vocabulary {
     public String val() {
         return element;
     }
-
 
 
 }

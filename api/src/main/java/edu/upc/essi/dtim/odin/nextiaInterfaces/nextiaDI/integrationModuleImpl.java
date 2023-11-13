@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of the integration module interface for integrating RDF graphs.
  */
-public class integrationModuleImpl implements integrationModuleInterface{
+public class integrationModuleImpl implements integrationModuleInterface {
     @Override
     public Graph integrate(Graph graphA, Graph graphB, List<Alignment> alignments) {
         Graph integratedGraph = CoreGraphFactory.createGraphInstance("normal");
@@ -60,9 +60,9 @@ public class integrationModuleImpl implements integrationModuleInterface{
         Graph schemaIntegration = CoreGraphFactory.createGraphInstance("normal");
         NextiaDI n = new NextiaDI();
 
-        for(JoinAlignment a : joinAlignments) {
+        for (JoinAlignment a : joinAlignments) {
 
-            if(a.getRightArrow())
+            if (a.getRightArrow())
                 schemaIntegration.setGraph(n.JoinIntegration(integratedGraph.getGraph(), a.getIriA(), a.getIriB(), a.getL(), a.getRelationship(), a.getDomainA(), a.getDomainB()));
             else
                 schemaIntegration.setGraph(n.JoinIntegration(integratedGraph.getGraph(), a.getIriA(), a.getIriB(), a.getL(), a.getRelationship(), a.getDomainB(), a.getDomainA()));
@@ -81,7 +81,7 @@ public class integrationModuleImpl implements integrationModuleInterface{
      * @param graph The input graph.
      * @return A global graph.
      */
-    public Graph generateGlobalGraph(Graph graph){
+    public Graph generateGlobalGraph(Graph graph) {
         Graph globalGraph = CoreGraphFactory.createGlobalGraph();
 
         NextiaDI n = new NextiaDI();
@@ -103,22 +103,22 @@ public class integrationModuleImpl implements integrationModuleInterface{
      */
     public Model retrieveSourceGraph(List<Alignment> alignments, Graph graph) {
         // Todo think in a better way to do this. Maybe identifiers should be declared when loading data
-        List<Alignment> aligId= alignments.stream().filter(x -> x.getType().contains("datatype")  ).collect(Collectors.toList());;
+        List<Alignment> aligId = alignments.stream().filter(x -> x.getType().contains("datatype")).collect(Collectors.toList());
 
         Model sourceG = graph.getGraph();
 
-        for ( Alignment a : aligId) {
+        for (Alignment a : aligId) {
             Resource rA = sourceG.createResource(a.getIriA());
             Resource rB = sourceG.createResource(a.getIriB());
 
-            if (sourceG.containsResource(rA) ) {
-                graph.addTriple(rA.getURI(), RDFS.subClassOf.getURI(),Namespaces.SCHEMA.val()+"identifier");
+            if (sourceG.containsResource(rA)) {
+                graph.addTriple(rA.getURI(), RDFS.subClassOf.getURI(), Namespaces.SCHEMA.val() + "identifier");
             } else {
-                graph.addTriple(rB.getURI(), RDFS.subClassOf.getURI(), Namespaces.SCHEMA.val()+"identifier");
+                graph.addTriple(rB.getURI(), RDFS.subClassOf.getURI(), Namespaces.SCHEMA.val() + "identifier");
             }
         }
 
         sourceG = graph.getGraph();
-        return  sourceG;
+        return sourceG;
     }
 }

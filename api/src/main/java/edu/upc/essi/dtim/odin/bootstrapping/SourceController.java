@@ -108,8 +108,6 @@ public class SourceController {
     }
 
 
-
-
     /**
      * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.
      *
@@ -127,7 +125,7 @@ public class SourceController {
                                             @RequestParam(required = false) String datasetDescription,
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
                                             @RequestParam(required = false) List<String> attachTables) {
-        try{
+        try {
             logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here
             //future check when adding authentification
@@ -149,7 +147,7 @@ public class SourceController {
             String directoryName = repositoryId.toString() + repository.getRepositoryName().toString();
 
 
-            if (attachFiles == null || attachFiles.isEmpty()){
+            if (attachFiles == null || attachFiles.isEmpty()) {
                 handleAttachTables(attachTables, datasetName, datasetDescription, repositoryId);
             } else {
                 handleAttachFiles(attachFiles, datasetName, datasetDescription, directoryName, repositoryId);
@@ -226,7 +224,7 @@ public class SourceController {
 
     private void handleAttachTables(List<String> attachTables, String datasetName, String datasetDescription, String repositoryId) {
         System.out.println(attachTables);
-        for (String tableName : attachTables){
+        for (String tableName : attachTables) {
             System.out.println(tableName + " ++++++++++ table name");
             // Get the original filename of the uploaded file
             String originalFileName = tableName;
@@ -280,15 +278,15 @@ public class SourceController {
      */
     @DeleteMapping("/project/{projectId}/datasource/{id}")
     public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectId") String projectId,
-                                                    @PathVariable("id") String id) {
+                                                 @PathVariable("id") String id) {
         // Print a message to indicate that the delete request was received
-        logger.info("DELETE A DATASOURCE from project: {}" ,projectId);
-        logger.info("DELETE A DATASOURCE RECEIVED: {}" ,id);
+        logger.info("DELETE A DATASOURCE from project: {}", projectId);
+        logger.info("DELETE A DATASOURCE RECEIVED: {}", id);
 
         boolean deleted = false;
 
         //Check if the dataset is part of that project
-        if(sourceService.projectContains(projectId, id)){
+        if (sourceService.projectContains(projectId, id)) {
             sourceService.deleteDatasetFromDataLayer(id);
             sourceService.deleteDatasetFile(id);
 
@@ -320,11 +318,11 @@ public class SourceController {
     @GetMapping("/project/{id}/datasources")
     public ResponseEntity<Object> getDatasourcesFromProject(@PathVariable String id) {
         try {
-            logger.info("GET ALL DATASOURCE FROM PROJECT {}" , id);
+            logger.info("GET ALL DATASOURCE FROM PROJECT {}", id);
             List<Dataset> datasets = sourceService.getDatasetsOfProject(id);
 
             if (datasets.isEmpty()) {
-                return new ResponseEntity<>("There are no datasets yet",HttpStatus.NO_CONTENT);
+                return new ResponseEntity<>("There are no datasets yet", HttpStatus.NO_CONTENT);
             }
 
             return new ResponseEntity<>(datasets, HttpStatus.OK);
@@ -391,12 +389,12 @@ public class SourceController {
     /**
      * Edits a dataset in a specific project.
      *
-     * @param projectId         The ID of the project where the dataset belongs.
-     * @param datasetId         The ID of the dataset to edit.
-     * @param datasetName       The new name for the dataset.
+     * @param projectId          The ID of the project where the dataset belongs.
+     * @param datasetId          The ID of the dataset to edit.
+     * @param datasetName        The new name for the dataset.
      * @param datasetDescription The new description for the dataset (optional, default is an empty string).
-     * @param repositoryId      The ID of the repository where the dataset should be stored.
-     * @param repositoryName    The name of the repository (used when creating a new one).
+     * @param repositoryId       The ID of the repository where the dataset should be stored.
+     * @param repositoryName     The name of the repository (used when creating a new one).
      * @return A ResponseEntity object containing a boolean indicating if the dataset was edited successfully or not.
      */
     @PostMapping("/editDataset")
@@ -498,9 +496,9 @@ public class SourceController {
             @PathVariable("datasetID") String datasetID
     ) {
         logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
-        sourceService.setProjectSchemasBase(projectID,datasetID);
+        sourceService.setProjectSchemasBase(projectID, datasetID);
         sourceService.deleteIntegratedDatasets(projectID);
-        sourceService.addIntegratedDataset(projectID,datasetID);
+        sourceService.addIntegratedDataset(projectID, datasetID);
 
         return ResponseEntity.ok("Dataset schema set as project schema.");
 
@@ -509,11 +507,11 @@ public class SourceController {
     }
 
     @PostMapping("prueba")
-    public ResponseEntity<String> pru(@RequestBody String path){
-        System.out.println("Generating visual graph for file: "+path);
+    public ResponseEntity<String> pru(@RequestBody String path) {
+        System.out.println("Generating visual graph for file: " + path);
         String visualSchemaIntegration = "";
-        if(path != null) {
-            Model model = RDFDataMgr.loadModel(path) ;
+        if (path != null) {
+            Model model = RDFDataMgr.loadModel(path);
             Graph g = CoreGraphFactory.createNormalGraph();
             g.setGraph(model);
             NextiaGraphy ng = new NextiaGraphy();

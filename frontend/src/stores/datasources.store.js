@@ -38,7 +38,7 @@ export const useDataSourceStore = defineStore('datasource', {
     getRepos(state) {
       return state.repositories
     },
-    getSelectedRepositoryId(state){
+    getSelectedRepositoryId(state) {
       return state.selectedRepositoryId;
     },
   },
@@ -53,7 +53,7 @@ export const useDataSourceStore = defineStore('datasource', {
       this.selectedRepositoryType = this.repositories.some(repository => repository.id === this.selectedRepositoryId) ? this.repositories.find(repository => repository.id === this.selectedRepositoryId).repositoryType : "ERROR 404 No type";
     },
 
-    setSelectedRepositoryName(repositoryId){
+    setSelectedRepositoryName(repositoryId) {
       this.selectedRepositoryName = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId).repositoryName : "ERROR 404 No name";
     },
 
@@ -167,8 +167,8 @@ export const useDataSourceStore = defineStore('datasource', {
       api.editDatasource(data, authStore.user.accessToken)
         .then((response) => {
           if (response.status === 200) {
-              notify.positive(`Dataset successfully edited`);
-              successCallback()
+            notify.positive(`Dataset successfully edited`);
+            successCallback()
           } else {
             notify.negative("Cannot edit data. Something went wrong on the server.");
           }
@@ -270,7 +270,7 @@ export const useDataSourceStore = defineStore('datasource', {
       const notify = useNotify()
       api.setDatasetSchemaAsProjectOne(this.project.projectId, ds.id, authStore.user.accessToken)
         .then((response) => {
-          console.log(response+" fffffffffffffffffffffffffffffffffff");
+          console.log(response + " fffffffffffffffffffffffffffffffffff");
           if (response.status == 200) {
             notify.positive("Schema successfully set")
             this.updateProjectInfo()
