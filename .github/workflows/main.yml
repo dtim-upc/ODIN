@@ -1,9 +1,9 @@
 name: Sonarcloud
 on:
   push:
-    branches: [ master, ODINwhiteboard ]
+    branches: [ main, automation ]
   pull_request:
-   branches: [ master, ODINwhiteboard ]
+   branches: [ main, automation ]
    # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 jobs:
