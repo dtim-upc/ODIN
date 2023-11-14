@@ -97,6 +97,8 @@ dependencies {
 
 	//implementation fileTree(dir: 'lib', include: ['*.jar'])
 
+	implementation group: 'org.apache.spark', name: 'spark-sql_2.13', version: '3.3.2'
+
 }
 
 

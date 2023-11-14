@@ -5,6 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.odin.query.pojos.Property;
 import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
 import edu.upc.essi.dtim.odin.query.pojos.RDFSResult;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 
 import java.util.*;
 
@@ -13,69 +21,74 @@ public class qrModuleImpl implements qrModuleInterface {
     public RDFSResult makeQuery(QueryDataSelection body) {
         // Crear una instancia de RDFSResult
         RDFSResult res = new RDFSResult();
+        Dataset<Row> dataFrame = hardcodeDataFrame(body.getProperties());
 
         // Configurar las columnas
-        res.setColumns(Arrays.asList("Subject", "Predicate", "Object", "DataType"));
+        res.setColumns(List.of(dataFrame.columns()));
 
-        // Filas hardcodeadas
-        List<List<String>> hardCodedRows = Arrays.asList(
-                Arrays.asList("Person1", "hasName", "John Doe", "xsd:string"),
-                Arrays.asList("Person2", "hasAge", "25", "xsd:integer"),
-                Arrays.asList("Person3", "hasOccupation", "Engineer", "xsd:string"),
-                Arrays.asList("Person4", "hasCity", "New York", "xsd:string"),
-                Arrays.asList("Person5", "hasAge", "30", "xsd:integer"),
-                Arrays.asList("Person6", "hasOccupation", "Doctor", "xsd:string"),
-                Arrays.asList("Person7", "hasCity", "San Francisco", "xsd:string"),
-                Arrays.asList("Person8", "hasAge", "28", "xsd:integer"),
-                Arrays.asList("Person9", "hasOccupation", "Teacher", "xsd:string"),
-                Arrays.asList("Person10", "hasCity", "London", "xsd:string")
-        );
+        // Configurar las filas
+        res.setRows(getRowsFromDataFrame(dataFrame));
 
-        // Adaptar las filas al formato necesario
+        return res;
+    }
+
+    private List<String> getRowsFromDataFrame(Dataset<Row> dataFrame) {
+        // Crear una lista para almacenar las filas adaptadas
         List<String> adaptedRows = new ArrayList<>();
 
-        List<Property> properties = body.getProperties();
-        int rowCounter = properties.size();
-        int hardcodedModule = hardCodedRows.size();
-        for (Property property : properties) {
-            Map<String, String> rowMap = new HashMap<>();
-            for (int i = 0; i < res.getColumns().size(); i++) {
-                if (i == 0) {
-                    String iri = property.getIri();
-                    String ultimaParte = iri;
-                    // Encuentra la última posición del símbolo '#'
-                    int lastHashIndex = iri.lastIndexOf("/");
+        // Iterar sobre las filas del DataFrame
+        for (Row row : dataFrame.collectAsList()) {
+            Map<String, String> adaptedRow = new HashMap<>();
 
-                    // Comprueba si se encontró el símbolo '#'
-                    if (lastHashIndex != -1) {
-                        // Obtiene la parte de la cadena desde la última posición del símbolo '#' hasta el final
-                        ultimaParte = iri.substring(lastHashIndex + 1);
-
-                        // Imprime la última parte
-                        System.out.println("Última parte de la cadena: " + ultimaParte);
-                    } else {
-                        // Si no se encuentra el símbolo '#', imprime un mensaje de error o realiza alguna acción apropiada
-                        System.out.println("La cadena no contiene el símbolo '/'");
-                    }
-
-                    rowMap.put(res.getColumns().get(i), ultimaParte);
-                } else {
-                    rowMap.put(res.getColumns().get(i), hardCodedRows.get(rowCounter % hardcodedModule).get(i));
-                }
+            // Iterar sobre las columnas del DataFrame
+            for (String column : dataFrame.columns()) {
+                adaptedRow.put(column, row.getString(row.fieldIndex(column)));
             }
 
-            --rowCounter;
-            if (rowCounter < 0) rowCounter = 50;
-
             // Convertir el mapa a una cadena JSON y agregarlo a la lista
-            String rowJson = convertMapToJsonString(rowMap);
+            String rowJson = convertMapToJsonString(adaptedRow);
             adaptedRows.add(rowJson);
         }
 
-        // Asignar las filas adaptadas a la instancia de RDFSResult
-        res.setRows(adaptedRows);
+        return adaptedRows;
+    }
 
-        return res;
+    private Dataset<Row> hardcodeDataFrame(List<Property> properties) {
+        // Configuración de Spark
+        SparkSession spark = SparkSession.builder()
+                .appName("SparkExample")
+                .master("local[*]")
+                .getOrCreate();
+
+        // Crear un conjunto de datos hardcodeado
+        // Aquí estoy creando un DataFrame con las columnas "Subject", "Predicate", "Object", "DataType"
+        List<Row> data = Arrays.asList(
+                RowFactory.create("Person1", "hasName", "John Doe", "xsd:string"),
+                RowFactory.create("Person2", "hasAge", "25", "xsd:integer"),
+                RowFactory.create("Person3", "hasOccupation", "Engineer", "xsd:string"),
+                RowFactory.create("Person4", "hasCity", "New York", "xsd:string"),
+                RowFactory.create("Person5", "hasAge", "30", "xsd:integer"),
+                RowFactory.create("Person6", "hasOccupation", "Doctor", "xsd:string"),
+                RowFactory.create("Person7", "hasCity", "San Francisco", "xsd:string"),
+                RowFactory.create("Person8", "hasAge", "28", "xsd:integer"),
+                RowFactory.create("Person9", "hasOccupation", "Teacher", "xsd:string"),
+                RowFactory.create("Person10", "hasCity", "London", "xsd:string")
+        );
+
+        // Definir el esquema del DataFrame
+        StructType schema = new StructType(new StructField[]{
+                new StructField("Subject", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("Predicate", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("Object", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("DataType", DataTypes.StringType, false, Metadata.empty())
+        });
+
+        for (Property property : properties){
+            schema.add(new StructField("Subject", DataTypes.StringType, false, Metadata.empty()));
+        }
+
+        // Crear el DataFrame
+        return spark.createDataFrame(data, schema);
     }
 
     // Método para convertir un mapa a una cadena JSON todo eliminar cuando ya no se hardcodee
