@@ -61,34 +61,47 @@ public class qrModuleImpl implements qrModuleInterface {
                 .getOrCreate();
 
         // Crear un conjunto de datos hardcodeado
-        // Aquí estoy creando un DataFrame con las columnas "Subject", "Predicate", "Object", "DataType"
-        List<Row> data = Arrays.asList(
-                RowFactory.create("Person1", "hasName", "John Doe", "xsd:string"),
-                RowFactory.create("Person2", "hasAge", "25", "xsd:integer"),
-                RowFactory.create("Person3", "hasOccupation", "Engineer", "xsd:string"),
-                RowFactory.create("Person4", "hasCity", "New York", "xsd:string"),
-                RowFactory.create("Person5", "hasAge", "30", "xsd:integer"),
-                RowFactory.create("Person6", "hasOccupation", "Doctor", "xsd:string"),
-                RowFactory.create("Person7", "hasCity", "San Francisco", "xsd:string"),
-                RowFactory.create("Person8", "hasAge", "28", "xsd:integer"),
-                RowFactory.create("Person9", "hasOccupation", "Teacher", "xsd:string"),
-                RowFactory.create("Person10", "hasCity", "London", "xsd:string")
-        );
-
-        // Definir el esquema del DataFrame
-        StructType schema = new StructType(new StructField[]{
-                new StructField("Subject", DataTypes.StringType, false, Metadata.empty()),
-                new StructField("Predicate", DataTypes.StringType, false, Metadata.empty()),
-                new StructField("Object", DataTypes.StringType, false, Metadata.empty()),
-                new StructField("DataType", DataTypes.StringType, false, Metadata.empty())
-        });
+        // Definir el esquema del DataFrame (las columnas)
+        StructType schema = new StructType();
 
         for (Property property : properties){
-            schema.add(new StructField("Subject", DataTypes.StringType, false, Metadata.empty()));
+            String iri = property.getIri();
+            String ultimaParte = iri;
+            // Encuentra la última posición del símbolo '#'
+            int lastHashIndex = iri.lastIndexOf("/");
+
+            // Comprueba si se encontró el símbolo '#'
+            if (lastHashIndex != -1) {
+                // Obtiene la parte de la cadena desde la última posición del símbolo '#' hasta el final
+                ultimaParte = iri.substring(lastHashIndex + 1);
+
+                // Imprime la última parte
+                System.out.println("Última parte de la cadena: " + ultimaParte);
+            } else {
+                // Si no se encuentra el símbolo '#', imprime un mensaje de error o realiza alguna acción apropiada
+                System.out.println("La cadena no contiene el símbolo '/'");
+            }
+            schema = schema.add(new StructField(ultimaParte, DataTypes.StringType, false, Metadata.empty()));
         }
+
+        List<Row> data = generateDataFromColumnsNum(properties.size());
 
         // Crear el DataFrame
         return spark.createDataFrame(data, schema);
+    }
+
+    private List<Row> generateDataFromColumnsNum(int size) {
+        List<Row> data = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            List<Object> values = new ArrayList<>();
+            for (int j = 1; j <= size; j++) {
+                values.add("Value " + i + " col. " + j);
+            }
+            data.add(RowFactory.create(values.toArray()));
+        }
+
+        return data;
     }
 
     // Método para convertir un mapa a una cadena JSON todo eliminar cuando ya no se hardcodee
