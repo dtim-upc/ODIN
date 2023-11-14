@@ -19,17 +19,23 @@ import java.util.*;
 public class qrModuleImpl implements qrModuleInterface {
     @Override
     public RDFSResult makeQuery(QueryDataSelection body) {
-        // Crear una instancia de RDFSResult
-        RDFSResult res = new RDFSResult();
+        //TODO modificar siguiente llamada a la del módulo de la query que debería retornar un Dataset<Row>
         Dataset<Row> dataFrame = hardcodeDataFrame(body.getProperties());
 
+        // Crear una instancia de RDFSResult
+        RDFSResult res = new RDFSResult();
+
         // Configurar las columnas
-        res.setColumns(List.of(dataFrame.columns()));
+        res.setColumns(getColumnsFromDataFrame(dataFrame));
 
         // Configurar las filas
         res.setRows(getRowsFromDataFrame(dataFrame));
 
         return res;
+    }
+
+    private List<String> getColumnsFromDataFrame(Dataset<Row> dataFrame) {
+        return List.of(dataFrame.columns());
     }
 
     private List<String> getRowsFromDataFrame(Dataset<Row> dataFrame) {
@@ -104,7 +110,7 @@ public class qrModuleImpl implements qrModuleInterface {
         return data;
     }
 
-    // Método para convertir un mapa a una cadena JSON todo eliminar cuando ya no se hardcodee
+    // Método para convertir un mapa a una cadena JSON
     private String convertMapToJsonString(Map<String, String> map) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
