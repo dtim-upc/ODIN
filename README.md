@@ -3,7 +3,7 @@
   </a>
 </h1>
 
-<h4 align="center">A dataspace management system<a href="(https://www.essi.upc.edu/dtim/tools/odin)"></a></h4>
+<h4 align="center">A dataspace management system<a href="https://www.essi.upc.edu/dtim/tools/odin"></a></h4>
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dtim-upc_newODIN&metric=alert_status)](https://sonarcloud.io/dashboard?id=dtim-upc_newODIN)
 
@@ -133,5 +133,5 @@ IF STILL NOT WORKING CHECK THE package.json and ensure to have installed the Nod
 ## Contributing <a name="contributing"></a>
 ## License <a name="license"></a>
 
-   This project is licensed under the <a href="(https://opensource.org/license/mit/)">MIT License</a>.
+   This project is licensed under the <a href="https://opensource.org/license/mit/">MIT License</a>.
 
