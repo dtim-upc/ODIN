@@ -54,11 +54,17 @@ dependencies {
 	runtimeOnly group: 'com.h2database', name: 'h2', version: '2.1.214'
 
 	// https://mvnrepository.com/artifact/io.delta/delta-spark
+	// https://mvnrepository.com/artifact/io.delta/delta-core_2.13/2.3.0
 	implementation group: 'io.delta', name: 'delta-core_2.13', version: '2.3.0'
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////// JENA DEPENDENCIES ///////////////////////////////////////
+	// https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs
+	// https://mvnrepository.com/artifact/org.apache.jena/apache-jena-libs/4.1.0
 	implementation group: 'org.apache.jena', name: 'apache-jena-libs', version: '4.1.0', ext: 'pom'
+
+	// https://mvnrepository.com/artifact/org.apache.jena/jena-querybuilder
+	// https://mvnrepository.com/artifact/org.apache.jena/jena-querybuilder/4.1.0
 	implementation group: 'org.apache.jena', name: 'jena-querybuilder', version: '4.1.0'
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
