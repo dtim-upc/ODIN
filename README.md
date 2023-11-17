@@ -201,7 +201,6 @@ NextiaQR-->NextiaDataLayer;
 
 #### Architecture <a name="backend-architecture"></a>
 
-
 Simple interaction with a Nextia module
 
 ```mermaid
@@ -218,13 +217,13 @@ sequenceDiagram
     Service->>Interface: request template
     Interface->>InterfaceImpl: d
     InterfaceImpl->>Nextia: info
-    Nextia->>InterfaceImpl: answer
-    InterfaceImpl->>Interface: answer
-    Interface->>Service: html & javascript
-    Service->>Controller: iframe ready
+    Nextia-->>InterfaceImpl: answer
+    InterfaceImpl-->>Interface: answer
+    Interface-->>Service: html & javascript
+    Service-->>Controller: iframe ready
     Controller->>Service: set mermaid data on iframe
     Service->>Service: render mermaid
-    Controller->>Frontend: answer
+    Controller-->>Frontend: answer
 ```
    
 #### Code Style <a name="code-style"></a>
