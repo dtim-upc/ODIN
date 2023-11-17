@@ -111,7 +111,7 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
    Then, copy the NextiaCore.jar generated and paste it in the `./NextiaDataLayer/lib` folder to generate NextiaDataLayer.jar, which serves as a critical component utilized by both NextiaJD and ODIN. This JAR encapsulates data layer functionalities, ensuring seamless communication between NextiaJD and ODIN, and enabling efficient data management within the integrated system.
 
-   Once you have the `NextiaCore.jar` and the `NextiaDataLayer.jar`, copy `NextiaCore.jar` in the `lib` folder, as before, of the other Nextia projects cloned (NextiaBS, NextiaJD, NextiaDI, NextiaQR). You must also copy `NextiaDataLayer.jar` in the same `lib` folder of NextiaJD.
+   Once you have the `NextiaCore.jar` and the `NextiaDataLayer.jar`, copy `NextiaCore.jar` in the `lib` folder, as before, of the other Nextia projects cloned (NextiaBS, NextiaJD, NextiaDI, NextiaQR). You must also copy `NextiaDataLayer.jar` in the same `lib` folder of NextiaJD and NextiaQR.
 
    Now generate the remaining JARs: `NextiaBS.jar`, `NextiaDI.jar`, `NextiaJD.jar`, `NextiaQR.jar`.
 
