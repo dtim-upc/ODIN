@@ -173,20 +173,20 @@ Note that you must have Quasar CLI as it's mentioned in the Prerequisites sectio
 graph TD;
 
 subgraph ODIN
-  NextiaStore[<a href='https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/NextiaStore' >NextiaStore</a>]
-  NextiaGraphy[<a href='https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/nextiaInterfaces/NextiaGraphy' >NextiaGraphy</a>]
+  NextiaStore[fa:fa-database <a href='https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/NextiaStore' >NextiaStore</a>]
+  NextiaGraphy[fa:fa-paint-brush <a href='https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/nextiaInterfaces/NextiaGraphy' >NextiaGraphy</a>]
 end
 
 subgraph MODULES
-  NextiaBS[<a href='https://github.com/dtim-upc/NextiaBS' >NextiaBS</a>]
-  NextiaJD[<a href='https://github.com/dtim-upc/NextiaJD2' >NextiaJD</a>]
-  NextiaDI[<a href='https://github.com/dtim-upc/NextiaDI' >NextiaDI</a>]
-  NextiaQR[<a href='https://github.com/dtim-upc/NextiaQR' >NextiaQR</a>]
+  NextiaBS[fa:fa-file-code <a href='https://github.com/dtim-upc/NextiaBS' >NextiaBS</a>]
+  NextiaJD[fa:fa-copy <a href='https://github.com/dtim-upc/NextiaJD2' >NextiaJD</a>]
+  NextiaDI[fa:fa-object-group <a href='https://github.com/dtim-upc/NextiaDI' >NextiaDI</a>]
+  NextiaQR[fa:fa-search <a href='https://github.com/dtim-upc/NextiaQR' >NextiaQR</a>]
 end
 
 subgraph TRANSVERSAL
-  NextiaCore[<a href='https://github.com/dtim-upc/NextiaCore' >NextiaCore</a>]
-  NextiaDataLayer[<a href='https://github.com/dtim-upc/NextiaDataLayer' >NextiaDataLayer</a>]
+  NextiaCore[fa:fa-book <a href='https://github.com/dtim-upc/NextiaCore' >NextiaCore</a>]
+  NextiaDataLayer[fa:fa-universal-access <a href='https://github.com/dtim-upc/NextiaDataLayer' >NextiaDataLayer</a>]
 end
 
 ODIN-->NextiaCore;
