@@ -17,14 +17,16 @@
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
     - [Configuration](#configuration)
+      - [Backend](#backend-configuration)
+      - [Frontend](#frontend-configuration)
 3. [Project Structure](#project-structure)
-- [Backend](#backend)
-    - [Architecture](#backend-architecture)
-    - [Code style](#code-style)
-    - [Dependencies](#backend-dependencies)
-- [Frontend](#frontend)
-    - [Architecture](#frontend-architecture)
-    - [Dependencies](#frontend-dependencies)
+   - [Backend](#backend)
+       - [Architecture](#backend-architecture)
+       - [Code style](#code-style)
+       - [Dependencies](#backend-dependencies)
+   - [Frontend](#frontend)
+       - [Architecture](#frontend-architecture)
+       - [Dependencies](#frontend-dependencies)
 4. [Usage](#usage)
 5. [People](#people)
 6. [Related links](#related-links)
@@ -97,6 +99,10 @@ Before you begin, ensure that you have the following prerequisites installed:
 
 ### Configuration <a name="configuration"></a>
 
+After following the previous steps [Prerequisites](#prerequisites) and [Installation](#installation). Lets ensemble everything to be able to compile and make ODIN run.
+
+#### Backend <a name="backend-configuration"></a>
+
 1. Generate the JAR folders of the Nextia projects:
 
    Execute for each Nextia project the Gradle task `uberJar`. This task will generate a zipped folder containing the compiled and optimized JAR files necessary for the seamless integration of Nextia functionalities within the ODIN system. The JAR generated will be located in the `build/libs` path of each project. 
@@ -112,7 +118,11 @@ Before you begin, ensure that you have the following prerequisites installed:
 
    Check that the JAR libraries have been imported into lib directory in ODIN/api.
 
-3. Finally execute `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class `OdinApplication.java`.
+3. Finally, execute `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class `OdinApplication.java`.
+
+#### Frontend <a name="frontend-configuration"></a>
+
+
 
 ## Project Structure <a name="project-structure"></a>
 
