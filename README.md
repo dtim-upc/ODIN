@@ -139,6 +139,24 @@ Before you begin, ensure that you have the following prerequisites installed:
 
 ```mermaid
 graph TD;
+
+subgraph ODIN
+  NextiaStore
+  NextiaGraphy
+end
+
+subgraph MODULES
+  NextiaBS
+  NextiaJD
+  NextiaDI
+  NextiaQR
+end
+
+subgraph TRANSVERSAL
+  NextiaCore
+  NextiaDataLayer
+end
+
 ODIN-->NextiaCore;
 ODIN-->NextiaDataLayer-->NextiaCore;
 ODIN-->NextiaBS-->NextiaCore;
