@@ -103,7 +103,9 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
 #### Backend <a name="backend-configuration"></a>
 
-1. Generate the JAR folders of the Nextia projects:
+1. Open in IntelliJ the `ODIN/api` folder.
+
+2. Generate the JAR folders of the Nextia projects:
 
    Execute for each Nextia project the Gradle task `uberJar`. This task will generate a zipped folder containing the compiled and optimized JAR files necessary for the seamless integration of Nextia functionalities within the ODIN system. The JAR generated will be located in the `build/libs` path of each project. 
 
@@ -117,17 +119,26 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
     Note that NextiaQR it's optional right now.
 
-2. Execute `importExternalJar` Gradle task of ODIN:
+3. Execute `importExternalJar` Gradle task of ODIN:
 
    This task will import automatically all the `NextiaXX.jar` needed by ODIN.
    Ensure that all Nextia projects are located under the same folder as ODIN. This organizational structure is essential for the importExternalJar Gradle task to effectively locate and import the generated JAR files from Nextia projects.
 
    Check that the JAR libraries have been imported into lib directory in ODIN/api.
 
-3. Finally, execute `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class `OdinApplication.java`.
+4. Finally, execute `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class `OdinApplication.java`.
 
 #### Frontend <a name="frontend-configuration"></a>
 
+1. Open in the terminal the `ODIN/frontend` folder.
+
+2. Execute `npm install`.
+
+3. Then, execute `yarn install`.
+
+4. Finally, execute `quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
+
+Note that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed. 
 
 
 ## Project Structure <a name="project-structure"></a>
