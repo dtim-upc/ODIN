@@ -173,20 +173,20 @@ Note that you must have Quasar CLI as it's mentioned in the Prerequisites sectio
 graph TD;
 
 subgraph ODIN
-  NextiaStore
-  NextiaGraphy
+  NextiaStore[<a href='https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/NextiaStore'>NextiaStore</a>]
+  NextiaGraphy[<a href='https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/nextiaInterfaces/NextiaGraphy'>NextiaGraphy</a>]
 end
 
 subgraph MODULES
-  NextiaBS
-  NextiaJD
-  NextiaDI
-  NextiaQR
+  NextiaBS[<a href='https://github.com/dtim-upc/NextiaBS'>NextiaBS</a>]
+  NextiaJD[<a href='https://github.com/dtim-upc/NextiaJD2'>NextiaJD</a>]
+  NextiaDI[<a href='https://github.com/dtim-upc/NextiaDI'>NextiaDI</a>]
+  NextiaQR[<a href='https://github.com/dtim-upc/NextiaQR'>NextiaQR</a>]
 end
 
 subgraph TRANSVERSAL
-  NextiaCore
-  NextiaDataLayer
+  NextiaCore[<a href='https://github.com/dtim-upc/NextiaCore'>NextiaCore</a>]
+  NextiaDataLayer[<a href='https://github.com/dtim-upc/NextiaDataLayer'>NextiaDataLayer</a>]
 end
 
 ODIN-->NextiaCore;
