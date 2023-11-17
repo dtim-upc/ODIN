@@ -68,7 +68,7 @@ Before you begin, ensure that you have the following prerequisites installed:
 
    - [NextiaDataLayer](https://github.com/dtim-upc/NextiaDataLayer) (ask for permissions)
    ```bash
-   git clone https://github.com/dtim-upc/NextiaJD2.git
+   git clone https://github.com/dtim-upc/NextiaDataLayer.git
    ```
 
 
@@ -89,6 +89,11 @@ Before you begin, ensure that you have the following prerequisites installed:
    git clone https://github.com/dtim-upc/NextiaJD2.git
    ```
 
+
+   - [NextiaQR](https://github.com/dtim-upc/NextiaQR) (ask for permissions)
+   ```bash
+   git clone https://github.com/dtim-upc/NextiaQR.git
+   ```
 
 ### Configuration <a name="configuration"></a>
 
