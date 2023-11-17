@@ -5,6 +5,7 @@ import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaJD.Discovery;
+import edu.upc.essi.dtim.NextiaJD.IDiscovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +29,7 @@ public class jdModuleImpl implements jdModuleInterface {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        Discovery discovery = new Discovery(dl);
+        IDiscovery discovery = new Discovery(dl);
         try {
             List<Alignment> alignmentsJD = discovery.getAlignments(dataset, dsB);
             return alignmentsJD;
