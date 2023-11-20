@@ -42,7 +42,7 @@ public class QueryController {
         System.out.println(body.getProperties().get(0).getType());
 
 
-        RDFSResult res = queryService.getQueryResult(body);
+        RDFSResult res = queryService.getQueryResult(body, id);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
