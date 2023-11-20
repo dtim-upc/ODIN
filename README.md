@@ -201,6 +201,9 @@ NextiaQR-->NextiaDataLayer;
 
 #### Architecture <a name="backend-architecture"></a>
 
+To see the UML class diagram, download [Visual Paradigm Community Edition](https://www.visual-paradigm.com/download/community.jsp). It will ask you an email by the end of the installation or the first time you open the program just to send you the key activation code.
+Then open the C:\Users\victor.asenjo\Desktop\Diagrama UML
+
 Simple interaction with a Nextia module
 
 ```mermaid

@@ -107,10 +107,6 @@ dependencies {
 	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaJD.jar']))
 
 	//implementation fileTree(dir: 'lib', include: ['*.jar'])
-
-	// https://mvnrepository.com/artifact/org.apache.spark/spark-sql
-	// https://mvnrepository.com/artifact/org.apache.spark/spark-sql_2.13/3.3.2
-	implementation group: 'org.apache.spark', name: 'spark-sql_2.13', version: '3.3.2'
 }
 
 
