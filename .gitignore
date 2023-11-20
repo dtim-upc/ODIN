@@ -29,3 +29,6 @@ api/dbFiles/ttl/integrated
 *.html
 *.png
 *.parquet
+!doc/Diagrama UML/*.png
+!doc/Diagrama UML/*.jpg
+!doc/Readme Pictures/*.png

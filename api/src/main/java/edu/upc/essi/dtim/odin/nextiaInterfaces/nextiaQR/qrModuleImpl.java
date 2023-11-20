@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.odin.query.pojos.Property;
 import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
 import edu.upc.essi.dtim.odin.query.pojos.RDFSResult;
@@ -18,10 +19,10 @@ import java.util.*;
 
 public class qrModuleImpl implements qrModuleInterface {
     @Override
-    public RDFSResult makeQuery(QueryDataSelection body) {
+    public RDFSResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset> integratedDatasets, QueryDataSelection body) {
         //TODO modificar siguiente llamada a la del módulo de la query que debería retornar un Dataset<Row>
         Dataset<Row> dataFrame = hardcodeDataFrame(body.getProperties());
-
+        
         // Crear una instancia de RDFSResult
         RDFSResult res = new RDFSResult();
 
