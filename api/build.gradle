@@ -75,8 +75,8 @@ dependencies {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////// NextiaDataLayer //////////////////////////////////////////
-	implementation fileTree(dir: 'lib', include: ['NextiaDataLayer.jar'])
-	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDataLayer.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaDL.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDL.jar']))
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -132,6 +132,7 @@ task generateDocs(type: Javadoc) {
 }
 
 sonarqube {
+	properties {
 	properties {
 		property "sonar.projectKey", "dtim-upc_newODIN"
 		property "sonar.organization", "dtim"
@@ -249,7 +250,7 @@ task importExternalJar {
 		copy {
 			from nextiaDLJarPath
 			into "../api/lib"
-			rename { 'NextiaDataLayer.jar' }
+			rename { 'NextiaDL.jar' }
 		}
 
 		copy {
