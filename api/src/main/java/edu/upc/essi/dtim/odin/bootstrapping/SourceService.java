@@ -143,7 +143,7 @@ public class SourceService {
      * @return A Dataset object with the extracted data.
      * @throws IllegalArgumentException if the file format is not supported.
      */
-    public Dataset extractData(String filePath, String datasetName, String datasetDescription) throws SQLException, IOException, ClassNotFoundException {
+    public Dataset extractData(String filePath, String datasetName, String datasetDescription, String repositoryId) throws SQLException, IOException, ClassNotFoundException {
         if (filePath == null) filePath = "table.sql";
         // Extract the extension of the file from the file path
         String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
@@ -161,8 +161,11 @@ public class SourceService {
                 dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
                 break;
             case "sql":
+                DataRepository repository = findRepositoryById(repositoryId);
                 // Create a SqlDataset object for JSON files
-                dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, "dtim.essi.upc.edu", "5432", "vasenjo", "jBGRfEu");
+                String password = ((RelationalJDBCRepository) repository).getPassword();
+                String username = ((RelationalJDBCRepository) repository).getUsername();
+                dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, ((RelationalJDBCRepository) repository).retrieveHostname(), ((RelationalJDBCRepository) repository).retrievePort(), username, password);
                 break;
             case "xml":
                 // Create a XmlDataset object for JSON files

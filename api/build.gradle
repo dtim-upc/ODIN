@@ -133,7 +133,6 @@ task generateDocs(type: Javadoc) {
 
 sonarqube {
 	properties {
-	properties {
 		property "sonar.projectKey", "dtim-upc_newODIN"
 		property "sonar.organization", "dtim"
 		property "sonar.host.url", "https://sonarcloud.io"
