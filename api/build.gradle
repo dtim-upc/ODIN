@@ -79,8 +79,8 @@ dependencies {
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	////////////////////////////////////////// NextiaDataLayer //////////////////////////////////////////
-	implementation fileTree(dir: 'lib', include: ['NextiaDataLayer.jar'])
-	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDataLayer.jar']))
+	implementation fileTree(dir: 'lib', include: ['NextiaDL.jar'])
+	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaDL.jar']))
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -249,7 +249,7 @@ task importExternalJar {
 		copy {
 			from nextiaDLJarPath
 			into "../api/lib"
-			rename { 'NextiaDataLayer.jar' }
+			rename { 'NextiaDL.jar' }
 		}
 
 		copy {
