@@ -178,7 +178,7 @@ subgraph ODIN
 end
 
 subgraph MODULES
-  NextiaBS[fa:fa-file-code <a href='https://github.com/dtim-upc/NextiaBS' >NextiaBS</a>]
+  NextiaBS[fa:fa-file-code <img src='https://iconscout.com/ms-icon-310x310.png' width='40' height='40' /> <a href='https://github.com/dtim-upc/NextiaBS' >NextiaBS</a>]
   NextiaJD[fa:fa-copy <a href='https://github.com/dtim-upc/NextiaJD2' >NextiaJD</a>]
   NextiaDI[fa:fa-object-group <a href='https://github.com/dtim-upc/NextiaDI' >NextiaDI</a>]
   NextiaQR[fa:fa-search <a href='https://github.com/dtim-upc/NextiaQR' >NextiaQR</a>]
