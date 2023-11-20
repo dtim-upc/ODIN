@@ -18,6 +18,10 @@ configurations {
 	}
 }
 
+configurations.all {
+	exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+
 repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
@@ -103,10 +107,6 @@ dependencies {
 	runtimeOnly(fileTree(dir: 'lib', include: ['NextiaJD.jar']))
 
 	//implementation fileTree(dir: 'lib', include: ['*.jar'])
-
-	// https://mvnrepository.com/artifact/org.apache.spark/spark-sql
-	// https://mvnrepository.com/artifact/org.apache.spark/spark-sql_2.13/3.3.2
-	implementation group: 'org.apache.spark', name: 'spark-sql_2.13', version: '3.3.2'
 }
 
 
@@ -146,7 +146,7 @@ tasks['sonarqube'].dependsOn test
 //para copiar la versión actualizada de NextiaCore y NextiaDI (tener dependencias en misma carpeta que ODIN)
 //por ejemplo carpeta Folder y dentro de Folder tener ODIN, NextiaCore, NextiaBS, etc.
 def nextiaCoreJarPath = "..\\..\\NextiaCore\\build\\libs"
-def nextiaDIJarPath = "..\\..\\NextiaDI\\source\\build\\libs"
+def nextiaDIJarPath = "..\\..\\NextiaDI\\build\\libs"
 def nextiaBSJarPath = "..\\..\\NextiaBS\\build\\libs"
 def nextiaDLJarPath = "..\\..\\NextiaDataLayer\\build\\libs"
 def nextiaJDJarPath = "..\\..\\NextiaJD2\\build\\libs"

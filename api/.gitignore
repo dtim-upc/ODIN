@@ -37,3 +37,4 @@ out/
 .vscode/
 
 !empty.ttl
+!EMPTY_FILE_FOR_LIB_FOLDER.txt
