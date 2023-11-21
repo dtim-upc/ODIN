@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
+import com.opencsv.CSVWriter;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
@@ -8,12 +9,13 @@ import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DataLayerImpl implements DataLayerInterace {
     private final String dataLayerPath;
@@ -47,6 +49,8 @@ public class DataLayerImpl implements DataLayerInterace {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+
     }
 
     @Override
@@ -110,6 +114,40 @@ public class DataLayerImpl implements DataLayerInterace {
         DataLayer dl = getDataLayer();
         try {
             return dl.reconstructFile(multipartFile, repositoryIdAndName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+         */
+    }
+
+    @Override
+    public String reconstructTable(String tableName, String url, String username, String password) {
+        String jdbcUrl = url;
+        String usuario = username;
+        String contrasena = password;
+        String nombreTabla = tableName;
+        String rutaArchivoCSV = dataLayerPath+tableName+".csv";
+
+        try (Connection conexion = DriverManager.getConnection(jdbcUrl, usuario, contrasena);
+             Statement statement = conexion.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + nombreTabla);
+             CSVWriter csvWriter = new CSVWriter(new FileWriter(rutaArchivoCSV))) {
+
+            // Escribir encabezados
+            csvWriter.writeAll(resultSet, true);
+
+            System.out.println("Tabla descargada exitosamente en formato CSV.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return rutaArchivoCSV;
+
+        /* todo uncomment when DL done
+        DataLayer dl = getDataLayer();
+        try {
+            return dl.reconstructTable(datasetName, url, username, password);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

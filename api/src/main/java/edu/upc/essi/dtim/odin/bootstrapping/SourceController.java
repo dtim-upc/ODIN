@@ -246,6 +246,8 @@ public class SourceController {
             savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
             sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
 
+            String dataLayerPath = sourceService.reconstructTable(savedDataset);
+
             // Transform datasource into graph and generate the wrapper
             BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
             Graph graph = bsResult.getGraph();
