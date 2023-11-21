@@ -287,7 +287,6 @@ The main branch must always contain a working version of the project. Developers
    - NextiaBS.jar
    - NextiaDI.jar
    - NextiaJD.jar
-   - Spark
 
 ### Frontend <a name="frontend"></a>
 #### Architecture <a name="frontend-architecture"></a>
