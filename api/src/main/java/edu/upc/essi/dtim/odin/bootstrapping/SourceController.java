@@ -182,7 +182,7 @@ public class SourceController {
             // Extract data from datasource file and save it
             Dataset savedDataset = null;
             try {
-                savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription);
+                savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription, repositoryId);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -233,7 +233,7 @@ public class SourceController {
             // Extract data from datasource file and save it
             Dataset savedDataset = null;
             try {
-                savedDataset = sourceService.extractData(null, datasetName, datasetDescription);
+                savedDataset = sourceService.extractData(null, datasetName, datasetDescription, repositoryId);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
