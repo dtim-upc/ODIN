@@ -122,6 +122,7 @@ public class DataLayerImpl implements DataLayerInterace {
 
     @Override
     public String reconstructTable(String tableName, String url, String username, String password) {
+        System.out.println("ENTRO A RECONSTRUIR LA TALBA "+tableName);
         String jdbcUrl = url;
         String usuario = username;
         String contrasena = password;

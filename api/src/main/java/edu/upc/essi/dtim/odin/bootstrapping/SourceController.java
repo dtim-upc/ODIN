@@ -147,7 +147,9 @@ public class SourceController {
             String directoryName = repositoryId.toString() + repository.getRepositoryName().toString();
 
 
-            if (attachFiles == null || attachFiles.isEmpty()) {
+            System.out.println(attachTables);
+
+            if (attachTables != null || !attachTables.isEmpty()) {
                 handleAttachTables(attachTables, datasetName, datasetDescription, repositoryId);
             } else {
                 handleAttachFiles(attachFiles, datasetName, datasetDescription, directoryName, repositoryId);

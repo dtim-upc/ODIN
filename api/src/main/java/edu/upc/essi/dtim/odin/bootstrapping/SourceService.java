@@ -92,7 +92,7 @@ public class SourceService {
 
     public String reconstructTable(Dataset savedDataset) {
         DataLayerInterace dataLayerInterace = new DataLayerImpl(appConfig);
-        String datalayerPath = dataLayerInterace.reconstructTable(savedDataset.getDatasetName(), ((RelationalJDBCRepository)savedDataset.getRepository()).getUrl(), ((RelationalJDBCRepository)savedDataset.getRepository()).getUsername(), ((RelationalJDBCRepository)savedDataset.getRepository()).getPassword());
+        String datalayerPath = dataLayerInterace.reconstructTable(((SQLDataset)savedDataset).getTableName(), ((RelationalJDBCRepository)savedDataset.getRepository()).getUrl(), ((RelationalJDBCRepository)savedDataset.getRepository()).getUsername(), ((RelationalJDBCRepository)savedDataset.getRepository()).getPassword());
         savedDataset.setDataLayerPath(datalayerPath);
         this.saveDataset(savedDataset);
         return datalayerPath;

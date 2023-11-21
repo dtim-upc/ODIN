@@ -459,7 +459,8 @@ const onSubmit = () => {
         data.append('attachFiles', file);
       });
     } else if (item.files === undefined && !isLocalRepository.value) {
-      data.append('attachFiles', item);
+      //data.append('attachFiles', item);
+      attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
     } else {
       console.log("attachTables: " + item.name);
       attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
