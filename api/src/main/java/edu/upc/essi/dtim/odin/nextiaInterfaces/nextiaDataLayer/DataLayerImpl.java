@@ -102,8 +102,17 @@ public class DataLayerImpl implements DataLayerInterace {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        
         // Return the absolute path of the stored file
         return destinationFile.toString();
+
+        /* todo uncomment when DL done
+        DataLayer dl = getDataLayer();
+        try {
+            return dl.reconstructFile(multipartFile, repositoryIdAndName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+         */
     }
 }
