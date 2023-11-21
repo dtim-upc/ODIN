@@ -19,8 +19,8 @@ class AppConfigTest {
     }
 
     @Test
-    void testGetDiskPath() {
-        Assertions.assertEquals("..\\api\\dbFiles\\diskFiles", config.getDiskPath());
+    void testGetDataLayerPath() {
+        Assertions.assertEquals("..\\\\api\\\\dbFiles\\\\DataLayerZone\\\\", config.getDataLayerPath());
     }
 
     @Test

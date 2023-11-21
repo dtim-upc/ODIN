@@ -32,3 +32,6 @@ api/dbFiles/ttl/integrated
 !doc/Diagrama UML/*.png
 !doc/Diagrama UML/*.jpg
 !doc/Readme Pictures/*.png
+api/dbFiles/DataLayerZone/DuckDBDataLake/database
+api/dbFiles/DataLayerZone/DuckDBDataLake/database.wal
+*.crc

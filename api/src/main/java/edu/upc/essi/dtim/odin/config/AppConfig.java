@@ -29,17 +29,14 @@ public class AppConfig {
     /**
      * Disk path property retrieved from application.properties.
      */
-    @Value("${dataStorage.diskPath}")
-    public String diskPath;
+    @Value("${dataStorage.DataLayerPath}")
+    private String DataLayerPath;
 
     /**
      * Jena path property retrieved from application.properties.
      */
     @Value("${dataStorage.JenaPath}")
     private String JenaPath;
-
-    @Value("${dataStorage.DataLayerPath}")
-    private String DataLayerPath;
 
     @Value("${dataStorage.DataLayerTechnology}")
     private String DataLayerTechnology;

@@ -210,7 +210,7 @@ public class SourceController {
             Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
             graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
             // Get the disk path from the app configuration
-            Path diskPath = Path.of(appConfig.getDiskPath());
+            Path diskPath = Path.of(appConfig.getDataLayerPath());
             graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
 
             // Save graph into the database

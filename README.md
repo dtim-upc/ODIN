@@ -238,7 +238,47 @@ sequenceDiagram
    
 #### Code Style <a name="code-style"></a>
 
+##### Overview
+This project follows a set of coding standards and practices to ensure consistency, readability, and maintainability of the codebase. Adhering to these guidelines will help streamline collaboration and make the codebase more accessible to developers.
 
+##### Branching Strategy
+We follow a feature-based branching strategy, where each new feature or task is developed on a dedicated branch. Once a feature is complete and tested, it is merged into the main branch. Branches should be named descriptively, reflecting the nature of the feature or task they represent.
+
+Example git graph:
+```mermaid
+gitGraph:
+commit "Ashish"
+branch newbranch
+checkout newbranch
+commit id:"1111"
+commit tag:"test"
+checkout main
+commit type: HIGHLIGHT
+commit
+merge newbranch
+commit
+branch b2
+commit
+```
+
+After a successful merge, the feature branch should be deleted to keep the repository clean and avoid unnecessary noise.
+
+##### Code Organization
+###### Main Branch
+The main branch must always contain a working version of the project. Developers should avoid pushing directly to the main branch and instead use feature branches for development.
+
+###### Naming Conventions
+* CamelCase: Variable and method names should use CamelCase. For example: myVariable, calculateTotalAmount().
+
+* Class Naming:
+  * Interfaces: Named as ConcreteNameInterface.java (e.g., GraphStoreInterface.java).
+  * Implementations: Named as ConcreteNameTechnologyUsedImpl (e.g., GraphStoreJenaImpl.java).
+  Controller and Service Naming: Controllers should be named with a descriptive term followed by "Controller" (e.g., IntegrationController). The corresponding service should be named with a similar descriptive term followed by "Service" (e.g., IntegrationService).
+
+* Communication between Components: Controllers only communicate with their associated services. Services can interact with other services but should not communicate directly with controllers. Interfaces are used for communication with other modules.
+
+###### Dependency Management
+* Interfaces for Communication: Use interfaces to define contracts for communication between modules. This enhances modularity and allows for easier maintenance and testing.
 
 #### Dependencies <a name="backend-dependencies"></a>
 
@@ -247,7 +287,6 @@ sequenceDiagram
    - NextiaBS.jar
    - NextiaDI.jar
    - NextiaJD.jar
-   - Spark
 
 ### Frontend <a name="frontend"></a>
 #### Architecture <a name="frontend-architecture"></a>
