@@ -86,53 +86,9 @@ public class SourceService {
      * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
      */
     public String reconstructFile(MultipartFile multipartFile, String repositoryIdAndName) {
-        try {
-            if (multipartFile.isEmpty()) {
-                throw new RuntimeException("Failed to store empty file.");
-            }
-
-            String originalFilename = multipartFile.getOriginalFilename();
-
-            if (originalFilename != null) {
-                int lastSlashIndex = originalFilename.lastIndexOf("/");
-
-                if (lastSlashIndex >= 0) {
-                    originalFilename = originalFilename.substring(lastSlashIndex + 1);
-                    // extractedSubstring ahora contiene la parte de la cadena después de la última "/"
-                    System.out.println("Substring extraída: " + originalFilename);
-                } else {
-                    // No se encontró "/" en el nombre de archivo original, por lo que originalFilename no se modifica.
-                    System.out.println("No se encontró '/' en el nombre de archivo original.");
-                }
-            }
-
-            String modifiedFilename = repositoryIdAndName + "/" + originalFilename;
-
-            System.out.println(originalFilename);
-            System.out.println(modifiedFilename);
-
-            // Get the disk path from the app configuration
-            Path diskPath = Path.of(appConfig.getDiskPath());
-
-            // Resolve the destination file path using the disk path and the modified filename
-            Path destinationFile = diskPath.resolve(Paths.get(modifiedFilename));
-
-            // Create parent directories if they don't exist
-            Files.createDirectories(destinationFile.getParent());
-
-            // Copy the input stream of the multipart file to the destination file
-            try (InputStream inputStream = multipartFile.getInputStream()) {
-                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            // Return the absolute path of the stored file
-            return destinationFile.toString();
-        } catch (IOException e) {
-            // Throw a runtime exception if an error occurs during file storage
-            throw new RuntimeException("Failed to store file.", e);
-        }
+        DataLayerInterace dataLayerInterace = new DataLayerImpl(appConfig);
+        return dataLayerInterace.reconstructFile(multipartFile, repositoryIdAndName);
     }
-
 
     /**
      * Extracts data from a file and returns a Dataset object with the extracted data.

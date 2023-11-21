@@ -36,7 +36,7 @@ public class SourceServiceTest {
         try {
             // Arrange
             // Mock the appConfig.getDiskPath() method to return a temporary directory path
-            when(appConfig.getDiskPath()).thenReturn(System.getProperty("java.io.tmpdir"));
+            when(appConfig.getDataLayerPath()).thenReturn(System.getProperty("java.io.tmpdir"));
 
             // Create a test MultipartFile
             String originalFilename = "test.csv";
@@ -79,7 +79,7 @@ public class SourceServiceTest {
     public void testReconstructFileOutsideCurrentDirectory() {
         // Arrange
         // Mock the appConfig.getDiskPath() method to return the root directory (which is not safe)
-        when(appConfig.getDiskPath()).thenReturn("/");
+        when(appConfig.getDataLayerPath()).thenReturn("/");
 
         // Create a test MultipartFile
         String originalFilename = "test.csv";
