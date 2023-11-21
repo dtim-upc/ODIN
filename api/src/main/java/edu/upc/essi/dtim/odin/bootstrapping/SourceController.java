@@ -175,6 +175,10 @@ public class SourceController {
             int slashIndex = originalFileName.lastIndexOf("/");
             int dotIndex = originalFileName.lastIndexOf('.');
             datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
+            // If the file comes from an API call there is no name, so we have to introduce a placeholder (as we will use the UUID in the tables)
+            if (datasetName.isEmpty()) {
+                datasetName = "apiFile";
+            }
 
             // Reconstruct file from Multipart file
             String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());

@@ -37,7 +37,6 @@ public class DataLayerImpl implements DataLayerInterace {
     @Override
     public void uploadToDataLayer(Dataset dataset) {
         DataLoading dloading = DataLoadingSingleton.getInstance(dataLayerPath);
-
         System.out.println(dataset.getWrapper());
         dloading.uploadToLandingZone(dataset);
 
@@ -61,58 +60,19 @@ public class DataLayerImpl implements DataLayerInterace {
 
     @Override
     public String reconstructFile(MultipartFile multipartFile, String repositoryIdAndName) {
+        DataLoading dloading = DataLoadingSingleton.getInstance(dataLayerPath);
         if (multipartFile.isEmpty()) {
             throw new RuntimeException("Failed to store empty file.");
         }
-
-        String originalFilename = multipartFile.getOriginalFilename();
-
-        if (originalFilename != null) {
-            int lastSlashIndex = originalFilename.lastIndexOf("/");
-
-            if (lastSlashIndex >= 0) {
-                originalFilename = originalFilename.substring(lastSlashIndex + 1);
-                // extractedSubstring ahora contiene la parte de la cadena después de la última "/"
-                System.out.println("Substring extraída: " + originalFilename);
-            } else {
-                // No se encontró "/" en el nombre de archivo original, por lo que originalFilename no se modifica.
-                System.out.println("No se encontró '/' en el nombre de archivo original.");
-            }
+        String originalFileName = multipartFile.getOriginalFilename();
+        // If the file comes from an API call there is no name, so we have to introduce a placeholder (as we will use the UUID in the tables)
+        if (originalFileName.isEmpty()) {
+            originalFileName = "apiCall.json";
         }
-
-        String modifiedFilename = repositoryIdAndName + "/" + originalFilename;
-
-        System.out.println(originalFilename);
-        System.out.println(modifiedFilename);
-
-        // Get the disk path from the app configuration
-        Path diskPath = Path.of(dataLayerPath);
-
-        // Resolve the destination file path using the disk path and the modified filename
-        Path destinationFile = diskPath.resolve(modifiedFilename);
-
-        // Create parent directories if they don't exist
         try {
-            Files.createDirectories(destinationFile.getParent());
-
-            // Copy the input stream of the multipart file to the destination file
-            try (InputStream inputStream = multipartFile.getInputStream()) {
-                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            }
+            return dloading.reconstructFile(multipartFile.getInputStream(), originalFileName, repositoryIdAndName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        
-        // Return the absolute path of the stored file
-        return destinationFile.toString();
-
-        /* todo uncomment when DL done
-        DataLayer dl = getDataLayer();
-        try {
-            return dl.reconstructFile(multipartFile, repositoryIdAndName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-         */
     }
 }
