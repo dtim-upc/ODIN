@@ -147,7 +147,9 @@ public class SourceController {
             String directoryName = repositoryId.toString() + repository.getRepositoryName().toString();
 
 
-            if (attachFiles == null || attachFiles.isEmpty()) {
+            System.out.println(attachTables);
+
+            if (attachTables != null || !attachTables.isEmpty()) {
                 handleAttachTables(attachTables, datasetName, datasetDescription, repositoryId);
             } else {
                 handleAttachFiles(attachFiles, datasetName, datasetDescription, directoryName, repositoryId);
@@ -249,6 +251,8 @@ public class SourceController {
             // Add the dataset to the repository and delete the reference from others if exists
             savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
             sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
+
+            String dataLayerPath = sourceService.reconstructTable(savedDataset);
 
             // Transform datasource into graph and generate the wrapper
             BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
