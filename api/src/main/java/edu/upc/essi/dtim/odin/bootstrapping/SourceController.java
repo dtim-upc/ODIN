@@ -128,7 +128,6 @@ public class SourceController {
         try {
             logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here
-            //future check when adding authentification
 
             // Check if a new repository should be created or an existing one should be used
             boolean haveToCreateRepository = (repositoryId == null) || (repositoryId.equals(""));
@@ -144,15 +143,17 @@ public class SourceController {
                 repository = sourceService.findRepositoryById(repositoryId);
             }
             repositoryId = repository.getId();
-            String directoryName = repositoryId.toString() + repository.getRepositoryName().toString();
-
+            String directoryName = repositoryId + repository.getRepositoryName();
 
             System.out.println(attachTables);
+            System.out.println(attachFiles);
 
-            if (attachTables != null || !attachTables.isEmpty()) {
-                handleAttachTables(attachTables, datasetName, datasetDescription, repositoryId);
+            // If attachTables is empty it means that we either have a local file or a file coming from an API (which is
+            // stored as a json file). Otherwise, we have data coming from a sql database.
+            if (!attachTables.isEmpty()) {
+                handleAttachTables(attachTables, datasetDescription, repositoryId);
             } else {
-                handleAttachFiles(attachFiles, datasetName, datasetDescription, directoryName, repositoryId);
+                handleAttachFiles(attachFiles, datasetDescription, directoryName, repositoryId);
             }
 
             // Return success message
@@ -166,34 +167,37 @@ public class SourceController {
         }
     }
 
-    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetName, String datasetDescription, String directoryName, String repositoryId) {
+    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, String directoryName, String repositoryId) {
+        if (attachFiles.isEmpty()) {
+            throw new RuntimeException("Failed to store empty file.");
+        }
         // Iterate through the list of MultipartFiles to handle each file
         for (MultipartFile attachFile : attachFiles) {
-            // Get the original filename of the uploaded file
+            // Get the original filename of the uploaded file (e.g. folder1/folder2/datasetName.extension)
             String originalFileName = attachFile.getOriginalFilename();
-
-            // Use the original filename as the datasetName
             assert originalFileName != null;
+
+            // We get the dataset name (to create the graph data) and the name + extension (to store the file)
             int slashIndex = originalFileName.lastIndexOf("/");
             int dotIndex = originalFileName.lastIndexOf('.');
-            datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
+            String datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
+            String datasetNameWithExtension = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0);
             // If the file comes from an API call there is no name, so we have to introduce a placeholder (as we will use the UUID in the tables)
             if (datasetName.isEmpty()) {
                 datasetName = "apiFile";
+                datasetNameWithExtension = "apiFile.json";
             }
+            // This is the direction in which the new dataset will be stored
+            String newFileDirectory = directoryName + "/" + datasetNameWithExtension;
 
-            // Reconstruct file from Multipart file
-            String filePath = sourceService.reconstructFile(attachFile, directoryName.toString());
+            // Reconstruct file from Multipart file (i.e. store in the temporal zone)
+            String filePath = sourceService.reconstructFile(attachFile, newFileDirectory);
 
             // Extract data from datasource file and save it
-            Dataset savedDataset = null;
+            Dataset savedDataset;
             try {
                 savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription, repositoryId);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
+            } catch (SQLException | IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
@@ -215,9 +219,10 @@ public class SourceController {
             // Create the relation with dataset adding the graph generated to generate an id
             Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
             graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
+
             // Get the disk path from the app configuration
             Path diskPath = Path.of(appConfig.getDataLayerPath());
-            graph.write(diskPath.toString() + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
+            graph.write(diskPath + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
 
             // Save graph into the database
             sourceService.saveGraphToDatabase(graph);
@@ -228,31 +233,22 @@ public class SourceController {
         }
     }
 
-    private void handleAttachTables(List<String> attachTables, String datasetName, String datasetDescription, String repositoryId) {
+    private void handleAttachTables(List<String> attachTables, String datasetDescription, String repositoryId) {
         System.out.println(attachTables);
         for (String tableName : attachTables) {
             System.out.println(tableName + " ++++++++++ table name");
-            // Get the original filename of the uploaded file
-            String originalFileName = tableName;
-            datasetName = originalFileName;
 
             // Extract data from datasource file and save it
-            Dataset savedDataset = null;
+            Dataset savedDataset;
             try {
-                savedDataset = sourceService.extractData(null, datasetName, datasetDescription, repositoryId);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
+                savedDataset = sourceService.extractData(null, tableName, datasetDescription, repositoryId);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
             // Add the dataset to the repository and delete the reference from others if exists
             savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
             sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
-
-            String dataLayerPath = sourceService.reconstructTable(savedDataset);
 
             // Transform datasource into graph and generate the wrapper
             BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);

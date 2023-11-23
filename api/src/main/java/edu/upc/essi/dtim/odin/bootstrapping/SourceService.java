@@ -85,9 +85,9 @@ public class SourceService {
      * @return The absolute path of the stored file.
      * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
      */
-    public String reconstructFile(MultipartFile multipartFile, String repositoryIdAndName) {
-        DataLayerInterace dataLayerInterace = new DataLayerImpl(appConfig);
-        return dataLayerInterace.reconstructFile(multipartFile, repositoryIdAndName);
+    public String reconstructFile(MultipartFile multipartFile, String newFileDirectory) {
+        DataLayerInterace dataLayerInterFace = new DataLayerImpl(appConfig);
+        return dataLayerInterFace.reconstructFile(multipartFile, newFileDirectory);
     }
 
     public String reconstructTable(Dataset savedDataset) {
