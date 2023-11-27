@@ -20,6 +20,8 @@ public class Project {
     private List<DataRepository> repositories;
     private IntegratedGraphJenaImpl integratedGraph;
 
+    private IntegratedGraphJenaImpl temporalIntegratedGraph;
+
     private List<Dataset> integratedDatasets;
 
     /**
@@ -146,6 +148,24 @@ public class Project {
      */
     public void setIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
         this.integratedGraph = integratedGraph;
+    }
+
+    /**
+     * Set the integrated graph associated with the project.
+     *
+     * @param integratedGraph The integrated graph.
+     */
+    public void setTemporalIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
+        this.temporalIntegratedGraph = integratedGraph;
+    }
+
+    /**
+     * Get the integrated graph associated with the project.
+     *
+     * @return The integrated graph.
+     */
+    public IntegratedGraphJenaImpl getTemporalIntegratedGraph() {
+        return temporalIntegratedGraph;
     }
 
     /**

@@ -255,6 +255,23 @@ public class IntegrationService {
         return project;
     }
 
+    public Project updateTemporalIntegratedGraphProject(Project project, Graph integratedGraph) {
+        // Create an instance of an integrated graph from the CoreGraphFactory.
+        Graph integratedImpl = CoreGraphFactory.createIntegratedGraph();
+
+        // Set the graph data of the integrated graph to the data from the provided integratedGraph.
+        integratedImpl.setGraph(integratedGraph.getGraph());
+
+        // Set the integrated graph in the project.
+        project.setTemporalIntegratedGraph((IntegratedGraphJenaImpl) integratedImpl);
+
+        // Set the graphical schema of the integrated graph in the project.
+        project.getTemporalIntegratedGraph().setGraphicalSchema(integratedGraph.getGraphicalSchema());
+
+        // Return the updated project with the new integrated graph.
+        return project;
+    }
+
     /**
      * Updates the global graph within an integrated project with a new global graph.
      *
@@ -274,6 +291,23 @@ public class IntegrationService {
 
         // Set the graphical schema of the global graph within the project.
         project.getIntegratedGraph().getGlobalGraph().setGraphicalSchema(globalGraph.getGraphicalSchema());
+
+        // Return the updated project with the new global graph.
+        return project;
+    }
+
+    public Project updateTemporalGlobalGraphProject(Project project, Graph globalGraph) {
+        // Create an instance of a global graph from the CoreGraphFactory.
+        Graph globalImpl = CoreGraphFactory.createGlobalGraph();
+
+        // Set the graph data of the global graph to the data from the provided globalGraph.
+        globalImpl.setGraph(globalGraph.getGraph());
+
+        // Set the global graph within the project's integrated graph.
+        project.getTemporalIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalImpl);
+
+        // Set the graphical schema of the global graph within the project.
+        project.getTemporalIntegratedGraph().getGlobalGraph().setGraphicalSchema(globalGraph.getGraphicalSchema());
 
         // Return the updated project with the new global graph.
         return project;
