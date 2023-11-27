@@ -1,5 +1,9 @@
 cd ../../NextiaCore
+./gradlew --stop &
+wait
+
 ./gradlew.bat uberJar
+wait
 
 cd ../NextiaDataLayer
 ./gradlew.bat uberJar
