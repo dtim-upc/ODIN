@@ -1,16 +1,16 @@
 cd ../../NextiaCore
-./gradlew.bat ubeJar
+./gradlew.bat uberJar
 
 cd ../NextiaDataLayer
-./gradlew.bat ubeJar
+./gradlew.bat uberJar
 
 cd ../NextiaJD2
-./gradlew.bat ubeJar
+./gradlew.bat uberJar
 
 cd ../NextiaBS
-./gradlew.bat ubeJar
+./gradlew.bat uberJar
 
 cd ../NextiaDI
-./gradlew.bat ubeJar
+./gradlew.bat uberJar
 
 echo "Archivo copiado correctamente."
