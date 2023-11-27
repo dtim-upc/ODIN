@@ -348,7 +348,7 @@ public class IntegrationService {
         integrationModuleInterface integrationInterface = new integrationModuleImpl();
 
         // Integrate the integrated graph, graphB, and alignments to generate the global graph.
-        Graph globalGraph = integrationInterface.globalGraph(integratedGraph, graphB, alignments);
+        Graph globalGraph = integrationInterface.generateGlobalGraph(integratedGraph);
 
         // Write the global graph to a file or location (e.g., "..\\api\\dbFiles\\ttl\\globalGraph.ttl").
         globalGraph.write("..\\api\\dbFiles\\ttl\\globalGraph.ttl");

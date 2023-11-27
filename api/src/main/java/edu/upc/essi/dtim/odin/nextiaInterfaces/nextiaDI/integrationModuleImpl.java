@@ -40,21 +40,6 @@ public class integrationModuleImpl implements integrationModuleInterface {
     }
 
     @Override
-    public Graph globalGraph(Graph graphA, Graph graphB, List<Alignment> alignments) {
-        Graph globalGraph = CoreGraphFactory.createGraphInstance("normal");
-
-        NextiaDI n = new NextiaDI();
-
-        n.Integrate(retrieveSourceGraph(alignments, graphA), retrieveSourceGraph(alignments, graphB), alignments);
-
-        globalGraph.setGraph(
-                n.getMinimalGraph2()
-        );
-
-        return globalGraph;
-    }
-
-    @Override
     public Graph joinIntegration(Graph integratedGraph, List<JoinAlignment> joinAlignments) {
         Graph joinGraph = CoreGraphFactory.createGraphInstance("normal");
         Graph schemaIntegration = CoreGraphFactory.createGraphInstance("normal");
