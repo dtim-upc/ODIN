@@ -32,16 +32,6 @@ public interface integrationModuleInterface {
     List<Alignment> getUnused(Graph graphA, Graph graphB, List<Alignment> alignments);
 
     /**
-     * Integrates two RDF graphs to create a global graph.
-     *
-     * @param graphA     The first RDF graph to be integrated.
-     * @param graphB     The second RDF graph to be integrated.
-     * @param alignments A list of alignments specifying how the global graph should be created.
-     * @return The integrated global RDF graph.
-     */
-    Graph globalGraph(Graph graphA, Graph graphB, List<Alignment> alignments);
-
-    /**
      * Performs join integration on an integrated RDF graph.
      *
      * @param integratedGraph The integrated RDF graph to which the join operation will be applied.

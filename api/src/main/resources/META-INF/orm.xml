@@ -58,6 +58,14 @@
                     <cascade-all/>
                 </cascade>
             </one-to-one>
+
+            <one-to-one name="temporalIntegratedGraph"
+                        target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-one>
+
             <!--> element-collections, transient and other properties here <-->
         </attributes>
 

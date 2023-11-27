@@ -35,6 +35,16 @@ export const useDataSourceStore = defineStore('datasource', {
         return state.project.integratedGraph.graphicalSchema
       return ""
     },
+    getTemporalGlobalSchema(state) {
+      if (state.project.temporalIntegratedGraph.globalGraph.graphicalSchema)
+        return state.project.temporalIntegratedGraph.globalGraph.graphicalSchema
+      return ""
+    },
+    getTemporalGraphicalSchemaIntegration(state) {
+      if (state.project.temporalIntegratedGraph.graphicalSchema)
+        return state.project.temporalIntegratedGraph.graphicalSchema
+      return ""
+    },
     getRepos(state) {
       return state.repositories
     },

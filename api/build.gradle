@@ -140,119 +140,41 @@ sonarqube {
 tasks['sonarqube'].dependsOn test
 
 
-//para copiar la versión actualizada de NextiaCore y NextiaDI (tener dependencias en misma carpeta que ODIN)
-//por ejemplo carpeta Folder y dentro de Folder tener ODIN, NextiaCore, NextiaBS, etc.
-def nextiaCoreJarPath = "..\\..\\NextiaCore\\build\\libs"
-def nextiaDIJarPath = "..\\..\\NextiaDI\\build\\libs"
-def nextiaBSJarPath = "..\\..\\NextiaBS\\build\\libs"
-def nextiaDLJarPath = "..\\..\\NextiaDataLayer\\build\\libs"
-def nextiaJDJarPath = "..\\..\\NextiaJD2\\build\\libs"
+task buildNextiaCore(type: GradleBuild) {
+	buildFile = '..\\..\\NextiaCore\\build.gradle'
+	tasks = ['build']
+}
 
-task importExternalJar {
-	doLast {
-		def nextiaCorePath = project(':NextiaCore')
-		def nextiaDIPath = project(':NextiaDI')
-		def nextiaBSPath = project(':NextiaBS')
-		def nextiaDLPath = project(':NextiaDataLayer')
-		def nextiaJDPath = project(':NextiaJD')
+task buildNextiaDataLayer(type: GradleBuild) {
+	buildFile = '..\\..\\NextiaDataLayer\\build.gradle'
+	tasks = ['build']
+}
 
-		// Verifica si los archivos JAR existen en las rutas especificadas
-		def nextiaCoreJar = file(nextiaCoreJarPath)
-		def nextiaDIJar = file(nextiaDIJarPath)
-		def nextiaBSJar = file(nextiaBSJarPath)
-		def nextiaDLJar = file(nextiaDLJarPath)
-		def nextiaJDJar = file(nextiaJDJarPath)
+task buildNextiaJD(type: GradleBuild) {
+	buildFile = '..\\..\\NextiaJD2\\build.gradle'
+	tasks = ['build']
+}
 
+task buildNextiaBS(type: GradleBuild) {
+	buildFile = '..\\..\\NextiaBS\\build.gradle'
+	tasks = ['build']
+}
 
-		if (!nextiaCoreJar.exists()) {
-			nextiaCorePath.tasks.uberJar.dependsOn {
-				println "Ejecutando uberJar para NextiaCore..."
-			}
-			nextiaCorePath.tasks.uberJar.execute()
-			nextiaCorePath.tasks.uberJar.get()
+task buildNextiaDI(type: GradleBuild) {
+	buildFile = '..\\..\\NextiaDI\\build.gradle'
+	tasks = ['build']
+}
 
-			if (!nextiaCoreJar.exists()) {
-				throw new GradleException("No se pudo generar el archivo JAR para NextiaCore.")
-			}
-		}
+// Dependency relationships
+buildNextiaDI.dependsOn buildNextiaCore
+buildNextiaBS.dependsOn buildNextiaCore
+buildNextiaJD.dependsOn buildNextiaCore, buildNextiaDataLayer
+buildNextiaDataLayer.dependsOn buildNextiaCore
 
-		if (!nextiaDIJar.exists()) {
-			nextiaDIPath.tasks.uberJar.dependsOn {
-				println "Ejecutando uberJar para NextiaDI..."
-			}
-			nextiaDIPath.tasks.uberJar.execute()
-			nextiaDIPath.tasks.uberJar.get()
-
-			if (!nextiaDIJar.exists()) {
-				throw new GradleException("No se pudo generar el archivo JAR para NextiaDI.")
-			}
-		}
-
-		if (!nextiaBSJar.exists()) {
-			nextiaBSPath.tasks.uberJar.dependsOn {
-				println "Ejecutando uberJar para NextiaBS..."
-			}
-			nextiaBSPath.tasks.uberJar.execute()
-			nextiaBSPath.tasks.uberJar.get()
-
-			if (!nextiaBSJar.exists()) {
-				throw new GradleException("No se pudo generar el archivo JAR para NextiaBS.")
-			}
-		}
-
-		if (!nextiaDLJar.exists()) {
-			nextiaDLPath.tasks.uberJar.dependsOn {
-				println "Ejecutando uberJar para NextiaDL..."
-			}
-			nextiaDLPath.tasks.uberJar.execute()
-			nextiaDLPath.tasks.uberJar.get()
-
-			if (!nextiaDLJar.exists()) {
-				throw new GradleException("No se pudo generar el archivo JAR para NextiaDL.")
-			}
-		}
-
-		if (!nextiaJDJar.exists()) {
-			nextiaJDPath.tasks.uberJar.dependsOn {
-				println "Ejecutando uberJar para NextiaJD..."
-			}
-			nextiaJDPath.tasks.uberJar.execute()
-			nextiaJDPath.tasks.uberJar.get()
-
-			if (!nextiaJDar.exists()) {
-				throw new GradleException("No se pudo generar el archivo JAR para NextiaJD.")
-			}
-		}
-
-		// Copiar los JAR después de asegurarse de que existen
-		copy {
-			from nextiaCoreJarPath
-			into "../api/lib"
-			rename { 'NextiaCore.jar' }
-		}
-
-		copy {
-			from nextiaDIJarPath
-			into "../api/lib"
-			rename { 'NextiaDI.jar' }
-		}
-
-		copy {
-			from nextiaBSJarPath
-			into "../api/lib"
-			rename { 'NextiaBS.jar' }
-		}
-
-		copy {
-			from nextiaDLJarPath
-			into "../api/lib"
-			rename { 'NextiaDL.jar' }
-		}
-
-		copy {
-			from nextiaJDJarPath
-			into "../api/lib"
-			rename { 'NextiaJD.jar' }
-		}
-	}
+task generateAndImportExternalJar {
+	dependsOn tasks.named('buildNextiaCore'),
+			tasks.named('buildNextiaDataLayer'),
+			tasks.named('buildNextiaJD'),
+			tasks.named('buildNextiaDI'),
+			tasks.named('buildNextiaBS')
 }

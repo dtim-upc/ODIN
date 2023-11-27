@@ -51,6 +51,7 @@ public class IntegrationController {
                                                                  @RequestBody IntegrationData iData) {
         logger.info("INTEGRATING temporal with project: " + projectId);
 
+        /* JUST DEBUG CODE
         for (Alignment a : iData.getAlignments()) {
             System.out.println(a.getIriA()); //http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/201/col7
             System.out.println(a.getIriB()); //http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/153/col2
@@ -59,6 +60,7 @@ public class IntegrationController {
             System.out.println(a.getLabelB()); //col2
             System.out.println(a.getIriL()); //http://www.essi.upc.edu/DTIM/NextiaDI/col7_col2
         }
+        */
 
         Project project = integrationService.getProject(projectId);
 
@@ -76,13 +78,14 @@ public class IntegrationController {
 
             String path = "..\\api\\dbFiles\\ttl\\";
 
-            Project projectToSave = integrationService.updateIntegratedGraphProject(project, integratedGraph);
+            Project projectToSave = integrationService.updateTemporalIntegratedGraphProject(project, integratedGraph);
 
             Graph globalGraph = integrationService.generateGlobalGraph(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
             projectToSave = integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
 
             Project project1 = integrationService.saveProject(projectToSave);
             logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
+            //todo review
             project1 = integrationService.addIntegratedDataset(project1.getProjectId(), iData.getDsB().getId());
 
             Project project2 = integrationService.getProject(project1.getProjectId());
@@ -113,21 +116,21 @@ public class IntegrationController {
         logger.info("INTEGRATING joins...");
 
         Project project = integrationService.getProject(id);
-        System.out.println(project.getIntegratedGraph().getGlobalGraph().getGraphicalSchema() + "DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+        System.out.println(project.getTemporalIntegratedGraph().getGlobalGraph().getGraphicalSchema() + "DDDDDDDDDDDDDDDDDDDDDDDDDDD");
 
         // Integrate the join alignments into the integrated graph
-        Graph integratedSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
+        Graph integratedSchema = integrationService.joinIntegration(project.getTemporalIntegratedGraph(), joinA);
 
         // Update the project's integrated graph with the integrated schema
         //project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedSchema);
-        project = integrationService.updateIntegratedGraphProject(project, integratedSchema);
+        project = integrationService.updateTemporalIntegratedGraphProject(project, integratedSchema);
 
         // Integrate the join alignments into the global schema
-        Graph globalSchema = integrationService.joinIntegration(project.getIntegratedGraph(), joinA);
+        Graph globalSchema = integrationService.joinIntegration(project.getTemporalIntegratedGraph(), joinA);
 
         // Set the global graph of the project's integrated graph
         //project.getIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalSchema);
-        project = integrationService.updateGlobalGraphProject(project, globalSchema);
+        project = integrationService.updateTemporalGlobalGraphProject(project, globalSchema);
 
         //project = integrationService.addIntegratedDataset(datasetId);
 
@@ -135,7 +138,7 @@ public class IntegrationController {
         Project savedProject = integrationService.saveProject(project);
 
         savedProject = integrationService.getProject(savedProject.getProjectId());
-        System.out.println(savedProject.getIntegratedGraph().getGlobalGraph().getGraphicalSchema());
+        System.out.println(savedProject.getTemporalIntegratedGraph().getGlobalGraph().getGraphicalSchema());
 
 
         return new ResponseEntity(savedProject, HttpStatus.OK);
@@ -150,8 +153,13 @@ public class IntegrationController {
      */
     @PostMapping(value = "/project/{id}/integration/persist")
     public ResponseEntity<Project> acceptIntegration(@PathVariable("id") String id) {
-        // TODO: Delete this call
-        // Currently, this method returns the Project by calling integrationService.getProject(id)
+        Project temporalProject = integrationService.getProject(id);
+        Project projectToSave = integrationService.updateIntegratedGraphProject(temporalProject, temporalProject.getTemporalIntegratedGraph());
+
+        projectToSave = integrationService.updateGlobalGraphProject(projectToSave, temporalProject.getTemporalIntegratedGraph().getGlobalGraph());
+
+        Project project1 = integrationService.saveProject(projectToSave);
+        logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
         return new ResponseEntity(integrationService.getProject(id), HttpStatus.OK);
     }
 

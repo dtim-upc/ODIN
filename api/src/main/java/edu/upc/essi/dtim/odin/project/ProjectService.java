@@ -134,6 +134,26 @@ public class ProjectService {
             }
         }
 
+
+        if (savedProject.getTemporalIntegratedGraph() != null && savedProject.getTemporalIntegratedGraph().getGraphName() != null) {
+            try {
+                // Get the GraphStore interface using the AppConfig
+                GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
+
+                // Get the integrated graph from the project
+                Graph graph = project.getTemporalIntegratedGraph();
+
+                // Set the graph name to match the saved project's integrated graph name
+                graph.setGraphName(savedProject.getTemporalIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getTemporalIntegratedGraph().getGraphName());
+
+                // Save the graph to the graph store
+                graphStoreInterface.saveGraph(graph);
+            } catch (Exception e) {
+                // Handle any exceptions by throwing a runtime exception
+                throw new RuntimeException(e);
+            }
+        }
+
         // Return the saved project
         return savedProject;
     }
@@ -160,6 +180,14 @@ public class ProjectService {
                 // Retrieve the integrated graph by its graph name and cast it to IntegratedGraphJenaImpl
                 Graph integratedGraph = graphStoreInterface.getGraph(project.getIntegratedGraph().getGraphName());
                 project.setIntegratedGraph((IntegratedGraphJenaImpl) integratedGraph);
+            }
+            if (project.getTemporalIntegratedGraph() != null) {
+                // Get the GraphStoreInterface from the GraphStoreFactory using the appConfig
+                GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
+
+                // Retrieve the integrated graph by its graph name and cast it to IntegratedGraphJenaImpl
+                Graph integratedGraph = graphStoreInterface.getGraph(project.getTemporalIntegratedGraph().getGraphName());
+                project.setTemporalIntegratedGraph((IntegratedGraphJenaImpl) integratedGraph);
             }
         } catch (Exception e) {
             // Throw a runtime exception if an error occurs while loading the integrated graph

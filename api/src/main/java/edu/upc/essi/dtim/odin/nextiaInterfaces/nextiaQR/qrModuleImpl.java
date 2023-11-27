@@ -22,7 +22,13 @@ public class qrModuleImpl implements qrModuleInterface {
     public RDFSResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset> integratedDatasets, QueryDataSelection body) {
         //TODO modificar siguiente llamada a la del módulo de la query que debería retornar un Dataset<Row>
         Dataset<Row> dataFrame = hardcodeDataFrame(body.getProperties());
-        
+
+        // global of the integrated one
+        integratedGraph.getGlobalGraph();
+
+        // local graph
+        integratedDatasets.get(0).getLocalGraph();
+
         // Crear una instancia de RDFSResult
         RDFSResult res = new RDFSResult();
 
