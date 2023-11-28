@@ -21,9 +21,10 @@
       - [Frontend](#frontend-configuration)
 3. [Project Structure](#project-structure)
    - [Backend](#backend)
-       - [Architecture](#backend-architecture)
-       - [Code style](#code-style)
-       - [Dependencies](#backend-dependencies)
+     - [Database division](#database-division)
+     - [Architecture](#backend-architecture)
+     - [Code style](#code-style)
+     - [Dependencies](#backend-dependencies)
    - [Frontend](#frontend)
        - [Architecture](#frontend-architecture)
        - [Dependencies](#frontend-dependencies)
@@ -103,30 +104,26 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
 #### Backend <a name="backend-configuration"></a>
 
-1. Open in IntelliJ the `ODIN/api` folder.
+1. Open in IntelliJ the [`ODIN/api`](api) folder.
 
-2. Generate the JAR folders of the Nextia projects:
+2. Ensure that the other Nextia projects are updated and in the same folder of ODIN.
 
-   Execute for each Nextia project the Gradle task `uberJar`. This task will generate a zipped folder containing the compiled and optimized JAR files necessary for the seamless integration of Nextia functionalities within the ODIN system. The JAR generated will be located in the `build/libs` path of each project. 
+3. From IntelliJ open the [`build.gradle`](api/build.gradle) file.
 
-   First, you should generate NextiaCore.jar because this JAR will be used by the other Nextia projects as a fundamental component, serving as a core library that provides essential functionalities and serves as a foundation for the remaining Nextia modules.
+4. Execute the task (by clicking the button `▶` next to the task name) [`generateAndImportExternalJar`](https://github.com/dtim-upc/ODIN/blob/6ef41b22c57a7f763a91a7d0ae843918d0be1666/api/build.gradle#L174)
 
-   Then, copy the NextiaCore.jar generated and paste it in the `./NextiaDataLayer/lib` folder to generate NextiaDataLayer.jar, which serves as a critical component utilized by both NextiaJD and ODIN. This JAR encapsulates data layer functionalities, ensuring seamless communication between NextiaJD and ODIN, and enabling efficient data management within the integrated system.
+5. This task will generate the JAR folders of the Nextia projects and import them in ODIN.
 
-   Once you have the `NextiaCore.jar` and the `NextiaDataLayer.jar`, copy `NextiaCore.jar` in the `lib` folder, as before, of the other Nextia projects cloned (NextiaBS, NextiaJD, NextiaDI, NextiaQR). You must also copy `NextiaDataLayer.jar` in the same `lib` folder of NextiaJD and NextiaQR.
+6. Refresh the gradle to index the new JARs imported. Click the `🔄` button of gradle (normally on the right side of the editor).
 
-   Now generate the remaining JARs: `NextiaBS.jar`, `NextiaDI.jar`, `NextiaJD.jar`, `NextiaQR.jar`.
+7. Verify that the JAR libraries have been successfully imported into the lib directory in `ODIN/api` and properly indexed. If indexed correctly, you should be able to expand each JAR folder to inspect its contents.
 
-    Note that NextiaQR it's optional right now.
+8. Finally, open the project in IntelliJ IDE and execute the main class OdinApplication.java to launch the application.
 
-3. Execute `importExternalJar` Gradle task of ODIN:
+_Note: The Nextia projects include `uberJar` tasks that generate a zipped folder containing compiled and optimized JAR files essential for seamless integration of Nextia functionalities within the ODIN system. The generated JARs can be found in the `build/libs` path of each respective project._
+_If any JAR is not imported, you can generate it in the specific project using the `uberJar` task. However, exercise caution when propagating it to other dependent projects, as it may necessitate regenerating JARs in those projects as well._
 
-   This task will import automatically all the `NextiaXX.jar` needed by ODIN.
-   Ensure that all Nextia projects are located under the same folder as ODIN. This organizational structure is essential for the importExternalJar Gradle task to effectively locate and import the generated JAR files from Nextia projects.
-
-   Check that the JAR libraries have been imported into lib directory in ODIN/api.
-
-4. Finally, execute `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class `OdinApplication.java`.
+_Also, please be aware that NextiaQR is currently an optional component._
 
 #### Frontend <a name="frontend-configuration"></a>
 
@@ -138,7 +135,7 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
 4. Finally, execute `quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
 
-Note that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed. 
+_Note: that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed._ 
 
 
 ## Project Structure <a name="project-structure"></a>
@@ -149,21 +146,21 @@ Note that you must have Quasar CLI as it's mentioned in the Prerequisites sectio
 
 ### Backend <a name="backend"></a>
 
-   ODIN's backend is developed in Java and utilizes the Spring framework. As the backend for ODIN, its primary role is to orchestrate calls to various Nextia libraries within the department. Each Nextia library serves a distinct functionality, and ODIN also manages application persistence.
+   ODIN's backend is developed in **Java** and utilizes the **Spring framework**. As the backend for ODIN, its primary role is to **orchestrate** calls to various Nextia libraries within the department. **Each Nextia** library serves a distinct **functionality**, and ODIN also manages application persistence.
 
-   ODIN's persistence is bifurcated into two components: graph persistence, currently using Jena, and relational database persistence using ORM with the embedded H2 database.
+   ODIN's **persistence** is bifurcated into two components: graph persistence, currently using Jena, and relational database persistence using ORM with the embedded H2 database.
 
    Among the "external" Nextia libraries (those requiring JAR import), the following are noteworthy:
 
-   - NextiaCore: Contains domain class definitions for the system and serves as a cross-cutting library. It lacks business logic, focusing solely on Plain Old Java Object (POJO) classes. 
+   - **NextiaCore:** Contains domain class definitions for the system and serves as a cross-cutting library. It lacks business logic, focusing solely on Plain Old Java Object (POJO) classes. 
 
-   - NextiaDataLayer: Manages an intermediate persistence layer for accessing data from uploaded datasets.
+   - **NextiaDataLayer:** Manages an intermediate persistence layer for accessing data from uploaded datasets.
 
-   - NextiaBS: Extracts schemas from datasets loaded into ODIN and generates wrappers, which are SQL queries demonstrating how to access the original dataset's data.
+   - **NextiaBS:** Extracts schemas from datasets loaded into ODIN and generates wrappers, which are SQL queries demonstrating how to access the original dataset's data.
 
-   - NextiaJD: Join discovery. Responsible for automatically discovering attribute alignments from datasets.
+   - **NextiaJD:** Join discovery. Responsible for automatically discovering attribute alignments from datasets.
 
-   - NextiaDI: Handles data integration. Given two schemas and alignments, it integrates them and generates the corresponding integrated graph.
+   - **NextiaDI:** Handles data integration. Given two schemas and alignments, it integrates them and generates the corresponding integrated graph.
 
    Internally within ODIN, there are NextiaStore and NextiaGraphy. The former manages persistence, while the latter generates a string representation for visually rendering graphs generated by NextiaBS in the frontend.
 
@@ -199,11 +196,50 @@ NextiaJD-->NextiaDataLayer;
 NextiaQR-->NextiaDataLayer;
 ```
 
+#### Summary modules structure
+#### Transversal Modules
+
+- **NextiaCore:** Contains domain class definitions and acts as a cross-cutting library.
+- **NextiaDataLayer:** Manages an intermediate persistence layer to access data from loaded datasets.
+
+#### Nextia Modules
+
+- **NextiaBS:** Extracts schemas from loaded datasets in ODIN and generates wrappers.
+- **NextiaJD:** Join discovery. Automatically discovers attribute alignments.
+- **NextiaDI:** Handles data integration. Integrates two schemas and generates the corresponding integrated graph.
+- **NextiaQR:** (Optional) Performs query-based searches on datasets.
+
+#### Internal NextiaStore and NextiaGraphy
+
+- **NextiaStore:** Manages persistence.
+- **NextiaGraphy:** Generates a string representation for rendering graphs in the frontend.
+
+
+
+#### Database Division <a name="database-division"></a>
+
+NextiaStore is divided into two types of databases:
+
+1. **Relational Database (H2):**
+    - This is used to store relational data as could be some part of a project, datasets, user information...
+    - If you must change something, make the necessary changes in the [orm.xml](api/src/main/resources/META-INF/orm.xml) in the `api/src/main/resources/META-INF/orm.xml` path. This file contains the mapping one-to-one with our domain objects persisted ([ORM syntax](https://www.datanucleus.org/products/accessplatform_5_1/jpa/metadata_xml.html)).
+
+2. **Graph Database (Jena):**
+    - This one is used to store the schemas of our graphs. This graphs now are implemented under an interface as Model Jena's object.
+
+A usage example of the two databases are available in [getProjectById(String projectId)](https://github.com/dtim-upc/ODIN/blob/6ef41b22c57a7f763a91a7d0ae843918d0be1666/api/src/main/java/edu/upc/essi/dtim/odin/project/ProjectService.java#L167) or also [saveProject(Project project)](https://github.com/dtim-upc/ODIN/blob/6ef41b22c57a7f763a91a7d0ae843918d0be1666/api/src/main/java/edu/upc/essi/dtim/odin/project/ProjectService.java#L113) where we must get from the RelationalDB some information and the other related with its schemas from the GraphDB.
+
+Both types are structured by the same pattern (see [NextiaStore](https://github.com/dtim-upc/ODIN/tree/main/api/src/main/java/edu/upc/essi/dtim/odin/NextiaStore) folder): Factory, Interface, Implementation. See the examples to know how to use them.
+
+#### UML Diagram <a name="uml-diagram"></a>
+
+The UML diagram provides an overview of the project structure. The key sections are described below:
+
 #### Architecture <a name="backend-architecture"></a>
 
 To see the UML class diagram, download [Visual Paradigm Community Edition](https://www.visual-paradigm.com/download/community.jsp). It will ask you an email by the end of the installation or the first time you open the program just to send you the key activation code.
 
-Then open the 
+Then open the [UML conceptual ODIN.vpp](https://github.com/dtim-upc/ODIN/blob/integration-dataset-bug/doc/Diagrama%20UML/UML%20conceptual%20ODIN.vpp)
 
 It should look like this:
 <p align="center">
@@ -313,5 +349,5 @@ These researchers have significantly contributed to shaping ODIN into a more rob
 
 ## License <a name="license"></a>
 
-   This project is licensed under the [GNU General Public License v3.0]([https://opensource.org/license/mit/](https://www.gnu.org/licenses/gpl-3.0.html)https://www.gnu.org/licenses/gpl-3.0.html).
+   This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 

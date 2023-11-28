@@ -52,6 +52,11 @@
                 <join-column name="PROJECTID"/>
             </one-to-many>
 
+            <one-to-many orphan-removal="false" name="temporalIntegratedDatasets"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                <join-column name="PROJECTID"/>
+            </one-to-many>
+
             <one-to-one name="integratedGraph"
                         target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl">
                 <cascade>
@@ -115,6 +120,7 @@
                 <generated-value strategy="AUTO"/>
             </id>
             <basic name="repositoryName"/>
+            <basic name="isVirtual"/>
             <one-to-many name="datasets" orphan-removal="true"
                          target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
                 <cascade>

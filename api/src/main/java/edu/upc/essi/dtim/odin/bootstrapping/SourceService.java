@@ -371,17 +371,6 @@ public class SourceService {
 
 
     /**
-     * Creates a new DataRepository with the specified repository name using the ORMStoreInterface.
-     *
-     * @param repositoryName The name of the DataRepository to create.
-     * @return The created DataRepository.
-     */
-    public DataRepository createRepository(String repositoryName, String repositoryType) {
-        return repositoryService.createRepository(repositoryName, repositoryType);
-    }
-
-
-    /**
      * Adds a dataset to a DataRepository and updates the repository associations using the ORMStoreInterface.
      *
      * @param datasetId    The ID of the dataset to add to the repository.
