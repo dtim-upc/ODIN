@@ -222,7 +222,7 @@ NextiaStore is divided into two types of databases:
 
 1. **Relational Database (H2):**
     - This is used to store relational data as could be some part of a project, datasets, user information...
-    - If you must change something
+    - If you must change something, make the necessary changes in the [orm.xml](api/src/main/resources/META-INF/orm.xml) in the `api/src/main/resources/META-INF/orm.xml` path. This file contains the mapping one-to-one with our domain objects persisted ([ORM syntax](https://www.datanucleus.org/products/accessplatform_5_1/jpa/metadata_xml.html)).
 
 2. **Graph Database (Jena):**
     - This one is used to store the schemas of our graphs. This graphs now are implemented under an interface as Model Jena's object.
