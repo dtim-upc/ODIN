@@ -134,14 +134,10 @@ public class SourceController {
 
             // Find/create repository
             DataRepository repository;
-            if (haveToCreateRepository) {
-                // Create a new repository and add it to the project
-                repository = sourceService.createRepository(repositoryName, "LocalRepository");
-                sourceService.addRepositoryToProject(projectId, repository.getId());
-            } else {
-                // Find the existing repository using the provided repositoryId
-                repository = sourceService.findRepositoryById(repositoryId);
-            }
+
+            // Find the existing repository using the provided repositoryId
+            repository = sourceService.findRepositoryById(repositoryId);
+
             repositoryId = repository.getId();
             String directoryName = repositoryId + repository.getRepositoryName();
 
@@ -420,17 +416,6 @@ public class SourceController {
 
         // Check if the repositoryId is empty, which indicates a new repository should be created
         boolean createRepo = (repositoryId == null) || (repositoryId.equals(""));
-
-        // Find or create the repository
-        DataRepository repository;
-        if (createRepo) {
-            // Create a new repository if repositoryId is empty
-            repository = sourceService.createRepository(repositoryName, "LocalRepository");
-            repositoryId = repository.getId();
-
-            // Add the new repository to the project
-            sourceService.addRepositoryToProject(projectId, repositoryId);
-        }
 
         // Add the dataset to the repository and delete the reference from others if exists
         sourceService.addDatasetToRepository(datasetId, repositoryId);

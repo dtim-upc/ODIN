@@ -110,7 +110,7 @@ public class RepositoryService {
      * @param repositoryName The name of the DataRepository to create.
      * @return The created DataRepository.
      */
-    public DataRepository createRepository(String repositoryName, String repositoryType) {
+    public DataRepository createRepository(String repositoryName, String repositoryType, Boolean isVirtual) {
         // Create a new DataRepository instance
         DataRepository repository;
 
@@ -131,6 +131,7 @@ public class RepositoryService {
 
         // Set the repository name for the DataRepository
         repository.setRepositoryName(repositoryName);
+        repository.setVirtual(isVirtual);
 
         // Save the DataRepository and return it
         return ormDataResource.save(repository);

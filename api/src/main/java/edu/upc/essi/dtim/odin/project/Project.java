@@ -24,6 +24,17 @@ public class Project {
 
     private List<Dataset> integratedDatasets;
 
+    public List<Dataset> getTemporalIntegratedDatasets() {
+        return this.temporalIntegratedDatasets;
+    }
+
+    public void setTemporalIntegratedDatasets(final List<Dataset> temporalIntegratedDatasets) {
+        this.temporalIntegratedDatasets = temporalIntegratedDatasets;
+    }
+
+    private List<Dataset> temporalIntegratedDatasets;
+
+
     /**
      * Get the unique identifier of the project.
      *

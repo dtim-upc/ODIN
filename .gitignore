@@ -35,3 +35,5 @@ api/dbFiles/ttl/integrated
 api/dbFiles/DataLayerZone/DuckDBDataLake/database
 api/dbFiles/DataLayerZone/DuckDBDataLake/database.wal
 *.crc
+api/dbFiles/DataLayer/DuckDBDataLake/database.wal
+api/dbFiles/DataLayer/DuckDBDataLake/database
