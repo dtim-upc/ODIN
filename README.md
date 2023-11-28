@@ -349,5 +349,5 @@ These researchers have significantly contributed to shaping ODIN into a more rob
 
 ## License <a name="license"></a>
 
-   This project is licensed under the [GNU General Public License v3.0]([https://opensource.org/license/mit/](https://www.gnu.org/licenses/gpl-3.0.html)https://www.gnu.org/licenses/gpl-3.0.html).
+   This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 
