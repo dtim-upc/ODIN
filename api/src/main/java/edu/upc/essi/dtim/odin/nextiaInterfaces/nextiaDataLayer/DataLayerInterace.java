@@ -12,6 +12,4 @@ public interface DataLayerInterace {
     void deleteDataset(String dataLayerPath);
 
     String reconstructFile(MultipartFile multipartFile, String repositoryIdAndName);
-
-    String reconstructTable(String datasetName, String url, String username, String password);
 }

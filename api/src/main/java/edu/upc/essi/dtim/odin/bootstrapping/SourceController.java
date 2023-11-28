@@ -145,8 +145,8 @@ public class SourceController {
             repositoryId = repository.getId();
             String directoryName = repositoryId + repository.getRepositoryName();
 
-            System.out.println(attachTables);
-            System.out.println(attachFiles);
+            System.out.println("ATTACH TABLE:" + attachTables);
+            System.out.println("ATTACH FILE:" + attachFiles);
 
             // If attachTables is empty it means that we either have a local file or a file coming from an API (which is
             // stored as a json file). Otherwise, we have data coming from a sql database.

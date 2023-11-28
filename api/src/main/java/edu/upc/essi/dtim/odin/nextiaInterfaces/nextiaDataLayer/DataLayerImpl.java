@@ -64,10 +64,4 @@ public class DataLayerImpl implements DataLayerInterace {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public String reconstructTable(String tableName, String url, String username, String password) {
-        DataLoading dataLoading = DataLoadingSingleton.getInstance(dataLayerPath);
-        return dataLoading.reconstructTable(tableName, url, username, password);
-    }
 }

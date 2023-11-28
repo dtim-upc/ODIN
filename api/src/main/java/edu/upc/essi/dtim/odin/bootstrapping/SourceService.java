@@ -90,14 +90,6 @@ public class SourceService {
         return dataLayerInterFace.reconstructFile(multipartFile, newFileDirectory);
     }
 
-    public String reconstructTable(Dataset savedDataset) {
-        DataLayerInterace dataLayerInterace = new DataLayerImpl(appConfig);
-        String datalayerPath = dataLayerInterace.reconstructTable(((SQLDataset)savedDataset).getTableName(), ((RelationalJDBCRepository)savedDataset.getRepository()).getUrl(), ((RelationalJDBCRepository)savedDataset.getRepository()).getUsername(), ((RelationalJDBCRepository)savedDataset.getRepository()).getPassword());
-        savedDataset.setDataLayerPath(datalayerPath);
-        this.saveDataset(savedDataset);
-        return datalayerPath;
-    }
-
     /**
      * Extracts data from a file and returns a Dataset object with the extracted data.
      *
