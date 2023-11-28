@@ -95,6 +95,7 @@ public class RepositoryController {
             String repositoryName = requestData.get("repositoryName");
             String repositoryDescription = requestData.get("repositoryDescription");
             String repositoryType = requestData.get("repositoryType");
+            Boolean isVirtual = Boolean.valueOf(requestData.get("isVirtual"));
 
             logger.info("POST REPOSITORY RECEIVED FOR " + projectId + " with repo name " + repositoryName + " and type " + repositoryType);
             // Validate and authenticate access here
@@ -104,7 +105,7 @@ public class RepositoryController {
             DataRepository repository;
 
             // Create a new repository and add it to the project
-            repository = repositoryService.createRepository(repositoryName, repositoryType);
+            repository = repositoryService.createRepository(repositoryName, repositoryType, isVirtual);
             repository = repositoryService.addRepositoryParameters(repository.getId(), requestData);
             repositoryService.addRepositoryToProject(projectId, repository.getId());
 

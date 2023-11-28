@@ -13,16 +13,23 @@
             <q-input v-model="formData['repositoryDescription']" filled autogrow label="Description (Optional)"/>
           </q-card-section>
 
-
           <!-- Tipo de origen de datos -->
           <q-card-section>
             <!-- Tipo de origen de datos -->
             <q-select
               v-model="RepositoryType"
               :options="dataRepositoryTypes"
-              label="Type"
+              label="Repository Type"
               class="q-mt-none"
             />
+          </q-card-section>
+
+          <q-card-section>
+            <div class="text-h6">Access:</div>
+            <div>
+              <span>Materialized</span>
+              <q-toggle v-model="formData.isVirtualized" label="" :disable="RepositoryType?.value === 'Local_Repository.json'"/>
+              <span>Virtual</span></div>
           </q-card-section>
 
           <q-card-section>
@@ -190,6 +197,7 @@ import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
 import {odinApi} from "../../boot/axios";
 
+
 const isPwd = ref(true);
 // -------------------------------------------------------------
 //                         PROPS & EMITS
@@ -226,6 +234,7 @@ const connectBy = ref("");
 const formData = ref({
   repositoryDescription: '',
   repositoryName: '',
+  isVirtualized: ref(false),
   connectBy: 'connectByUrl'
 });
 
@@ -279,6 +288,12 @@ watch(RepositoryType, (newType) => {
     formSchema.value = response.data;
     console.log(formSchema);
 
+    if (newType.value === 'Local_Repository.json') {
+      console.log("-------------------------- cambio")
+      formData.value.isVirtualized = false;
+      console.log("-------------------------- cambio " + formData['isVirtualized'])
+    }
+
     if (responseData.properties) {
       const properties = responseData.properties;
       for (const attributeName in properties) {
@@ -294,6 +309,7 @@ watch(RepositoryType, (newType) => {
       console.error('Error al obtener el JSON Schema', error);
     });
 });
+
 
 watch(() => showS.value, (newValue) => {
   if (newValue) {
@@ -355,6 +371,7 @@ const onSubmit = async () => {
   data["datasetDescription"] = formData.value["repositoryDescription"];
   data["repositoryType"] = formSchema.value.class;
   data["connectBy"] = formData.value["connectBy"];
+  data["isVirtual"] = formData.value["isVirtualized"];
 
   if (formSchema.value.attributes) {
     const formAttributes = formSchema.value.attributes;
