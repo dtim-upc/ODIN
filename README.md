@@ -135,7 +135,7 @@ _Also, please be aware that NextiaQR is currently an optional component._
 
 4. Finally, execute `quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
 
-Note that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed. 
+_Note: that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed._ 
 
 
 ## Project Structure <a name="project-structure"></a>
