@@ -102,8 +102,7 @@
             </clipPath>
           </defs>
         </svg>
-        <p style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">No alignments added.
-          Check classes color fixed to system</p>
+        <p style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">There are no projects. Create one and start using ODIN.</p>
         <!--
 
              <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon"/>-->
