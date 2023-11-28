@@ -168,8 +168,8 @@ task buildNextiaDI(type: GradleBuild) {
 // Dependency relationships
 buildNextiaDI.dependsOn buildNextiaCore
 buildNextiaBS.dependsOn buildNextiaCore
-buildNextiaJD.dependsOn buildNextiaCore, buildNextiaDataLayer
 buildNextiaDataLayer.dependsOn buildNextiaCore
+buildNextiaJD.dependsOn buildNextiaCore, buildNextiaDataLayer
 
 task generateAndImportExternalJar {
 	dependsOn tasks.named('buildNextiaCore'),
