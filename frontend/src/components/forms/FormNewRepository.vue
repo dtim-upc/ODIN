@@ -27,10 +27,23 @@
           <q-card-section>
             <div class="text-h6">Access:</div>
             <div>
-              <span>Materialized</span>
-              <q-toggle v-model="formData.isVirtualized" label="" :disable="RepositoryType?.value === 'Local_Repository.json'"/>
-              <span>Virtual</span></div>
+    <span
+      :class="{ 'text-bold': !formData.isVirtualized, 'text-normal': formData.isVirtualized }"
+      :style="{ 'color': formData.isVirtualized ? 'gray' : '', 'font-size': formData.isVirtualized ? '' : '1.09em' }"
+    >
+      Materialized
+    </span>
+              <q-toggle v-model="formData.isVirtualized" label=""
+                        :disable="RepositoryType?.value === 'Local_Repository.json'"/>
+              <span
+                :class="{ 'text-bold': formData.isVirtualized, 'text-normal': !formData.isVirtualized }"
+                :style="{ 'color': !formData.isVirtualized ? 'gray' : '', 'font-size': !formData.isVirtualized ? '' : '1.09em' }"
+              >
+      Virtual
+    </span>
+            </div>
           </q-card-section>
+
 
           <q-card-section>
             <div v-for="(field, fieldName) in formSchema.properties" :key="fieldName">
