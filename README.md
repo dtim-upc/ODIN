@@ -104,30 +104,26 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
 #### Backend <a name="backend-configuration"></a>
 
-1. Open in IntelliJ the `ODIN/api` folder.
+1. Open in IntelliJ the [`ODIN/api`](api) folder.
 
-2. Generate the JAR folders of the Nextia projects:
+2. Ensure that the other Nextia projects are updated and in the same folder of ODIN.
 
-   Execute for each Nextia project the Gradle task `uberJar`. This task will generate a zipped folder containing the compiled and optimized JAR files necessary for the seamless integration of Nextia functionalities within the ODIN system. The JAR generated will be located in the `build/libs` path of each project. 
+3. From IntelliJ open the [`build.gradle`](api/build.gradle) file.
 
-   First, you should generate NextiaCore.jar because this JAR will be used by the other Nextia projects as a fundamental component, serving as a core library that provides essential functionalities and serves as a foundation for the remaining Nextia modules.
+4. Execute the task (by clicking the button `▶` next to the task name) [`generateAndImportExternalJar`](https://github.com/dtim-upc/ODIN/blob/6ef41b22c57a7f763a91a7d0ae843918d0be1666/api/build.gradle#L174)
 
-   Then, copy the NextiaCore.jar generated and paste it in the `./NextiaDataLayer/lib` folder to generate NextiaDataLayer.jar, which serves as a critical component utilized by both NextiaJD and ODIN. This JAR encapsulates data layer functionalities, ensuring seamless communication between NextiaJD and ODIN, and enabling efficient data management within the integrated system.
+5. This task will generate the JAR folders of the Nextia projects and import them in ODIN.
 
-   Once you have the `NextiaCore.jar` and the `NextiaDataLayer.jar`, copy `NextiaCore.jar` in the `lib` folder, as before, of the other Nextia projects cloned (NextiaBS, NextiaJD, NextiaDI, NextiaQR). You must also copy `NextiaDataLayer.jar` in the same `lib` folder of NextiaJD and NextiaQR.
+6. Refresh the gradle to index the new JARs imported. Click the `🔄` button of gradle (normally on the right side of the editor).
 
-   Now generate the remaining JARs: `NextiaBS.jar`, `NextiaDI.jar`, `NextiaJD.jar`, `NextiaQR.jar`.
+7. Verify that the JAR libraries have been successfully imported into the lib directory in `ODIN/api` and properly indexed. If indexed correctly, you should be able to expand each JAR folder to inspect its contents.
 
-    Note that NextiaQR it's optional right now.
+8. Finally, open the project in IntelliJ IDE and execute the main class OdinApplication.java to launch the application.
 
-3. Execute `importExternalJar` Gradle task of ODIN:
+_Note: The Nextia projects include `uberJar` tasks that generate a zipped folder containing compiled and optimized JAR files essential for seamless integration of Nextia functionalities within the ODIN system. The generated JARs can be found in the `build/libs` path of each respective project._
+_If any JAR is not imported, you can generate it in the specific project using the `uberJar` task. However, exercise caution when propagating it to other dependent projects, as it may necessitate regenerating JARs in those projects as well._
 
-   This task will import automatically all the `NextiaXX.jar` needed by ODIN.
-   Ensure that all Nextia projects are located under the same folder as ODIN. This organizational structure is essential for the importExternalJar Gradle task to effectively locate and import the generated JAR files from Nextia projects.
-
-   Check that the JAR libraries have been imported into lib directory in ODIN/api.
-
-4. Finally, execute `gradle bootRun` to start the application or open the project in Intellij IDE and run the main class `OdinApplication.java`.
+_Also, please be aware that NextiaQR is currently an optional component._
 
 #### Frontend <a name="frontend-configuration"></a>
 
