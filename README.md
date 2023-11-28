@@ -239,7 +239,7 @@ The UML diagram provides an overview of the project structure. The key sections 
 
 To see the UML class diagram, download [Visual Paradigm Community Edition](https://www.visual-paradigm.com/download/community.jsp). It will ask you an email by the end of the installation or the first time you open the program just to send you the key activation code.
 
-Then open the [UML conceptual ODIN.vpp](doc/Diagrama UML/UML conceptual ODIN.vpp)
+Then open the [UML conceptual ODIN.vpp](https://github.com/dtim-upc/ODIN/blob/integration-dataset-bug/doc/Diagrama%20UML/UML%20conceptual%20ODIN.vpp)
 
 It should look like this:
 <p align="center">
