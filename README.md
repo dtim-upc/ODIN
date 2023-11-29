@@ -330,6 +330,7 @@ The main branch must always contain a working version of the project. Developers
 
 ## Demo <a name="demo"></a>
 
+https://github.com/dtim-upc/ODIN/assets/75260498/1a3a2642-7061-47e0-94b0-84f081b603bb
 
 
 ## People <a name="people"></a>
