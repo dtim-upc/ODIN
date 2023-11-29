@@ -108,6 +108,7 @@ public class SourceController {
     }
 
 
+
     /**
      * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.
      *
@@ -171,6 +172,18 @@ public class SourceController {
         for (MultipartFile attachFile : attachFiles) {
             // Get the original filename of the uploaded file (e.g. folder1/folder2/datasetName.extension)
             String originalFileName = attachFile.getOriginalFilename();
+
+            int lastDotIndex = originalFileName.lastIndexOf(".");
+            if (lastDotIndex != -1) {
+                // Replace the last dot with an underscore
+                originalFileName = originalFileName.substring(0, lastDotIndex).replace(".", "_") + "." + originalFileName.substring(lastDotIndex + 1);
+
+                System.out.println(originalFileName);
+            } else {
+                // The file name has no dot, handle this case as needed
+                System.out.println("Invalid file name format");
+            }
+            System.out.println(originalFileName);
             assert originalFileName != null;
 
             // We get the dataset name (to create the graph data) and the name + extension (to store the file)
