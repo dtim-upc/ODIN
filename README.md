@@ -325,9 +325,37 @@ The main branch must always contain a working version of the project. Developers
    - NextiaJD.jar
 
 ### Frontend <a name="frontend"></a>
-#### Architecture <a name="frontend-architecture"></a>
-#### Dependencies <a name="frontend-dependencies"></a>
 
+#### Architecture <a name="frontend-architecture"></a>
+The frontend is organized by components: forms, tables, etc. 
+
+There's an special form: [FormNewRepository.vue](frontend/src/components/forms/FormNewRepository.vue). It has a static part that represents de global repository information and then the dynamic part that charges from the backend all the jsons files located in the backend in this path [`api/src/main/resources/frontend-schemas/RepositoryForms`](api/src/main/resources/frontend-schemas/RepositoryForms). By using this json structures it builds the hierarchy part of the repository specialitation.
+
+##### Component Overview:
+1. Global Repository Information:
+
+There is a static part of the form that represents global repository information. This part likely includes fields and input elements for information that is applicable to the entire repository.
+
+2. Dynamic Part - Repository Specialization:
+
+The dynamic part of the form is responsible for loading data from the backend. Specifically, it loads JSON files located in the backend at the path: api/src/main/resources/frontend-schemas/RepositoryForms.
+
+2.1. Dynamic Part Details:
+- JSON Files in Backend:
+
+In the backend, there is a directory path specified as `api/src/main/resources/frontend-schemas/RepositoryForms`. This path contains JSON files.
+- Purpose of JSON Files:
+
+These JSON files likely contain schema or structure information for various forms related to repository specialization.
+- Runtime Loading:
+
+At runtime, the FormNewRepository.vue component fetches and loads these JSON files from the backend.
+- Building Hierarchy:
+
+The loaded JSON structures are used to dynamically construct or build a hierarchy within the form. This hierarchy is likely related to the specialization of the repository and is represented in the form.
+
+#### Dependencies <a name="frontend-dependencies"></a>
+Dependencies are located in the [package.json](frontend/package.json) file.
 ## Demo <a name="demo"></a>
 
 https://github.com/dtim-upc/ODIN/assets/75260498/1a3a2642-7061-47e0-94b0-84f081b603bb
