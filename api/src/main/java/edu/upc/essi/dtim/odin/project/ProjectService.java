@@ -478,6 +478,34 @@ public class ProjectService {
         return null; // Proyecto no encontrado o dataset no encontrado
     }
 
+    public Project addTemporalIntegratedDataset(String projectID, String datasetID) {
+        // 1. Recupera el proyecto por su ID
+        Project project = getProjectById(projectID);
+
+        if (project != null) {
+            // 2. Comprueba si el dataset ya está en la lista de datasets integrados del proyecto
+            List<Dataset> temporalIntegratedDatasets = project.getTemporalIntegratedDatasets();
+            if (isDatasetIntegrated(temporalIntegratedDatasets, datasetID)) {
+                return project;
+            } else {
+                // 3. Recupera el dataset por su ID
+                Dataset dataset = ormProject.findById(Dataset.class, datasetID);
+
+                if (dataset != null) {
+                    // 4. Agrega el nuevo dataset a la lista de datasets integrados
+                    temporalIntegratedDatasets.add(dataset);
+
+                    // 5. Actualiza la lista de datasets integrados en el proyecto
+                    project.setTemporalIntegratedDatasets(temporalIntegratedDatasets);
+
+                    // 6. Guarda el proyecto para persistir los cambios
+                    return saveProject(project);
+                }
+            }
+        }
+        return null; // Proyecto no encontrado o dataset no encontrado
+    }
+
     // Función auxiliar para comprobar si un dataset ya está integrado en un proyecto
     private boolean isDatasetIntegrated(List<Dataset> integratedDatasets, String datasetID) {
         for (Dataset integratedDataset : integratedDatasets) {
