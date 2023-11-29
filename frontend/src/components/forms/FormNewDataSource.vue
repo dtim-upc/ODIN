@@ -458,7 +458,7 @@ const onSubmit = () => {
       item.files.forEach((file) => {
         data.append('attachFiles', file);
       });
-    } else if (item.files === undefined && !isLocalRepository.value) {
+    } else if (item.files === undefined && !isLocalRepository.value && !isAPIRepository.value) {
       //data.append('attachFiles', item);
       attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
     } else if (item.files === undefined && isAPIRepository.value) {
