@@ -28,7 +28,7 @@
    - [Frontend](#frontend)
        - [Architecture](#frontend-architecture)
        - [Dependencies](#frontend-dependencies)
-4. [Usage](#usage)
+4. [Demo](#demo)
 5. [People](#people)
 6. [Related links](#related-links)
 7. [License](#license)
@@ -328,7 +328,8 @@ The main branch must always contain a working version of the project. Developers
 #### Architecture <a name="frontend-architecture"></a>
 #### Dependencies <a name="frontend-dependencies"></a>
 
-## Usage <a name="usage"></a>
+## Demo <a name="demo"></a>
+
 
 
 ## People <a name="people"></a>
