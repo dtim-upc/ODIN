@@ -244,6 +244,8 @@ async function makeRequest() {
         responseType: 'arraybuffer',
       });
 
+      newDatasource.endpoint = endpoint;
+
       const contentDisposition = response.headers['content-disposition'];
       let filename;
 
@@ -355,8 +357,6 @@ async function initializeComponent() {
           for (const table of tablesData) {
             uploadedItems.value.push(table); // Agregar cada objeto individual a uploadedItems
           }
-
-          console.log(tablesData);
         } else {
           // Maneja el caso en el que la solicitud no se realizó con éxito (por ejemplo, un código de estado no 200)
           console.error('Error en la solicitud al obtener información de tablas');
@@ -415,6 +415,7 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
   newDatasource.repositoryName = '';
   newDatasource.datasetName = '';
   newDatasource.datasetDescription = '';
+  newDatasource.endpoint = '';
   DataSourceType.value = options[0];
   databaseHost.value = '';
   databaseUser.value = '';
@@ -458,11 +459,12 @@ const onSubmit = () => {
       item.files.forEach((file) => {
         data.append('attachFiles', file);
       });
-    } else if (item.files === undefined && !isLocalRepository.value) {
+    } else if (item.files === undefined && !isLocalRepository.value && !isAPIRepository.value) {
       //data.append('attachFiles', item);
       attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
     } else if (item.files === undefined && isAPIRepository.value) {
       data.append('attachFiles', item);
+      data.append('endpoint', newDatasource.endpoint)
     } else {
       console.log("attachTables: " + item.name);
       attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
@@ -471,6 +473,9 @@ const onSubmit = () => {
   });
 
   data.append('attachTables', attachTables);
+
+  console.log('HAIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
+  console.log(data)
 
   integrationStore.addDataSource(route.params.id, data, successCallback);
 

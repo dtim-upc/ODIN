@@ -1,8 +1,8 @@
 package edu.upc.essi.dtim.odin;
 
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
+import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLoadingSingleton;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ public class OdinApplication {
         // Inicia la aplicación Spring Boot
         SpringApplication.run(OdinApplication.class, args);
 
-        //INICIALIZA DATALAYER
-        DataLoading dl = DataLoadingSingleton.getInstance(appConfig.getDataLayerPath());
+        // Initialize data layer
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
 
         // Registra un mensaje en el registro de eventos cuando la aplicación se inicia correctamente
         logger.info("Application started. Ready to receive API requests.");

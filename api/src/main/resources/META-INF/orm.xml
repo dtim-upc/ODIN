@@ -243,4 +243,12 @@
         </attributes>
     </entity>
 
+    <entity name="APIDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset">
+        <table name="APIDataset"/>
+        <attributes>
+            <basic name="endpoint"/>
+            <basic name="jsonPath"/>
+        </attributes>
+    </entity>
+
 </entity-mappings>

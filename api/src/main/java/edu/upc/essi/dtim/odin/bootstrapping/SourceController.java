@@ -1,14 +1,21 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset;
+import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.NextiaGraphy;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
+import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.jvnet.hk2.annotations.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.w3c.dom.Attr;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,6 +35,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -122,15 +131,13 @@ public class SourceController {
                                             @RequestParam String repositoryId,
                                             @RequestParam String repositoryName,
                                             @RequestParam String datasetName,
+                                            @RequestParam(required = false) String endpoint,
                                             @RequestParam(required = false) String datasetDescription,
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
                                             @RequestParam(required = false) List<String> attachTables) {
         try {
             logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
             // Validate and authenticate access here
-
-            // Check if a new repository should be created or an existing one should be used
-            boolean haveToCreateRepository = (repositoryId == null) || (repositoryId.equals(""));
 
             // Find/create repository
             DataRepository repository;
@@ -147,9 +154,9 @@ public class SourceController {
             // If attachTables is empty it means that we either have a local file or a file coming from an API (which is
             // stored as a json file). Otherwise, we have data coming from a sql database.
             if (!attachTables.isEmpty()) {
-                handleAttachTables(attachTables, datasetDescription, repositoryId);
+                handleAttachTables(attachTables, datasetDescription, repositoryId, repository.getVirtual());
             } else {
-                handleAttachFiles(attachFiles, datasetDescription, directoryName, repositoryId);
+                handleAttachFiles(attachFiles, datasetDescription, directoryName, repositoryId, repository.getVirtual(), endpoint);
             }
 
             // Return success message
@@ -163,7 +170,7 @@ public class SourceController {
         }
     }
 
-    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, String directoryName, String repositoryId) {
+    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, String directoryName, String repositoryId, Boolean isVirtual, String endpoint) {
         if (attachFiles.isEmpty()) {
             throw new RuntimeException("Failed to store empty file.");
         }
@@ -180,8 +187,8 @@ public class SourceController {
             String datasetNameWithExtension = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0);
             // If the file comes from an API call there is no name, so we have to introduce a placeholder (as we will use the UUID in the tables)
             if (datasetName.isEmpty()) {
-                datasetName = "apiFile";
-                datasetNameWithExtension = "apiFile.json";
+                datasetName = endpoint.replace("/", "_");
+                datasetNameWithExtension = datasetName + ".json";
             }
             // This is the direction in which the new dataset will be stored
             String newFileDirectory = directoryName + "/" + datasetNameWithExtension;
@@ -192,14 +199,14 @@ public class SourceController {
             // Extract data from datasource file and save it
             Dataset savedDataset;
             try {
-                savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription, repositoryId);
+                savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription, repositoryId, endpoint);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
             // Add the dataset to the repository and delete the reference from others if exists
             sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
-            sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
+            savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
 
             // Transform datasource into graph
             BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
@@ -223,13 +230,15 @@ public class SourceController {
             // Save graph into the database
             sourceService.saveGraphToDatabase(graph);
 
-            sourceService.uploadToDataLayer(datasetWithGraph);
+            if (!isVirtual) {
+                sourceService.uploadToDataLayer(datasetWithGraph);
+            }
 
             //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
         }
     }
 
-    private void handleAttachTables(List<String> attachTables, String datasetDescription, String repositoryId) {
+    private void handleAttachTables(List<String> attachTables, String datasetDescription, String repositoryId, Boolean isVirtual) {
         System.out.println(attachTables);
         for (String tableName : attachTables) {
             System.out.println(tableName + " ++++++++++ table name");
@@ -237,7 +246,7 @@ public class SourceController {
             // Extract data from datasource file and save it
             Dataset savedDataset;
             try {
-                savedDataset = sourceService.extractData(null, tableName, datasetDescription, repositoryId);
+                savedDataset = sourceService.extractData(null, tableName, datasetDescription, repositoryId, null);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -265,7 +274,9 @@ public class SourceController {
             // Save graph into the database
             sourceService.saveGraphToDatabase(graph);
 
-            sourceService.uploadToDataLayer(datasetWithGraph);
+            if (!isVirtual) {
+                sourceService.uploadToDataLayer(datasetWithGraph);
+            }
         }
     }
 

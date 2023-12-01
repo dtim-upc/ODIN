@@ -1,10 +1,13 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
@@ -23,6 +26,11 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterace
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
+import org.apache.hadoop.shaded.org.apache.http.HttpResponse;
+import org.apache.hadoop.shaded.org.apache.http.client.methods.HttpGet;
+import org.apache.hadoop.shaded.org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hadoop.shaded.org.apache.http.impl.client.HttpClients;
+import org.apache.hadoop.shaded.org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,13 +38,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -99,7 +110,7 @@ public class SourceService {
      * @return A Dataset object with the extracted data.
      * @throws IllegalArgumentException if the file format is not supported.
      */
-    public Dataset extractData(String filePath, String datasetName, String datasetDescription, String repositoryId) throws SQLException, IOException, ClassNotFoundException {
+    public Dataset extractData(String filePath, String datasetName, String datasetDescription, String repositoryId, String endpoint) throws SQLException, IOException, ClassNotFoundException {
         if (filePath == null) filePath = "table.sql";
         // Extract the extension of the file from the file path
         String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
@@ -112,17 +123,26 @@ public class SourceService {
                 // Create a CsvDataset object for CSV files
                 dataset = new CsvDataset(null, datasetName, datasetDescription, filePath);
                 break;
-            case "json":
-                // Create a JsonDataset object for JSON files
-                dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
+            case "json": // Either local json files or API files
+                if (endpoint != null) { // API file
+                    dataset = new APIDataset(null, datasetName, datasetDescription, endpoint, filePath);
+                    DataRepository repository = findRepositoryById(repositoryId);
+                    String url = ((ApiRepository) repository).getUrl();
+                    setAttributesOfAPIDataset((APIDataset) dataset, url);
+                }
+                else { // Local json file
+                    dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
+                }
                 break;
             case "sql":
                 DataRepository repository = findRepositoryById(repositoryId);
-                // Create a SqlDataset object for JSON files
+                // Create a SqlDataset object for SQL files
                 String password = ((RelationalJDBCRepository) repository).getPassword();
                 String username = ((RelationalJDBCRepository) repository).getUsername();
+                String URL = ((RelationalJDBCRepository) repository).getUrl();
                 dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, ((RelationalJDBCRepository) repository).retrieveHostname(), ((RelationalJDBCRepository) repository).retrievePort(), username, password);
-                break;
+                setAttributesOfSQLDataset(dataset, URL);
+                 break;
             case "xml":
                 // Create a XmlDataset object for JSON files
                 dataset = new XmlDataset(null, datasetName, datasetDescription, filePath);
@@ -164,6 +184,8 @@ public class SourceService {
             ((XmlDataset) dataset).setPath(datasetPath);
         } else if (dataset instanceof ParquetDataset) {
             ((ParquetDataset) dataset).setPath(datasetPath);
+        } else if (dataset instanceof APIDataset) {
+            ((APIDataset) dataset).setJsonPath(datasetPath);
         }
 
         // Rename the file on disk with the updated datasetPath
@@ -175,11 +197,77 @@ public class SourceService {
             System.out.println("File renaming failed.");
         }
 
+        dataset.setDataLayerPath(generateUUID());
+
         // Save the dataset again with the updated datasetPath
         dataset = saveDataset(dataset);
-        System.out.println(id);
 
         return dataset;
+    }
+
+    private void setAttributesOfSQLDataset(Dataset dataset, String url) {
+        String password = ((SQLDataset) dataset).getPassword();
+        String username = ((SQLDataset) dataset).getUsername();
+        String tableName = ((SQLDataset) dataset).getTableName();
+        try {
+            Connection connection = DriverManager.getConnection(url, username, password); //postgres
+            Statement stmt = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+
+            ResultSet rs;
+            rs = stmt.executeQuery("SELECT *\n" +
+                    " FROM information_schema.columns\n" +
+                    " WHERE table_name = '" + tableName + "';"
+            );
+
+            List<Attribute> attributes = new LinkedList<>();
+
+            while (rs.next()) {
+                String columnName = rs.getString("column_name");
+                String dataType = rs.getString("data_type");
+                attributes.add(new Attribute(columnName, dataType));
+            }
+
+            dataset.setAttributes(attributes);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setAttributesOfAPIDataset(APIDataset dataset, String url) {
+        try {
+            // Replace "your_api_url" with the actual URL of your API
+            String apiUrl = url + dataset.getEndpoint();
+            // Create an HttpClient
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            // Create an HTTP GET request
+            HttpGet httpGet = new HttpGet(apiUrl);
+            // Execute the request and get the response
+            HttpResponse response = httpClient.execute(httpGet);
+            List<Attribute> attributes = new LinkedList<>();
+
+            // Check if the response is successful (status code 200)
+            if (response.getStatusLine().getStatusCode() == 200) {
+                // Convert the response entity to a String
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+                // Create ObjectMapper
+                ObjectMapper objectMapper = new ObjectMapper();
+                // Read JSON string into JsonNode
+                JsonNode rootNode = objectMapper.readTree(jsonResponse);
+                // Get iterator for all field names
+                Iterator<String> fieldNames = rootNode.fieldNames();
+                // Iterate through field names and print them
+                while (fieldNames.hasNext()) {
+                    String fieldName = fieldNames.next();
+                    attributes.add(new Attribute(fieldName, "String"));
+                }
+                dataset.setAttributes(attributes);
+            } else {
+                System.out.println("Failed to retrieve data. HTTP status code: " + response.getStatusLine().getStatusCode());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String generateUUID() {
@@ -694,7 +782,8 @@ public class SourceService {
                 (dataset instanceof JsonDataset ||
                         dataset instanceof CsvDataset ||
                         dataset instanceof ParquetDataset ||
-                        dataset instanceof XmlDataset)) {
+                        dataset instanceof XmlDataset ||
+                        dataset instanceof APIDataset)) {
             return true; // LocalDataset can be added to ApiRepository
         } else {
             return false; // Incompatible dataset and repository types
@@ -710,13 +799,9 @@ public class SourceService {
     }
 
     public void uploadToDataLayer(Dataset dataset) {
-        //TODO delete if when NextiaDatalayer accepts SQL and other dataset formats
-        if (dataset instanceof CsvDataset || dataset instanceof JsonDataset) {
-            DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
-            dataset.setDataLayerPath(generateUUID());
-            dlInterface.uploadToDataLayer(dataset);
-            saveDataset(dataset);
-        }
+        DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
+        dlInterface.uploadToDataLayer(dataset);
+        saveDataset(dataset);
     }
 
     public void deleteDatasetFromDataLayer(String id) {

@@ -12,30 +12,18 @@ import java.io.IOException;
 import java.sql.*;
 
 public class DataLayerImpl implements DataLayerInterace {
-    private final String dataLayerPath;
-    private final String technology;
+    private static AppConfig appConfig;
 
     public DataLayerImpl(@Autowired AppConfig appConfig) {
-        this.dataLayerPath = appConfig.getDataLayerPath();
-        this.technology = appConfig.getDataLayerTechnology();
-    }
-
-    private DataLayer getDataLayer() {
-        DataLayer dl;
-        try {
-            dl = DataLayerFactory.getInstance(technology, dataLayerPath);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return dl;
+        this.appConfig = appConfig;
     }
 
     @Override
     public void uploadToDataLayer(Dataset dataset) {
-        DataLoading dloading = DataLoadingSingleton.getInstance(dataLayerPath);
-        dloading.uploadToLandingZone(dataset);
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        DataLoading dLoading = dl.getDataLoading();
+        dLoading.uploadToLandingZone(dataset);
 
-        DataLayer dl = getDataLayer();
         try {
             dl.uploadToFormattedZone(dataset, dataset.getDataLayerPath());
         } catch (SQLException e) {
@@ -47,7 +35,7 @@ public class DataLayerImpl implements DataLayerInterace {
 
     @Override
     public void deleteDataset(String dataLayerPath) {
-        DataLayer dl = getDataLayer();
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         try {
             dl.RemoveFromFormattedZone(dataLayerPath);
         } catch (SQLException e) {
@@ -57,9 +45,10 @@ public class DataLayerImpl implements DataLayerInterace {
 
     @Override
     public String reconstructFile(MultipartFile multipartFile, String newFileDirectory) {
-        DataLoading dataLoading = DataLoadingSingleton.getInstance(dataLayerPath);
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        DataLoading dLoading = dl.getDataLoading();
         try {
-            return dataLoading.reconstructFile(multipartFile.getInputStream(), newFileDirectory);
+            return dLoading.reconstructFile(multipartFile.getInputStream(), newFileDirectory);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

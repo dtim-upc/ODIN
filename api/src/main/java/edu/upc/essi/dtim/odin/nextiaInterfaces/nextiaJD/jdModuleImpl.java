@@ -7,32 +7,27 @@ import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaJD.Discovery;
 import edu.upc.essi.dtim.NextiaJD.IDiscovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 public class jdModuleImpl implements jdModuleInterface {
 
-    private final String dataLayerPath;
-    private final String technology;
+    private static AppConfig appConfig;
 
     public jdModuleImpl(@Autowired AppConfig appConfig) {
-        this.dataLayerPath = appConfig.getDataLayerPath();
-        this.technology = appConfig.getDataLayerTechnology();
+        this.appConfig = appConfig;
     }
 
     @Override
     public List<Alignment> getAlignments(Dataset dataset, Dataset dsB) {
-        DataLayer dl = null;
-        try {
-            dl = DataLayerFactory.getInstance(technology, dataLayerPath);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         IDiscovery discovery = new Discovery(dl);
+        System.out.println(dataset.getDataLayerPath());
+        System.out.println(dsB.getDataLayerPath());
         try {
-            List<Alignment> alignmentsJD = discovery.getAlignments(dataset, dsB);
-            return alignmentsJD;
+            return discovery.getAlignments(dataset, dsB);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

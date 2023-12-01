@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.*;
@@ -18,8 +19,7 @@ public class bsModuleImpl implements bsModuleInterface {
      * @return Un grafo que representa el conjunto de datos.
      */
     public BootstrapResult bootstrapDataset(Dataset dataset) {
-        NextiaBootstrapInterface bootstrapInterface = null;
-
+        NextiaBootstrapInterface bootstrapInterface;
         try {
             bootstrapInterface = BootstrapFactory.getInstance(dataset);
             return bootstrapInterface.bootstrap(dataset);
