@@ -86,7 +86,7 @@ public class IntegrationController {
             Project project1 = integrationService.saveProject(projectToSave);
             logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
             //todo review
-            project1 = integrationService.addIntegratedDataset(project1.getProjectId(), iData.getDsB().getId());
+            project1 = integrationService.addTemporalIntegratedDataset(project1.getProjectId(), iData.getDsB().getId());
 
             Project project2 = integrationService.getProject(project1.getProjectId());
 
@@ -159,6 +159,14 @@ public class IntegrationController {
         projectToSave = integrationService.updateGlobalGraphProject(projectToSave, temporalProject.getTemporalIntegratedGraph().getGlobalGraph());
 
         Project project1 = integrationService.saveProject(projectToSave);
+
+        List<Dataset> temporalIntegratedDatasets = project1.getTemporalIntegratedDatasets();
+        String lastDatasetIdAdded = temporalIntegratedDatasets.get(temporalIntegratedDatasets.size()-1).getId();
+
+        project1 = integrationService.addIntegratedDataset(project1.getProjectId(), lastDatasetIdAdded);
+
+        //todo delete temporalDatasetsList
+
         logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
         return new ResponseEntity(integrationService.getProject(id), HttpStatus.OK);
     }

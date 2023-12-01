@@ -392,6 +392,10 @@ public class IntegrationService {
         return projectService.addIntegratedDataset(projectId, id);
     }
 
+    public Project addTemporalIntegratedDataset(String projectId, String id) {
+        return projectService.addTemporalIntegratedDataset(projectId, id);
+    }
+
     public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
         SourceService sourceService = new SourceService(appConfig, projectService, new RepositoryService(appConfig, projectService));
         Project project = getProject(projectId);
