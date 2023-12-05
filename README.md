@@ -15,7 +15,6 @@
 1. [Introduction](#introduction)
 2. [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
     - [Configuration](#configuration)
       - [Backend](#backend-configuration)
       - [Frontend](#frontend-configuration)
@@ -24,7 +23,6 @@
      - [Database division](#database-division)
      - [Architecture](#backend-architecture)
      - [Code style](#code-style)
-     - [Dependencies](#backend-dependencies)
    - [Frontend](#frontend)
        - [Architecture](#frontend-architecture)
        - [Dependencies](#frontend-dependencies)
@@ -51,79 +49,27 @@ Before you begin, ensure that you have the following prerequisites installed:
 - [Java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html) (version 11)
 - [Spark](https://spark.apache.org/downloads.html)
 
-### Installation <a name="installation"></a>
-
-1. Clone the repository:
+Then, clone the repository:
 
    ```bash
    git clone https://github.com/dtim-upc/ODIN.git
    cd ODIN
    ```
    
-2. Clone the others repositories used by ODIN:
-
-
-   - [NextiaCore](https://github.com/dtim-upc/NextiaCore)
-   ```bash
-   git clone https://github.com/dtim-upc/NextiaCore.git
-   ```
-
-
-   - [NextiaDataLayer](https://github.com/dtim-upc/NextiaDataLayer) (ask for permissions)
-   ```bash
-   git clone https://github.com/dtim-upc/NextiaDataLayer.git
-   ```
-
-
-   - [NextiaBS](https://github.com/dtim-upc/NextiaBS)
-   ```bash
-   git clone https://github.com/dtim-upc/NextiaBS.git
-   ```
-
-
-   - [NextiaDI](https://github.com/dtim-upc/NextiaDI)
-   ```bash
-   git clone https://github.com/dtim-upc/NextiaDI.git
-   ```
-
-
-   - [NextiaJD2](https://github.com/dtim-upc/NextiaJD2) (ask for permissions)
-   ```bash
-   git clone https://github.com/dtim-upc/NextiaJD2.git
-   ```
-
-
-   - [NextiaQR](https://github.com/dtim-upc/NextiaQR) (ask for permissions)
-   ```bash
-   git clone https://github.com/dtim-upc/NextiaQR.git
-   ```
-
 ### Configuration <a name="configuration"></a>
 
 After following the previous steps [Prerequisites](#prerequisites) and [Installation](#installation). Lets ensemble everything to be able to compile and make ODIN run.
 
 #### Backend <a name="backend-configuration"></a>
 
-1. Open in IntelliJ the [`ODIN/api`](api) folder.
+1. In the root folder execute the following command:
 
-2. Ensure that the other Nextia projects are updated and in the same folder of ODIN.
+    ```bash
+   gradlew build
+   ```
+    This will compile all the different modules and run their respective tests.
 
-3. From IntelliJ open the [`build.gradle`](api/build.gradle) file.
-
-4. Execute the task (by clicking the button `▶` next to the task name) [`generateAndImportExternalJar`](https://github.com/dtim-upc/ODIN/blob/6ef41b22c57a7f763a91a7d0ae843918d0be1666/api/build.gradle#L174)
-
-5. This task will generate the JAR folders of the Nextia projects and import them in ODIN.
-
-6. Refresh the gradle to index the new JARs imported. Click the `🔄` button of gradle (normally on the right side of the editor).
-
-7. Verify that the JAR libraries have been successfully imported into the lib directory in `ODIN/api` and properly indexed. If indexed correctly, you should be able to expand each JAR folder to inspect its contents.
-
-8. Finally, open the project in IntelliJ IDE and execute the main class OdinApplication.java to launch the application.
-
-_Note: The Nextia projects include `uberJar` tasks that generate a zipped folder containing compiled and optimized JAR files essential for seamless integration of Nextia functionalities within the ODIN system. The generated JARs can be found in the `build/libs` path of each respective project._
-_If any JAR is not imported, you can generate it in the specific project using the `uberJar` task. However, exercise caution when propagating it to other dependent projects, as it may necessitate regenerating JARs in those projects as well._
-
-_Also, please be aware that NextiaQR is currently an optional component._
+2. As of now, the best way to launch the application is to open the project in a Java IDE (e.g. IntelliJ) and execute the class OdinApplication.java.
 
 #### Frontend <a name="frontend-configuration"></a>
 
@@ -150,7 +96,7 @@ _Note: that you must have Quasar CLI as it's mentioned in the Prerequisites sect
 
    ODIN's **persistence** is bifurcated into two components: graph persistence, currently using Jena, and relational database persistence using ORM with the embedded H2 database.
 
-   Among the "external" Nextia libraries (those requiring JAR import), the following are noteworthy:
+   The different Nextia modules are presented next:
 
    - **NextiaCore:** Contains domain class definitions for the system and serves as a cross-cutting library. It lacks business logic, focusing solely on Plain Old Java Object (POJO) classes. 
 
@@ -315,14 +261,6 @@ The main branch must always contain a working version of the project. Developers
 
 ###### Dependency Management
 * Interfaces for Communication: Use interfaces to define contracts for communication between modules. This enhances modularity and allows for easier maintenance and testing.
-
-#### Dependencies <a name="backend-dependencies"></a>
-
-   - NextiaCore.jar
-   - NextiaDataLayer.jar
-   - NextiaBS.jar
-   - NextiaDI.jar
-   - NextiaJD.jar
 
 ### Frontend <a name="frontend"></a>
 

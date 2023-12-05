@@ -21,6 +21,8 @@ api/dbFiles
 *.png
 *.crc
 
+frontend/package-lock.json
 
 !orm.xml
 !persistence.xml
+!gradle/wrapper/gradle-wrapper.jar
