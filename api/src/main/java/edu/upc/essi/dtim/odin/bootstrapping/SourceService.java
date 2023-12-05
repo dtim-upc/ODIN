@@ -22,27 +22,25 @@ import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleInterface;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
-import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterace;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
-import org.apache.hadoop.shaded.org.apache.http.HttpResponse;
-import org.apache.hadoop.shaded.org.apache.http.client.methods.HttpGet;
-import org.apache.hadoop.shaded.org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.hadoop.shaded.org.apache.http.impl.client.HttpClients;
-import org.apache.hadoop.shaded.org.apache.http.util.EntityUtils;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.ArrayList;
@@ -97,7 +95,7 @@ public class SourceService {
      * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
      */
     public String reconstructFile(MultipartFile multipartFile, String newFileDirectory) {
-        DataLayerInterace dataLayerInterFace = new DataLayerImpl(appConfig);
+        DataLayerInterface dataLayerInterFace = new DataLayerImpl(appConfig);
         return dataLayerInterFace.reconstructFile(multipartFile, newFileDirectory);
     }
 
@@ -197,7 +195,7 @@ public class SourceService {
             System.out.println("File renaming failed.");
         }
 
-        dataset.setDataLayerPath(generateUUID());
+        dataset.setUUID(generateUUID());
 
         // Save the dataset again with the updated datasetPath
         dataset = saveDataset(dataset);
@@ -275,7 +273,7 @@ public class SourceService {
         final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder(16);
         SecureRandom random = new SecureRandom();
-        sb.append("PREFIX");
+        sb.append("UUID_");
         for (int i = 0; i < 16; i++) {
             int randomIndex = random.nextInt(characters.length());
             sb.append(characters.charAt(randomIndex));
@@ -799,7 +797,7 @@ public class SourceService {
     }
 
     public void uploadToDataLayer(Dataset dataset) {
-        DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
+        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
         dlInterface.uploadToDataLayer(dataset);
         saveDataset(dataset);
     }
@@ -808,8 +806,8 @@ public class SourceService {
         Dataset datasetToDelete = getDatasetById(id);
         if (datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset) {
             //delete from datalayer
-            DataLayerInterace dlInterface = new DataLayerImpl(appConfig);
-            dlInterface.deleteDataset(datasetToDelete.getDataLayerPath());
+            DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+            dlInterface.deleteDataset(datasetToDelete.getUUID());
         }
     }
 

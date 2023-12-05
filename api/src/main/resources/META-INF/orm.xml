@@ -190,7 +190,7 @@
                 <temporal>TIMESTAMP</temporal>
             </basic>
             <basic name="wrapper"/>
-            <basic name="dataLayerPath"/>
+            <basic name="UUID"/>
             <many-to-one name="repository"
                          target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
             </many-to-one>

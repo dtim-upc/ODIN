@@ -1,21 +1,14 @@
 package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset;
-import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.NextiaGraphy;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
-import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
-import org.jvnet.hk2.annotations.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import org.w3c.dom.Attr;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,7 +27,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -44,9 +35,7 @@ import java.util.List;
 @RestController
 public class SourceController {
     private static final Logger logger = LoggerFactory.getLogger(SourceController.class);
-
     private final SourceService sourceService;
-
     private final AppConfig appConfig;
 
     /**
@@ -65,23 +54,21 @@ public class SourceController {
     @GetMapping("/download")
     public ResponseEntity<ByteArrayResource> downloadFileFromURL(@RequestParam String url) {
         try {
-            // Parsea la URL para obtener el nombre del archivo
+            // Parse URL to obtain file name
             URL fileUrl = new URL(url);
             String fileName = Paths.get(fileUrl.getPath()).getFileName().toString();
 
-            // Realiza la solicitud HTTP y obtén el contenido del archivo
+            // HTTP request to obtain the data
             byte[] fileContent = restTemplate.getForObject(url, byte[].class);
 
             if (fileContent != null && fileContent.length > 0) {
-                // Configura los encabezados de la respuesta con el nombre del archivo
+                // Header configuration
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                headers.setContentDispositionFormData("attachment", fileName); // Establece el nombre del archivo
+                headers.setContentDispositionFormData("attachment", fileName);
 
-                // Crea un objeto ByteArrayResource a partir del contenido del archivo
-                ByteArrayResource resource = new ByteArrayResource(fileContent);
-
-                // Devuelve la respuesta con el archivo como MultipartFile
+                ByteArrayResource resource = new ByteArrayResource(fileContent); // ByteArrayResource from the data
+                // Return the response with the Multipart file
                 return ResponseEntity.ok()
                         .headers(headers)
                         .body(resource);
@@ -98,25 +85,23 @@ public class SourceController {
     public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
         logger.info("Make request to URL received: " + url);
         try {
-            // Realiza la solicitud HTTP y obtén el contenido de la respuesta en formato byte[]
+            // Execute HTTP request and get the data in a byte array (byte[])
             byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
 
             if (responseBytes != null && responseBytes.length > 0) {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
 
-                // Devuelve el archivo JSON
+                // Return JSON file
                 return ResponseEntity.ok().headers(headers).body(responseBytes);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró contenido en la URL especificada.".getBytes());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("URL content could not be found".getBytes());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error en la solicitud: " + e.getMessage()).getBytes());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error in request: " + e.getMessage()).getBytes());
         }
     }
-
-
 
     /**
      * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.
@@ -137,20 +122,13 @@ public class SourceController {
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
                                             @RequestParam(required = false) List<String> attachTables) {
         try {
-            logger.info("POST DATASOURCE RECEIVED FOR BOOTSTRAP " + repositoryId);
-            // Validate and authenticate access here
+            logger.info("Datasource received for bootstrap: " + repositoryId);
 
-            // Find/create repository
-            DataRepository repository;
-
-            // Find the existing repository using the provided repositoryId
-            repository = sourceService.findRepositoryById(repositoryId);
-
+            // Find the existing repository using the provided repositoryId and get the directory name used when
+            // creating a file
+            DataRepository repository = sourceService.findRepositoryById(repositoryId);
             repositoryId = repository.getId();
             String directoryName = repositoryId + repository.getRepositoryName();
-
-            System.out.println("ATTACH TABLE:" + attachTables);
-            System.out.println("ATTACH FILE:" + attachFiles);
 
             // If attachTables is empty it means that we either have a local file or a file coming from an API (which is
             // stored as a json file). Otherwise, we have data coming from a sql database.
@@ -165,7 +143,6 @@ public class SourceController {
         } catch (UnsupportedOperationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data source not created successfully");
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
         }
@@ -175,35 +152,34 @@ public class SourceController {
         if (attachFiles.isEmpty()) {
             throw new RuntimeException("Failed to store empty file.");
         }
-        // Iterate through the list of MultipartFiles to handle each file
+        // Iterate through the list of MultipartFiles to handle each file (the user might have uploaded several files at once)
         for (MultipartFile attachFile : attachFiles) {
             // Get the original filename of the uploaded file (e.g. folder1/folder2/datasetName.extension)
             String originalFileName = attachFile.getOriginalFilename();
-
-            int lastDotIndex = originalFileName.lastIndexOf(".");
-            if (lastDotIndex != -1) {
-                // Replace the last dot with an underscore
-                originalFileName = originalFileName.substring(0, lastDotIndex).replace(".", "_") + "." + originalFileName.substring(lastDotIndex + 1);
-
-                System.out.println(originalFileName);
-            } else {
-                // The file name has no dot, handle this case as needed
-                System.out.println("Invalid file name format");
-            }
-            System.out.println(originalFileName);
             assert originalFileName != null;
 
-            // We get the dataset name (to create the graph data) and the name + extension (to store the file)
+            // The filename might have extra dots (e.g. file.name.extension). To prevent errors when handling the filename, we
+            // substitute them for underscores (except the last one). If there is no dot (extension), we can not handle the file
+            int lastDotIndex = originalFileName.lastIndexOf(".");
+            if (lastDotIndex != -1) {
+                originalFileName = originalFileName.substring(0, lastDotIndex).replace(".", "_") + "." + originalFileName.substring(lastDotIndex + 1);
+            } else {
+                logger.error("Invalid file name format");
+            }
+
+            // We get the dataset name (to create the graph data), and the name + extension (to store the file)
             int slashIndex = originalFileName.lastIndexOf("/");
             int dotIndex = originalFileName.lastIndexOf('.');
             String datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
             String datasetNameWithExtension = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0);
-            // If the file comes from an API call there is no name, so we have to introduce a placeholder (as we will use the UUID in the tables)
+
+            // If the file comes from an API call there is no name, so we have to introduce a placeholder. This is not an issue
+            // as we will use the UUID later to create the tables
             if (datasetName.isEmpty()) {
                 datasetName = endpoint.replace("/", "_");
                 datasetNameWithExtension = datasetName + ".json";
             }
-            // This is the direction in which the new dataset will be stored
+            // Direction in which the new dataset will be stored
             String newFileDirectory = directoryName + "/" + datasetNameWithExtension;
 
             // Reconstruct file from Multipart file (i.e. store in the temporal zone)
@@ -229,6 +205,7 @@ public class SourceController {
             String visualSchema = sourceService.generateVisualSchema(graph);
             graph.setGraphicalSchema(visualSchema);
 
+            // Set the wrapper for the data
             String wrapper = bsResult.getWrapper();
             savedDataset.setWrapper(wrapper);
 
@@ -237,7 +214,9 @@ public class SourceController {
             graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
 
             // Get the disk path from the app configuration
+            // TODO: Remove?
             Path diskPath = Path.of(appConfig.getDataLayerPath());
+            System.out.println("PATH: " + diskPath + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
             graph.write(diskPath + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
 
             // Save graph into the database
@@ -252,10 +231,7 @@ public class SourceController {
     }
 
     private void handleAttachTables(List<String> attachTables, String datasetDescription, String repositoryId, Boolean isVirtual) {
-        System.out.println(attachTables);
         for (String tableName : attachTables) {
-            System.out.println(tableName + " ++++++++++ table name");
-
             // Extract data from datasource file and save it
             Dataset savedDataset;
             try {
@@ -319,7 +295,6 @@ public class SourceController {
 
             // Is not necessary to call the projectService to delete the project and get the result
             // since we have the cascade all call in relation one-to-many Project 1-* Dataset
-
             deleted = true;
         }
 

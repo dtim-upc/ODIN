@@ -32,13 +32,13 @@ public class QueryController {
         System.out.println("CLASS 0");
         System.out.println(body.getClasses().get(0).getIri());
         System.out.println(body.getClasses().get(0).getType());
-        System.out.println(body.getClasses().get(0).getIsIntegrated());
+        System.out.println(body.getClasses().get(0).getIntegrated());
 
         System.out.println("PROPERTY 0");
         System.out.println(body.getProperties().get(0).getDomain());
         System.out.println(body.getProperties().get(0).getRange());
         System.out.println(body.getProperties().get(0).getIri());
-        System.out.println(body.getProperties().get(0).getIsIntegrated());
+        System.out.println(body.getProperties().get(0).getIntegrated());
         System.out.println(body.getProperties().get(0).getType());
 
 

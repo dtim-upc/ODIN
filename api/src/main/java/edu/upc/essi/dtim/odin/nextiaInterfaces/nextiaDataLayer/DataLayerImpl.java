@@ -2,7 +2,6 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.*;
 
-public class DataLayerImpl implements DataLayerInterace {
+public class DataLayerImpl implements DataLayerInterface {
     private static AppConfig appConfig;
 
     public DataLayerImpl(@Autowired AppConfig appConfig) {
@@ -25,7 +24,7 @@ public class DataLayerImpl implements DataLayerInterace {
         dLoading.uploadToLandingZone(dataset);
 
         try {
-            dl.uploadToFormattedZone(dataset, dataset.getDataLayerPath());
+            dl.uploadToFormattedZone(dataset, dataset.getUUID());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -34,10 +33,10 @@ public class DataLayerImpl implements DataLayerInterace {
     }
 
     @Override
-    public void deleteDataset(String dataLayerPath) {
+    public void deleteDataset(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         try {
-            dl.RemoveFromFormattedZone(dataLayerPath);
+            dl.RemoveFromFormattedZone(UUID);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

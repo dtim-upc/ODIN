@@ -3,7 +3,6 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLayerFactory;
 import edu.upc.essi.dtim.NextiaJD.Discovery;
 import edu.upc.essi.dtim.NextiaJD.IDiscovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;
@@ -24,8 +23,8 @@ public class jdModuleImpl implements jdModuleInterface {
     public List<Alignment> getAlignments(Dataset dataset, Dataset dsB) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         IDiscovery discovery = new Discovery(dl);
-        System.out.println(dataset.getDataLayerPath());
-        System.out.println(dsB.getDataLayerPath());
+        System.out.println(dataset.getUUID());
+        System.out.println(dsB.getUUID());
         try {
             return discovery.getAlignments(dataset, dsB);
         } catch (Exception e) {

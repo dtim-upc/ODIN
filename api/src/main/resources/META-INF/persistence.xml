@@ -16,7 +16,7 @@
         <properties>
             <!-- Database connection properties -->
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:h2:file:..\\api\\dbFiles\\sqlFiles\\sqlEmbeddedFile.db"/>
+                      value="jdbc:h2:file:..\\ODIN\\api\\dbFiles\\sqlFiles\\sqlEmbeddedFile.db"/>
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>

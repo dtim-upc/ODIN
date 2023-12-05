@@ -1,13 +1,11 @@
 package edu.upc.essi.dtim.odin.config;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration class to manage application properties.
  */
-@Getter
 @Configuration
 public class AppConfig {
 

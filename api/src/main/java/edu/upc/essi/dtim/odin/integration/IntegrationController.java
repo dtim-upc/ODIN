@@ -76,7 +76,7 @@ public class IntegrationController {
             // Integrate the new data source onto the existing integrated graph and overwrite it
             Graph integratedGraph = integrationService.integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
 
-            String path = "..\\api\\dbFiles\\ttl\\";
+            String path = "api\\dbFiles\\ttl\\";
 
             Project projectToSave = integrationService.updateTemporalIntegratedGraphProject(project, integratedGraph);
 

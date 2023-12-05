@@ -350,8 +350,8 @@ public class IntegrationService {
         // Integrate the integrated graph, graphB, and alignments to generate the global graph.
         Graph globalGraph = integrationInterface.generateGlobalGraph(integratedGraph);
 
-        // Write the global graph to a file or location (e.g., "..\\api\\dbFiles\\ttl\\globalGraph.ttl").
-        globalGraph.write("..\\api\\dbFiles\\ttl\\globalGraph.ttl");
+        // Write the global graph to a file or location (e.g., "api\\dbFiles\\ttl\\globalGraph.ttl").
+        globalGraph.write("api\\dbFiles\\ttl\\globalGraph.ttl");
 
         // Print a message indicating that the global graph has been generated.
         System.out.println("+++++++++++++++++++++++++++++++++++++++ GLOBAL GRAPH GENERATED");

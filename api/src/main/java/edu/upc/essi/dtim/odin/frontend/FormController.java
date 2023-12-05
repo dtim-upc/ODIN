@@ -24,7 +24,7 @@ public class FormController {
         logger.info("FORMSCHEMA ASKED");
         try {
             // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "../api/src/main/resources/frontend-schemas/RepositoryForms/Template_Repository.json";
+            String filePath = "api/src/main/resources/frontend-schemas/RepositoryForms/Template_Repository.json";
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {
@@ -50,7 +50,7 @@ public class FormController {
         logger.info("FORMSCHEMA ASKED: " + fileName);
         try {
             // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "../api/src/main/resources/frontend-schemas/RepositoryForms/" + fileName;
+            String filePath = "api/src/main/resources/frontend-schemas/RepositoryForms/" + fileName;
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {
@@ -73,13 +73,14 @@ public class FormController {
 
     @GetMapping("/api/data-repository-types")
     public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
-        return getAllDataRepositoryTypesService("../api/src/main/resources/frontend-schemas/RepositoryForms");
+        return getAllDataRepositoryTypesService("api/src/main/resources/frontend-schemas/RepositoryForms");
     }
 
     public List<DataRepositoryTypeInfo> getAllDataRepositoryTypesService(String directoryPath) {
         List<DataRepositoryTypeInfo> dataRepositoryClasses = new ArrayList<>();
 
         File directory = new File(directoryPath);
+        System.out.println(directoryPath);
 
         if (directory.isDirectory()) {
             File[] jsonFiles = directory.listFiles((dir, name) -> name.endsWith(".json"));
@@ -87,6 +88,7 @@ public class FormController {
             if (jsonFiles != null) {
                 for (File jsonFile : jsonFiles) {
                     String fileName = jsonFile.getName();
+                    System.out.println(fileName);
                     String displayName = fileName.replace("_", " ").replace(".json", "");
 
                     DataRepositoryTypeInfo dataRepositoryTypeInfo = new DataRepositoryTypeInfo(displayName, fileName);

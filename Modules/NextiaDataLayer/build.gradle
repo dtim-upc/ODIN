@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'edu.upc.essi.dtim'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':Modules:NextiaCore')
+
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation group: 'org.apache.spark', name: 'spark-sql_2.13', version: '3.3.2'
+    implementation group: 'io.delta', name: 'delta-core_2.13', version: '2.3.0'
+    implementation group: 'org.duckdb', name: 'duckdb_jdbc', version: '0.9.1'
+}
+
+test {
+    useJUnitPlatform()
+}

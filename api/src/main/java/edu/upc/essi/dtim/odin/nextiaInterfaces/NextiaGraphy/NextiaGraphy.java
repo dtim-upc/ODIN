@@ -36,7 +36,7 @@ public class NextiaGraphy {
      */
     public String generateVisualGraphNew(Graph model) {
 
-        model.write("..\\api\\dbFiles\\ttl" + "/graphJena1.ttl");
+        model.write("api\\dbFiles\\ttl" + "/graphJena1.ttl");
 
         HashMap<String, String> nodesId = new HashMap<>();
 

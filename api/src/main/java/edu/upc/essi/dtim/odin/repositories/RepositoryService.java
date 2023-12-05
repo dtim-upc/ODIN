@@ -178,7 +178,7 @@ public class RepositoryService {
             } else if (repository instanceof ApiRepository) {
                 ((ApiRepository) repository).setUrl(requestData.get("url"));
             } else {
-                System.out.println("NO SE HAN PODIDO ASIGNAR LOS PARÁMETROS");
+                System.out.println("NO SE HAN PODIDO ASIGNAR LOS PARAMETROS");
             }
         } else {
             System.out.println("REPOSITORIO NO ENCONTRADO");

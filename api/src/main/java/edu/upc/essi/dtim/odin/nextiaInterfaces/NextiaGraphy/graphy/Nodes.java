@@ -1,7 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.graphy;
 
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary.Vocabulary;
-import lombok.Data;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
@@ -9,7 +8,6 @@ import org.apache.jena.vocabulary.XSD;
 /**
  * Represents nodes in a graph used in NextiaGraphy.
  */
-@Data
 public class Nodes {
     String id;          // Unique identifier for the node
     String iri;         // IRI (Internationalized Resource Identifier) of the node
@@ -89,5 +87,85 @@ public class Nodes {
             }
         }
         computeShortType();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIri() {
+        return iri;
+    }
+
+    public void setIri(String iri) {
+        this.iri = iri;
+    }
+
+    public String getIriType() {
+        return iriType;
+    }
+
+    public void setIriType(String iriType) {
+        this.iriType = iriType;
+    }
+
+    public String getShortType() {
+        return shortType;
+    }
+
+    public void setShortType(String shortType) {
+        this.shortType = shortType;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public String getRange() {
+        return range;
+    }
+
+    public void setRange(String range) {
+        this.range = range;
+    }
+
+    public Boolean getIntegrated() {
+        return isIntegrated;
+    }
+
+    public void setIntegrated(Boolean integrated) {
+        isIntegrated = integrated;
+    }
+
+    public String getLinkId() {
+        return linkId;
+    }
+
+    public void setLinkId(String linkId) {
+        this.linkId = linkId;
     }
 }

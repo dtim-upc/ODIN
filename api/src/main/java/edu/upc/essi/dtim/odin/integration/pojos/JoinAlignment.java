@@ -1,14 +1,9 @@
 package edu.upc.essi.dtim.odin.integration.pojos;
 
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * Represents a custom alignment class with additional information for joining two domains.
  */
-@Getter
-@Setter
 public class JoinAlignment extends Alignment {
 
     /**
@@ -63,5 +58,53 @@ public class JoinAlignment extends Alignment {
         this.labelB = a.getLabelB();
         this.l = a.getL();
         this.type = a.getType();
+    }
+
+    public String getDomainA() {
+        return domainA;
+    }
+
+    public void setDomainA(String domainA) {
+        this.domainA = domainA;
+    }
+
+    public String getDomainLabelA() {
+        return domainLabelA;
+    }
+
+    public void setDomainLabelA(String domainLabelA) {
+        this.domainLabelA = domainLabelA;
+    }
+
+    public String getDomainB() {
+        return domainB;
+    }
+
+    public void setDomainB(String domainB) {
+        this.domainB = domainB;
+    }
+
+    public String getDomainLabelB() {
+        return domainLabelB;
+    }
+
+    public void setDomainLabelB(String domainLabelB) {
+        this.domainLabelB = domainLabelB;
+    }
+
+    public String getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
+    }
+
+    public Boolean getRightArrow() {
+        return rightArrow;
+    }
+
+    public void setRightArrow(Boolean rightArrow) {
+        this.rightArrow = rightArrow;
     }
 }
