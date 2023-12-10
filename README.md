@@ -79,7 +79,7 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
 3. Then, execute `yarn install` (on macOS it is possible you need to run `yarn install --ignore-engines`).
 
-4. Finally, execute `quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
+4. Finally, execute `quasar dev` (or on a macOS do it from the `node_modules` directory using `node_modules/@quasar/app-vite/bin/quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
 
 _Note: that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed._ 
 
