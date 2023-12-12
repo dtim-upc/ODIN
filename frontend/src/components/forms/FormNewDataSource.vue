@@ -133,7 +133,6 @@
               GET
               {{ }}
             </q-badge>
-            <!-- Mostrar campo de entrada para la URL del archivo remoto si "Remote file/s" está seleccionado -->
             <q-input
               filled
               v-model="remoteFileUrl"
@@ -145,6 +144,13 @@
               label="Make request"
               color="primary"
               @click="makeRequest"
+            />
+            <q-input
+              filled
+              v-model="apiDatasetName"
+              label="Dataset name"
+              lazy-rules
+              :rules="[(val) => (val && val.length > 0) || 'Please enter a URL']"
             />
           </q-card-section>
 
@@ -190,6 +196,7 @@ import {odinApi} from "../../boot/axios";
 
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
+const apiDatasetName = ref(""); // 
 
 async function downloadFile() {
   let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
@@ -245,6 +252,7 @@ async function makeRequest() {
       });
 
       newDatasource.endpoint = endpoint;
+      newDatasource.apiDatasetName = apiDatasetName
 
       const contentDisposition = response.headers['content-disposition'];
       let filename;
@@ -403,7 +411,6 @@ const options = [
 const newDatasource = reactive({
   repositoryId: storeDS.selectedRepositoryId,
   repositoryName: storeDS.selectedRepositoryName,
-  datasetName: '',
   datasetDescription: '',
 });
 
@@ -413,9 +420,9 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
   newDatasource.repositoryId = null;
   storeDS.selectedRepositoryId = null;
   newDatasource.repositoryName = '';
-  newDatasource.datasetName = '';
   newDatasource.datasetDescription = '';
   newDatasource.endpoint = '';
+  newDatasource.apiDatasetName = '';
   DataSourceType.value = options[0];
   databaseHost.value = '';
   databaseUser.value = '';
@@ -441,7 +448,6 @@ const onSubmit = () => {
   console.log("Contenido de uploadedItems:", uploadedItems.value);
 
 
-  data.append("datasetName", newDatasource.datasetName);
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
   data.append("repositoryId", storeDS.selectedRepositoryId); // Set as empty string if repositoryId is null
@@ -465,6 +471,7 @@ const onSubmit = () => {
     } else if (item.files === undefined && isAPIRepository.value) {
       data.append('attachFiles', item);
       data.append('endpoint', newDatasource.endpoint)
+      data.append('apiDatasetName', newDatasource.apiDatasetName)
     } else {
       console.log("attachTables: " + item.name);
       attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
@@ -474,7 +481,6 @@ const onSubmit = () => {
 
   data.append('attachTables', attachTables);
 
-  console.log('HAIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
   console.log(data)
 
   integrationStore.addDataSource(route.params.id, data, successCallback);

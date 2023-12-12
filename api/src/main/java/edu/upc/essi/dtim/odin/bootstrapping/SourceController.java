@@ -111,11 +111,13 @@ public class SourceController {
     @PostMapping(value = "/project/{id}")
     public ResponseEntity<Object> bootstrap(@PathVariable("id") String projectId,
                                             @RequestParam String repositoryId,
+                                            @RequestParam(required = false) String apiDatasetName,
                                             @RequestParam(required = false) String endpoint,
                                             @RequestParam(required = false) String datasetDescription,
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
                                             @RequestParam(required = false) List<String> attachTables) {
         try {
+            System.out.println("API DATASET NAME: " + apiDatasetName);
             logger.info("Datasource received for bootstrap: " + repositoryId);
 
             // Get the repository object associated to the new dataset
@@ -126,7 +128,7 @@ public class SourceController {
             if (!attachTables.isEmpty()) {
                 handleAttachTables(attachTables, datasetDescription, repository, projectId);
             } else {
-                handleAttachFiles(attachFiles, datasetDescription, repository, endpoint, projectId);
+                handleAttachFiles(attachFiles, datasetDescription, repository, endpoint, apiDatasetName, projectId);
             }
 
             // Return success message
@@ -141,7 +143,7 @@ public class SourceController {
         }
     }
 
-    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, DataRepository repository, String endpoint, String projectId) {
+    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, DataRepository repository, String endpoint, String apiDatasetName, String projectId) {
         if (attachFiles.isEmpty()) {
             throw new RuntimeException("File is empty");
         }
@@ -176,7 +178,7 @@ public class SourceController {
             // However, we now change the format to create the correct dataset
             if (fullFileName.equals(".json")) {
                 format = "api";
-                datasetName = "APIDataset_" + UUID;
+                datasetName = apiDatasetName;
             }
 
             // Extract data from datasource file, set UUID parameter and save it
@@ -251,7 +253,6 @@ public class SourceController {
         //Check if the dataset is part of that project
         if (sourceService.projectContains(projectId, id)) {
             // Delete dataset from the dataLayer (parquet files and tables) and from the project (ODIN database)
-            sourceService.deleteDatasetFromDataLayer(id);
             sourceService.deleteDatasetFromProject(projectId, id);
             deleted = true;
         }
