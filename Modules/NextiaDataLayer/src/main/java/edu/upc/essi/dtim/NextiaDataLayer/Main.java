@@ -5,8 +5,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DLDuckDB;
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DLDuckDB;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -80,9 +79,8 @@ public class Main {
         d7.setWrapper("SELECT * FROM personas\n");
 
         DLDuckDB dlm = new DLDuckDB("C:\\Work\\Database");
-        DataLoading dl = dlm.getDataLoading();
-        dl.uploadToLandingZone(d7);
-        dl.close();
+        dlm.uploadToLandingZone(d7);
+        dlm.close();
         dlm.uploadToFormattedZone(d7, d7.getUUID());
 
         Dataset[] datasets = new Dataset[]{d7};
@@ -128,10 +126,9 @@ public class Main {
         d2.setUUID("titanic2");
         d1.setWrapper("SELECT * FROM titanic1\n");
         d2.setWrapper("SELECT * FROM titanic2\n");
-        DataLoading dl = new DataLoading("C:\\Work\\Database");
-        dl.uploadToLandingZone(d1);
-        dl.close();
         DLDuckDB dlm = new DLDuckDB("C:\\Work\\Database");
+        dlm.uploadToLandingZone(d1);
+        dlm.close();
         dlm.uploadToFormattedZone(d1, d1.getUUID());
         /////////////////////////////////////////////////////////////////////////
         Dataset[] datasets = new Dataset[]{d1, d2};

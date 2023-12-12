@@ -18,6 +18,8 @@ dependencies {
     implementation group: 'org.apache.spark', name: 'spark-sql_2.13', version: '3.3.2'
     implementation group: 'io.delta', name: 'delta-core_2.13', version: '2.3.0'
     implementation group: 'org.duckdb', name: 'duckdb_jdbc', version: '0.9.1'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
 }
 
 test {

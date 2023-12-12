@@ -1,8 +1,8 @@
 package edu.upc.essi.dtim.NextiaDataLayer.utils;
 
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DLDuckDB;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DLSpark;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DLDuckDB;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DLSpark;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 
 public class DataLayerFactory {
     private static DataLayer instance = null;

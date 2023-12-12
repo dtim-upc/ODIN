@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.odin.bootstrapping;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
@@ -21,12 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -106,8 +104,6 @@ public class SourceController {
     /**
      * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.
      *
-     * @param projectId          The ID of the project.
-     * @param datasetName        The name of the dataset.
      * @param datasetDescription The description of the dataset.
      * @param attachFiles        The attached files representing the datasources.
      * @return A ResponseEntity object containing the saved dataset or an error message.
@@ -115,8 +111,6 @@ public class SourceController {
     @PostMapping(value = "/project/{id}")
     public ResponseEntity<Object> bootstrap(@PathVariable("id") String projectId,
                                             @RequestParam String repositoryId,
-                                            @RequestParam String repositoryName,
-                                            @RequestParam String datasetName,
                                             @RequestParam(required = false) String endpoint,
                                             @RequestParam(required = false) String datasetDescription,
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
@@ -124,147 +118,119 @@ public class SourceController {
         try {
             logger.info("Datasource received for bootstrap: " + repositoryId);
 
-            // Find the existing repository using the provided repositoryId and get the directory name used when
-            // creating a file
+            // Get the repository object associated to the new dataset
             DataRepository repository = sourceService.findRepositoryById(repositoryId);
-            repositoryId = repository.getId();
-            String directoryName = repositoryId + repository.getRepositoryName();
 
             // If attachTables is empty it means that we either have a local file or a file coming from an API (which is
             // stored as a json file). Otherwise, we have data coming from a sql database.
             if (!attachTables.isEmpty()) {
-                handleAttachTables(attachTables, datasetDescription, repositoryId, repository.getVirtual());
+                handleAttachTables(attachTables, datasetDescription, repository, projectId);
             } else {
-                handleAttachFiles(attachFiles, datasetDescription, directoryName, repositoryId, repository.getVirtual(), endpoint);
+                handleAttachFiles(attachFiles, datasetDescription, repository, endpoint, projectId);
             }
 
             // Return success message
             return new ResponseEntity<>(null, HttpStatus.OK);
+
         } catch (UnsupportedOperationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data source not created successfully");
         } catch (Exception e) {
             logger.error(e.getMessage());
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
         }
     }
 
-    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, String directoryName, String repositoryId, Boolean isVirtual, String endpoint) {
+    private void handleAttachFiles(List<MultipartFile> attachFiles, String datasetDescription, DataRepository repository, String endpoint, String projectId) {
         if (attachFiles.isEmpty()) {
-            throw new RuntimeException("Failed to store empty file.");
+            throw new RuntimeException("File is empty");
         }
         // Iterate through the list of MultipartFiles to handle each file (the user might have uploaded several files at once)
         for (MultipartFile attachFile : attachFiles) {
-            // Get the original filename of the uploaded file (e.g. folder1/folder2/datasetName.extension)
-            String originalFileName = attachFile.getOriginalFilename();
-            assert originalFileName != null;
+            String UUID = sourceService.generateUUID(); // Unique universal identifier (UUID) of the dataset
+            String fullFileName = attachFile.getOriginalFilename(); // Full file name (e.g. directory/filename.extension)
+            assert fullFileName != null;
 
-            // The filename might have extra dots (e.g. file.name.extension). To prevent errors when handling the filename, we
-            // substitute them for underscores (except the last one). If there is no dot (extension), we can not handle the file
-            int lastDotIndex = originalFileName.lastIndexOf(".");
-            if (lastDotIndex != -1) {
-                originalFileName = originalFileName.substring(0, lastDotIndex).replace(".", "_") + "." + originalFileName.substring(lastDotIndex + 1);
-            } else {
-                logger.error("Invalid file name format");
+            // We get the file extension, which defines the format of the file. This is because the type of dataset to
+            // be created depends on it. If there is no extension, we can not handle the file.
+            String format;
+            int dotIndex = fullFileName.lastIndexOf('.');
+            if (dotIndex == -1) {
+                throw new RuntimeException("The files does not have extension and so it can not be handled");
+            }
+            else {
+                format = fullFileName.substring(dotIndex + 1);
             }
 
-            // We get the dataset name (to create the graph data), and the name + extension (to store the file)
-            int slashIndex = originalFileName.lastIndexOf("/");
-            int dotIndex = originalFileName.lastIndexOf('.');
-            String datasetName = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex >= 0 ? dotIndex : originalFileName.length());
-            String datasetNameWithExtension = originalFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0);
+            // Get only the file name to add it to the dataset instance (we need it to execute the bootstrap)
+            int slashIndex = fullFileName.lastIndexOf("/");
+            String datasetName = fullFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex);
 
-            // If the file comes from an API call there is no name, so we have to introduce a placeholder. This is not an issue
-            // as we will use the UUID later to create the tables
-            if (datasetName.isEmpty()) {
-                datasetName = endpoint.replace("/", "_");
-                datasetNameWithExtension = datasetName + ".json";
-            }
-            // Direction in which the new dataset will be stored
-            String newFileDirectory = directoryName + "/" + datasetNameWithExtension;
+            String newFileName = UUID + "." + format; // New file name using the UUID
 
-            // Reconstruct file from Multipart file (i.e. store in the temporal zone)
-            String filePath = sourceService.reconstructFile(attachFile, newFileDirectory);
+            // Reconstruct file from the Multipart file (i.e. store the file in the temporal zone to be accessed later)
+            String filePath = sourceService.storeTemporalFile(attachFile, newFileName);
 
-            // Extract data from datasource file and save it
-            Dataset savedDataset;
-            try {
-                savedDataset = sourceService.extractData(filePath, datasetName, datasetDescription, repositoryId, endpoint);
-            } catch (SQLException | IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+            // Specific handling of API calls. If the file comes from an API, there is no name, and we only receive ".json".
+            // The file that has been created in the temporal zone is a json, which is needed to obtain/execute the wrapper.
+            // However, we now change the format to create the correct dataset
+            if (fullFileName.equals(".json")) {
+                format = "api";
+                datasetName = "APIDataset_" + UUID;
             }
 
-            // Add the dataset to the repository and delete the reference from others if exists
-            sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
-            savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
+            // Extract data from datasource file, set UUID parameter and save it
+            Dataset dataset = sourceService.generateDataset(filePath, datasetName, datasetDescription, repository, endpoint, format);
+            dataset.setUUID(UUID);
+            sourceService.saveDataset(dataset);
 
-            // Transform datasource into graph
-            BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-            Graph graph = bsResult.getGraph();
-
-            // Generating visual schema for frontend
-            String visualSchema = sourceService.generateVisualSchema(graph);
-            graph.setGraphicalSchema(visualSchema);
-
-            // Set the wrapper for the data
-            String wrapper = bsResult.getWrapper();
-            savedDataset.setWrapper(wrapper);
-
-            // Create the relation with dataset adding the graph generated to generate an id
-            Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
-            graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
-
-            // Get the disk path from the app configuration
-            // TODO: Remove?
-            Path diskPath = Path.of(appConfig.getDataLayerPath());
-            System.out.println("PATH: " + diskPath + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
-            graph.write(diskPath + "/" + directoryName + "/" + datasetWithGraph.getId() + datasetName + ".ttl");
-
-            // Save graph into the database
-            sourceService.saveGraphToDatabase(graph);
-
-            if (!isVirtual) {
-                sourceService.uploadToDataLayer(datasetWithGraph);
-            }
-
-            //if(!sourceService.projectHasIntegratedGraph(projectId)) sourceService.setProjectSchemasBase(projectId,datasetWithGraph.getId());
+            handleDataset(dataset, repository.getVirtual(), repository.getId(), projectId);
         }
     }
 
-    private void handleAttachTables(List<String> attachTables, String datasetDescription, String repositoryId, Boolean isVirtual) {
+    private void handleAttachTables(List<String> attachTables, String datasetDescription, DataRepository repository, String projectId) {
         for (String tableName : attachTables) {
-            // Extract data from datasource file and save it
-            Dataset savedDataset;
-            try {
-                savedDataset = sourceService.extractData(null, tableName, datasetDescription, repositoryId, null);
-            } catch (SQLException | IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            // Extract data from datasource file, set UUID parameter and save it
+            Dataset dataset = sourceService.generateDataset(null, tableName, datasetDescription, repository, null, "sql");
+            String UUID = sourceService.generateUUID(); // Unique universal identifier (UUID) of the dataset
+            dataset.setUUID(UUID);
+            sourceService.saveDataset(dataset);
 
-            // Add the dataset to the repository and delete the reference from others if exists
-            savedDataset = sourceService.addRepositoryToDataset(savedDataset.getId(), repositoryId);
-            sourceService.addDatasetToRepository(savedDataset.getId(), repositoryId);
+            handleDataset(dataset, repository.getVirtual(), repository.getId(), projectId);
+        }
+    }
 
-            // Transform datasource into graph and generate the wrapper
-            BootstrapResult bsResult = sourceService.bootstrapDataset(savedDataset);
-            Graph graph = bsResult.getGraph();
+    private void handleDataset(Dataset dataset, Boolean isVirtual, String repositoryId, String projectId) {
+        // Add the dataset to the repository and delete the reference from others if exists
+        dataset = sourceService.addRepositoryToDataset(dataset.getId(), repositoryId);
+        sourceService.addDatasetToRepository(dataset.getId(), repositoryId);
 
-            // Generating visual schema for frontend
-            String visualSchema = sourceService.generateVisualSchema(graph);
-            graph.setGraphicalSchema(visualSchema);
+        // Transform datasource into graph and generate the wrapper
+        BootstrapResult bsResult = sourceService.bootstrapDataset(dataset);
+        Graph graph = bsResult.getGraph();
 
-            //Set wrapper to the dataset
-            String wrapper = bsResult.getWrapper();
-            savedDataset.setWrapper(wrapper);
+        // Generating visual schema for frontend
+        String visualSchema = sourceService.generateVisualSchema(graph);
+        graph.setGraphicalSchema(visualSchema);
 
-            // Create the relation with dataset adding the graph generated to generate an id
-            Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(savedDataset, graph);
-            graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
+        // Set wrapper to the dataset and add the attributes based on the wrapper
+        String wrapper = bsResult.getWrapper();
+        dataset.setWrapper(wrapper);
+        dataset.setAttributes(sourceService.getAttributesFromWrapper(wrapper));
 
-            // Save graph into the database
-            sourceService.saveGraphToDatabase(graph);
+        // Create the relation with dataset adding the graph generated to generate an id
+        Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(dataset, graph);
+        graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
 
-            if (!isVirtual) {
-                sourceService.uploadToDataLayer(datasetWithGraph);
+        // Save graph into the database
+        sourceService.saveGraphToDatabase(graph);
+
+        // If dataset is materialized, store it permanently in the data layer (unless there is an error)
+        if (!isVirtual) {
+            boolean error = sourceService.uploadToDataLayer(datasetWithGraph);
+            if (error) {
+                sourceService.deleteDatasetFromProject(projectId, dataset.getId());
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "The was an error reading the data. Dataset not created");
             }
         }
     }
@@ -279,32 +245,21 @@ public class SourceController {
     @DeleteMapping("/project/{projectId}/datasource/{id}")
     public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectId") String projectId,
                                                  @PathVariable("id") String id) {
-        // Print a message to indicate that the delete request was received
-        logger.info("DELETE A DATASOURCE from project: {}", projectId);
-        logger.info("DELETE A DATASOURCE RECEIVED: {}", id);
-
+        logger.info("Delete dataset " + id + " from project: ", projectId);
         boolean deleted = false;
 
         //Check if the dataset is part of that project
         if (sourceService.projectContains(projectId, id)) {
+            // Delete dataset from the dataLayer (parquet files and tables) and from the project (ODIN database)
             sourceService.deleteDatasetFromDataLayer(id);
-            sourceService.deleteDatasetFile(id);
-
-            // Delete the relation with project
             sourceService.deleteDatasetFromProject(projectId, id);
-
-            // Is not necessary to call the projectService to delete the project and get the result
-            // since we have the cascade all call in relation one-to-many Project 1-* Dataset
             deleted = true;
         }
 
-        // Check if the project was deleted successfully
         if (deleted) {
-            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok(true); // HTTP status 200 (OK) and the boolean value true
         } else {
-            // Return a ResponseEntity with HTTP status 404 (Not Found)
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // HTTP status 404 (Not Found)
         }
     }
 

@@ -1,8 +1,7 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,17 +17,16 @@ public class DataLayerImpl implements DataLayerInterface {
     }
 
     @Override
-    public void uploadToDataLayer(Dataset dataset) {
+    public boolean uploadToDataLayer(Dataset dataset) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        DataLoading dLoading = dl.getDataLoading();
-        dLoading.uploadToLandingZone(dataset);
-
         try {
+            dl.uploadToLandingZone(dataset);
             dl.uploadToFormattedZone(dataset, dataset.getUUID());
+            return false;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return true;
         }
-
 
     }
 
@@ -36,18 +34,18 @@ public class DataLayerImpl implements DataLayerInterface {
     public void deleteDataset(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         try {
-            dl.RemoveFromFormattedZone(UUID);
+            dl.removeFromLandingZone(UUID);
+            dl.removeFromFormattedZone(UUID);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public String reconstructFile(MultipartFile multipartFile, String newFileDirectory) {
+    public String storeTemporalFile(MultipartFile multipartFile, String newFileDirectory) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        DataLoading dLoading = dl.getDataLoading();
         try {
-            return dLoading.reconstructFile(multipartFile.getInputStream(), newFileDirectory);
+            return dl.storeTemporalFile(multipartFile.getInputStream(), newFileDirectory);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

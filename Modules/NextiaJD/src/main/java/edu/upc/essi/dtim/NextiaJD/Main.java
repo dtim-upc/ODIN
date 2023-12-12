@@ -6,8 +6,8 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DLDuckDB;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DLDuckDB;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import org.json.simple.JSONArray;
 
 import java.io.File;

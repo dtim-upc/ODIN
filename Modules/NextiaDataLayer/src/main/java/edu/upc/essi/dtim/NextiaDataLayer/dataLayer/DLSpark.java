@@ -1,7 +1,7 @@
-package edu.upc.essi.dtim.NextiaDataLayer.implementations;
+package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
+import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollector;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.ResultSetSpark;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -15,20 +15,14 @@ import java.nio.file.Paths;
 import java.sql.*;
 import java.util.Comparator;
 
-public class DLSpark implements DataLayer {
+public class DLSpark extends DataLayer {
     SparkConf conf = new SparkConf().setAppName("Spark").setMaster("local");
     JavaSparkContext sc = new JavaSparkContext(conf);
     SparkSession spark = SparkSession.builder().config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension").config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog").appName("Spark").getOrCreate();
-    String dataStorePath;
-    DataLoading dl;
-    public DLSpark(String dataStorePath) {
-        this.dataStorePath = dataStorePath;
-        this.dl = new DataLoading(dataStorePath);
-    }
-
-    @Override
-    public DataLoading getDataLoading() {
-        return this.dl;
+    DataCollector dl;
+    public DLSpark(String dataStorePath) throws SQLException, IOException, ClassNotFoundException {
+        super(dataStorePath);
+//        this.dl = new DataCollector(dataStorePath);
     }
 
     @Override
@@ -40,7 +34,7 @@ public class DLSpark implements DataLayer {
     }
 
     @Override
-    public void RemoveFromFormattedZone(String tableName) throws SQLException {
+    public void removeFromFormattedZone(String tableName) throws SQLException {
         Path dir = Paths.get(dataStorePath + "\\DeltaLake\\formattedZone\\" + tableName);
         try {
             Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {
@@ -55,6 +49,8 @@ public class DLSpark implements DataLayer {
             throw new RuntimeException(e);
         }
     }
+
+
 
     @Override
     public ResultSet executeQuery(String sql, Dataset[] datasets) throws SQLException {

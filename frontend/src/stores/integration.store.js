@@ -236,7 +236,7 @@ export const useIntegrationStore = defineStore('integration', {
           }
         }).catch((error) => {
         console.log("error addding ds: ", error)
-        notify.negative("Something went wrong in the server.")
+        notify.negative("Something went wrong in the server. Dataset not created")
       });
     },
 

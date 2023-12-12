@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -94,9 +93,9 @@ public class SourceService {
      * @return The absolute path of the stored file.
      * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
      */
-    public String reconstructFile(MultipartFile multipartFile, String newFileDirectory) {
+    public String storeTemporalFile(MultipartFile multipartFile, String newFileDirectory) {
         DataLayerInterface dataLayerInterFace = new DataLayerImpl(appConfig);
-        return dataLayerInterFace.reconstructFile(multipartFile, newFileDirectory);
+        return dataLayerInterFace.storeTemporalFile(multipartFile, newFileDirectory);
     }
 
     /**
@@ -108,167 +107,67 @@ public class SourceService {
      * @return A Dataset object with the extracted data.
      * @throws IllegalArgumentException if the file format is not supported.
      */
-    public Dataset extractData(String filePath, String datasetName, String datasetDescription, String repositoryId, String endpoint) throws SQLException, IOException, ClassNotFoundException {
-        if (filePath == null) filePath = "table.sql";
-        // Extract the extension of the file from the file path
-        String extension = filePath.substring(filePath.lastIndexOf(".") + 1);
-
+    public Dataset generateDataset(String filePath, String datasetName, String datasetDescription, DataRepository repository, String endpoint, String format) {
         Dataset dataset;
 
-        // Create a new dataset object with the extracted data based on the file extension
-        switch (extension.toLowerCase()) {
+        // Create a new dataset object with the extracted data based on the format
+        switch (format) {
             case "csv":
-                // Create a CsvDataset object for CSV files
                 dataset = new CsvDataset(null, datasetName, datasetDescription, filePath);
                 break;
-            case "json": // Either local json files or API files
-                if (endpoint != null) { // API file
-                    dataset = new APIDataset(null, datasetName, datasetDescription, endpoint, filePath);
-                    DataRepository repository = findRepositoryById(repositoryId);
-                    String url = ((ApiRepository) repository).getUrl();
-                    setAttributesOfAPIDataset((APIDataset) dataset, url);
-                }
-                else { // Local json file
-                    dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
-                }
+            case "json":
+                dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
+                break;
+            case "api":
+                dataset = new APIDataset(null, datasetName, datasetDescription, endpoint, filePath);
                 break;
             case "sql":
-                DataRepository repository = findRepositoryById(repositoryId);
-                // Create a SqlDataset object for SQL files
                 String password = ((RelationalJDBCRepository) repository).getPassword();
                 String username = ((RelationalJDBCRepository) repository).getUsername();
-                String URL = ((RelationalJDBCRepository) repository).getUrl();
                 dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, ((RelationalJDBCRepository) repository).retrieveHostname(), ((RelationalJDBCRepository) repository).retrievePort(), username, password);
-                setAttributesOfSQLDataset(dataset, URL);
-                 break;
+                break;
             case "xml":
-                // Create a XmlDataset object for JSON files
                 dataset = new XmlDataset(null, datasetName, datasetDescription, filePath);
                 break;
             case "parquet":
-                // Create a ParquetDataset object for JSON files
                 dataset = new ParquetDataset(null, datasetName, datasetDescription, filePath);
                 break;
             default:
                 // Throw an exception for unsupported file formats
-                throw new IllegalArgumentException("Unsupported file format: " + extension);
+                throw new IllegalArgumentException("Unsupported file format: " + format);
         }
 
-        // Assign an ID to the dataset
         dataset = saveDataset(dataset);
-        String id = dataset.getId();
-        String datasetId = id;
-
-        // Modify the datasetPath to include the ID
-        String datasetPath;
-        int lastSlashIndex = Math.max(filePath.lastIndexOf("/"), filePath.lastIndexOf("\\"));
-        if (lastSlashIndex >= 0) {
-            datasetPath = filePath.substring(0, lastSlashIndex + 1) + datasetId + filePath.substring(lastSlashIndex + 1);
-            System.out.println(datasetPath + "+++++++++++++++++++ dataset path slash detection");
-            System.out.println(filePath + "+++++++++++++++++++ FILE ORIGINAL path slash detection");
-
-        } else {
-            datasetPath = datasetId + filePath;
-            System.out.println(datasetPath + "+++++++++++++++++++ dataset path SIN SLASH");
-        }
-
-
-        // Update the datasetPath in the dataset object
-        if (dataset instanceof JsonDataset) {
-            ((JsonDataset) dataset).setPath(datasetPath);
-        } else if (dataset instanceof CsvDataset) {
-            ((CsvDataset) dataset).setPath(datasetPath);
-        } else if (dataset instanceof XmlDataset) {
-            ((XmlDataset) dataset).setPath(datasetPath);
-        } else if (dataset instanceof ParquetDataset) {
-            ((ParquetDataset) dataset).setPath(datasetPath);
-        } else if (dataset instanceof APIDataset) {
-            ((APIDataset) dataset).setJsonPath(datasetPath);
-        }
-
-        // Rename the file on disk with the updated datasetPath
-        File originalFile = new File(filePath);
-        File renamedFile = new File(datasetPath);
-        if (originalFile.renameTo(renamedFile)) {
-            System.out.println("File renamed successfully.");
-        } else {
-            System.out.println("File renaming failed.");
-        }
-
-        dataset.setUUID(generateUUID());
-
-        // Save the dataset again with the updated datasetPath
-        dataset = saveDataset(dataset);
-
         return dataset;
     }
 
-    private void setAttributesOfSQLDataset(Dataset dataset, String url) {
-        String password = ((SQLDataset) dataset).getPassword();
-        String username = ((SQLDataset) dataset).getUsername();
-        String tableName = ((SQLDataset) dataset).getTableName();
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password); //postgres
-            Statement stmt = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-
-            ResultSet rs;
-            rs = stmt.executeQuery("SELECT *\n" +
-                    " FROM information_schema.columns\n" +
-                    " WHERE table_name = '" + tableName + "';"
-            );
-
-            List<Attribute> attributes = new LinkedList<>();
-
-            while (rs.next()) {
-                String columnName = rs.getString("column_name");
-                String dataType = rs.getString("data_type");
-                attributes.add(new Attribute(columnName, dataType));
-            }
-
-            dataset.setAttributes(attributes);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    private Attribute generateAttribute(String att) {
+        return new Attribute(att, "string");
     }
 
-    private void setAttributesOfAPIDataset(APIDataset dataset, String url) {
-        try {
-            // Replace "your_api_url" with the actual URL of your API
-            String apiUrl = url + dataset.getEndpoint();
-            // Create an HttpClient
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            // Create an HTTP GET request
-            HttpGet httpGet = new HttpGet(apiUrl);
-            // Execute the request and get the response
-            HttpResponse response = httpClient.execute(httpGet);
-            List<Attribute> attributes = new LinkedList<>();
-
-            // Check if the response is successful (status code 200)
-            if (response.getStatusLine().getStatusCode() == 200) {
-                // Convert the response entity to a String
-                String jsonResponse = EntityUtils.toString(response.getEntity());
-                // Create ObjectMapper
-                ObjectMapper objectMapper = new ObjectMapper();
-                // Read JSON string into JsonNode
-                JsonNode rootNode = objectMapper.readTree(jsonResponse);
-                // Get iterator for all field names
-                Iterator<String> fieldNames = rootNode.fieldNames();
-                // Iterate through field names and print them
-                while (fieldNames.hasNext()) {
-                    String fieldName = fieldNames.next();
-                    attributes.add(new Attribute(fieldName, "String"));
+    // Two types of wrappers: SELECT x,y,z FROM // SELECT `x` AS `x`, `y` AS `y`, `z` AS `z` FROM
+    public List<Attribute> getAttributesFromWrapper(String wrapper) {
+        List<Attribute> atts = new ArrayList<>();
+        String firstName = wrapper.substring(7, wrapper.indexOf(","));
+        if (firstName.contains("` AS `")) {
+            for (String name: wrapper.split(",")) {
+                int pos = name.indexOf("`");
+                int n = 3;
+                while (--n > 0 && pos != -1) {
+                    pos = name.indexOf("`", pos + 1);
                 }
-                dataset.setAttributes(attributes);
-            } else {
-                System.out.println("Failed to retrieve data. HTTP status code: " + response.getStatusLine().getStatusCode());
+                atts.add(generateAttribute(name.substring(pos + 1, name.indexOf("`", pos + 1))));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        else {
+            for (String name: wrapper.substring(7, wrapper.indexOf(" FROM ")).split(",")) {
+                atts.add(generateAttribute(name));
+            }
+        }
+        return atts;
     }
 
-    private String generateUUID() {
+    public String generateUUID() {
         // Generate a random 16-character string as part of the filename
         final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder(16);
@@ -278,7 +177,6 @@ public class SourceService {
             int randomIndex = random.nextInt(characters.length());
             sb.append(characters.charAt(randomIndex));
         }
-
         return sb.toString();
     }
 
@@ -363,6 +261,12 @@ public class SourceService {
      * @param datasetId The ID of the dataset to delete.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
+        // Delete rdf file (/jenaFiles)
+        try {
+            Files.delete(Path.of(appConfig.getJenaPath() + "\\" + getDatasetById(datasetId).getLocalGraph().getGraphName() + ".rdf"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // Call the projectService to delete the dataset from the specified project
         projectService.deleteDatasetFromProject(projectId, datasetId);
     }
@@ -796,43 +700,16 @@ public class SourceService {
         return saveDataset(dataset);
     }
 
-    public void uploadToDataLayer(Dataset dataset) {
+    public boolean uploadToDataLayer(Dataset dataset) {
         DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-        dlInterface.uploadToDataLayer(dataset);
-        saveDataset(dataset);
+        return dlInterface.uploadToDataLayer(dataset);
     }
 
     public void deleteDatasetFromDataLayer(String id) {
         Dataset datasetToDelete = getDatasetById(id);
-        if (datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset) {
-            //delete from datalayer
-            DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-            dlInterface.deleteDataset(datasetToDelete.getUUID());
-        }
+        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+        dlInterface.deleteDataset(datasetToDelete.getUUID());
     }
-
-    public void deleteDatasetFile(String id) {
-        Dataset datasetToDelete = getDatasetById(id);
-        String filePath = null;
-        if (datasetToDelete instanceof CsvDataset || datasetToDelete instanceof JsonDataset) {
-            //delete from the given path
-            if (datasetToDelete instanceof CsvDataset)
-                filePath = ((CsvDataset) datasetToDelete).getPath(); // Replace with the actual file path
-            if (datasetToDelete instanceof JsonDataset)
-                filePath = ((JsonDataset) datasetToDelete).getPath(); // Replace with the actual file path
-
-            Path path = Paths.get(filePath);
-
-            try {
-                Files.delete(path);
-                System.out.println("File deleted successfully.");
-            } catch (IOException e) {
-                System.err.println("Failed to delete the file: " + e.getMessage());
-            }
-        }
-    }
-
-
 }
 
 

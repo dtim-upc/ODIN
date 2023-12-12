@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin;
 
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.slf4j.Logger;

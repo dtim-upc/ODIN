@@ -2,7 +2,7 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
-import edu.upc.essi.dtim.NextiaDataLayer.implementations.DataLayer;
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.NextiaJD.Discovery;
 import edu.upc.essi.dtim.NextiaJD.IDiscovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;

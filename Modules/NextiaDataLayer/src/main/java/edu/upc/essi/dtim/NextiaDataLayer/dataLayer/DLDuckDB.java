@@ -1,33 +1,26 @@
-package edu.upc.essi.dtim.NextiaDataLayer.implementations;
+package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaDataLayer.utils.DataLoading;
+import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollector;
+import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollectorAPI;
+import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollectorSQL;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.Path;
 import java.sql.*;
-import java.util.Comparator;
 
-public class DLDuckDB implements DataLayer {
+public class DLDuckDB extends DataLayer {
     Connection conn;
     Statement stmt;
-    String dataStorePath;
-    DataLoading dl;
 
     public DLDuckDB(String dataStorePath) throws SQLException, ClassNotFoundException, IOException {
-        dl = new DataLoading(dataStorePath);
-        this.dataStorePath = dataStorePath;
+        super(dataStorePath);
         this.conn = getConnection();
         this.stmt = conn.createStatement();
-    }
-
-    @Override
-    public DataLoading getDataLoading() {
-        return this.dl;
     }
 
     private Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
@@ -39,15 +32,10 @@ public class DLDuckDB implements DataLayer {
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) throws SQLException {
-        String parquetPath = dataStorePath + "\\landingZone\\" + d.getUUID();
+        String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         stmt.execute("CREATE TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
-    }
-
-    @Override
-    public void RemoveFromFormattedZone(String tableName) throws SQLException {
-        stmt.execute("DROP TABLE " + tableName);
     }
 
     public void uploadToTemporalFormattedZone(Dataset d, String tableName) throws SQLException {
@@ -55,6 +43,11 @@ public class DLDuckDB implements DataLayer {
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         stmt.execute("CREATE TEMP TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+    }
+
+    @Override
+    public void removeFromFormattedZone(String tableName) throws SQLException {
+        stmt.execute("DROP TABLE " + tableName);
     }
 
     private String getParquetFile(File directoryPath) {
@@ -89,38 +82,37 @@ public class DLDuckDB implements DataLayer {
                     }
                 }
                 if (!tableExists) {
-                    if (repo.getRepositoryType().equals("ApiRepository")) {
-                        dl.loadFromAPI(dataset);
-                    }
-                    else if (repo.getRepositoryType().equals("RelationalJDBCRepository")) {
-                        dl.loadFromJDBC(dataset);
-                    }
-                    // file is now into /tmp in parquet format
+                    DataCollector dc = getDataCollector(repo);
+                    dc.uploadDataToTemporalFolder(dataset);
+                    // Data is now into /tmp in whichever format is needed (e.g. api calls are stored as json files)
+                    uploadToTemporalLandingZone(dataset);
+                    // Data is now into /tmp, under a folder and with parquet format
                     uploadToTemporalFormattedZone(dataset, dataset.getUUID()); // create temporal table in db
                 }
             }
         }
     }
 
+    @NotNull
+    private DataCollector getDataCollector(DataRepository repo) {
+        DataCollector dc;
+        if (repo.getRepositoryType().equals("ApiRepository")) {
+            dc = new DataCollectorAPI(dataStorePath);
+        }
+        else if (repo.getRepositoryType().equals("RelationalJDBCRepository")) {
+            dc = new DataCollectorSQL(dataStorePath);
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported data collector");
+        }
+        return dc;
+    }
+
     @Override
     public void close() throws SQLException {
         stmt.close();
         conn.close();
-
         // Remove all the files in the temporal zone (/tmp)
-        Path dir = Paths.get(dataStorePath + "\\tmp");
-        try {
-            Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {
-                try {
-                    System.out.println("Deleting: " + path);
-                    Files.delete(path);  //delete each file or directory
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        deleteFilesFromDirectory(dataStorePath + "\\tmp");
     }
-
 }

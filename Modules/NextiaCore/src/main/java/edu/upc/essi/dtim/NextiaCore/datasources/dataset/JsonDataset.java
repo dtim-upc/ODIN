@@ -39,28 +39,6 @@ public class JsonDataset extends Dataset{
             throw new IllegalArgumentException("Invalid file format. Only JSON files are supported.");
         }
         else {
-            try {
-                List<Attribute> attributes = new LinkedList<>();
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonArray = objectMapper.readTree(new File(path));
-
-                if (jsonArray.isArray()) {
-                    // Assuming all objects in the array have the same keys
-                    JsonNode firstObject = jsonArray.get(0);
-                    Iterator<String> fieldNames = firstObject.fieldNames();
-
-                    while (fieldNames.hasNext()) {
-                        String key = fieldNames.next();
-                        attributes.add(new Attribute(key, ""));
-                    }
-                } else {
-                    System.out.println("The JSON data is not an array.");
-                }
-                super.setAttributes(attributes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             this.path = path;
         }
     }

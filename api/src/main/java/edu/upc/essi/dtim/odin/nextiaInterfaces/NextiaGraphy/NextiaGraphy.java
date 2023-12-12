@@ -35,9 +35,6 @@ public class NextiaGraphy {
      * @return A JSON representation of the visual graph.
      */
     public String generateVisualGraphNew(Graph model) {
-
-        model.write("api\\dbFiles\\ttl" + "/graphJena1.ttl");
-
         HashMap<String, String> nodesId = new HashMap<>();
 
         List<Nodes> nodes = new ArrayList<>();

@@ -84,6 +84,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         } catch (FileNotFoundException e) {
             System.out.println("Error al guardar el modelo: " + e.getMessage());
         }
+        modelToSave.close();
     }
 
     @Override

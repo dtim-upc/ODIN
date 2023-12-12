@@ -87,12 +87,12 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
         List<String> columns = new LinkedList<>();
         for(Pair<String, String> col: tableData.getColumns())
             columns.add(col.getLeft());
-        String columnNames = String.join(", ", columns);
+        String columnNames = String.join(",", columns);
 
         wrapper += columnNames;
         wrapper += " FROM ";
         wrapper += tableName;
-        System.out.println("Generated wrapper: "+wrapper);
+        System.out.println("Generated wrapper: " + wrapper);
         return wrapper;
     }
 

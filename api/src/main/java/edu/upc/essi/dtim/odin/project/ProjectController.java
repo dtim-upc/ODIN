@@ -25,6 +25,7 @@ public class ProjectController {
      * Constructs a new ProjectController with the specified ProjectService.
      *
      * @param projectService The ProjectService to be used.
+     * @param projectService The ProjectService to be used.
      */
     ProjectController(@Autowired ProjectService projectService) {
         this.projectService = projectService;

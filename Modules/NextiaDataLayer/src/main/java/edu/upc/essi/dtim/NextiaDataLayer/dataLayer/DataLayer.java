@@ -1,6 +1,5 @@
-package edu.upc.essi.dtim.NextiaDataLayer.utils;
+package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import org.apache.spark.SparkConf;
@@ -8,21 +7,24 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.Properties;
 
-public class DataLoading {
+public abstract class DataLayer {
     SparkConf conf;
     JavaSparkContext sc;
     SparkSession spark;
     String dataStorePath;
 
-    public DataLoading(String dataStorePath) {
+    public DataLayer(String dataStorePath) throws SQLException, ClassNotFoundException, IOException {
         conf = new SparkConf().setAppName("DataLoading").setMaster("local");
         sc = new JavaSparkContext(conf);
         spark = SparkSession.builder().appName("DataLoading").getOrCreate();
@@ -36,7 +38,16 @@ public class DataLoading {
         df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "\\landingZone\\" + d.getUUID());
     }
 
-    public org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) {
+    public void uploadToTemporalLandingZone(Dataset d) {
+        org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
+        df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "\\tmp\\" + d.getUUID());
+    }
+
+    public void removeFromLandingZone(String UUID) {
+        deleteFilesFromDirectory(dataStorePath + "\\landingZone\\" + UUID);
+    }
+
+    protected org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df = null;
         if (d instanceof CsvDataset) {
             df = spark.read().option("header", true).csv(((CsvDataset) d).getPath());
@@ -61,8 +72,24 @@ public class DataLoading {
         return spark.sql(d.getWrapper());
     }
 
-    public String reconstructFile(InputStream inputFile, String newFileDirectory) {
-        Path diskPath = Path.of(dataStorePath + "\\tmp");
+    protected void deleteFilesFromDirectory(String directoryPath) {
+        Path dir = Paths.get(directoryPath);
+        try {
+            Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {
+                try {
+                    System.out.println("Deleting: " + path);
+                    Files.delete(path);  //delete each file or directory
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String storeTemporalFile(String path, InputStream inputFile, String newFileDirectory) {
+        Path diskPath = Path.of(path);
         Path destinationFile = diskPath.resolve(newFileDirectory); // Resolve the destination file path using the disk path and the modified filename
         try {
             Files.createDirectories(destinationFile.getParent()); // Create parent directories if they don't exist
@@ -73,42 +100,15 @@ public class DataLoading {
         return destinationFile.toString(); // Return the absolute path of the stored file
     }
 
-    public void loadFromAPI(Dataset d) {
-        try {
-            ApiRepository repo = (ApiRepository) d.getRepository();
-            APIDataset ad = (APIDataset) d;
-            // Connection parameters
-            URL url = new URL(repo.getUrl() + ad.getEndpoint());
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Content-Type", "application/json");
-            int status = con.getResponseCode();
-            if (status == HttpURLConnection.HTTP_OK) { // Success
-                // Read the data from the API (json format) and store it in \tmp (json file)
-                String jsonPath = reconstructFile(con.getInputStream(), d.getUUID() + ".json");
-
-                // Upload .parquet to \tmp (We transform the json file into a parquet file for easier processing)
-                org.apache.spark.sql.Dataset<Row> df;
-                df = spark.read().option("header", true).json(jsonPath);
-                df.createOrReplaceTempView(d.getUUID());
-                spark.sql(d.getWrapper()).write().format("parquet").save(dataStorePath + "\\tmp\\" + d.getUUID()); // apply wrapper
-
-            } else {
-                System.out.println("GET request did not work.");
-            }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public String storeTemporalFile(InputStream inputFile, String newFileDirectory) {
+        return storeTemporalFile(dataStorePath + "\\tmp", inputFile, newFileDirectory);
     }
 
-    public void loadFromJDBC(Dataset d) {
-        org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
-        df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "\\tmp\\" + d.getUUID());
-    }
+    public abstract void uploadToFormattedZone(Dataset d, String tableName) throws SQLException;
 
-    public void close() {
-        sc.close();
-        spark.close();
-    }
+    public abstract void removeFromFormattedZone(String tableName) throws SQLException;
+
+    public abstract ResultSet executeQuery(String sql, Dataset[] datasets) throws SQLException;
+
+    public abstract void close() throws SQLException;
 }

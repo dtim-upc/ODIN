@@ -44,27 +44,18 @@ public class ProjectService {
     public void deleteDatasetFromProject(String projectId, String datasetId) {
         // Retrieve the project with the given ID
         Project project = getProjectById(projectId);
-        System.out.println("++++++++++++++++++++ DELETE DATASET OF PROJECTo");
 
-        // Check if the project is found
+        // Check if the project is found and throw an IllegalArgumentException if the project is not found
         if (project == null) {
-            System.out.println("++++++++++++++++++++ QUÉ PASO NO ENCONTRÉ");
-
-            // Throw an IllegalArgumentException if the project is not found
             throw new IllegalArgumentException("Project not found");
         }
 
         // Get the list of data repositories associated with the project
-        List<DataRepository> repositoriesOfProjectToUpload = project.getRepositories();
+        List<DataRepository> repositoriesOfProject = project.getRepositories();
         boolean datasetFound = false;
 
-        // Create an iterator for the data repositories
-        Iterator<DataRepository> repositoryIterator = repositoriesOfProjectToUpload.iterator();
-
         // Iterate through the data repositories using the iterator
-        while (repositoryIterator.hasNext()) {
-            DataRepository repoInProject = repositoryIterator.next();
-
+        for (DataRepository repoInProject : repositoriesOfProject) {
             // Iterate through the datasets in each data repository
             Iterator<Dataset> datasetIterator = repoInProject.getDatasets().iterator();
             while (datasetIterator.hasNext()) {
@@ -72,24 +63,13 @@ public class ProjectService {
 
                 // Check if the dataset ID matches the specified dataset ID
                 if (datasetId.equals(dataset.getId())) {
-                    System.out.println("++++++++++++++++++++encontrado");
-                    datasetFound = true;
-
                     // Remove the dataset from the data repository
+                    datasetFound = true;
                     datasetIterator.remove();
 
-                    // Check if the data repository is now empty and remove it from the project
-                    if (repoInProject.getDatasets().isEmpty()) {
-                        repositoryIterator.remove();
-                    }
+                    // Save the updated list of data repositories and update the project's list
+                    project.setRepositories(repositoriesOfProject);
 
-                    // Save the updated list of data repositories
-                    ormProject.save(repositoriesOfProjectToUpload);
-
-                    // Update the project's list of data repositories
-                    project.setRepositories(repositoriesOfProjectToUpload);
-
-                    // Exit the loop after deleting the dataset
                     break;
                 }
             }
@@ -165,9 +145,6 @@ public class ProjectService {
      * @return The found project, or null if not found.
      */
     public Project getProjectById(String projectId) {
-        // Print the project ID for debugging
-        System.out.println(projectId + " ++++++++++++++++++++++++++++++++projectId");
-
         // Retrieve the project with the specified ID from the ORM store
         Project project = ormProject.findById(Project.class, projectId);
 
@@ -231,36 +208,24 @@ public class ProjectService {
         // Get the list of repositories in the project
         List<DataRepository> repos = project.getRepositories();
 
-        // Print debugging information
-        System.out.println("++++++++++++++++++++ llegue " + repos.size() + repos);
-
         // Iterate through the repositories
-        for (int i = 0; i < repos.size(); ++i) {
+        for (DataRepository repo : repos) {
             // Get the datasets associated with the current repository
-            List<Dataset> datasets = repos.get(i).getDatasets();
-
-            // Print debugging information
-            System.out.println("++++++++++++++++++++ entro " + i + " " + datasets.size());
+            List<Dataset> datasets = repo.getDatasets();
 
             // Iterate through the datasets
             for (Dataset dataset : datasets) {
                 // Get the ID of the current dataset
                 String datasetId = dataset.getId();
 
-                // Print debugging information
-                System.out.println("++++++++++++++++++++ MIRO " + datasetId + " " + dataresourceId);
-
                 // Check if the dataset ID matches the provided dataresourceId
                 if (datasetId.equals(dataresourceId)) {
                     // Dataset with the specified ID found in the project
-                    System.out.println("++++++++++++++++++++ ENCONTRÉ MUCHACHO");
                     return true; // Return true if the dataresourceId exists in any dataset
                 }
             }
         }
 
-        // Dataset with the specified ID not found in the project
-        System.out.println("++++++++++++++++++++ NO ENCONTRÉ MUCHACHO");
         return false; // Return false if the dataresourceId is not found in any dataset
     }
 

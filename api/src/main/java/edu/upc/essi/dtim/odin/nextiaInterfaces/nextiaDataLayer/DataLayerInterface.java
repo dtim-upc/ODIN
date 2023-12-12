@@ -7,9 +7,9 @@ public interface DataLayerInterface {
     /**
      * @param dataset The dataset to upload to DataLayer
      */
-    void uploadToDataLayer(Dataset dataset);
+    boolean uploadToDataLayer(Dataset dataset);
 
     void deleteDataset(String UUID);
 
-    String reconstructFile(MultipartFile multipartFile, String repositoryIdAndName);
+    String storeTemporalFile(MultipartFile multipartFile, String repositoryIdAndName);
 }

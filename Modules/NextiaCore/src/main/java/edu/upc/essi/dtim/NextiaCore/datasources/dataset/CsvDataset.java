@@ -38,20 +38,6 @@ public class CsvDataset extends Dataset{
             throw new IllegalArgumentException("Invalid file format. Only CSV files are supported.");
         }
         else {
-            List<Attribute> attributes = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader(path))) {
-                String[] columnNames = reader.readNext(); // Read the first row as column names
-                if (columnNames != null) {
-                    for (String columnName : columnNames) {
-                        attributes.add(new Attribute(columnName, ""));
-                    }
-                } else {
-                    throw new IllegalArgumentException("No column names found in the CSV file.");
-                }
-                super.setAttributes(attributes);
-            } catch (IOException e) {
-                //e.printStackTrace();
-            }
             this.path = path;
         }
     }
