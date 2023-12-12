@@ -16,8 +16,8 @@ public class Main {
 
         CsvDataset d1 = new CsvDataset("d1", "d1", "description1", "src\\main\\resources\\sample.csv");
         CsvDataset d2 = new CsvDataset("titanic", "titanic", "description2", "C:\\Work\\Files\\titanic.csv");
-        JsonDataset d3 = new JsonDataset("cats", "cats", "description3", "C:\\Work\\Files\\cats_simplified.json");
-        CsvDataset d4 = new CsvDataset("airtravel", "airtravel", "description3", "C:\\Work\\Files\\airtravel.csv");
+        JsonDataset d3 = new JsonDataset("test", "test", "description3", "C:\\Work\\Files\\test.json");
+        JsonDataset d4 = new JsonDataset("test2", "test2", "description3", "C:\\Work\\Files\\test.json");
 
         CsvDataset d5 = new CsvDataset("titanic1", "titanic1", "description2", "C:\\Work\\Files\\titanic1.csv");
         CsvDataset d6 = new CsvDataset("titanic2", "titanic2", "description2", "C:\\Work\\Files\\titanic2.csv");
@@ -25,11 +25,11 @@ public class Main {
         SQLDataset d7 = new SQLDataset("sql", "personas", "", "personas", "dtim.essi.upc.edu", "5432", "vasenjo", "jBGRfEu");
         APIDataset d8 = new APIDataset("api", "fact", "", "fact", "");
 
-
+        testWrapper(d3, d4);
 
 //        testMultipleAccess(d5,d6);
 
-        testSQL(d7);
+//        testSQL(d7);
 
 //        testAPI(d8);
 
@@ -70,6 +70,23 @@ public class Main {
 //        dlm.close();
     }
 
+    private static void testWrapper(JsonDataset d1, JsonDataset d2) throws SQLException, IOException, ClassNotFoundException {
+        DLDuckDB dlm = new DLDuckDB("C:\\Work\\Database");
+
+//        d1.setUUID("test");
+//        d1.setWrapper("SELECT glossary.GlossDiv.GlossList.GlossEntry.GlossTerm AS GlossTerm,glossary.GlossDiv.GlossList.GlossEntry.GlossSee AS GlossSee,glossary.GlossDiv.GlossList.GlossEntry.SortAs AS SortAs,glossary.GlossDiv.GlossList.GlossEntry.GlossDef.para AS para,glossary.GlossDiv.title AS title2,glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso_view AS GlossSeeAlso,glossary.GlossDiv.GlossList.GlossEntry.ID AS ID,glossary.title AS title,glossary.GlossDiv.GlossList.GlossEntry.Acronym AS Acronym,glossary.GlossDiv.GlossList.GlossEntry.Abbrev AS Abbrev FROM test LATERAL VIEW explode(GlossSeeAlso) AS GlossSeeAlso_view\n");
+//        dlm.uploadToLandingZone(d1);
+//        dlm.uploadToFormattedZone(d1, d1.getUUID());
+
+        d2.setUUID("test2");
+        d2.setWrapper("SELECT glossary.GlossDiv.GlossList.GlossEntry.GlossTerm,glossary.GlossDiv.GlossList.GlossEntry.GlossSee,glossary.GlossDiv.GlossList.GlossEntry.SortAs,glossary.GlossDiv.GlossList.GlossEntry.GlossDef.para,glossary.GlossDiv.title AS title2,glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso AS GlossSeeAlso,glossary.GlossDiv.GlossList.GlossEntry.ID,glossary.title,glossary.GlossDiv.GlossList.GlossEntry.Acronym,glossary.GlossDiv.GlossList.GlossEntry.Abbrev FROM test2 LATERAL VIEW explode(glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso) AS GlossSeeAlso_view\n");
+        dlm.uploadToLandingZone(d2);
+        dlm.uploadToFormattedZone(d2, d2.getUUID());
+
+//        dlm.show(d1);
+        dlm.show(d2);
+    }
+
     private static void testSQL(SQLDataset d7) throws SQLException, IOException, ClassNotFoundException {
         RelationalJDBCRepository dr = new RelationalJDBCRepository();
         dr.setUrl("jdbc:postgresql://dtim.essi.upc.edu:5432/odin_test");
@@ -80,7 +97,6 @@ public class Main {
 
         DLDuckDB dlm = new DLDuckDB("C:\\Work\\Database");
         dlm.uploadToLandingZone(d7);
-        dlm.close();
         dlm.uploadToFormattedZone(d7, d7.getUUID());
 
         Dataset[] datasets = new Dataset[]{d7};

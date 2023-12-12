@@ -10,9 +10,14 @@ import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -63,6 +68,17 @@ public class ProjectService {
 
                 // Check if the dataset ID matches the specified dataset ID
                 if (datasetId.equals(dataset.getId())) {
+                    // Remove from Data layer
+                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+                    dlInterface.deleteDataset(dataset.getUUID());
+
+                    // Delete rdf file (/jenaFiles)
+                    try {
+                        Files.delete(Path.of(appConfig.getJenaPath() + "\\" + dataset.getLocalGraph().getGraphName() + ".rdf"));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                     // Remove the dataset from the data repository
                     datasetFound = true;
                     datasetIterator.remove();
@@ -191,6 +207,13 @@ public class ProjectService {
      * @return true if the project was deleted successfully, false otherwise.
      */
     public boolean deleteProject(String id) {
+        // Before deleting the project from the ODIN database, we need to remove the datasets of the project from the Data layer
+        Project p = ormProject.findById(Project.class, id);
+        for (DataRepository dr: p.getRepositories()) {
+            for (Dataset d: dr.getDatasets()) {
+                deleteDatasetFromProject(id, d.getId());
+            }
+        }
         return ormProject.deleteOne(Project.class, id);
     }
 

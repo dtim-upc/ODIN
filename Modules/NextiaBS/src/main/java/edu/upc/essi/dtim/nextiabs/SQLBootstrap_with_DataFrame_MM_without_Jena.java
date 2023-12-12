@@ -86,8 +86,8 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
         String wrapper = "SELECT ";
         List<String> columns = new LinkedList<>();
         for(Pair<String, String> col: tableData.getColumns())
-            columns.add(col.getLeft());
-        String columnNames = String.join(",", columns);
+            columns.add(col.getLeft() + " AS `" + col.getLeft() + "`");
+        String columnNames = String.join(", ", columns);
 
         wrapper += columnNames;
         wrapper += " FROM ";

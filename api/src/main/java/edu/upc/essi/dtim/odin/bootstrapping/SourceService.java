@@ -35,6 +35,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Attr;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -145,24 +146,13 @@ public class SourceService {
         return new Attribute(att, "string");
     }
 
-    // Two types of wrappers: SELECT x,y,z FROM // SELECT `x` AS `x`, `y` AS `y`, `z` AS `z` FROM
     public List<Attribute> getAttributesFromWrapper(String wrapper) {
         List<Attribute> atts = new ArrayList<>();
-        String firstName = wrapper.substring(7, wrapper.indexOf(","));
-        if (firstName.contains("` AS `")) {
-            for (String name: wrapper.split(",")) {
-                int pos = name.indexOf("`");
-                int n = 3;
-                while (--n > 0 && pos != -1) {
-                    pos = name.indexOf("`", pos + 1);
-                }
-                atts.add(generateAttribute(name.substring(pos + 1, name.indexOf("`", pos + 1))));
-            }
-        }
-        else {
-            for (String name: wrapper.substring(7, wrapper.indexOf(" FROM ")).split(",")) {
-                atts.add(generateAttribute(name));
-            }
+        int backtickIndex = wrapper.indexOf("`");
+        while (backtickIndex != -1) {
+            int nextBacktickIndex = wrapper.indexOf("`", backtickIndex + 1);
+            atts.add(generateAttribute(wrapper.substring(backtickIndex + 1, nextBacktickIndex)));
+            backtickIndex = wrapper.indexOf("`", nextBacktickIndex + 1);
         }
         return atts;
     }
@@ -261,12 +251,6 @@ public class SourceService {
      * @param datasetId The ID of the dataset to delete.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
-        // Delete rdf file (/jenaFiles)
-        try {
-            Files.delete(Path.of(appConfig.getJenaPath() + "\\" + getDatasetById(datasetId).getLocalGraph().getGraphName() + ".rdf"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         // Call the projectService to delete the dataset from the specified project
         projectService.deleteDatasetFromProject(projectId, datasetId);
     }
@@ -703,12 +687,6 @@ public class SourceService {
     public boolean uploadToDataLayer(Dataset dataset) {
         DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
         return dlInterface.uploadToDataLayer(dataset);
-    }
-
-    public void deleteDatasetFromDataLayer(String id) {
-        Dataset datasetToDelete = getDatasetById(id);
-        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-        dlInterface.deleteDataset(datasetToDelete.getUUID());
     }
 }
 

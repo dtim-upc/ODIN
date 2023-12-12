@@ -111,4 +111,11 @@ public abstract class DataLayer {
     public abstract ResultSet executeQuery(String sql, Dataset[] datasets) throws SQLException;
 
     public abstract void close() throws SQLException;
+
+    // Only for testing the data that is uploaded
+    public void show(Dataset d) {
+        String parquetPath = dataStorePath + "\\landingZone\\" + d.getUUID();
+        org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(parquetPath);
+        df.show();
+    }
 }

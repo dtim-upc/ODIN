@@ -32,7 +32,7 @@ public class DLDuckDB extends DataLayer {
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) throws SQLException {
-        String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
+        String parquetPath = dataStorePath + "\\landingZone\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         stmt.execute("CREATE TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");

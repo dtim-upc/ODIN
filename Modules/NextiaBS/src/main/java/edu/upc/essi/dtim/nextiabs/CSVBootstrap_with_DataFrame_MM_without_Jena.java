@@ -50,7 +50,6 @@ public class CSVBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 	@Override
 	public Graph bootstrapSchema(Boolean generateMetadata) throws IOException {
 		G_target = CoreGraphFactory.createGraphInstance("local");
-		this.id = id;
 //		setPrefixes();
 
 		BufferedReader br = new BufferedReader(new FileReader(path));
@@ -60,16 +59,14 @@ public class CSVBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 		G_target.addTripleLiteral(createIRI(name), RDFS.label, name);
 		parser.getHeaderNames().forEach(h -> {
 			String h2 = h.replace("\"", "").trim();
-//			System.out.println(h2);
 			G_target.addTriple(createIRI(h2),RDF.type,DataFrame_MM.Data);
 			G_target.addTripleLiteral(createIRI(h2), RDFS.label,h2 );
 			G_target.addTriple(createIRI(name),DataFrame_MM.hasData,createIRI(h2));
 			G_target.addTriple(createIRI(h2),DataFrame_MM.hasDataType,DataFrame_MM.String);
-
 		});
 
-		String select =  parser.getHeaderNames().stream().map(a ->{ return  "`" + a + "` AS `" + a.replace(".","_") + "`"; }).collect(Collectors.joining(","));
-		wrapper = "SELECT " + select  + " FROM `" + name + "`";
+		String select =  parser.getHeaderNames().stream().map(a ->  a + " AS `" + a.replace(".","_") + "`").collect(Collectors.joining(", "));
+		wrapper = "SELECT " + select  + " FROM " + name;
 
 		//TODO: implement metadata
 //		if(generateMetadata)
@@ -97,7 +94,6 @@ public class CSVBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		String pathcsv = "src/main/resources/artworks.csv";
 		CSVBootstrap_with_DataFrame_MM_without_Jena csv = new CSVBootstrap_with_DataFrame_MM_without_Jena("12","artworks", pathcsv);
 		Graph m =csv.bootstrapSchema(true);

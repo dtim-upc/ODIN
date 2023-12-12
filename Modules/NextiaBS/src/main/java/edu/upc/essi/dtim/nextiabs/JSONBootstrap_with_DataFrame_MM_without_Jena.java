@@ -75,14 +75,19 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
         //productionRules_JSON_to_RDFS();
 
         String SELECT = attributesSWJ.entrySet().stream().map( p -> {
-            if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath();
-            return  p.getValue().getPath() + " AS " + p.getValue().getLabel();
-        }).collect(Collectors.joining(","));
+//            System.out.println(p.getKey() + " ----- " + p.getValue().getKey() + " ----- " + p.getValue().getPath());
+            if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath() + " AS `" + p.getKey() + "`";
+            return  p.getValue().getPath() + " AS `" + p.getValue().getLabel() + "`";
+        }).collect(Collectors.joining(", "));
 
-        String FROM = name;
-        String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
+
+//        System.out.println(" -------------------- ");
+//        for (Pair<String, String> s: lateralViews) {
+//            System.out.println(s.getLeft() + " ---- " + s.getRight());
+//        }
+
+        String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode(" + p.getLeft() + ") AS " + p.getRight()).collect(Collectors.joining("\n"));
         wrapper = "SELECT " + SELECT + " FROM " + name + " " + LATERAL;
-        System.out.println(wrapper);
 
         //generateMetadata();
 
@@ -98,7 +103,7 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
     @Override
     public void generateMetadata() {
         String ds = DataSourceVocabulary.DataSource.getURI() +"/" + name;
-        if (!id.equals("")){
+        if (!id.isEmpty()){
             ds = DataSourceVocabulary.DataSource.getURI() +"/" + id;
             G_target.addTripleLiteral( ds , DataSourceVocabulary.HAS_ID.getURI(), id);
         }
@@ -154,7 +159,7 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
             }
             G_source.addTriple(iri_u_prime,DataFrame_MM.hasData,iri_k);
             String path_tmp = p.getPath() +"."+k;
-            if(p.getPath().equals(""))
+            if(p.getPath().isEmpty())
                 path_tmp = k;
 
             DataType(v, new JSON_Aux(k, k_prime, path_tmp) );
@@ -189,7 +194,7 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
 //		G_source.add(createIRI(u_prime),JSON_MM.hasMember,createIRI(p));
     }
 
-    private void Primitive (JsonValue D, JSON_Aux p) {
+    private void Primitive(JsonValue D, JSON_Aux p) {
         resourcesLabelSWJ.add(p.getLabel());
         if (D.getValueType() == JsonValue.ValueType.NUMBER) {
             G_source.addTriple(createIRI(p.getLabel()),DataFrame_MM.hasDataType,DataFrame_MM.Number);
@@ -389,7 +394,6 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
         else if (dataset instanceof JsonDataset) {
             path = ((JsonDataset) dataset).getPath();
         }
-        System.out.println("PATHHHHHHHHHH " + path);
         JSONBootstrap_with_DataFrame_MM_without_Jena json = new JSONBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), path);
 
         try {
