@@ -43,7 +43,7 @@ Before you begin, ensure that you have the following prerequisites installed:
 
 - [Node.js](https://nodejs.org/) (version >=12.22.1)
 - [NPM](https://docs.npmjs.com/cli/v8/commands/npm-install) (version >=6.14.12)
-- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) You can install it using `npm install -g yarn`
+- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) You can install it using `npm install -g yarn` (or on a macOS install it using Homebrew using `brew install yarn`)
 - [Quasar](https://quasar.dev/) (CLI >= 2.0) You can install it using `npm install -g @quasar/cli`
 - [Gradle](https://gradle.org/) (version >=6.8)
 - [Java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html) (version 11)
@@ -77,9 +77,9 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
 
 2. Execute `npm install`.
 
-3. Then, execute `yarn install`.
+3. Then, execute `yarn install` (on macOS it is possible you need to run `yarn install --ignore-engines`).
 
-4. Finally, execute `quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
+4. Finally, execute `quasar dev` (or on a macOS do it from the `node_modules` directory using `node_modules/@quasar/app-vite/bin/quasar dev`. This will open your browser with the URL http://localhost:9000/#/projects.
 
 _Note: that you must have Quasar CLI as it's mentioned in the Prerequisites section. If there's an error like `Global Quasar CLI • ⚠️   Error  Unknown command "dev"`, it's because you are not in the correct path, or you don't have Quasar CLI installed._ 
 
