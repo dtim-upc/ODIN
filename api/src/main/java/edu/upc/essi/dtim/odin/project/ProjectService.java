@@ -50,11 +50,6 @@ public class ProjectService {
         // Retrieve the project with the given ID
         Project project = getProjectById(projectId);
 
-        // Check if the project is found and throw an IllegalArgumentException if the project is not found
-        if (project == null) {
-            throw new IllegalArgumentException("Project not found");
-        }
-
         // Get the list of data repositories associated with the project
         List<DataRepository> repositoriesOfProject = project.getRepositories();
         boolean datasetFound = false;
@@ -68,10 +63,6 @@ public class ProjectService {
 
                 // Check if the dataset ID matches the specified dataset ID
                 if (datasetId.equals(dataset.getId())) {
-                    // Remove from Data layer
-                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-                    dlInterface.deleteDataset(dataset.getUUID());
-
                     // Delete rdf file (/jenaFiles)
                     try {
                         Files.delete(Path.of(appConfig.getJenaPath() + "\\" + dataset.getLocalGraph().getGraphName() + ".rdf"));
@@ -163,6 +154,9 @@ public class ProjectService {
     public Project getProjectById(String projectId) {
         // Retrieve the project with the specified ID from the ORM store
         Project project = ormProject.findById(Project.class, projectId);
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found with projectId: " + projectId);
+        }
 
         // Check if the project has an integrated graph
         try {
@@ -259,10 +253,7 @@ public class ProjectService {
      * @return A list of datasets belonging to the project.
      */
     public List<Dataset> getDatasetsOfProject(String id) {
-        // Retrieve the project by its ID from the database
-        Project project = ormProject.findById(Project.class, id);
-
-        // Create a list to store the datasets associated with the project
+        Project project = getProjectById(id);
         List<Dataset> datasets = new ArrayList<>();
 
         // Iterate through the repositories in the project and collect their datasets
@@ -270,7 +261,7 @@ public class ProjectService {
             datasets.addAll(repository.getDatasets());
         }
 
-        return datasets; // Return the list of datasets associated with the project
+        return datasets;
     }
 
     /**
@@ -372,25 +363,12 @@ public class ProjectService {
      * Adds a data repository to a project.
      *
      * @param projectId    The ID of the project to which the repository should be added.
-     * @param repositoryId The ID of the repository to be added.
+     * @param repository   Repository to be added
      * @throws IllegalArgumentException If the project with the given ID is not found.
      */
-    public void addRepositoryToProject(String projectId, String repositoryId) {
-        // Retrieve the project with the given ID
+    public void addRepositoryToProject(String projectId, DataRepository repository) {
         Project project = getProjectById(projectId);
-
-        // If the project is not found, throw an exception
-        if (project == null) {
-            throw new IllegalArgumentException("Project not found");
-        }
-
-        // Retrieve the data repository by its ID
-        DataRepository dataRepository = ormProject.findById(DataRepository.class, repositoryId);
-
-        // Add the data repository to the project's list of repositories
-        project.getRepositories().add(dataRepository);
-
-        // Save the project to persist the changes
+        project.getRepositories().add(repository);
         saveProject(project);
     }
 
@@ -401,10 +379,7 @@ public class ProjectService {
      * @return A list of DataRepository objects belonging to the project.
      */
     public List<DataRepository> getRepositoriesOfProject(String id) {
-        // Find the project by its ID
-        Project project = ormProject.findById(Project.class, id);
-
-        // Return the list of data repositories associated with the project
+        Project project = getProjectById(id);
         return project.getRepositories();
     }
 
@@ -416,10 +391,7 @@ public class ProjectService {
      * @return true if the schema was set successfully, false otherwise.
      */
     public boolean setDatasetSchemaAsProjectSchema(String projectID, String datasetID) {
-        // Retrieve the project by its ID
         Project project = getProjectById(projectID);
-
-        // Retrieve the dataset by its ID
         Dataset dataset = ormProject.findById(Dataset.class, datasetID);
 
         if (project != null && dataset != null) {
@@ -439,62 +411,58 @@ public class ProjectService {
     }
 
     public Project addIntegratedDataset(String projectID, String datasetID) {
-        // 1. Recupera el proyecto por su ID
-        Project project = getProjectById(projectID);
 
+        Project project = getProjectById(projectID);
         if (project != null) {
-            // 2. Comprueba si el dataset ya está en la lista de datasets integrados del proyecto
+            // Check if the dataset has already been integrated in the project
             List<Dataset> integratedDatasets = project.getIntegratedDatasets();
             if (isDatasetIntegrated(integratedDatasets, datasetID)) {
                 return project;
             } else {
-                // 3. Recupera el dataset por su ID
-                Dataset dataset = ormProject.findById(Dataset.class, datasetID);
 
+                Dataset dataset = ormProject.findById(Dataset.class, datasetID);
                 if (dataset != null) {
-                    // 4. Agrega el nuevo dataset a la lista de datasets integrados
+                    // Add the new dataset to the list of integrated datasets
                     integratedDatasets.add(dataset);
 
-                    // 5. Actualiza la lista de datasets integrados en el proyecto
+                    // Update the list of integrated datasets in the project
                     project.setIntegratedDatasets(integratedDatasets);
 
-                    // 6. Guarda el proyecto para persistir los cambios
+                    // Store the project to persist the changes
                     return saveProject(project);
                 }
             }
         }
-        return null; // Proyecto no encontrado o dataset no encontrado
+        return null; // Project/dataset not found
     }
 
     public Project addTemporalIntegratedDataset(String projectID, String datasetID) {
-        // 1. Recupera el proyecto por su ID
-        Project project = getProjectById(projectID);
 
+        Project project = getProjectById(projectID);
         if (project != null) {
-            // 2. Comprueba si el dataset ya está en la lista de datasets integrados del proyecto
+            // Check if the dataset has already been integrated in the project
             List<Dataset> temporalIntegratedDatasets = project.getTemporalIntegratedDatasets();
             if (isDatasetIntegrated(temporalIntegratedDatasets, datasetID)) {
                 return project;
             } else {
-                // 3. Recupera el dataset por su ID
-                Dataset dataset = ormProject.findById(Dataset.class, datasetID);
 
+                Dataset dataset = ormProject.findById(Dataset.class, datasetID);
                 if (dataset != null) {
-                    // 4. Agrega el nuevo dataset a la lista de datasets integrados
+                    // Add the new dataset to the list of integrated datasets
                     temporalIntegratedDatasets.add(dataset);
 
-                    // 5. Actualiza la lista de datasets integrados en el proyecto
+                    // Update the list of integrated datasets in the project
                     project.setTemporalIntegratedDatasets(temporalIntegratedDatasets);
 
-                    // 6. Guarda el proyecto para persistir los cambios
+                    // Store the project to persist the changes
                     return saveProject(project);
                 }
             }
         }
-        return null; // Proyecto no encontrado o dataset no encontrado
+        return null; // Project/dataset not found
     }
 
-    // Función auxiliar para comprobar si un dataset ya está integrado en un proyecto
+    // Auxiliary function to check if a dataset has already been integrated
     private boolean isDatasetIntegrated(List<Dataset> integratedDatasets, String datasetID) {
         for (Dataset integratedDataset : integratedDatasets) {
             if (integratedDataset.getId().equals(datasetID)) {
@@ -504,17 +472,10 @@ public class ProjectService {
         return false;
     }
 
-    public Project deleteIntegratedDatasets(String projectID) {
-        // 1. Recupera el proyecto por su ID
+    public void deleteIntegratedDatasets(String projectID) {
         Project project = getProjectById(projectID);
-
-        if (project != null) {
-            project.setIntegratedDatasets(new ArrayList<>());
-            System.out.println(project.getIntegratedDatasets());
-            System.out.println("+++++++++++++++++++++++ELIMINADOS EXTERMINADOSSSSS");
-            return saveProject(project);
-        }
-        return null; // Proyecto no encontrado o dataset no encontrado
+        project.setIntegratedDatasets(new ArrayList<>());
+        saveProject(project);
     }
 }
 

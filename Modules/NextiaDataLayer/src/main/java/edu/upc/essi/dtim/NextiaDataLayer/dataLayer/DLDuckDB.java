@@ -26,20 +26,20 @@ public class DLDuckDB extends DataLayer {
     private Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
         Class.forName("org.duckdb.DuckDBDriver");
         // Create directory if it does not exist
-        Files.createDirectories(Paths.get(dataStorePath + "\\DuckDBDataLake"));
-        return DriverManager.getConnection("jdbc:duckdb:" + dataStorePath + "\\DuckDBDataLake\\database");
+        Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake"));
+        return DriverManager.getConnection("jdbc:duckdb:" + dataStorePath + "DuckDBDataLake\\database");
     }
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) throws SQLException {
-        String parquetPath = dataStorePath + "\\landingZone\\" + d.getUUID();
+        String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         stmt.execute("CREATE TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
     }
 
     public void uploadToTemporalFormattedZone(Dataset d, String tableName) throws SQLException {
-        String parquetPath = dataStorePath + "\\tmp\\" + d.getUUID();
+        String parquetPath = dataStorePath + "tmp\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         stmt.execute("CREATE TEMP TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
@@ -113,6 +113,6 @@ public class DLDuckDB extends DataLayer {
         stmt.close();
         conn.close();
         // Remove all the files in the temporal zone (/tmp)
-        deleteFilesFromDirectory(dataStorePath + "\\tmp");
+        deleteFilesFromDirectory(dataStorePath + "tmp");
     }
 }

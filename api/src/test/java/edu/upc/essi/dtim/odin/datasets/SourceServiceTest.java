@@ -1,20 +1,4 @@
-package edu.upc.essi.dtim.odin.bootstrapping;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
-import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.project.ProjectService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
+package edu.upc.essi.dtim.odin.datasets;
 
 public class SourceServiceTest {
 //

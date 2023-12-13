@@ -12,7 +12,7 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleIm
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
-import edu.upc.essi.dtim.odin.bootstrapping.SourceService;
+import edu.upc.essi.dtim.odin.datasets.DatasetService;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationData;
 import edu.upc.essi.dtim.odin.integration.pojos.JoinAlignment;
@@ -22,7 +22,6 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleInterface;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
-import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -397,11 +396,11 @@ public class IntegrationService {
     }
 
     public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
-        SourceService sourceService = new SourceService(appConfig, projectService, new RepositoryService(appConfig, projectService));
+        DatasetService datasetService = new DatasetService(appConfig, projectService);
         Project project = getProject(projectId);
 
-        Dataset datasetB = sourceService.getDatasetById(datasetId);
-        Dataset datasetA = sourceService.getDatasetById(project.getIntegratedDatasets().get(0).getId());
+        Dataset datasetB = datasetService.getDatasetById(datasetId);
+        Dataset datasetA = datasetService.getDatasetById(project.getIntegratedDatasets().get(0).getId());
 
         Graph graphA = project.getIntegratedGraph();
 

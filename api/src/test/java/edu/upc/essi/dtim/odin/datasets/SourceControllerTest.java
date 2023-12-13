@@ -1,26 +1,4 @@
-package edu.upc.essi.dtim.odin.bootstrapping;
-
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
-import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-
-import static org.mockito.Mockito.*;
-
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
+package edu.upc.essi.dtim.odin.datasets;
 
 public class SourceControllerTest {
 //

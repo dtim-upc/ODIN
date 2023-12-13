@@ -9,7 +9,7 @@ public class TableInfo {
         this.name = name;
     }
 
-    private String name;  // Nombre de la tabla
+    private String name;
 
     public String getSize() {
         return size;
@@ -30,9 +30,6 @@ public class TableInfo {
     private String size;    // Tamaño de la tabla (puedes cambiar el tipo de dato según tus necesidades)
     private String otherInfo;  // Otra información relevante
 
-    // Constructores, getters y setters
-
-    // Constructor principal
     public TableInfo(String name, String size, String otherInfo) {
         this.name = name;
         this.size = size;

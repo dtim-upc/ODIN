@@ -26,7 +26,7 @@ public class OdinApplication {
         // Initialize Spring Boot application
         SpringApplication.run(OdinApplication.class, args);
 
-        // Initialize data layer
+        // Initialize data layer (do not remove this line)
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
 
         logger.info("Application started. Ready to receive API requests.");

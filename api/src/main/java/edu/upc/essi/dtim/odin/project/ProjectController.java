@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.project;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ public class ProjectController {
     /**
      * Constructs a new ProjectController with the specified ProjectService.
      *
-     * @param projectService The ProjectService to be used.
      * @param projectService The ProjectService to be used.
      */
     ProjectController(@Autowired ProjectService projectService) {
@@ -126,25 +126,22 @@ public class ProjectController {
     /**
      * Clones a project by its ID.
      *
-     * @param id The ID of the project to clone.
+     * @param projectId The ID of the project to clone.
      * @return A ResponseEntity containing the cloned project and HTTP status 201 (Created) if successful,
      * or HTTP status 304 (Not Modified) if the project was not cloned.
      */
-    @PostMapping("/cloneProject/{id}")
-    public ResponseEntity<Project> cloneProject(@PathVariable("id") String id) {
-        logger.info("CLONE request received for cloning project with ID: {}", id);
+    @PostMapping("/cloneProject/{projectId}")
+    public ResponseEntity<Project> cloneProject(@PathVariable("id") String projectId) {
+        logger.info("Clone request received for cloning project with id: " +  projectId);
 
         // Call the projectService to clone the project and get the result
-        Project projectToClone = projectService.getProjectById(id);
+        Project projectToClone = projectService.getProjectById(projectId);
         Project projectClone = projectService.cloneProject(projectToClone);
 
-        // Check if the project was cloned successfully
-        if (!projectClone.getProjectId().equals(id)) {
-            // Return a ResponseEntity with HTTP status 201 (Created)
-            return new ResponseEntity<>(projectClone, HttpStatus.CREATED);
+        if (!projectClone.getProjectId().equals(projectId)) {
+            return new ResponseEntity<>(projectClone, HttpStatus.CREATED); // HTTP status 201 (Created)
         } else {
-            // Return a ResponseEntity with HTTP status 304 (Not Modified)
-            return new ResponseEntity<>(null, HttpStatus.NOT_MODIFIED);
+            return new ResponseEntity<>(null, HttpStatus.NOT_MODIFIED); // HTTP status 304 (Not Modified)
         }
     }
 
@@ -160,10 +157,6 @@ public class ProjectController {
     ) {
         Project project = projectService.getProjectById(projectID);
 
-        if (project == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         Model model = project.getIntegratedGraph().getGraph();
         StringWriter writer = new StringWriter();
         model.write(writer, "TTL");
@@ -177,5 +170,28 @@ public class ProjectController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("text/turtle"))
                 .body(resource);
+    }
+
+    /**
+     * Get the repositories associated with a specific project.
+     *
+     * @param projectId The ID of the project.
+     * @return A ResponseEntity containing the list of repositories if found, or a 404 response if not found.
+     */
+    @GetMapping("/projects/{id}/repositories")
+    public ResponseEntity<List<DataRepository>> getRepositoriesOfProject(@PathVariable("id") String projectId) {
+        logger.info("GET request received for retrieving repositories of project " + projectId);
+
+        // Call the service to retrieve repositories associated with the project
+        List<DataRepository> repositoriesOfProject = projectService.getRepositoriesOfProject(projectId);
+
+        // Check if repositories were found
+        if (!repositoriesOfProject.isEmpty()) {
+            // Return a successful response with the list of repositories
+            return ResponseEntity.ok(repositoriesOfProject);
+        } else {
+            // Return a 404 response if no repositories were found
+            return ResponseEntity.notFound().build();
+        }
     }
 }

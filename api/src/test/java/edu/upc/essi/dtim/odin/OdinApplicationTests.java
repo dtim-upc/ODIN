@@ -1,13 +1,5 @@
 package edu.upc.essi.dtim.odin;
 
-import edu.upc.essi.dtim.odin.bootstrapping.SourceController;
-import edu.upc.essi.dtim.odin.bootstrapping.SourceService;
-import edu.upc.essi.dtim.odin.project.ProjectController;
-import edu.upc.essi.dtim.odin.project.ProjectService;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

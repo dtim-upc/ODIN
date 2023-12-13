@@ -1,7 +1,5 @@
-package edu.upc.essi.dtim.odin.bootstrapping;
+package edu.upc.essi.dtim.odin.datasets;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
@@ -25,40 +23,21 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
-import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Attr;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.sql.*;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-
 
 /**
  * The service class for managing datasources in a project.
  */
 @Service
-public class SourceService {
-    /**
-     * The dependency on the ProjectService class.
-     */
+public class DatasetService {
     private final ProjectService projectService;
-    private final RepositoryService repositoryService;
     /**
      * The AppConfig dependency for accessing application configuration.
      */
@@ -74,12 +53,10 @@ public class SourceService {
      * @param appConfig      The AppConfig dependency for accessing application configuration.
      * @param projectService The ProjectService dependency.
      */
-    public SourceService(@Autowired AppConfig appConfig,
-                         @Autowired ProjectService projectService,
-                         @Autowired RepositoryService repositoryService) {
+    public DatasetService(@Autowired AppConfig appConfig,
+                          @Autowired ProjectService projectService) {
         this.appConfig = appConfig;
         this.projectService = projectService;
-        this.repositoryService = repositoryService;
         try {
             this.ormDataResource = ORMStoreFactory.getInstance();
         } catch (Exception e) {
@@ -90,9 +67,10 @@ public class SourceService {
     /**
      * Stores a multipart file in the specified disk path with a modified filename and returns the absolute path of the file.
      *
-     * @param multipartFile The multipart file to store.
-     * @return The absolute path of the stored file.
-     * @throws RuntimeException if the file is empty or an error occurs during the file storage process.
+     * @param multipartFile     The multipart file to store.
+     * @param newFileDirectory  Directory of the new file
+     * @return                  The absolute path of the stored file.
+     * @throws RuntimeException If the file is empty or an error occurs during the file storage process.
      */
     public String storeTemporalFile(MultipartFile multipartFile, String newFileDirectory) {
         DataLayerInterface dataLayerInterFace = new DataLayerImpl(appConfig);
@@ -105,14 +83,16 @@ public class SourceService {
      * @param filePath           The path of the file to extract data from.
      * @param datasetName        The name of the dataset.
      * @param datasetDescription The description of the dataset.
+     * @param repository         The repository the dataset belongs to.
+     * @param endpoint           The endpoint of the URL used to get the data (when coming from an API).
+     * @param format             Format used by the data, which will define the dataset that we create.
      * @return A Dataset object with the extracted data.
      * @throws IllegalArgumentException if the file format is not supported.
      */
     public Dataset generateDataset(String filePath, String datasetName, String datasetDescription, DataRepository repository, String endpoint, String format) {
         Dataset dataset;
 
-        // Create a new dataset object with the extracted data based on the format
-        switch (format) {
+        switch (format) { // Create a new dataset object with the extracted data based on the format
             case "csv":
                 dataset = new CsvDataset(null, datasetName, datasetDescription, filePath);
                 break;
@@ -133,8 +113,7 @@ public class SourceService {
             case "parquet":
                 dataset = new ParquetDataset(null, datasetName, datasetDescription, filePath);
                 break;
-            default:
-                // Throw an exception for unsupported file formats
+            default: // Throw an exception for unsupported file formats
                 throw new IllegalArgumentException("Unsupported file format: " + format);
         }
 
@@ -142,21 +121,32 @@ public class SourceService {
         return dataset;
     }
 
-    private Attribute generateAttribute(String att) {
-        return new Attribute(att, "string");
-    }
-
+    /**
+     * Extracts the attributes of the dataset from the wrapper. This needs to be done, as the wrapper dictates which
+     * are the attributes of the dataset.
+     *
+     * @param wrapper wrapper obtained from the bootstrapping process of the dataset
+     * @return A Dataset object with the extracted data.
+     * @throws IllegalArgumentException if the file format is not supported.
+     */
     public List<Attribute> getAttributesFromWrapper(String wrapper) {
-        List<Attribute> atts = new ArrayList<>();
+        List<Attribute> attributes = new ArrayList<>();
         int backtickIndex = wrapper.indexOf("`");
         while (backtickIndex != -1) {
             int nextBacktickIndex = wrapper.indexOf("`", backtickIndex + 1);
-            atts.add(generateAttribute(wrapper.substring(backtickIndex + 1, nextBacktickIndex)));
+            attributes.add(generateAttribute(wrapper.substring(backtickIndex + 1, nextBacktickIndex)));
             backtickIndex = wrapper.indexOf("`", nextBacktickIndex + 1);
         }
-        return atts;
+        return attributes;
     }
 
+    private Attribute generateAttribute(String attributeName) {
+        return new Attribute(attributeName, "string");
+    }
+
+    /**
+     * Generates a universal unique identifier for the dataset
+     */
     public String generateUUID() {
         // Generate a random 16-character string as part of the filename
         final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -179,26 +169,18 @@ public class SourceService {
      */
     public BootstrapResult bootstrapDataset(Dataset dataset) {
         try {
-            // Create an instance of the bsModuleImpl class that implements the bsModuleInterface
             bsModuleInterface bsInterface = new bsModuleImpl();
-
-            // Use the bsInterface to convert the dataset to a Graph object
             return bsInterface.bootstrapDataset(dataset);
         } catch (UnsupportedOperationException e) {
-            // Throw an exception if the dataset type is not supported or an error occurs during the transformation
             throw new UnsupportedOperationException("Dataset type not supported. Something went wrong during the bootstrap process generating the schema.");
         }
     }
 
     public Graph bootstrapDatasetG(Dataset dataset) {
         try {
-            // Create an instance of the bsModuleImpl class that implements the bsModuleInterface
             bsModuleInterface bsInterface = new bsModuleImpl();
-
-            // Use the bsInterface to convert the dataset to a Graph object
             return bsInterface.bootstrapGraph(dataset);
         } catch (UnsupportedOperationException e) {
-            // Throw an exception if the dataset type is not supported or an error occurs during the transformation
             throw new UnsupportedOperationException("Dataset type not supported. Something went wrong during the bootstrap process generating the schema.");
         }
     }
@@ -210,10 +192,7 @@ public class SourceService {
      * @return A String representing the visual schema of the Graph.
      */
     public String generateVisualSchema(Graph graph) {
-        // Create an instance of the nextiaGraphyModuleImpl class that implements the nextiaGraphyModuleInterface
         nextiaGraphyModuleInterface visualLibInterface = new nextiaGraphyModuleImpl();
-
-        // Use the visualLibInterface to generate a visual representation of the Graph
         return visualLibInterface.generateVisualGraph(graph);
     }
 
@@ -221,27 +200,18 @@ public class SourceService {
      * Saves a Graph object to the database using a GraphStoreInterface.
      *
      * @param graph The Graph object to save.
-     * @return A boolean indicating whether the saving operation was successful.
      * @throws RuntimeException if an error occurs during the graph storage process.
      */
-    public boolean saveGraphToDatabase(Graph graph) {
+    public void saveGraphToDatabase(Graph graph) {
         GraphStoreInterface graphStore;
         try {
-            // Get an instance of the GraphStoreInterface using the appConfig
             graphStore = GraphStoreFactory.getInstance(appConfig);
         } catch (Exception e) {
-            // Throw a runtime exception if an error occurs while getting the GraphStoreInterface
             throw new RuntimeException(e);
         }
 
-        // Ensure that the graphStore is not null
         assert graphStore != null;
-
-        // Save the Graph object to the database using the graphStore
-        graphStore.saveGraph(graph);
-
-        // Return true to indicate a successful saving operation
-        return true;
+        graphStore.saveGraph(graph); // Save the Graph object to the database
     }
 
     /**
@@ -250,8 +220,12 @@ public class SourceService {
      * @param projectId The ID of the project to delete the dataset from.
      * @param datasetId The ID of the dataset to delete.
      */
-    public void deleteDatasetFromProject(String projectId, String datasetId) {
-        // Call the projectService to delete the dataset from the specified project
+    public void deleteDataset(String projectId, String datasetId) {
+        Dataset dataset = getDatasetById(datasetId);
+        // Remove from Data layer
+        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+        dlInterface.deleteDataset(dataset.getUUID());
+        // Remove from project and remove the rdf file
         projectService.deleteDatasetFromProject(projectId, datasetId);
     }
 
@@ -262,7 +236,6 @@ public class SourceService {
      * @return The saved Dataset object.
      */
     public Dataset saveDataset(Dataset dataset) {
-        // Save the Dataset object using the ORMStoreInterface and return the saved Dataset object
         return ormDataResource.save(dataset);
     }
 
@@ -272,19 +245,7 @@ public class SourceService {
      * @return A list of Dataset objects.
      */
     public List<Dataset> getDatasets() {
-        // Retrieve all Dataset objects from the ORMStoreInterface and return them as a list
         return ormDataResource.getAll(Dataset.class);
-    }
-
-    /**
-     * Deletes a datasource from the ORMStoreInterface. NOT USED. When deleteDatasetFromProject(...) cascade all does this implicit.
-     *
-     * @param id The ID of the datasource to delete.
-     * @return A boolean indicating whether the deletion was successful.
-     */
-    public boolean deleteDatasource(String id) {
-        // Delete a datasource with the specified ID from the ORMStoreInterface (not used)
-        return ormDataResource.deleteOne(Dataset.class, id);
     }
 
     /**
@@ -295,7 +256,6 @@ public class SourceService {
      * @return A boolean indicating whether the project contains the dataset.
      */
     public boolean projectContains(String projectId, String id) {
-        // Use the ProjectService to check if the specified project contains the dataset with the given ID
         return projectService.projectContains(projectId, id);
     }
 
@@ -306,7 +266,6 @@ public class SourceService {
      * @return A list of Dataset objects associated with the project.
      */
     public List<Dataset> getDatasetsOfProject(String id) {
-        // Use the ProjectService to retrieve a list of Dataset objects associated with the specified project ID
         return projectService.getDatasetsOfProject(id);
     }
 
@@ -318,7 +277,6 @@ public class SourceService {
      * @return The updated Dataset object with the local graph set.
      */
     public Dataset setLocalGraphToDataset(Dataset savedDataset, Graph graph) {
-        // Create a new LocalGraphJenaImpl instance
         LocalGraphJenaImpl localGraph = CoreGraphFactory.createLocalGraph();
 
         // Set the graph name and graphical schema from the provided Graph object
@@ -329,7 +287,7 @@ public class SourceService {
         savedDataset.setLocalGraph(localGraph);
 
         // Save the updated Dataset and return it
-        return (Dataset) saveDataset(savedDataset);
+        return saveDataset(savedDataset);
     }
 
     /**
@@ -339,10 +297,12 @@ public class SourceService {
      * @return The found DataRepository or null if not found.
      */
     public DataRepository findRepositoryById(String repositoryId) {
-        // Find and return a DataRepository with the specified ID using the ORMStoreInterface
-        return ormDataResource.findById(DataRepository.class, repositoryId);
+        DataRepository repo = ormDataResource.findById(DataRepository.class, repositoryId);
+        if (repo == null) {
+            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
+        }
+        return repo;
     }
-
 
     /**
      * Adds a dataset to a DataRepository and updates the repository associations using the ORMStoreInterface.
@@ -353,18 +313,8 @@ public class SourceService {
      * @throws IllegalArgumentException If the repository or dataset is not found.
      */
     public DataRepository addDatasetToRepository(String datasetId, String repositoryId) throws IllegalArgumentException {
-        // Find the new repository and dataset by their respective IDs
         DataRepository newRepository = findRepositoryById(repositoryId);
         Dataset dataset = getDatasetById(datasetId);
-
-        // Check if the new repository and dataset were found
-        if (newRepository == null) {
-            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
-        }
-
-        if (dataset == null) {
-            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
-        }
 
         if (datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)) {
             // Remove the dataset from the old repository if it exists
@@ -378,19 +328,14 @@ public class SourceService {
 
             // Add the dataset to the new repository
             List<Dataset> newRepoDatasets = new ArrayList<>(newRepository.getDatasets());
-
             newRepoDatasets.add(dataset);
-
             newRepository.setDatasets(newRepoDatasets);
 
             // Save both repositories
-            DataRepository savedRepository = ormDataResource.save(newRepository);
-
-            return savedRepository;
+            return ormDataResource.save(newRepository);
         }
         return null;
     }
-
 
     /**
      * Finds a DataRepository that contains a specific dataset using the ORMStoreInterface.
@@ -402,12 +347,10 @@ public class SourceService {
         // Retrieve a list of all DataRepositories
         List<DataRepository> repositories = ormDataResource.getAll(DataRepository.class);
 
-        // Iterate through the repositories
-        for (DataRepository repository : repositories) {
+        for (DataRepository repository : repositories) { // Iterate through the repositories
             List<Dataset> datasets = repository.getDatasets();
 
-            // Iterate through the datasets in each repository
-            for (Dataset dataset : datasets) {
+            for (Dataset dataset : datasets) { // Iterate through the datasets in each repository
                 // Check if the dataset ID matches the specified datasetId
                 if (dataset.getId().equals(datasetId)) {
                     return repository; // Found the repository containing the dataset
@@ -418,18 +361,6 @@ public class SourceService {
         return null; // Dataset not found in any repository
     }
 
-
-    /**
-     * Adds a DataRepository to a specific project using the ORMStoreInterface and ProjectService.
-     *
-     * @param projectId    The ID of the project to which the repository will be added.
-     * @param repositoryId The ID of the DataRepository to be added to the project.
-     */
-    public void addRepositoryToProject(String projectId, String repositoryId) {
-        repositoryService.addRepositoryToProject(projectId, repositoryId);
-    }
-
-
     /**
      * Retrieves all DataRepositories associated with a specific project using the ProjectService.
      *
@@ -437,10 +368,8 @@ public class SourceService {
      * @return A list of DataRepository objects associated with the project.
      */
     public List<DataRepository> getRepositoriesOfProject(String id) {
-        // Call the ProjectService to retrieve all DataRepositories associated with the specified project
         return projectService.getRepositoriesOfProject(id);
     }
-
 
     /**
      * Edits a dataset's attributes in the database if any attribute has changed.
@@ -449,14 +378,12 @@ public class SourceService {
      * @return A boolean indicating whether the dataset was edited successfully.
      */
     public boolean editDataset(Dataset dataset) {
-        // Retrieve the original dataset from the database using its ID
         Dataset originalDataset = getDatasetById(dataset.getId());
         Dataset savedDS = null;
 
         // Check if any attribute has changed
         if (!dataset.getDatasetName().equals(originalDataset.getDatasetName())
                 || !dataset.getDatasetDescription().equals(originalDataset.getDatasetDescription())) {
-            // At least one attribute has changed
 
             // Update the attributes of the original dataset with the new values
             originalDataset.setDatasetName(dataset.getDatasetName());
@@ -466,56 +393,9 @@ public class SourceService {
             savedDS = saveDataset(originalDataset);
         }
 
-        if (savedDS.getId() != null) return true;
-
-        // No changes detected, return false
-        return false;
+        // return true if some change had been made, return false otherwise
+        return savedDS != null;
     }
-
-
-    /**
-     * Deletes a dataset from the list of datasets in a repository based on the dataset's ID.
-     *
-     * @param projectId The ID of the project to find the repository.
-     * @param datasetId The ID of the dataset to delete.
-     */
-    public void deleteDatasetFromRepo(String projectId, String datasetId) {
-        // Retrieve the project by its ID
-        Project project = projectService.getProjectById(projectId);
-
-        // Check if the project exists
-        if (project == null) {
-            throw new IllegalArgumentException("Project not found with projectId: " + projectId);
-        }
-
-        DataRepository targetRepository = null;
-
-        // Iterate through the repositories in the project
-        for (DataRepository repository : project.getRepositories()) {
-            // Iterate through the datasets in each repository
-            for (Dataset dataset : repository.getDatasets()) {
-                // Check if the dataset's ID matches the provided datasetId
-                if (dataset.getId().equals(datasetId)) {
-                    targetRepository = repository; // Store the repository containing the dataset
-                    break;
-                }
-            }
-            if (targetRepository != null) {
-                break; // Exit the loop once the target repository is found
-            }
-        }
-
-        if (targetRepository != null) {
-            // Remove the dataset from the target repository's list of datasets
-            List<Dataset> datasets = new ArrayList<>(targetRepository.getDatasets());
-            datasets.removeIf(dataset -> dataset.getId().equals(datasetId));
-            targetRepository.setDatasets(datasets);
-
-            // Save the updated repository to the database
-            ormDataResource.save(targetRepository);
-        }
-    }
-
 
     /**
      * Checks if a project has an integrated graph assigned.
@@ -524,18 +404,9 @@ public class SourceService {
      * @return A boolean indicating whether the project has an integrated graph assigned.
      */
     public boolean projectHasIntegratedGraph(String projectId) {
-        // Retrieve the project with the given ID
         Project project = projectService.getProjectById(projectId);
-
-        // If the project is not found, throw an exception
-        if (project == null) {
-            throw new IllegalArgumentException("Project not found");
-        }
-
-        // Check if the project has an integrated graph assigned
         return project.getIntegratedGraph() != null;
     }
-
 
     /**
      * Assigns the schema of a dataset to the integrated graph of a project.
@@ -544,21 +415,8 @@ public class SourceService {
      * @param datasetId The ID of the dataset whose schema is assigned to the project.
      */
     public void setProjectSchemasBase(String projectId, String datasetId) {
-        // Retrieve the project with the given ID
         Project project = projectService.getProjectById(projectId);
-
-        // If the project is not found, throw an exception
-        if (project == null) {
-            throw new IllegalArgumentException("Project not found");
-        }
-
-        // Find the dataset with the given datasetId
         Dataset dataset = getDatasetById(datasetId);
-
-        // If the dataset is not found in the project, throw an exception
-        if (dataset == null) {
-            throw new IllegalArgumentException("Dataset not found in the project");
-        }
 
         // Assign the schema of the dataset to the project's integrated graph
         try {
@@ -578,7 +436,6 @@ public class SourceService {
         }
     }
 
-
     /**
      * Retrieves a dataset by its unique identifier and returns it with its associated graph.
      *
@@ -588,6 +445,9 @@ public class SourceService {
     public Dataset getDatasetById(String datasetId) {
         // Retrieve the dataset by its unique identifier
         Dataset dataset = ormDataResource.findById(Dataset.class, datasetId);
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
+        }
 
         // Retrieve the content of the graph associated with the dataset
         GraphStoreInterface graphStore;
@@ -608,52 +468,30 @@ public class SourceService {
         return dataset;
     }
 
-    public Project addIntegratedDataset(String projectID, String datasetID) {
-        return projectService.addIntegratedDataset(projectID, datasetID);
+    public void addIntegratedDataset(String projectID, String datasetID) {
+        projectService.addIntegratedDataset(projectID, datasetID);
     }
 
-    public Project deleteIntegratedDatasets(String projectID) {
-        return projectService.deleteIntegratedDatasets(projectID);
+    public void deleteIntegratedDatasets(String projectID) {
+        projectService.deleteIntegratedDatasets(projectID);
     }
 
     public Dataset addRepositoryToDataset(String datasetId, String repositoryId) {
-        // Find the new repository and dataset by their respective IDs
         DataRepository newRepository = findRepositoryById(repositoryId);
         Dataset dataset = getDatasetById(datasetId);
-
-        // Check if the new repository and dataset were found
-        if (newRepository == null) {
-            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
-        }
-
-        if (dataset == null) {
-            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
-        }
 
         if (datasetIsTypeOfRepositoryRestriction(datasetId, repositoryId)) {
             dataset.setRepository(newRepository);
 
             // Save both repositories
-            Dataset savedDataset = saveDataset(dataset);
-
-            return savedDataset;
+            return saveDataset(dataset);
         }
         return null;
     }
 
     private boolean datasetIsTypeOfRepositoryRestriction(String datasetId, String repositoryId) {
-        // Find the new repository and dataset by their respective IDs
         DataRepository repository = findRepositoryById(repositoryId);
         Dataset dataset = getDatasetById(datasetId);
-
-        // Check if the new repository and dataset were found
-        if (repository == null) {
-            throw new IllegalArgumentException("Repository not found with repositoryId: " + repositoryId);
-        }
-
-        if (dataset == null) {
-            throw new IllegalArgumentException("Dataset not found with datasetId: " + datasetId);
-        }
 
         // Check if the dataset type matches the repository type
         if (repository instanceof RelationalJDBCRepository && dataset instanceof SQLDataset) {
@@ -674,14 +512,6 @@ public class SourceService {
         } else {
             return false; // Incompatible dataset and repository types
         }
-    }
-
-    public Dataset setWrapperToDataset(String datasetId, String wrapper) {
-        Dataset dataset = getDatasetById(datasetId);
-        dataset.setWrapper(wrapper);
-
-        // Save the updated Dataset and return it
-        return saveDataset(dataset);
     }
 
     public boolean uploadToDataLayer(Dataset dataset) {

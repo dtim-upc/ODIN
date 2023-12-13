@@ -30,91 +30,48 @@ public class RepositoryController {
         this.repositoryService = repositoryService;
     }
 
-    /**
-     * Get the repositories associated with a specific project.
-     *
-     * @param projectId The ID of the project.
-     * @return A ResponseEntity containing the list of repositories if found, or a 404 response if not found.
-     */
-    @GetMapping("/projects/{id}/repositories")
-    public ResponseEntity<List<DataRepository>> getRepositoriesOfProject(@PathVariable("id") String projectId) {
-        logger.info("GET request received for retrieving repositories of project " + projectId);
-
-        // Call the service to retrieve repositories associated with the project
-        List<DataRepository> repositoriesOfProject = repositoryService.getRepositoriesOfProject(projectId);
-
-        // Check if repositories were found
-        if (!repositoriesOfProject.isEmpty()) {
-            // Return a successful response with the list of repositories
-            return ResponseEntity.ok(repositoriesOfProject);
-        } else {
-            // Return a 404 response if no repositories were found
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @PostMapping("/test-connection")
     public Boolean testConnection(@RequestBody Map<String, String> requestData) {
-        // Extract data from the request body
         String url = requestData.get("url");
         String username = requestData.get("username");
         String password = requestData.get("password");
         String port = requestData.get("port");
         String hostname = requestData.get("hostname");
-        String databasename = requestData.get("databaseName");
+        String databaseName = requestData.get("databaseName");
         String databaseType = requestData.get("databaseType");
 
-        // Crear una URL de conexión personalizada con hostname, port y databasename
-        String customUrl = "jdbc:" + databaseType + "://" + hostname + ":" + port + "/" + databasename;
+        String customUrl = "jdbc:" + databaseType + "://" + hostname + ":" + port + "/" + databaseName;
 
         return repositoryService.testConnection(url, username, password) || repositoryService.testConnection(customUrl, username, password);
     }
 
     @GetMapping(value = "/{id}/tables")
     public ResponseEntity<Object> retrieveDBtables(@PathVariable("id") String repositoryId) {
-        logger.info("GET TABLES RECEIVED FOR REPOSITORY: " + repositoryId);
+        logger.info("Get tables received from repository: " + repositoryId);
 
         try {
-            List<String> tables = repositoryService.getDatabaseTables(repositoryId);
-
             List<TableInfo> table = repositoryService.getDatabaseTablesInfo(repositoryId);
 
-            // Devuelve los resultados como una respuesta JSON
-            return ResponseEntity.ok(table);
+            return ResponseEntity.ok(table); // Return the results as a JSON
         } catch (Exception e) {
-            // Maneja cualquier excepción que pueda ocurrir durante la consulta
+            // TODO: manage exceptions
             return ResponseEntity.status(500).body("");
         }
     }
 
     @PostMapping(value = "/project/{id}/newRepository")
     public ResponseEntity<Object> addRepository(@PathVariable("id") String projectId,
-                                                @RequestBody Map<String, String> requestData) {
+                                                @RequestBody Map<String, String> repositoryData) {
         try {
-            // Accede a los campos específicos del objeto JSON
-            String repositoryName = requestData.get("repositoryName");
-            String repositoryDescription = requestData.get("repositoryDescription");
-            String repositoryType = requestData.get("repositoryType");
-            Boolean isVirtual = Boolean.valueOf(requestData.get("isVirtual"));
+            logger.info("Post repository received for project " + projectId + " with repo name " + repositoryData.get("repositoryName") + " and type " + repositoryData.get("repositoryType"));
 
-            logger.info("POST REPOSITORY RECEIVED FOR " + projectId + " with repo name " + repositoryName + " and type " + repositoryType);
-            // Validate and authenticate access here
-            //future check when adding authentification
+            DataRepository repository = repositoryService.createRepository(repositoryData);
+            repositoryService.addRepositoryToProject(projectId, repository);
 
-            // Find/create repository
-            DataRepository repository;
-
-            // Create a new repository and add it to the project
-            repository = repositoryService.createRepository(repositoryName, repositoryType, isVirtual);
-            repository = repositoryService.addRepositoryParameters(repository.getId(), requestData);
-            repositoryService.addRepositoryToProject(projectId, repository.getId());
-
-            // Return success message
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>(null, HttpStatus.OK); // Return success message
         } catch (UnsupportedOperationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Repository not created successfully");
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
         }

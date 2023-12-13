@@ -18,69 +18,76 @@ import java.util.List;
 @RestController
 public class FormController {
     private static final Logger logger = LoggerFactory.getLogger(FormController.class);
+    // Complete path of the file that contains the templates of the repositories.
+    private static final String repositoryFormsPath = "api\\src\\main\\resources\\frontend-schemas\\RepositoryForms\\";
 
+    /**
+     * Retrieves the basic template of the repositories
+     *
+     * @return A String containing the template.
+     */
     @GetMapping("/formSchema")
     public String getFormSchema() {
-        logger.info("FORMSCHEMA ASKED");
+        logger.info("Formschema asked");
         try {
-            // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "api/src/main/resources/frontend-schemas/RepositoryForms/Template_Repository.json";
+            String filePath = repositoryFormsPath + "Template_Repository.json";
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {
                 byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
                 String formSchema = new String(bytes);
-                logger.info("FORMSCHEMA RETRIEVED");
+                logger.info("Formschema retrieved");
                 return formSchema;
             } else {
-                logger.error("FORMSCHEMA not found");
-                // El archivo no existe en la ubicación especificada.
-                return "El archivo no se encontró.";
+                logger.error("Formschema not found");
+                return "Field was not found";
             }
         } catch (Exception e) {
-            logger.error("FORMSCHEMA ERROR: " + e);
-            // Manejar errores apropiadamente
-            e.printStackTrace();
+            logger.error("Formschema error: " + e);
+            // TODO: manage errors appropiately
             return null;
         }
     }
 
+    /**
+     * Retrieves the template of a specific type of repository
+     *
+     * @param fileName Type of template to be retrieved.
+     * @return A String containing the template.
+     */
     @GetMapping("/formSchema/{fileName}")
     public String getConcreteFormSchema(@PathVariable("fileName") String fileName) {
-        logger.info("FORMSCHEMA ASKED: " + fileName);
+        logger.info("Formschema asked: " + fileName);
         try {
-            // Especifica la ruta completa al archivo en el sistema de archivos local.
-            String filePath = "api/src/main/resources/frontend-schemas/RepositoryForms/" + fileName;
+            String filePath = repositoryFormsPath + fileName;
             Resource resource = new FileSystemResource(filePath);
 
             if (resource.exists()) {
                 byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
                 String formSchema = new String(bytes);
-                logger.info("FORMSCHEMA RETRIEVED");
+                logger.info("Formschema retrieved");
                 return formSchema;
             } else {
-                logger.error("FORMSCHEMA not found");
-                // El archivo no existe en la ubicación especificada.
-                return "El archivo no se encontró.";
+                logger.error("Formschema not found");
+                return "File not found";
             }
         } catch (Exception e) {
-            logger.error("FORMSCHEMA ERROR: " + e);
-            // Manejar errores apropiadamente
-            e.printStackTrace();
+            logger.error("Formschema error: " + e);
+            // TODO: manage errors appropiately
             return null;
         }
     }
 
+    /**
+     * Retrieves all templates of all repositories
+     *
+     * @return A List<DataRepositoryTypeInfo> containing the different templates.
+     */
     @GetMapping("/api/data-repository-types")
     public List<DataRepositoryTypeInfo> getAllDataRepositoryTypes() {
-        return getAllDataRepositoryTypesService("api/src/main/resources/frontend-schemas/RepositoryForms");
-    }
-
-    public List<DataRepositoryTypeInfo> getAllDataRepositoryTypesService(String directoryPath) {
         List<DataRepositoryTypeInfo> dataRepositoryClasses = new ArrayList<>();
 
-        File directory = new File(directoryPath);
-        System.out.println(directoryPath);
+        File directory = new File(repositoryFormsPath);
 
         if (directory.isDirectory()) {
             File[] jsonFiles = directory.listFiles((dir, name) -> name.endsWith(".json"));
@@ -88,7 +95,6 @@ public class FormController {
             if (jsonFiles != null) {
                 for (File jsonFile : jsonFiles) {
                     String fileName = jsonFile.getName();
-                    System.out.println(fileName);
                     String displayName = fileName.replace("_", " ").replace(".json", "");
 
                     DataRepositoryTypeInfo dataRepositoryTypeInfo = new DataRepositoryTypeInfo(displayName, fileName);
@@ -99,4 +105,5 @@ public class FormController {
 
         return dataRepositoryClasses;
     }
+
 }

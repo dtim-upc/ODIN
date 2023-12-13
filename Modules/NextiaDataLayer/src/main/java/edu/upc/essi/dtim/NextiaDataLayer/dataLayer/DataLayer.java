@@ -35,16 +35,16 @@ public abstract class DataLayer {
 
     public void uploadToLandingZone(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
-        df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "\\landingZone\\" + d.getUUID());
+        df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "landingZone\\" + d.getUUID());
     }
 
     public void uploadToTemporalLandingZone(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
-        df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "\\tmp\\" + d.getUUID());
+        df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "tmp\\" + d.getUUID());
     }
 
     public void removeFromLandingZone(String UUID) {
-        deleteFilesFromDirectory(dataStorePath + "\\landingZone\\" + UUID);
+        deleteFilesFromDirectory(dataStorePath + "landingZone\\" + UUID);
     }
 
     protected org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) {
@@ -101,7 +101,7 @@ public abstract class DataLayer {
     }
 
     public String storeTemporalFile(InputStream inputFile, String newFileDirectory) {
-        return storeTemporalFile(dataStorePath + "\\tmp", inputFile, newFileDirectory);
+        return storeTemporalFile(dataStorePath + "tmp", inputFile, newFileDirectory);
     }
 
     public abstract void uploadToFormattedZone(Dataset d, String tableName) throws SQLException;
@@ -114,7 +114,7 @@ public abstract class DataLayer {
 
     // Only for testing the data that is uploaded
     public void show(Dataset d) {
-        String parquetPath = dataStorePath + "\\landingZone\\" + d.getUUID();
+        String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
         org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(parquetPath);
         df.show();
     }

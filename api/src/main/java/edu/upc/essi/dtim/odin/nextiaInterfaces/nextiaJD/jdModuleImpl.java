@@ -20,13 +20,12 @@ public class jdModuleImpl implements jdModuleInterface {
     }
 
     @Override
-    public List<Alignment> getAlignments(Dataset dataset, Dataset dsB) {
+    public List<Alignment> getAlignments(Dataset dataset, Dataset dataset2) {
+        // NextiaJD needs access to the data and, as such, the data layer, so we need to pass it as a parameter
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         IDiscovery discovery = new Discovery(dl);
-        System.out.println(dataset.getUUID());
-        System.out.println(dsB.getUUID());
         try {
-            return discovery.getAlignments(dataset, dsB);
+            return discovery.getAlignments(dataset, dataset2);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

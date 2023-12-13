@@ -39,9 +39,6 @@ public class AppConfig {
     @Value("${dataStorage.DataLayerTechnology}")
     private String DataLayerTechnology;
 
-
-
-    // The constructors are not necessary, but this way we prevent annoying warnings
     public String getDBTypeProperty() {
         return DBTypeProperty;
     }

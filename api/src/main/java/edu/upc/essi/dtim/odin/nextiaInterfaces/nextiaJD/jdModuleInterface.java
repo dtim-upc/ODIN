@@ -8,6 +8,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface jdModuleInterface {
-
-    List<Alignment> getAlignments(Dataset dataset, Dataset dsB) throws SQLException, IOException, ClassNotFoundException;
+    /**
+     * Gets the set of alignments between two datasets, that is, the degree of similarity between every column of both
+     * sets of data.
+     *
+     * @param dataset The first dataset
+     * @param dataset2 The second dataset
+     * @return A List of the Alignments, each Alignment indicating the names of the columns (one of each dataset) and
+     * the degree of similarity.
+     */
+    List<Alignment> getAlignments(Dataset dataset, Dataset dataset2) throws SQLException, IOException, ClassNotFoundException;
 }

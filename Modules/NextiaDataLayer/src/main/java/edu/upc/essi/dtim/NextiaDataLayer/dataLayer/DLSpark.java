@@ -27,15 +27,15 @@ public class DLSpark extends DataLayer {
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) throws SQLException {
-        String path = dataStorePath + "\\landingZone\\" + d.getUUID();
+        String path = dataStorePath + "landingZone\\" + d.getUUID();
 
         org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(path);
-        df.write().format("delta").save(dataStorePath + "\\DeltaLake\\formattedZone\\" + tableName);
+        df.write().format("delta").save(dataStorePath + "DeltaLake\\formattedZone\\" + tableName);
     }
 
     @Override
     public void removeFromFormattedZone(String tableName) throws SQLException {
-        Path dir = Paths.get(dataStorePath + "\\DeltaLake\\formattedZone\\" + tableName);
+        Path dir = Paths.get(dataStorePath + "DeltaLake\\formattedZone\\" + tableName);
         try {
             Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
@@ -63,19 +63,6 @@ public class DLSpark extends DataLayer {
         sc.close();
         spark.close();
 
-//        Path dir = Paths.get(dataStorePath + "\\tmp");
-//        try {
-//            Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {
-//                try {
-//                    System.out.println("Deleting: " + path);
-//                    Files.delete(path);  //delete each file or directory
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//            Files.delete(dir);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+//        Delete files
     }
 }

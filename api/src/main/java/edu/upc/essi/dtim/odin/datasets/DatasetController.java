@@ -1,13 +1,11 @@
-package edu.upc.essi.dtim.odin.bootstrapping;
+package edu.upc.essi.dtim.odin.datasets;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.NextiaGraphy;
-import edu.upc.essi.dtim.odin.config.AppConfig;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -31,19 +29,17 @@ import java.util.List;
  * The controller class for managing datasources in a project.
  */
 @RestController
-public class SourceController {
-    private static final Logger logger = LoggerFactory.getLogger(SourceController.class);
-    private final SourceService sourceService;
-    private final AppConfig appConfig;
+public class DatasetController {
+    private static final Logger logger = LoggerFactory.getLogger(DatasetController.class);
+    private final DatasetService datasetService;
 
     /**
      * Constructs a new instance of SourceController.
      *
-     * @param sourceService the SourceService dependency for performing datasource operations
+     * @param datasetService the SourceService dependency for performing datasource operations
      */
-    SourceController(@Autowired SourceService sourceService, @Autowired AppConfig appConfig) {
-        this.sourceService = sourceService;
-        this.appConfig = appConfig;
+    DatasetController(@Autowired DatasetService datasetService) {
+        this.datasetService = datasetService;
     }
 
     @Autowired
@@ -74,11 +70,17 @@ public class SourceController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
+    /**
+     * Makes a request to an online API, obtaining the data.
+     *
+     * @param url URL of the API to be requested.
+     * @return A ResponseEntity object containing the data from the API or an error message.
+     */
     @GetMapping(value = "/makeRequest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
         logger.info("Make request to URL received: " + url);
@@ -96,7 +98,7 @@ public class SourceController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("URL content could not be found".getBytes());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Error in request: " + e.getMessage()).getBytes());
         }
     }
@@ -104,8 +106,11 @@ public class SourceController {
     /**
      * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.
      *
+     * @param apiDatasetName     Name given to the dataset by the user (only when the data comes from an API).
+     * @param endpoint           Endpoint of the URL.
      * @param datasetDescription The description of the dataset.
-     * @param attachFiles        The attached files representing the datasources.
+     * @param attachFiles        The attached files representing the datasets (for local/API repositories).
+     * @param attachTables       The description of the dataset (for JDBC repositories).
      * @return A ResponseEntity object containing the saved dataset or an error message.
      */
     @PostMapping(value = "/project/{id}")
@@ -117,11 +122,10 @@ public class SourceController {
                                             @RequestPart(required = false) List<MultipartFile> attachFiles,
                                             @RequestParam(required = false) List<String> attachTables) {
         try {
-            System.out.println("API DATASET NAME: " + apiDatasetName);
-            logger.info("Datasource received for bootstrap: " + repositoryId);
+            logger.info("Datasource received for bootstrap");
 
             // Get the repository object associated to the new dataset
-            DataRepository repository = sourceService.findRepositoryById(repositoryId);
+            DataRepository repository = datasetService.findRepositoryById(repositoryId);
 
             // If attachTables is empty it means that we either have a local file or a file coming from an API (which is
             // stored as a json file). Otherwise, we have data coming from a sql database.
@@ -138,7 +142,6 @@ public class SourceController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data source not created successfully");
         } catch (Exception e) {
             logger.error(e.getMessage());
-            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the data source");
         }
     }
@@ -149,7 +152,7 @@ public class SourceController {
         }
         // Iterate through the list of MultipartFiles to handle each file (the user might have uploaded several files at once)
         for (MultipartFile attachFile : attachFiles) {
-            String UUID = sourceService.generateUUID(); // Unique universal identifier (UUID) of the dataset
+            String UUID = datasetService.generateUUID(); // Unique universal identifier (UUID) of the dataset
             String fullFileName = attachFile.getOriginalFilename(); // Full file name (e.g. directory/filename.extension)
             assert fullFileName != null;
 
@@ -171,20 +174,21 @@ public class SourceController {
             String newFileName = UUID + "." + format; // New file name using the UUID
 
             // Reconstruct file from the Multipart file (i.e. store the file in the temporal zone to be accessed later)
-            String filePath = sourceService.storeTemporalFile(attachFile, newFileName);
+            String filePath = datasetService.storeTemporalFile(attachFile, newFileName);
 
             // Specific handling of API calls. If the file comes from an API, there is no name, and we only receive ".json".
-            // The file that has been created in the temporal zone is a json, which is needed to obtain/execute the wrapper.
-            // However, we now change the format to create the correct dataset
+            // As such, we require the name to be given from the frontend. The file that has been created in the
+            // temporal zone is a json, which is needed to obtain/execute the wrapper. However, we now change the format
+            // to create the correct dataset later
             if (fullFileName.equals(".json")) {
                 format = "api";
                 datasetName = apiDatasetName;
             }
 
-            // Extract data from datasource file, set UUID parameter and save it
-            Dataset dataset = sourceService.generateDataset(filePath, datasetName, datasetDescription, repository, endpoint, format);
+            // Extract data from the dataset file, set UUID parameter and save it
+            Dataset dataset = datasetService.generateDataset(filePath, datasetName, datasetDescription, repository, endpoint, format);
             dataset.setUUID(UUID);
-            sourceService.saveDataset(dataset);
+            datasetService.saveDataset(dataset);
 
             handleDataset(dataset, repository.getVirtual(), repository.getId(), projectId);
         }
@@ -193,10 +197,10 @@ public class SourceController {
     private void handleAttachTables(List<String> attachTables, String datasetDescription, DataRepository repository, String projectId) {
         for (String tableName : attachTables) {
             // Extract data from datasource file, set UUID parameter and save it
-            Dataset dataset = sourceService.generateDataset(null, tableName, datasetDescription, repository, null, "sql");
-            String UUID = sourceService.generateUUID(); // Unique universal identifier (UUID) of the dataset
+            Dataset dataset = datasetService.generateDataset(null, tableName, datasetDescription, repository, null, "sql");
+            String UUID = datasetService.generateUUID(); // Unique universal identifier (UUID) of the dataset
             dataset.setUUID(UUID);
-            sourceService.saveDataset(dataset);
+            datasetService.saveDataset(dataset);
 
             handleDataset(dataset, repository.getVirtual(), repository.getId(), projectId);
         }
@@ -204,34 +208,34 @@ public class SourceController {
 
     private void handleDataset(Dataset dataset, Boolean isVirtual, String repositoryId, String projectId) {
         // Add the dataset to the repository and delete the reference from others if exists
-        dataset = sourceService.addRepositoryToDataset(dataset.getId(), repositoryId);
-        sourceService.addDatasetToRepository(dataset.getId(), repositoryId);
+        dataset = datasetService.addRepositoryToDataset(dataset.getId(), repositoryId);
+        datasetService.addDatasetToRepository(dataset.getId(), repositoryId);
 
         // Transform datasource into graph and generate the wrapper
-        BootstrapResult bsResult = sourceService.bootstrapDataset(dataset);
+        BootstrapResult bsResult = datasetService.bootstrapDataset(dataset);
         Graph graph = bsResult.getGraph();
 
         // Generating visual schema for frontend
-        String visualSchema = sourceService.generateVisualSchema(graph);
+        String visualSchema = datasetService.generateVisualSchema(graph);
         graph.setGraphicalSchema(visualSchema);
 
         // Set wrapper to the dataset and add the attributes based on the wrapper
         String wrapper = bsResult.getWrapper();
         dataset.setWrapper(wrapper);
-        dataset.setAttributes(sourceService.getAttributesFromWrapper(wrapper));
+        dataset.setAttributes(datasetService.getAttributesFromWrapper(wrapper));
 
         // Create the relation with dataset adding the graph generated to generate an id
-        Dataset datasetWithGraph = sourceService.setLocalGraphToDataset(dataset, graph);
+        Dataset datasetWithGraph = datasetService.setLocalGraphToDataset(dataset, graph);
         graph.setGraphName(datasetWithGraph.getLocalGraph().getGraphName());
 
         // Save graph into the database
-        sourceService.saveGraphToDatabase(graph);
+        datasetService.saveGraphToDatabase(graph);
 
         // If dataset is materialized, store it permanently in the data layer (unless there is an error)
         if (!isVirtual) {
-            boolean error = sourceService.uploadToDataLayer(datasetWithGraph);
+            boolean error = datasetService.uploadToDataLayer(datasetWithGraph);
             if (error) {
-                sourceService.deleteDatasetFromProject(projectId, dataset.getId());
+                datasetService.deleteDataset(projectId, dataset.getId());
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "The was an error reading the data. Dataset not created");
             }
         }
@@ -248,33 +252,28 @@ public class SourceController {
     public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectId") String projectId,
                                                  @PathVariable("id") String id) {
         logger.info("Delete dataset " + id + " from project: ", projectId);
-        boolean deleted = false;
 
         //Check if the dataset is part of that project
-        if (sourceService.projectContains(projectId, id)) {
-            // Delete dataset from the dataLayer (parquet files and tables) and from the project (ODIN database)
-            sourceService.deleteDatasetFromProject(projectId, id);
-            deleted = true;
+        if (datasetService.projectContains(projectId, id)) {
+            datasetService.deleteDataset(projectId, id);
+            return ResponseEntity.ok(true);
         }
-
-        if (deleted) {
-            return ResponseEntity.ok(true); // HTTP status 200 (OK) and the boolean value true
-        } else {
+        else {
             return ResponseEntity.notFound().build(); // HTTP status 404 (Not Found)
         }
     }
 
     /**
-     * Retrieves all datasources from a specific project.
+     * Retrieves all datasets from a specific project.
      *
-     * @param id The ID of the project to retrieve datasources from.
+     * @param projectId The ID of the project to retrieve datasets from.
      * @return A ResponseEntity object containing the list of datasets or an error message.
      */
-    @GetMapping("/project/{id}/datasources")
-    public ResponseEntity<Object> getDatasourcesFromProject(@PathVariable String id) {
+    @GetMapping("/project/{projectId}/datasources")
+    public ResponseEntity<Object> getDatasetsFromProject(@PathVariable String projectId) {
         try {
-            logger.info("GET ALL DATASOURCE FROM PROJECT {}", id);
-            List<Dataset> datasets = sourceService.getDatasetsOfProject(id);
+            logger.info("Get all datasets from project " + projectId);
+            List<Dataset> datasets = datasetService.getDatasetsOfProject(projectId);
 
             if (datasets.isEmpty()) {
                 return new ResponseEntity<>("There are no datasets yet", HttpStatus.NO_CONTENT);
@@ -290,53 +289,44 @@ public class SourceController {
     /**
      * Retrieves all repositories from a specific project.
      *
-     * @param id The ID of the project to retrieve repositories from.
+     * @param projectId The ID of the project to retrieve repositories from.
      * @return A ResponseEntity object containing the list of repositories or an error message.
      */
-    @GetMapping("/project/{id}/repositories")
-    public ResponseEntity<Object> getRepositoriesFromProject(@PathVariable String id) {
+    @GetMapping("/project/{projectId}/repositories")
+    public ResponseEntity<Object> getRepositoriesFromProject(@PathVariable String projectId) {
         try {
-            logger.info("GET ALL repositories FROM PROJECT {}", id);
-
-            // Retrieve a list of repositories associated with the project
-            List<DataRepository> repositories = sourceService.getRepositoriesOfProject(id);
+            logger.info("Get all repositories from project " + projectId);
+            List<DataRepository> repositories = datasetService.getRepositoriesOfProject(projectId);
 
             if (repositories.isEmpty()) {
-                // If there are no repositories, return a response with "No content" status
                 return new ResponseEntity<>("There are no repositories yet", HttpStatus.NO_CONTENT);
             }
 
-            // Return the list of repositories with "OK" status
-            return new ResponseEntity<>(repositories, HttpStatus.OK);
+            return new ResponseEntity<>(repositories, HttpStatus.OK); // Return list of repositories with "OK" status
         } catch (Exception e) {
-            // Handle exceptions and return an error response if an error occurs
             logger.error(e.getMessage());
             return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * Retrieves all datasources.
+     * Retrieves all datasets.
      *
      * @return A ResponseEntity object containing the list of datasets or an error message.
      */
     @GetMapping("/datasources")
-    public ResponseEntity<Object> getAllDatasource() {
+    public ResponseEntity<Object> getAllDatasets() {
         try {
-            logger.info("GET ALL DATASOURCE RECEIVED");
-
-            // Retrieve a list of all datasets
-            List<Dataset> datasets = sourceService.getDatasets();
+            logger.info("Get all datasets from the system");
+            List<Dataset> datasets = datasetService.getDatasets();
 
             if (datasets.isEmpty()) {
-                // If there are no datasets, return a response with "Not Found" status
                 return new ResponseEntity<>("No datasets found", HttpStatus.NOT_FOUND);
             }
 
             // Return the list of datasets with "OK" status
             return new ResponseEntity<>(datasets, HttpStatus.OK);
         } catch (Exception e) {
-            // Handle exceptions and return an error response if an error occurs
             return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -359,29 +349,26 @@ public class SourceController {
                                                @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription,
                                                @RequestParam("repositoryId") String repositoryId,
                                                @RequestParam("repositoryName") String repositoryName) {
+        logger.info("Edit request received for editing dataset with ID: " +  datasetId +  ", name: " + datasetName);
+
         // Create a new Dataset object with the provided dataset information
         Dataset dataset = new Dataset(datasetId, datasetName, datasetDescription);
 
-        // Log the dataset ID and dataset name for debugging purposes
-        logger.info("EDIT request received for editing dataset with ID: {}", dataset.getId());
-        logger.info("EDIT request received for editing dataset with name: {}", dataset.getDatasetName());
-
-        // Call the sourceService to edit the dataset and get the result
-        boolean edited = sourceService.editDataset(dataset);
+        // Call the function to edit the dataset. Returns true if it was edited, false otherwise
+        boolean edited = datasetService.editDataset(dataset);
 
         // Check if the repositoryId is empty, which indicates a new repository should be created
-        boolean createRepo = (repositoryId == null) || (repositoryId.equals(""));
-
-        // Add the dataset to the repository and delete the reference from others if exists
-        sourceService.addDatasetToRepository(datasetId, repositoryId);
+        boolean createRepo = (repositoryId == null) || (repositoryId.isEmpty());
+        if (createRepo) {
+            // Add the dataset to the repository and delete the reference from others if exists
+            datasetService.addDatasetToRepository(datasetId, repositoryId);
+        }
 
         // Check if the dataset was edited successfully
         if (edited) {
-            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok(true); // HTTP status 200 (OK) and the boolean value true
         } else {
-            // Return a ResponseEntity with HTTP status 404 (Not Found)
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build(); // HTTP status 404 (Not Found)
         }
     }
 
@@ -399,12 +386,7 @@ public class SourceController {
             @RequestParam("dsID") String datasetId
     ) {
         // Get the dataset by its ID
-        Dataset dataset = sourceService.getDatasetById(datasetId);
-
-        if (dataset == null) {
-            // If the dataset doesn't exist, return a "Not Found" response
-            return ResponseEntity.notFound().build();
-        }
+        Dataset dataset = datasetService.getDatasetById(datasetId);
 
         // Get the RDF model (graph) from the dataset
         Model model = dataset.getLocalGraph().getGraph();
@@ -439,15 +421,12 @@ public class SourceController {
             @PathVariable("projectID") String projectID,
             @PathVariable("datasetID") String datasetID
     ) {
-        logger.info("SET PROJECT {projectID} SCHEMA request received", projectID);
-        sourceService.setProjectSchemasBase(projectID, datasetID);
-        sourceService.deleteIntegratedDatasets(projectID);
-        sourceService.addIntegratedDataset(projectID, datasetID);
+        logger.info("Set project " + projectID + " schema request received");
+        datasetService.setProjectSchemasBase(projectID, datasetID);
+        datasetService.deleteIntegratedDatasets(projectID);
+        datasetService.addIntegratedDataset(projectID, datasetID);
 
         return ResponseEntity.ok("Dataset schema set as project schema.");
-
-
-        //return ResponseEntity.notFound().build();
     }
 
     @PostMapping("prueba")

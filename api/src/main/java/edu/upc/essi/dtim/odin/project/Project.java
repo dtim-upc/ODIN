@@ -19,9 +19,7 @@ public class Project {
     private String createdBy;
     private List<DataRepository> repositories;
     private IntegratedGraphJenaImpl integratedGraph;
-
     private IntegratedGraphJenaImpl temporalIntegratedGraph;
-
     private List<Dataset> integratedDatasets;
 
     public List<Dataset> getTemporalIntegratedDatasets() {
@@ -33,7 +31,6 @@ public class Project {
     }
 
     private List<Dataset> temporalIntegratedDatasets;
-
 
     /**
      * Get the unique identifier of the project.
