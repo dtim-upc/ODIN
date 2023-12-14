@@ -90,6 +90,8 @@ public class integrationModuleImpl implements integrationModuleInterface {
         List<Alignment> aligId = alignments.stream().filter(x -> x.getType().contains("datatype")).collect(Collectors.toList());
 
         Model sourceG = graph.getGraph();
+        System.out.println("GRAPH NAME");
+        System.out.println(graph.getGraphName());
 
         for (Alignment a : aligId) {
             Resource rA = sourceG.createResource(a.getIriA());

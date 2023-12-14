@@ -13,7 +13,6 @@ import edu.upc.essi.dtim.nextiabs.utils.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import org.apache.jena.atlas.lib.Pair;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,11 +30,10 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
     private String username;
     private String password;
     private String tableName;
+    private String databaseName;
 
-    private String databasename;
 
-
-    public SQLBootstrap_with_DataFrame_MM_without_Jena(String id, String schemaName, String tableName, IDatabaseSystem DBType, String hostname, String port, String username, String password, String databasename) {
+    public SQLBootstrap_with_DataFrame_MM_without_Jena(String id, String schemaName, String tableName, IDatabaseSystem DBType, String hostname, String port, String username, String password, String databaseName) {
         super();
         this.id = id;
         this.name = schemaName;
@@ -47,7 +45,7 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
         this.password = password;
         this.tableName = tableName;
         this.tableData = new SQLTableData(tableName);
-        this.databasename = databasename;
+        this.databaseName = databaseName;
     }
 
     public SQLBootstrap_with_DataFrame_MM_without_Jena() {
@@ -61,7 +59,7 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
     @Override
     public Graph bootstrapSchema(Boolean generateMetadata) {
 
-        Database.connect(hostname, port,  username, password, databasename);
+        Database.connect(hostname, port,  username, password, databaseName);
 
         //Table's raw data
         tableData = Database.getMetamodelSingleTable(tableName);
@@ -72,7 +70,7 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
         //el wrapper sería un "SELECT * FROM TABLE"
         wrapper = generateWrapper();
 
-        if(generateMetadata) {
+        if (generateMetadata) {
             generateMetadata();
         }
 
@@ -83,15 +81,12 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
     }
 
     private String generateWrapper() {
-        String wrapper = "SELECT ";
         List<String> columns = new LinkedList<>();
         for(Pair<String, String> col: tableData.getColumns())
             columns.add(col.getLeft() + " AS `" + col.getLeft() + "`");
         String columnNames = String.join(", ", columns);
 
-        wrapper += columnNames;
-        wrapper += " FROM ";
-        wrapper += tableName;
+        String wrapper = "SELECT " + columnNames + " FROM " + tableName;
         System.out.println("Generated wrapper: " + wrapper);
         return wrapper;
     }
@@ -160,7 +155,7 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
     @Override
     public void generateMetadata(){
         String ds = DataSourceVocabulary.DataSource.getURI() +"/" + name;
-        if (!id.equals("")){
+        if (!id.isEmpty()){
             ds = DataSourceVocabulary.DataSource.getURI() +"/" + id;
             G_target.addTripleLiteral( ds , DataSourceVocabulary.HAS_ID.getURI(), id);
         }
@@ -191,9 +186,6 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 
     @Override
     public BootstrapResult bootstrap(Dataset dataset) {
-        Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-        String wrapperG;
-
         SQLBootstrap_with_DataFrame_MM_without_Jena sql =
                 new SQLBootstrap_with_DataFrame_MM_without_Jena(
                         dataset.getId(),
@@ -205,17 +197,14 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
                         ((RelationalJDBCRepository) dataset.getRepository()).getUsername(),
                         ((RelationalJDBCRepository) dataset.getRepository()).getPassword(),
                         "odin_test");
-        bootstrapG = sql.bootstrapSchema();
-        wrapperG = sql.wrapper;
+        Graph bootstrapG = sql.bootstrapSchema();
+        String wrapperG = sql.wrapper;
 
         return new BootstrapResult(bootstrapG, wrapperG);
     }
 
     @Override
     public Graph bootstrapGraph(Dataset dataset) {
-        Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-        String wrapperG;
-
         SQLBootstrap_with_DataFrame_MM_without_Jena sql =
                 new SQLBootstrap_with_DataFrame_MM_without_Jena(
                         dataset.getId(),
@@ -227,10 +216,8 @@ public class SQLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
                         ((RelationalJDBCRepository) dataset.getRepository()).getUsername(),
                         ((RelationalJDBCRepository) dataset.getRepository()).getPassword(),
                         "odin_test");
-        bootstrapG = sql.bootstrapSchema();
-        wrapperG = sql.wrapper;
 
-        return bootstrapG;
+        return sql.bootstrapSchema();
     }
 
 }

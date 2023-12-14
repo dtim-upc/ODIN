@@ -43,7 +43,6 @@ public class XMLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 	@Override
 	public Graph bootstrapSchema(Boolean generateMetadata) {
 		G_target = CoreGraphFactory.createGraphInstance("local");
-		this.id = id;
 //		setPrefixes();
 		try {
 
@@ -194,26 +193,17 @@ public class XMLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 
 	@Override
 	public BootstrapResult bootstrap(Dataset dataset) {
-		Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-		String wrapperG;
-
 		XMLBootstrap_with_DataFrame_MM_without_Jena xml = new XMLBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((XmlDataset) dataset).getPath());
-		bootstrapG = xml.bootstrapSchema();
-		wrapperG = xml.wrapper;
+		Graph bootstrapG = xml.bootstrapSchema();
+		String wrapperG = xml.wrapper;
 
 		return new BootstrapResult(bootstrapG, wrapperG);
 	}
 
 	@Override
 	public Graph bootstrapGraph(Dataset dataset) {
-		Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-		String wrapperG;
-
 		XMLBootstrap_with_DataFrame_MM_without_Jena xml = new XMLBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((XmlDataset) dataset).getPath());
-		bootstrapG = xml.bootstrapSchema();
-		wrapperG = xml.wrapper;
-
-		return bootstrapG;
+		return xml.bootstrapSchema();
 	}
 }
 

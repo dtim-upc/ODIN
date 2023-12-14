@@ -76,21 +76,19 @@ public class IntegrationController {
             // Integrate the new data source onto the existing integrated graph and overwrite it
             Graph integratedGraph = integrationService.integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
 
-            String path = "api\\dbFiles\\ttl\\";
-
             Project projectToSave = integrationService.updateTemporalIntegratedGraphProject(project, integratedGraph);
 
             Graph globalGraph = integrationService.generateGlobalGraph(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
             projectToSave = integrationService.updateGlobalGraphProject(projectToSave, globalGraph);
 
             Project project1 = integrationService.saveProject(projectToSave);
-            logger.info("PROJECT SAVED WITH THE NEW INTEGRATED GRAPH");
+            logger.info("Project saved with the integrated graph");
             //todo review
             project1 = integrationService.addTemporalIntegratedDataset(project1.getProjectId(), iData.getDsB().getId());
 
             Project project2 = integrationService.getProject(project1.getProjectId());
 
-            List<JoinAlignment> joinProperties = integrationService.generateJoinAlignments(project.getIntegratedGraph(), (Graph) iData.getDsB().getLocalGraph(), iData);
+            List<JoinAlignment> joinProperties = integrationService.generateJoinAlignments(project1.getIntegratedGraph(), (Graph) iData.getDsB().getLocalGraph(), iData);
             System.out.println(joinProperties);
             for (int i = 0; i < joinProperties.size(); ++i) {
                 System.out.println(joinProperties.get(i));
@@ -113,7 +111,7 @@ public class IntegrationController {
     @PostMapping(value = "/project/{id}/integration/join")
     public ResponseEntity<Project> integrateJoins(@PathVariable("id") String id, @RequestBody List<JoinAlignment> joinA) {
 
-        logger.info("INTEGRATING joins...");
+        logger.info("Integrating joins...");
 
         Project project = integrationService.getProject(id);
         System.out.println(project.getTemporalIntegratedGraph().getGlobalGraph().getGraphicalSchema() + "DDDDDDDDDDDDDDDDDDDDDDDDDDD");

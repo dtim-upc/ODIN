@@ -5,10 +5,13 @@
   <q-card-section>
 
     <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+      <!--
       <q-checkbox v-model="createNewRepository" label="Create new repository"
                   :disable="storeDS.repositories.length === 0"/>
+      -->
 
       <!-- Show the input field for the name of the new repository if "Nuevo repositorio" is selected -->
+      <!--
       <q-input v-if="createNewRepository" filled v-model="newDatasource.repositoryName"
                label="Name of the new repository" lazy-rules
                :rules="[(val) => (val && val.length > 0) || 'Please type a name']"/>
@@ -25,6 +28,7 @@
                 :rules="[(val) => !!val || 'Please select a repository']"
                 @input="onRepositoryChange"
       />
+      -->
 
       <q-input filled v-model="newDatasource.datasetName" label="Introduce a dataset name" lazy-rules
                :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>

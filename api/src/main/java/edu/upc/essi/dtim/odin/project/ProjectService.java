@@ -63,12 +63,6 @@ public class ProjectService {
 
                 // Check if the dataset ID matches the specified dataset ID
                 if (datasetId.equals(dataset.getId())) {
-                    // Delete rdf file (/jenaFiles)
-                    try {
-                        Files.delete(Path.of(appConfig.getJenaPath() + "\\" + dataset.getLocalGraph().getGraphName() + ".rdf"));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
 
                     // Remove the dataset from the data repository
                     datasetFound = true;

@@ -19,10 +19,7 @@ import org.apache.jena.tdb.TDBFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 
 @Component
 public class GraphStoreJenaImpl implements GraphStoreInterface {
@@ -79,10 +76,14 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         String modelName = graph.getGraphName();
         String filePath = directory + modelName + ".rdf";
         try {
-            modelToSave.write(new FileOutputStream(filePath), "RDF/XML");
-            System.out.println("Modelo guardado exitosamente en: " + filePath);
+            FileOutputStream fos = new FileOutputStream(filePath);
+            modelToSave.write(fos, "RDF/XML");
+            fos.close();
+            System.out.println("Model successfully store at: " + filePath);
         } catch (FileNotFoundException e) {
-            System.out.println("Error al guardar el modelo: " + e.getMessage());
+            System.out.println("Error when storing the model: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         modelToSave.close();
     }

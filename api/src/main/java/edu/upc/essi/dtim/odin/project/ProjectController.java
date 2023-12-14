@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.project;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,7 +179,7 @@ public class ProjectController {
      * @param projectId The ID of the project.
      * @return A ResponseEntity containing the list of repositories if found, or a 404 response if not found.
      */
-    @GetMapping("/projects/{id}/repositories")
+    @GetMapping("/project/{id}/repositories")
     public ResponseEntity<List<DataRepository>> getRepositoriesOfProject(@PathVariable("id") String projectId) {
         logger.info("GET request received for retrieving repositories of project " + projectId);
 
@@ -192,6 +193,27 @@ public class ProjectController {
         } else {
             // Return a 404 response if no repositories were found
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Retrieves all datasets from a specific project.
+     *
+     * @param projectId The ID of the project to retrieve datasets from.
+     * @return A ResponseEntity object containing the list of datasets or an error message.
+     */
+    @GetMapping("/project/{projectId}/datasources")
+    public ResponseEntity<Object> getDatasetsFromProject(@PathVariable String projectId) {
+        logger.info("Get all datasets from project " + projectId);
+        try {
+            List<Dataset> datasets = projectService.getDatasetsOfProject(projectId);
+            if (datasets.isEmpty()) {
+                return new ResponseEntity<>("The project does not contain datasets", HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(datasets, HttpStatus.OK); // Return the datasets
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

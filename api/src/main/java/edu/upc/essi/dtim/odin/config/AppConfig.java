@@ -36,6 +36,9 @@ public class AppConfig {
     @Value("${dataStorage.JenaPath}")
     private String JenaPath;
 
+    /**
+     * Tool used to implement the data layer
+     */
     @Value("${dataStorage.DataLayerTechnology}")
     private String DataLayerTechnology;
 

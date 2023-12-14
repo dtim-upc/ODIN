@@ -22,6 +22,7 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleInterface;
 import edu.upc.essi.dtim.odin.project.Project;
 import edu.upc.essi.dtim.odin.project.ProjectService;
+import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class IntegrationService {
      * The dependency on the ProjectService class.
      */
     private final ProjectService projectService;
+    private final RepositoryService repositoryService;
     private final AppConfig appConfig;
 
     /**
@@ -50,9 +52,10 @@ public class IntegrationService {
      *
      * @param appConfig The application configuration.
      */
-    public IntegrationService(@Autowired AppConfig appConfig, @Autowired ProjectService projectService) {
+    public IntegrationService(@Autowired AppConfig appConfig, @Autowired ProjectService projectService, @Autowired RepositoryService repositoryService) {
         this.appConfig = appConfig;
         this.projectService = projectService;
+        this.repositoryService = repositoryService;
     }
 
     /**
@@ -137,6 +140,7 @@ public class IntegrationService {
      * @return A list of JoinAlignment objects representing potential join alignments.
      */
     public List<JoinAlignment> generateJoinAlignments(Graph graphA, Graph graphB, IntegrationData iData) {
+
         // Create an instance of the integration module using the implementation.
         integrationModuleInterface integrationInterface = new integrationModuleImpl();
 
@@ -396,7 +400,7 @@ public class IntegrationService {
     }
 
     public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
-        DatasetService datasetService = new DatasetService(appConfig, projectService);
+        DatasetService datasetService = new DatasetService(appConfig, projectService, repositoryService);
         Project project = getProject(projectId);
 
         Dataset datasetB = datasetService.getDatasetById(datasetId);

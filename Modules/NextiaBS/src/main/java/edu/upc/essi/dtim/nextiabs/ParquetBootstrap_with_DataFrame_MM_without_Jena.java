@@ -46,7 +46,6 @@ public class ParquetBootstrap_with_DataFrame_MM_without_Jena extends DataSource 
 	@Override
 	public Graph bootstrapSchema(Boolean generateMetadata) throws IOException {
 		G_target = CoreGraphFactory.createGraphInstance("local");
-		this.id = id;
 //		setPrefixes();
 
 		G_target.addTriple(createIRI(name), RDF.type, DataFrame_MM.DataFrame);
@@ -121,7 +120,7 @@ public class ParquetBootstrap_with_DataFrame_MM_without_Jena extends DataSource 
 
 	@Override
 	public Graph bootstrapGraph(Dataset dataset) {
-		Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
+		Graph bootstrapG;
 
 		ParquetBootstrap_with_DataFrame_MM_without_Jena parquet = new ParquetBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((ParquetDataset) dataset).getPath());
 

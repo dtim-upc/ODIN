@@ -81,7 +81,7 @@ public class CSVBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 	@Override
 	public void generateMetadata(){
 		String ds = DataSourceVocabulary.DataSource.getURI() +"/" + name;
-		if (!id.equals("")){
+		if (!id.isEmpty()){
 			ds = DataSourceVocabulary.DataSource.getURI() +"/" + id;
 			G_target.addTripleLiteral( ds , DataSourceVocabulary.HAS_ID.getURI(), id);
 		}
@@ -102,7 +102,7 @@ public class CSVBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 
 	@Override
 	public BootstrapResult bootstrap(Dataset dataset) {
-		Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
+		Graph bootstrapG;
 		String wrapperG;
 
 		CSVBootstrap_with_DataFrame_MM_without_Jena csv = new CSVBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((CsvDataset) dataset).getPath());
@@ -118,13 +118,11 @@ public class CSVBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 
 	@Override
 	public Graph bootstrapGraph(Dataset dataset) {
-		Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-		String wrapperG;
+		Graph bootstrapG;
 
 		CSVBootstrap_with_DataFrame_MM_without_Jena csv = new CSVBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((CsvDataset) dataset).getPath());
 		try {
 			bootstrapG = csv.bootstrapSchema();
-			wrapperG = csv.wrapper;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

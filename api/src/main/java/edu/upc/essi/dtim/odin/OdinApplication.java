@@ -19,7 +19,7 @@ public class OdinApplication {
     private static AppConfig appConfig;
 
     public OdinApplication(@Autowired AppConfig appConfig) {
-        this.appConfig = appConfig;
+        OdinApplication.appConfig = appConfig;
     }
 
     public static void main(String[] args) {

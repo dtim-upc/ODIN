@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.project.ProjectService;
@@ -100,6 +101,10 @@ public class RepositoryService {
         repository.setRepositoryName(repositoryData.get("repositoryName"));
         repository.setVirtual(Boolean.valueOf(repositoryData.get("isVirtual")));
         return ormDataResource.save(repository); // Save the DataRepository and return it
+    }
+
+    public DataRepository saveRepository(DataRepository repository) {
+        return ormDataResource.save(repository);
     }
 
     /**

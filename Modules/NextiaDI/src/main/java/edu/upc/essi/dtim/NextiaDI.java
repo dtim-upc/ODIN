@@ -36,6 +36,8 @@ public class NextiaDI {
 
 
     public Model Integrate(Model graphA, Model graphB, List<Alignment> alignments){
+        System.out.println(graphA.isClosed());
+        System.out.println(graphB.isClosed());
 
         List<Alignment> classes = alignments.stream().filter( a -> a.getType().toLowerCase().contains("class") ).collect(Collectors.toList());
         List<Alignment> datatypes = alignments.stream().filter( a -> a.getType().toLowerCase().contains("datatype") ).collect(Collectors.toList());
