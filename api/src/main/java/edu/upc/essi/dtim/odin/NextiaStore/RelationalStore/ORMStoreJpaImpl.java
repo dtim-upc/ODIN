@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * Implementation of the {@link ORMStoreInterface} using Java Persistence API (JPA).
  */
-public class OrmStoreJpaImpl implements ORMStoreInterface {
+public class ORMStoreJpaImpl implements ORMStoreInterface {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrmStoreJpaImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ORMStoreJpaImpl.class);
     private final EntityManagerFactory emf;
 
     /**
      * Constructs a new instance of {@code OrmStoreJpaImpl}.
      * Initializes the entity manager factory using the "ORMPersistenceUnit" defined in the persistence configuration.
      */
-    public OrmStoreJpaImpl() {
+    public ORMStoreJpaImpl() {
         emf = Persistence.createEntityManagerFactory("ORMPersistenceUnit");
     }
 
@@ -36,9 +36,9 @@ public class OrmStoreJpaImpl implements ORMStoreInterface {
             em.getTransaction().begin();
             savedObject = em.merge(object);
             em.getTransaction().commit();
-            logger.info("Object {} saved successfully", object.getClass());
+            logger.info("Object " + object.getClass() + " saved successfully");
         } catch (Exception e) {
-            logger.error("Error saving object {}: {}", object.getClass(), e.getMessage(), e);
+            logger.error("Error saving object " + object.getClass() + " error: " + e.getMessage());
         } finally {
             em.close();
         }
@@ -59,7 +59,7 @@ public class OrmStoreJpaImpl implements ORMStoreInterface {
         try {
             object = em.find(entityClass, id);
         } catch (Exception e) {
-            logger.warn("Error finding object {}: {}", entityClass.getSimpleName(), e.getMessage(), e);
+            logger.warn("Error finding object " + entityClass.getSimpleName() + " error: " + e.getMessage());
         } finally {
             em.close();
         }
@@ -84,7 +84,7 @@ public class OrmStoreJpaImpl implements ORMStoreInterface {
             objects = query.getResultList();
             em.getTransaction().commit();
         } catch (Exception e) {
-            logger.error("Error retrieving all objects {}: {}", entityClass.getSimpleName(), e.getMessage(), e);
+            logger.error("Error retrieving all objects " + entityClass.getSimpleName() + " error: " + e.getMessage());
         } finally {
             em.close();
         }
@@ -103,21 +103,21 @@ public class OrmStoreJpaImpl implements ORMStoreInterface {
         EntityManager em = emf.createEntityManager();
         boolean success = false;
         try {
-            logger.info("-------------> STARTING DELETE PROCESS");
+            logger.info("Delete process started");
             em.getTransaction().begin();
 
             T objectToRemove = em.find(entityClass, id);
             if (objectToRemove != null) {
-                logger.info("{} DELETED", entityClass.getSimpleName());
+                logger.info(entityClass.getSimpleName() + " deleted");
                 em.remove(objectToRemove);
                 em.getTransaction().commit();
                 success = true;
             } else {
-                logger.warn("Error deleting {}: Object not found", entityClass.getSimpleName());
+                logger.warn("Error deleting " + entityClass.getSimpleName() + ". Object not found");
                 em.getTransaction().rollback();
             }
         } catch (Exception e) {
-            logger.error("Error deleting {}: {}", entityClass.getSimpleName(), e.getMessage(), e);
+            logger.error("Error deleting " + entityClass.getSimpleName() + " error: " + e.getMessage());
         } finally {
             em.close();
         }

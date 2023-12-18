@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * The controller class for managing datasources in a project.
+ * The controller class for managing datasets in a project.
  */
 @RestController
 public class DatasetController {
@@ -40,35 +40,39 @@ public class DatasetController {
     private RestTemplate restTemplate;
 
     /**
-     * Performs a bootstrap operation by creating a datasource, transforming it into a graph, and saving it to the database.
+     * Adds a new dataset into the system, which requires to create the dataset object, execute a bootstrap operation,
+     * transform the data into a graph and store it to the databases (ODIN and data layer).
      *
-     * @param apiDatasetName     Name given to the dataset by the user (only when the data comes from an API).
-     * @param endpoint           Endpoint of the URL.
-     * @param datasetDescription The description of the dataset.
+     * @param projectID          Identification of the project to which the new dataset will be added.
+     * @param repositoryId       Identification of the repository to which the new dataset will belong to
      * @param attachFiles        The attached files representing the datasets (for local/API repositories).
-     * @param attachTables       The description of the dataset (for JDBC repositories).
+     * @param attachTables       The SQL tables representing the datasets (for JDBC repositories).
+     * @param apiDatasetName     Name given to the dataset by the user (only when the data comes from an API).
+     * @param endpoint           Endpoint of the URL (only when the data comes from an API).
+     * @param datasetDescription The description of the dataset.
      * @return A ResponseEntity object containing the saved dataset or an error message.
      */
-    @PostMapping(value = "/project/{projectId}")
-    public ResponseEntity<Object> postDataset(@PathVariable("projectId") String projectId,
+    @PostMapping(value = "/project/{projectID}")
+    public ResponseEntity<Object> postDataset(@PathVariable("projectID") String projectID,
                                               @RequestParam String repositoryId,
+                                              @RequestPart(required = false) List<MultipartFile> attachFiles,
+                                              @RequestParam(required = false) List<String> attachTables,
                                               @RequestParam(required = false) String apiDatasetName,
                                               @RequestParam(required = false) String endpoint,
-                                              @RequestParam(required = false) String datasetDescription,
-                                              @RequestPart(required = false) List<MultipartFile> attachFiles,
-                                              @RequestParam(required = false) List<String> attachTables) {
-        logger.info("Adding dataset to project " + projectId + " in repository " + repositoryId);
+                                              @RequestParam(required = false) String datasetDescription) {
+        logger.info("Adding dataset to project " + projectID + " in repository " + repositoryId);
+        // TODO: put all of this code in the datasetService
         try {
             DataRepository repository = datasetService.getRepositoryById(repositoryId);
             switch (repository.getRepositoryType()) { // Depending on the type of repo, we execute a different operation
                 case "ApiRepository":
-                    datasetService.postAPIDataset(attachFiles, datasetDescription, repositoryId, endpoint, apiDatasetName, projectId);
+                    datasetService.postAPIDataset(attachFiles, datasetDescription, repositoryId, endpoint, apiDatasetName, projectID);
                     break;
                 case "LocalRepository":
-                    datasetService.postLocalDataset(attachFiles, datasetDescription, repositoryId, projectId);
+                    datasetService.postLocalDataset(attachFiles, datasetDescription, repositoryId, projectID);
                     break;
                 case "RelationalJDBCRepository":
-                    datasetService.postJDBCDataset(attachTables, datasetDescription, repositoryId, projectId);
+                    datasetService.postJDBCDataset(attachTables, datasetDescription, repositoryId, projectID);
                     break;
                 default: // Throw an exception for unsupported file formats
                     throw new IllegalArgumentException("Unsupported repository type: " + repository.getRepositoryType());
@@ -86,18 +90,18 @@ public class DatasetController {
     }
 
     /**
-     * Deletes a datasource from a specific project.
+     * Deletes a dataset from a specific project.
      *
-     * @param projectId The ID of the project from which to delete the datasource.
-     * @param datasetId The ID of the datasource to delete.
+     * @param projectID The ID of the project from which to delete the datasource.
+     * @param datasetID The ID of the datasource to delete.
      * @return A ResponseEntity object containing a boolean indicating if the deletion was successful or not.
      */
-    @DeleteMapping("/project/{projectId}/datasource/{datasetId}")
-    public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectId") String projectId,
-                                                 @PathVariable("datasetId") String datasetId) {
-        logger.info("Delete dataset " + datasetId + " from project: " +  projectId);
+    @DeleteMapping("/project/{projectID}/datasource/{datasetID}")
+    public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectID") String projectID,
+                                                 @PathVariable("datasetID") String datasetID) {
+        logger.info("Delete dataset " + datasetID + " from project: " +  projectID);
         try {
-            datasetService.deleteDataset(projectId, datasetId);
+            datasetService.deleteDataset(projectID, datasetID);
             return ResponseEntity.ok(true);
         }
         catch (RuntimeException e) {
@@ -107,7 +111,7 @@ public class DatasetController {
     }
 
     /**
-     * Edits a dataset in a specific project.
+     * Edits a dataset (name of the dataset and description) in a specific project.
      *
      * @param datasetId          The ID of the dataset to edit.
      * @param datasetName        The new name for the dataset.
@@ -134,16 +138,16 @@ public class DatasetController {
     /**
      * Downloads the schema of a specific dataset as a Turtle (.ttl) file.
      *
-     * @param datasetId The ID of the dataset to download the schema for.
+     * @param datasetID The ID of the dataset to download the schema for.
      * @return A ResponseEntity object containing the Turtle schema file or a "Not Found" response if the dataset doesn't exist.
      */
     @GetMapping("/project/{id}/datasources/download/datasetschema")
-    public ResponseEntity<InputStreamResource> downloadDatasetSchema(@RequestParam("dsID") String datasetId) {
-        return datasetService.downloadDatasetSchema(datasetId);
+    public ResponseEntity<InputStreamResource> downloadDatasetSchema(@RequestParam("dsID") String datasetID) {
+        return datasetService.downloadDatasetSchema(datasetID);
     }
 
     /**
-     * Sets the dataset schema as the project schema.
+     * Sets the dataset schema as the project schema (it also updates the set of integrated datasets).
      *
      * @param projectID The ID of the project.
      * @param datasetID The ID of the dataset whose schema should be set as the project schema.
@@ -153,15 +157,20 @@ public class DatasetController {
     public ResponseEntity<?> setDatasetSchemaAsProjectSchema(@PathVariable("projectID") String projectID,
                                                              @PathVariable("datasetID") String datasetID) {
         logger.info("Set project " + projectID + " schema request received for dataset" + datasetID);
-        datasetService.setProjectSchemasBase(projectID, datasetID);
-        datasetService.deleteIntegratedDatasets(projectID);
-        datasetService.addIntegratedDataset(projectID, datasetID);
+        datasetService.setDatasetSchemaAsProjectSchema(projectID, datasetID);
 
         return ResponseEntity.ok("Dataset schema set as project schema.");
     }
 
+    /**
+     * Downloads file(s) from a given URL
+     *
+     * @param url URL to get the file from.
+     * @return ResponseEntity containing the files(s) or an error message.
+     */
     @GetMapping("/download")
     public ResponseEntity<ByteArrayResource> downloadFileFromURL(@RequestParam String url) {
+        // TODO: put all of this code in the datasetService
         try {
             // Parse URL to obtain file name
             URL fileUrl = new URL(url);
@@ -198,6 +207,7 @@ public class DatasetController {
      */
     @GetMapping(value = "/makeRequest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
+        // TODO: put all of this code in the datasetService
         logger.info("Make request to URL received: " + url);
 
         try {
@@ -219,6 +229,7 @@ public class DatasetController {
         }
     }
 
+    // TODO: remove once guaranteed that it is not useful
     @PostMapping("prueba")
     public ResponseEntity<String> pru(@RequestBody String path) {
         System.out.println("Generating visual graph for file: " + path);

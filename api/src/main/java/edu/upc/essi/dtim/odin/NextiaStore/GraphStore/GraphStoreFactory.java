@@ -30,9 +30,9 @@ public class GraphStoreFactory {
      *
      * @param appConfig The application configuration containing database type information.
      * @return An instance of {@link GraphStoreInterface} corresponding to the specified database type.
-     * @throws Exception If there is an error creating the instance or if the database type is not recognized.
+     * @throws RuntimeException If there is an error creating the instance or if the database type is not recognized.
      */
-    public static GraphStoreInterface getInstance(AppConfig appConfig) throws Exception {
+    public static GraphStoreInterface getInstance(AppConfig appConfig){
         if (appConfig == null) {
             throw new IllegalArgumentException("appConfig cannot be null");
         }
@@ -49,7 +49,7 @@ public class GraphStoreFactory {
                     // Add other implementations here.
                     break;
                 default:
-                    throw new Exception("Error with DB type: " + dbType);
+                    throw new RuntimeException("Error with DB type: " + dbType);
             }
         }
         return instance;

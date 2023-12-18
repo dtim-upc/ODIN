@@ -12,12 +12,4 @@ public interface bsModuleInterface {
      * @return A BootstrapResult, a class that which contains two variables: graph and wrapper
      */
     BootstrapResult bootstrapDataset(Dataset dataset);
-
-    /**
-     * Converts a dataset into a graph
-     *
-     * @param dataset The dataset to be converted into a graph.
-     * @return A graph representing the set of data (only the graph, no wrapper).
-     */
-    Graph bootstrapGraph(Dataset dataset);
 }

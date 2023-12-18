@@ -24,14 +24,14 @@ public class ORMStoreFactory {
 
     /**
      * Get an instance of {@link ORMStoreInterface}.
-     * If an instance does not exist, a new instance of the default ORM implementation {@link OrmStoreJpaImpl} is created.
+     * If an instance does not exist, a new instance of the default ORM implementation {@link ORMStoreJpaImpl} is created.
      *
      * @return An instance of {@link ORMStoreInterface}.
      */
     public static ORMStoreInterface getInstance() {
         if (ormStoreInterfaceInstance == null) {
             logger.info("Creating a new instance of JpaOrmImplementation");
-            ormStoreInterfaceInstance = new OrmStoreJpaImpl();
+            ormStoreInterfaceInstance = new ORMStoreJpaImpl();
         }
         return ormStoreInterfaceInstance;
     }

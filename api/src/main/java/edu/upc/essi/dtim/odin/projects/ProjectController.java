@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.project;
+package edu.upc.essi.dtim.odin.projects;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 public class ProjectController {
     private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
-
     private final ProjectService projectService;
 
     /**
@@ -40,7 +39,7 @@ public class ProjectController {
      */
     @PostMapping("/projects")
     public ResponseEntity<Project> saveProject(@RequestBody Project project) {
-        logger.info("POST request received for saving project");
+        logger.info("Post request received for saving project");
         Project savedProject = projectService.saveProject(project);
         return new ResponseEntity<>(savedProject, HttpStatus.CREATED);
     }

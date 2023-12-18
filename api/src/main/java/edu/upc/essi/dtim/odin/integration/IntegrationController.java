@@ -7,7 +7,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationData;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationTemporalResponse;
 import edu.upc.essi.dtim.odin.integration.pojos.JoinAlignment;
-import edu.upc.essi.dtim.odin.project.Project;
+import edu.upc.essi.dtim.odin.projects.Project;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

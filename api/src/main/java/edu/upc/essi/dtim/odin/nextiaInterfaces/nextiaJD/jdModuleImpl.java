@@ -16,7 +16,7 @@ public class jdModuleImpl implements jdModuleInterface {
     private static AppConfig appConfig;
 
     public jdModuleImpl(@Autowired AppConfig appConfig) {
-        this.appConfig = appConfig;
+        jdModuleImpl.appConfig = appConfig;
     }
 
     @Override

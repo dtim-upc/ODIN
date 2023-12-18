@@ -12,7 +12,7 @@
     </persistence-unit-metadata><-->
 
     <!--> MAPPING PROJECT CLASS<-->
-    <entity class="edu.upc.essi.dtim.odin.project.Project" name="Project">
+    <entity class="edu.upc.essi.dtim.odin.projects.Project" name="Project">
         <table name="Project">
             <unique-constraint>
                 <column-name>PROJECTID</column-name>

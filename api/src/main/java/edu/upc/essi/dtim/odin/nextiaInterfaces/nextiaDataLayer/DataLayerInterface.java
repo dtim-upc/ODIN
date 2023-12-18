@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface DataLayerInterface {
     /**
-     * Uploads a dataset to the data layer, in a permanent folder to be accessed afterward.
+     * Uploads a dataset to the data layer, in a permanent folder/database to be accessed afterward.
      *
      * @param dataset The dataset to be uploaded.
      * @return A boolean indicating whether the file was uploaded successfully.

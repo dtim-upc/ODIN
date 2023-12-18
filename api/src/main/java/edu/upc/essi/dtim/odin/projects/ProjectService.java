@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.odin.project;
+package edu.upc.essi.dtim.odin.projects;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
@@ -10,14 +10,9 @@ import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
-import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -92,50 +87,33 @@ public class ProjectService {
      * @return The saved project.
      */
     public Project saveProject(Project project) {
-        // Save the project using the ORM store and get the saved project
-        Project savedProject = ormProject.save(project);
+        Project savedProject = ormProject.save(project); // Save the project using the ORM store
 
-        // Check if the project has an integrated graph and a graph name
+        // Check if the project has an integrated or temporal integrated graph. If that is the case, set a name for them
         if (savedProject.getIntegratedGraph() != null && savedProject.getIntegratedGraph().getGraphName() != null) {
             try {
-                // Get the GraphStore interface using the AppConfig
                 GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
-
-                // Get the integrated graph from the project
                 Graph graph = project.getIntegratedGraph();
-
                 // Set the graph name to match the saved project's integrated graph name
                 graph.setGraphName(savedProject.getIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getIntegratedGraph().getGraphName());
-
-                // Save the graph to the graph store
                 graphStoreInterface.saveGraph(graph);
             } catch (Exception e) {
-                // Handle any exceptions by throwing a runtime exception
                 throw new RuntimeException(e);
             }
         }
-
 
         if (savedProject.getTemporalIntegratedGraph() != null && savedProject.getTemporalIntegratedGraph().getGraphName() != null) {
             try {
-                // Get the GraphStore interface using the AppConfig
                 GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
-
-                // Get the integrated graph from the project
                 Graph graph = project.getTemporalIntegratedGraph();
-
                 // Set the graph name to match the saved project's integrated graph name
                 graph.setGraphName(savedProject.getTemporalIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getTemporalIntegratedGraph().getGraphName());
-
-                // Save the graph to the graph store
                 graphStoreInterface.saveGraph(graph);
             } catch (Exception e) {
-                // Handle any exceptions by throwing a runtime exception
                 throw new RuntimeException(e);
             }
         }
 
-        // Return the saved project
         return savedProject;
     }
 

@@ -13,7 +13,7 @@ public class DataLayerImpl implements DataLayerInterface {
     private static AppConfig appConfig;
 
     public DataLayerImpl(@Autowired AppConfig appConfig) {
-        this.appConfig = appConfig;
+        DataLayerImpl.appConfig = appConfig;
     }
 
     @Override

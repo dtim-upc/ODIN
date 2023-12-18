@@ -20,56 +20,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Component
 public class GraphStoreJenaImpl implements GraphStoreInterface {
-    private Dataset dataset;
     private final String directory;
 
     public GraphStoreJenaImpl(@Autowired AppConfig appConfig) {
         this.directory = appConfig.getJenaPath();
-
-        // Verificar si el directorio no existe y crearlo si es necesario
-        File directoryFile = new File(directory);
-        if (!directoryFile.exists()) {
-            if (directoryFile.mkdirs()) {
-                System.out.println("Directorio creado con éxito: " + directory);
-            } else {
-                System.err.println("No se pudo crear el directorio: " + directory);
-            }
-        }
-
-        // Open TDB Dataset
-        dataset = TDBFactory.createDataset(directory);
+        new File(directory); // Create the directory to store the graphs (if it is necessary)
     }
 
     /**
-     * Deletes the graph with the given name.
+     * Deletes the graph from the graph database (i.e. delete the corresponding .rdf file)
      *
-     * @param name the URI of the graph to delete
+     * @param graph graph to be removed
      */
     @Override
-    public void deleteGraph(URI name) {
-        dataset.begin(ReadWrite.WRITE);
+    public void deleteGraph(Graph graph) {
         try {
-            String modelName = name.getURI();
-            if (dataset.containsNamedModel(modelName)) {
-                dataset.removeNamedModel(modelName);
-            } else {
-                throw getIllegalArgumentException(name);
-            }
-            dataset.commit();
-        } catch (final Exception ex) {
-            dataset.abort();
-            throw ex;
+            Files.delete(Path.of(directory + graph.getGraphName() + ".rdf"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static IllegalArgumentException getIllegalArgumentException(URI name) {
-        return new IllegalArgumentException("Graph " + name.getURI() + " not found");
-    }
-
-
+    /**
+     * Saves a graph into the graph database (i.e. write the graph into a .rdf file)
+     *
+     * @param graph graph to be saved
+     */
     @Override
     public void saveGraph(Graph graph) {
         Model modelToSave = graph.getGraph();
@@ -88,17 +69,22 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         modelToSave.close();
     }
 
+    /**
+     * Gets a graph from the graph database.
+     *
+     * @param graphName name of the graph to be retrieved
+     */
     @Override
-    public Graph getGraph(String modelName) {
-        String filePath = directory + modelName + ".rdf";
+    public Graph getGraph(String graphName) {
+        String filePath = directory + graphName + ".rdf";
         Model model = ModelFactory.createDefaultModel();
-        Graph graph;
 
-        //miramos qué tipo de grafo es para constuir la interficie
+        Graph graph;
+        // Check what type of graph it is to build the interface
         ORMStoreInterface ormInterface = ORMStoreFactory.getInstance();
-        if (ormInterface.findById(LocalGraphJenaImpl.class, modelName) != null) {
+        if (ormInterface.findById(LocalGraphJenaImpl.class, graphName) != null) {
             graph = CoreGraphFactory.createLocalGraph();
-        } else if (ormInterface.findById(IntegratedGraphJenaImpl.class, modelName) != null) {
+        } else if (ormInterface.findById(IntegratedGraphJenaImpl.class, graphName) != null) {
             graph = CoreGraphFactory.createIntegratedGraph();
         } else {
             graph = CoreGraphFactory.createGraphInstance("normal");
@@ -106,7 +92,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
 
         try {
             model.read(new FileInputStream(filePath), "RDF/XML");
-            graph.setGraphName(modelName);
+            graph.setGraphName(graphName);
             graph.setGraph(model);
 
             nextiaGraphyModuleInterface visualLibInterface = new nextiaGraphyModuleImpl();
@@ -119,73 +105,12 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
                 ((IntegratedGraphJenaImpl) graph).setGlobalGraph((GlobalGraphJenaImpl) globalGraph);
             }
 
-            System.out.println("Modelo cargado exitosamente desde: " + filePath);
+            System.out.println("Model loaded successfully from: " + filePath);
         } catch (FileNotFoundException e) {
-            System.out.println("Error al cargar el modelo: " + e.getMessage());
+            System.out.println("Error when loading the model: " + e.getMessage());
         }
         return graph;
     }
-
-
-    /**
-     * Saves the given graph.
-     *
-     * @param graph the graph to save
-     *//*
-    @Override
-    public void saveGraph(Graph graph) {
-        Model modelToSave = graph.getGraph();
-        dataset.begin(ReadWrite.WRITE);
-        try {
-            String modelName = "http://example.com/"+graph.getGraphName();
-            dataset.addNamedModel(modelName, modelToSave);
-            dataset.commit();
-            dataset.end();
-            System.out.println("+++++++++++++++++++GRAFO SALVADOOOOO "+graph.getGraphName());
-        } catch (final Exception ex) {
-            dataset.abort();
-            throw ex;
-        }
-    }
-    */
-
-
-    /**
-     * Retrieves the graph with the given name.
-     *
-     * @param name the URI of the graph to retrieve
-     * @return the retrieved graph
-     */
-    /*
-    @Override
-    public Graph getGraph(String name) {
-        dataset.begin(ReadWrite.READ);
-        try {
-            //Retrieve Named Graph from Dataset, or use Default Graph.
-            String modelName = "http://example.com/"+name;
-            if (dataset.containsNamedModel(modelName)) {
-                Model model = dataset.getNamedModel(modelName);
-                Graph graph = CoreGraphFactory.createGraphInstance("normal");
-                graph.setGraphName(name);
-                graph.setGraph(model);
-
-                nextiaGraphyModuleInterface visualLibInterface = new nextiaGraphyModuleImpl();
-                String graphicalSchema = visualLibInterface.generateVisualGraph(graph);
-                graph.setGraphicalSchema(graphicalSchema);
-
-                return graph;
-            } else {
-                throw getIllegalArgumentException(new URI(name));
-            }
-        } catch (final Exception ex) {
-            dataset.abort();
-            throw ex;
-        } finally {
-            dataset.end();
-        }
-    }
-
-     */
 
 }
 

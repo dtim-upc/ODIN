@@ -17,15 +17,4 @@ public class bsModuleImpl implements bsModuleInterface {
         }
     }
 
-    @Override
-    public Graph bootstrapGraph(Dataset dataset) {
-        NextiaBootstrapInterface bootstrapInterface;
-        try {
-            bootstrapInterface = BootstrapFactory.getInstance(dataset);
-            return bootstrapInterface.bootstrapGraph(dataset);
-        } catch (Exception e) {
-            throw new RuntimeException("Error converting dataset to graph: " + e.getMessage(), e);
-        }
-    }
-
 }

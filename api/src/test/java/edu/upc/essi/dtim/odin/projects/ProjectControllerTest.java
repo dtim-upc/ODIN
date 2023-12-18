@@ -1,17 +1,4 @@
-package edu.upc.essi.dtim.odin.project;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
+package edu.upc.essi.dtim.odin.projects;
 
 
 class ProjectControllerTest {

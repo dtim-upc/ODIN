@@ -2,8 +2,8 @@ package edu.upc.essi.dtim.odin.query;
 
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR.qrModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR.qrModuleInterface;
-import edu.upc.essi.dtim.odin.project.Project;
-import edu.upc.essi.dtim.odin.project.ProjectService;
+import edu.upc.essi.dtim.odin.projects.Project;
+import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
 import edu.upc.essi.dtim.odin.query.pojos.RDFSResult;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.NextiaStore.RelationalStore;
 
-import edu.upc.essi.dtim.odin.project.Project;
+import edu.upc.essi.dtim.odin.projects.Project;
 import org.junit.jupiter.api.*;
 
 import javax.persistence.EntityManager;
@@ -8,16 +8,16 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
-class OrmStoreJpaImplTest {
+class ORMStoreJpaImplTest {
 
     private EntityManagerFactory emf;
-    private OrmStoreJpaImpl ormImplementation;
+    private ORMStoreJpaImpl ormImplementation;
     private Project entity;
 
     @BeforeEach
     void setUp() {
         emf = Persistence.createEntityManagerFactory("ORMPersistenceUnit");
-        ormImplementation = new OrmStoreJpaImpl();
+        ormImplementation = new ORMStoreJpaImpl();
         this.entity = new Project();
         this.entity.setProjectId("testID");
         this.entity.setProjectName("testName");
