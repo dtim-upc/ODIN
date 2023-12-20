@@ -7,8 +7,7 @@ public class Alignment {
 	private String label;
 	private float similarity;
 
-	public Alignment() {
-	}
+	public Alignment() {}
 
 	public Alignment(Attribute attributeA, Attribute attributeB, String label, float similarity) {
 		this.attributeA = attributeA;
@@ -21,7 +20,6 @@ public class Alignment {
 	public Attribute getAttributeA() {
 		return attributeA;
 	}
-
 	public void setAttributeA(Attribute attributeA) {
 		this.attributeA = attributeA;
 	}
@@ -29,7 +27,6 @@ public class Alignment {
 	public Attribute getAttributeB() {
 		return attributeB;
 	}
-
 	public void setAttributeB(Attribute attributeB) {
 		this.attributeB = attributeB;
 	}
@@ -37,7 +34,6 @@ public class Alignment {
 	public String getLabel() {
 		return label;
 	}
-
 	public void setLabel(String label) {
 		this.label = label;
 	}
@@ -45,7 +41,6 @@ public class Alignment {
 	public float getSimilarity() {
 		return similarity;
 	}
-
 	public void setSimilarity(float similarity) {
 		this.similarity = similarity;
 	}
@@ -82,15 +77,9 @@ public class Alignment {
 		this.identifier = identifier;
 	}
 
-
-	public String getIriL() {
-		return "http://www.essi.upc.edu/DTIM/NextiaDI/" + l;
-	}
-
 	public String getIriA() {
 		return iriA;
 	}
-
 	public void setIriA(String iriA) {
 		this.iriA = iriA;
 	}
@@ -98,7 +87,6 @@ public class Alignment {
 	public String getIriB() {
 		return iriB;
 	}
-
 	public void setIriB(String iriB) {
 		this.iriB = iriB;
 	}
@@ -106,7 +94,6 @@ public class Alignment {
 	public String getLabelA() {
 		return labelA;
 	}
-
 	public void setLabelA(String labelA) {
 		this.labelA = labelA;
 	}
@@ -114,7 +101,6 @@ public class Alignment {
 	public String getLabelB() {
 		return labelB;
 	}
-
 	public void setLabelB(String labelB) {
 		this.labelB = labelB;
 	}
@@ -122,7 +108,6 @@ public class Alignment {
 	public String getL() {
 		return l;
 	}
-
 	public void setL(String l) {
 		this.l = l;
 	}
@@ -130,7 +115,6 @@ public class Alignment {
 	public String getType() {
 		return type;
 	}
-
 	public void setType(String type) {
 		this.type = type;
 	}
@@ -138,9 +122,12 @@ public class Alignment {
 	public Boolean getIdentifier() {
 		return identifier;
 	}
-
 	public void setIdentifier(Boolean identifier) {
 		this.identifier = identifier;
+	}
+
+	public String getIriL() {
+		return "http://www.essi.upc.edu/DTIM/NextiaDI/" + l;
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////
 }

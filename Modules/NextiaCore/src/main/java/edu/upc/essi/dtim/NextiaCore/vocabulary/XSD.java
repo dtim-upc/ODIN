@@ -2,10 +2,6 @@ package edu.upc.essi.dtim.NextiaCore.vocabulary;
 
 public class XSD {
     public static final String uri = "http://www.w3.org/2001/XMLSchema#";
-
-    /** returns the URI for this schema
-     @return the URI for this schema
-     */
     public static String getURI() {
         return uri;
     }

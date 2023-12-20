@@ -1,10 +1,14 @@
-package edu.upc.essi.dtim.NextiaJD;
-
+package edu.upc.essi.dtim.NextiaJD.discovery;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
+import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
+import edu.upc.essi.dtim.NextiaJD.calculateQuality.CalculateQuality;
+import edu.upc.essi.dtim.NextiaJD.calculateQuality.CalculateQualityFromCSV;
+import edu.upc.essi.dtim.NextiaJD.predictQuality.PredictQuality;
+import edu.upc.essi.dtim.NextiaJD.predictQuality.Profile;
 import jakarta.xml.bind.JAXBException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
@@ -15,7 +19,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Discovery implements IDiscovery {
     DataLayer dl;
@@ -23,21 +29,45 @@ public class Discovery implements IDiscovery {
         this.dl = dl;
     }
     @Override
-    public double calculateJoinQualityDiscrete(String table1, String table2, String att1, String att2) throws SQLException, ClassNotFoundException, IOException, InterruptedException {
-        Connection conn = DuckDB.getConnection();
-        CalculateQualityNoNextiaCore cq = new CalculateQualityNoNextiaCore(conn, 4.0, 0.5);
-        return cq.calculateQualityDiscrete(table1, table2, att1, att2);
+    public double calculateJoinQualityDiscreteFromCSV(String CSVPath1, String CSVPath2, String att1, String att2) {
+        try {
+            Connection conn = DuckDB.getConnection();
+            CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
+            return cq.calculateQualityDiscreteFromCSV(CSVPath1, CSVPath2, att1, att2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public double calculateJoinQualityContinuous(String table1, String table2, String att1, String att2) throws SQLException, ClassNotFoundException, IOException, InterruptedException {
-        Connection conn = DuckDB.getConnection();
-        CalculateQualityNoNextiaCore cq = new CalculateQualityNoNextiaCore(conn, 4.0, 0.5);
-        return cq.calculateQualityContinuous(table1, table2, att1, att2);
+    public double calculateJoinQualityContinuousFromCSV(String CSVPath1, String CSVPath2, String att1, String att2){
+        try {
+            Connection conn = DuckDB.getConnection();
+            CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
+            return cq.calculateQualityContinuousFromCSV(CSVPath1, CSVPath2, att1, att2);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, ClassNotFoundException, IOException {
+    public LinkedList<Map<String, Object>> calculateQualitiesFromDatasets(String CSVPath1, String CSVPath2, String qualityType) {
+        if (qualityType.equals("continuous") || qualityType.equals("discrete")) {
+            throw new RuntimeException("Type of quality needs to be 'continuous' or 'discrete'");
+        }
+        else {
+            try {
+                Connection conn = DuckDB.getConnection();
+                CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
+                return cq.calculateQualityForDatasets(CSVPath1, CSVPath2);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, IOException {
         Connection conn = DuckDB.getConnection();
         Profile p = new Profile(conn);
         return p.createProfile(path, pathToStoreProfile, resultingProfileName);

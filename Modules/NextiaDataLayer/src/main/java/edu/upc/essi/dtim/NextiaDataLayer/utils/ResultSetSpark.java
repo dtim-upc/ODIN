@@ -10,7 +10,6 @@ import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class ResultSetSpark implements ResultSet {
@@ -43,8 +42,7 @@ public class ResultSetSpark implements ResultSet {
 
     @Override
     public String getString(int columnIndex) throws SQLException {
-        String result = currentRow.get(columnIndex-1).toString();
-        return result;
+        return currentRow.get(columnIndex-1).toString();
     }
 
     @Override

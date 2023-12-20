@@ -1,12 +1,12 @@
-package edu.upc.essi.dtim.NextiaJD;
+package edu.upc.essi.dtim.NextiaJD.calculateQuality;
 
 import org.apache.commons.math3.special.Erf;
 
 public class TruncatedNormalDistribution {
-    private double mean;
-    private double stdDev;
-    private double lowerBound;
-    private double upperBound;
+    private final double mean;
+    private final double stdDev;
+    private final double lowerBound;
+    private final double upperBound;
     public TruncatedNormalDistribution(double mean, double stdDev, double lowerBound, double upperBound) {
         this.mean = mean;
         this.stdDev = stdDev;

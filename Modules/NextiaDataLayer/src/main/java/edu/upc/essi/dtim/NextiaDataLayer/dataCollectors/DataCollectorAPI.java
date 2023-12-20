@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataCollectors;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 
@@ -18,7 +18,7 @@ public class DataCollectorAPI extends DataCollector {
     @Override
     public void uploadDataToTemporalFolder(Dataset d) {
         try {
-            ApiRepository repo = (ApiRepository) d.getRepository();
+            APIRepository repo = (APIRepository) d.getRepository();
             APIDataset ad = (APIDataset) d;
             // Connection parameters
             URL url = new URL(repo.getUrl() + ad.getEndpoint());
@@ -32,7 +32,7 @@ public class DataCollectorAPI extends DataCollector {
                 ((APIDataset) d).setJsonPath(jsonPath); // add path of the json file to be accessed later
 
             } else {
-                System.out.println("GET request did not work.");
+                throw new RuntimeException("API call did not work");
             }
         }
         catch (IOException e) {

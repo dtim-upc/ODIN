@@ -19,7 +19,7 @@ public class QueryService {
 
     public RDFSResult getQueryResult(QueryDataSelection body, String projectId) {
 
-        Project project = projectService.getProjectById(projectId);
+        Project project = projectService.getProject(projectId);
 
         qrModuleInterface qrInterface = new qrModuleImpl();
         return qrInterface.makeQuery(project.getIntegratedGraph(), project.getIntegratedDatasets(), body);

@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Properties;
 
@@ -24,7 +23,7 @@ public abstract class DataLayer {
     SparkSession spark;
     String dataStorePath;
 
-    public DataLayer(String dataStorePath) throws SQLException, ClassNotFoundException, IOException {
+    public DataLayer(String dataStorePath) {
         conf = new SparkConf().setAppName("DataLoading").setMaster("local");
         sc = new JavaSparkContext(conf);
         spark = SparkSession.builder().appName("DataLoading").getOrCreate();
@@ -49,22 +48,22 @@ public abstract class DataLayer {
 
     protected org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df = null;
-        if (d instanceof CsvDataset) {
-            df = spark.read().option("header", true).csv(((CsvDataset) d).getPath());
+        if (d instanceof CSVDataset) {
+            df = spark.read().option("header", true).csv(((CSVDataset) d).getPath());
         }
-        else if (d instanceof JsonDataset) {
-            df = spark.read().option("multiline","true").json(((JsonDataset) d).getPath());
+        else if (d instanceof JSONDataset) {
+            df = spark.read().option("multiline","true").json(((JSONDataset) d).getPath());
         }
         else if (d instanceof APIDataset) {
             df = spark.read().option("multiline","true").json(((APIDataset) d).getJsonPath());
         }
         else if (d.getClass().equals(SQLDataset.class)) {
-            SQLDataset sqld = (SQLDataset) d;
+            SQLDataset SQLDataset = (SQLDataset) d;
             RelationalJDBCRepository repo = (RelationalJDBCRepository) d.getRepository();
             Properties connectionProperties = new Properties();
-            connectionProperties.put("user", sqld.getUsername());
-            connectionProperties.put("password", sqld.getPassword());
-            df = spark.read().jdbc(repo.getUrl(), sqld.getTableName(), connectionProperties);
+            connectionProperties.put("user", SQLDataset.getUsername());
+            connectionProperties.put("password", SQLDataset.getPassword());
+            df = spark.read().jdbc(repo.getUrl(), SQLDataset.getTableName(), connectionProperties);
         }
         // we use the name because the wrapper is expecting the sql table to have the name of the dataset
         assert df != null;
@@ -80,7 +79,7 @@ public abstract class DataLayer {
                     System.out.println("Deleting: " + path);
                     Files.delete(path);  //delete each file or directory
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             });
         } catch (IOException e) {
@@ -104,13 +103,13 @@ public abstract class DataLayer {
         return storeTemporalFile(dataStorePath + "tmp", inputFile, newFileDirectory);
     }
 
-    public abstract void uploadToFormattedZone(Dataset d, String tableName) throws SQLException;
+    public abstract void uploadToFormattedZone(Dataset d, String tableName);
 
-    public abstract void removeFromFormattedZone(String tableName) throws SQLException;
+    public abstract void removeFromFormattedZone(String tableName);
 
-    public abstract ResultSet executeQuery(String sql, Dataset[] datasets) throws SQLException;
+    public abstract ResultSet executeQuery(String sql, Dataset[] datasets);
 
-    public abstract void close() throws SQLException;
+    public abstract void close();
 
     // Only for testing the data that is uploaded
     public void show(Dataset d) {

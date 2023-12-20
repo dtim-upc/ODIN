@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.repositories;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
@@ -21,17 +21,9 @@ import java.util.Map;
 
 @Service
 public class RepositoryService {
-    private final ORMStoreInterface ormDataResource;
-    private final ProjectService projectService;
-
-    public RepositoryService(@Autowired ProjectService projectService) {
-        try {
-            this.ormDataResource = ORMStoreFactory.getInstance();
-            this.projectService = projectService;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
+    @Autowired
+    private ProjectService projectService;
 
     public DataRepository getRepositoryById(String repositoryId) {
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
@@ -41,7 +33,21 @@ public class RepositoryService {
         return dataRepository;
     }
 
-    public boolean testConnection(String url, String user, String password) {
+    public boolean testConnectionFromRequest(Map<String, String> requestData) {
+        String url = requestData.get("url");
+        String username = requestData.get("username");
+        String password = requestData.get("password");
+        String port = requestData.get("port");
+        String hostname = requestData.get("hostname");
+        String databaseName = requestData.get("databaseName");
+        String databaseType = requestData.get("databaseType");
+
+        String customUrl = "jdbc:" + databaseType + "://" + hostname + ":" + port + "/" + databaseName;
+
+        return testConnection(url, username, password) || testConnection(customUrl, username, password);
+    }
+
+    private boolean testConnection(String url, String user, String password) {
         // Check that all parameters have values
         if (url != null && !url.isEmpty() && user != null && !user.isEmpty() && password != null && !password.isEmpty()) {
             RelationalJDBCRepository jdbcRepository = new RelationalJDBCRepository(user, password, url);
@@ -56,9 +62,8 @@ public class RepositoryService {
      * Creates a new DataRepository with the specified repository name using the ORMStoreInterface.
      *
      * @param repositoryData Data to create the repository
-     * @return The created DataRepository.
      */
-    public DataRepository createRepository(Map<String, String> repositoryData) {
+    public void createRepository(Map<String, String> repositoryData, String projectId) {
         DataRepository repository;
 
         switch (repositoryData.get("repositoryType")) {
@@ -90,8 +95,8 @@ public class RepositoryService {
                 ((LocalRepository) repository).setPath(repositoryData.get("path"));
                 break;
             case "ApiRepository":
-                repository = new ApiRepository();
-                ((ApiRepository) repository).setUrl(repositoryData.get("url"));
+                repository = new APIRepository();
+                ((APIRepository) repository).setUrl(repositoryData.get("url"));
                 break;
             default:
                 repository = new DataRepository();
@@ -99,21 +104,12 @@ public class RepositoryService {
 
         repository.setRepositoryName(repositoryData.get("repositoryName"));
         repository.setVirtual(Boolean.valueOf(repositoryData.get("isVirtual")));
-        return ormDataResource.save(repository); // Save the DataRepository and return it
-    }
-
-    public DataRepository saveRepository(DataRepository repository) {
-        return ormDataResource.save(repository);
-    }
-
-    /**
-     * Adds a DataRepository to a specific project using the ORMStoreInterface and ProjectService.
-     *
-     * @param projectId  The ID of the project to which the repository will be added.
-     * @param repository Repository to be added to the project
-     */
-    public void addRepositoryToProject(String projectId, DataRepository repository) {
         projectService.addRepositoryToProject(projectId, repository);
+        saveRepository(repository); // Save the DataRepository
+    }
+
+    public void saveRepository(DataRepository repository) {
+        ormDataResource.save(repository);
     }
 
     public List<String> getDatabaseTables(String repositoryId) {
@@ -175,9 +171,8 @@ public class RepositoryService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
-
         return tableList;
     }
 

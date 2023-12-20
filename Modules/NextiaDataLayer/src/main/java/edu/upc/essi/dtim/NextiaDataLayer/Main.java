@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.NextiaDataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
@@ -14,13 +14,13 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        CsvDataset d1 = new CsvDataset("d1", "d1", "description1", "src\\main\\resources\\sample.csv");
-        CsvDataset d2 = new CsvDataset("titanic", "titanic", "description2", "C:\\Work\\Files\\titanic.csv");
-        JsonDataset d3 = new JsonDataset("test", "test", "description3", "C:\\Work\\Files\\test.json");
-        JsonDataset d4 = new JsonDataset("test2", "test2", "description3", "C:\\Work\\Files\\test.json");
+        CSVDataset d1 = new CSVDataset("d1", "d1", "description1", "src\\main\\resources\\sample.csv");
+        CSVDataset d2 = new CSVDataset("titanic", "titanic", "description2", "C:\\Work\\Files\\titanic.csv");
+        JSONDataset d3 = new JSONDataset("test", "test", "description3", "C:\\Work\\Files\\test.json");
+        JSONDataset d4 = new JSONDataset("test2", "test2", "description3", "C:\\Work\\Files\\test.json");
 
-        CsvDataset d5 = new CsvDataset("titanic1", "titanic1", "description2", "C:\\Work\\Files\\titanic1.csv");
-        CsvDataset d6 = new CsvDataset("titanic2", "titanic2", "description2", "C:\\Work\\Files\\titanic2.csv");
+        CSVDataset d5 = new CSVDataset("titanic1", "titanic1", "description2", "C:\\Work\\Files\\titanic1.csv");
+        CSVDataset d6 = new CSVDataset("titanic2", "titanic2", "description2", "C:\\Work\\Files\\titanic2.csv");
 
         SQLDataset d7 = new SQLDataset("sql", "personas", "", "personas", "dtim.essi.upc.edu", "5432", "vasenjo", "jBGRfEu");
         APIDataset d8 = new APIDataset("api", "fact", "", "fact", "");
@@ -70,7 +70,7 @@ public class Main {
 //        dlm.close();
     }
 
-    private static void testWrapper(JsonDataset d1, JsonDataset d2) throws SQLException, IOException, ClassNotFoundException {
+    private static void testWrapper(JSONDataset d1, JSONDataset d2) throws SQLException, IOException, ClassNotFoundException {
         DLDuckDB dlm = new DLDuckDB("C:\\Work\\Database");
 
 //        d1.setUUID("test");
@@ -108,7 +108,7 @@ public class Main {
     }
 
     private static void testAPI(APIDataset d8) throws SQLException, IOException, ClassNotFoundException {
-        ApiRepository dr = new ApiRepository();
+        APIRepository dr = new APIRepository();
         dr.setUrl("https://catfact.ninja/");
         dr.setVirtual(true);
         d8.setRepository(dr);
@@ -135,7 +135,7 @@ public class Main {
         DataRepository dr1 = new LocalRepository();
         dr1.setVirtual(false);
         d1.setRepository(dr1);
-        DataRepository dr2 = new ApiRepository();
+        DataRepository dr2 = new APIRepository();
         dr2.setVirtual(true);
         d2.setRepository(dr2);
         d1.setUUID("titanic1");

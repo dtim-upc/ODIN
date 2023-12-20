@@ -17,37 +17,65 @@ public class DLDuckDB extends DataLayer {
     Connection conn;
     Statement stmt;
 
-    public DLDuckDB(String dataStorePath) throws SQLException, ClassNotFoundException, IOException {
+    public DLDuckDB(String dataStorePath) {
         super(dataStorePath);
         this.conn = getConnection();
-        this.stmt = conn.createStatement();
+        try {
+            this.stmt = conn.createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
-        Class.forName("org.duckdb.DuckDBDriver");
+    private Connection getConnection() {
+        try {
+            Class.forName("org.duckdb.DuckDBDriver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         // Create directory if it does not exist
-        Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake"));
-        return DriverManager.getConnection("jdbc:duckdb:" + dataStorePath + "DuckDBDataLake\\database");
+        try {
+            Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            return DriverManager.getConnection("jdbc:duckdb:" + dataStorePath + "DuckDBDataLake\\database");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void uploadToFormattedZone(Dataset d, String tableName) throws SQLException {
+    public void uploadToFormattedZone(Dataset d, String tableName) {
         String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
-        stmt.execute("CREATE TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+        try {
+            stmt.execute("CREATE TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void uploadToTemporalFormattedZone(Dataset d, String tableName) throws SQLException {
+    public void uploadToTemporalFormattedZone(Dataset d, String tableName) {
         String parquetPath = dataStorePath + "tmp\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
-        stmt.execute("CREATE TEMP TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+        try {
+            stmt.execute("CREATE TEMP TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void removeFromFormattedZone(String tableName) throws SQLException {
-        stmt.execute("DROP TABLE " + tableName);
+    public void removeFromFormattedZone(String tableName) {
+        try {
+            stmt.execute("DROP TABLE " + tableName);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String getParquetFile(File directoryPath) {
@@ -63,23 +91,32 @@ public class DLDuckDB extends DataLayer {
     }
 
     @Override
-    public ResultSet executeQuery(String sql, Dataset[] datasets) throws SQLException {
-        collectVirtualizedTables(datasets);
-        return stmt.executeQuery(sql);
+    public ResultSet executeQuery(String sql, Dataset[] datasets) {
+        try {
+            collectVirtualizedTables(datasets);
+            return stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void collectVirtualizedTables(Dataset[] datasets) throws SQLException {
+    private void collectVirtualizedTables(Dataset[] datasets) {
         // If the dataset is virtualized we have to go fetch the data. Otherwise, we do not need to do anything
         for (Dataset dataset: datasets) {
             DataRepository repo = dataset.getRepository();
             if (repo.getVirtual()) {
                 // First, we check if the table has already been virtualized. If that is the case, we don't do anything
-                ResultSet rs = stmt.executeQuery("SHOW TABLES");
+                ResultSet rs;
                 boolean tableExists = false;
-                while (rs.next()) {
-                    if (rs.getString(1).equals(dataset.getUUID())) {
-                        tableExists = true;
+                try {
+                    rs = stmt.executeQuery("SHOW TABLES");
+                    while (rs.next()) {
+                        if (rs.getString(1).equals(dataset.getUUID())) {
+                            tableExists = true;
+                        }
                     }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
                 if (!tableExists) {
                     DataCollector dc = getDataCollector(repo);
@@ -109,9 +146,13 @@ public class DLDuckDB extends DataLayer {
     }
 
     @Override
-    public void close() throws SQLException {
-        stmt.close();
-        conn.close();
+    public void close() {
+        try {
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         // Remove all the files in the temporal zone (/tmp)
         deleteFilesFromDirectory(dataStorePath + "tmp");
     }

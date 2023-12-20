@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.nextiabs;
+package edu.upc.essi.dtim.nextiabs.bootstrap;
 
 import edu.upc.essi.dtim.nextiabs.utils.IDataSource;
 

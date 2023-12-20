@@ -8,74 +8,64 @@ import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.vocabulary.RDFS;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.*;
 
 public class GraphJenaImpl implements Graph {
-
-    /*
-    public GraphJenaImpl(String id, String name, Model triples) {
-        this.graph = ModelFactory.createDefaultModel();
-        this.graphName = (name != null) ? "http://example/" + name : "null";
-    }*/
+	private String graphName; // e.g. "http://example/"+ UUID.randomUUID().toString();
+	private String graphicalSchema;
+	@JsonIgnore
+	private Model graph;
 
 	public GraphJenaImpl(String graphNameA){
 		this.graph = ModelFactory.createDefaultModel();
 		this.graphName = graphNameA;
 	}
 	public GraphJenaImpl() {
-		//this.graphName = "http://example/"+ UUID.randomUUID().toString();
 		this.graph = ModelFactory.createDefaultModel();
 	}
-
-	private String graphName;
-
-	private String graphicalSchema;
 
 	public String getGraphName() {
 		return graphName;
 	}
+	public void setGraphName(String graphName) {
+		this.graphName = graphName;
+	}
 
-	/**
-	 * @param subject Subject
-	 * @param predicate Predicate
-	 * @param object Object
-	 */
+	public String getGraphicalSchema() {
+		return graphicalSchema;
+	}
+	public void setGraphicalSchema(String graphicalSchema) {
+		this.graphicalSchema = graphicalSchema;
+	}
+
+	public Model getGraph() {
+		return graph;
+	}
+	public void setGraph(Model graph) {
+		this.graph = graph;
+	}
+
+
 	@Override
 	public void addTriple(String subject, String predicate, String object) {
 		Resource r = graph.createResource(subject);
 		r.addProperty(graph.createProperty(predicate), graph.createResource(object));
 	}
 
-
-	/**
-	 * @param subject Subject
-	 * @param predicate Predicate
-	 * @param literal literal
-	 */
 	@Override
 	public void addTripleLiteral(String subject, String predicate, String literal) {
 		Resource r = graph.createResource(subject);
 		r.addProperty(graph.createProperty(predicate), literal);
 	}
 
-	/**
-	 * @param subject Subject
-	 * @param predicate Predicate
-	 * @param object Object
-	 */
 	@Override
 	public void deleteTriple(String subject, String predicate, String object) {
 		graph.removeAll(new ResourceImpl(subject), new PropertyImpl(predicate), new ResourceImpl(object));
 	}
 
-	/**
-	 * @param sparql query
-	 * @return List
-	 */
 	@Override
 	public List<Map<String, Object>> query(String sparql) {
 		List<Map<String, Object>> resultsList = new ArrayList<>();
@@ -85,11 +75,11 @@ public class GraphJenaImpl implements Graph {
 			qExec.close();
 
 			while (results.hasNext()) {
-				QuerySolution soln = results.nextSolution();
+				QuerySolution solution = results.nextSolution();
 				Map<String, Object> row = new HashMap<>();
 
 				for (String var : results.getResultVars()) {
-					RDFNode node = soln.get(var);
+					RDFNode node = solution.get(var);
 
 					// Convert RDFNode to a more general data type if possible
 					if (node.isLiteral()) {
@@ -106,55 +96,13 @@ public class GraphJenaImpl implements Graph {
 			e.printStackTrace();
 		}
 		return resultsList;
-
-
-		//return null;
 	}
 
-	public void setGraphName(String graphName) {
-		this.graphName = graphName;
-	}
-
-	public Model getGraph() {
-		return graph;
-	}
-	public void setGraph(Model graph) {
-		this.graph = graph;
-	}
-
-	@JsonIgnore
-	private Model graph;
-
-	public String getGraphicalSchema() {
-		return graphicalSchema;
-	}
-
-	public void setGraphicalSchema(String graphicalSchema) {
-		this.graphicalSchema = graphicalSchema;
-	}
-
-	/**
-	 * @return iter
-	 */
 	@Override
 	public ResIterator retrieveSubjects() {
-		List<String> subjects = new ArrayList<>();
-
-		ResIterator iter = graph.listSubjects();
-		return iter;
-
-
-		/*while (iter.hasNext()) {
-			Resource resource = iter.nextResource();
-			subjects.add(resource.getURI());
-		}
-		return subjects;
-		*/
+		return graph.listSubjects();
 	}
 
-	/**
-	 * @return list string
-	 */
 	@Override
 	public List<String> retrievePredicates() {
 		List<String> predicates = new ArrayList<>();
@@ -169,22 +117,15 @@ public class GraphJenaImpl implements Graph {
 		return predicates;
 	}
 
-	/**
-	 * @param file file
-	 */
 	@Override
 	public void write(String file) {
 		try {
 			RDFDataMgr.write(new FileOutputStream(file), graph, Lang.TURTLE);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw new RuntimeException("File not found");
 		}
 	}
 
-	/**
-	 * @param propertyIRI propertyIRI
-	 * @return string
-	 */
 	@Override
 	public String getDomainOfProperty(String propertyIRI) {
         /*
@@ -197,14 +138,8 @@ public class GraphJenaImpl implements Graph {
         }
 */
 		return null;
-
-
 	}
 
-	/**
-	 * @param resourceIRI resourceIRI
-	 * @return string
-	 */
 	@Override
 	public String getRDFSLabel(String resourceIRI) {
         /*
@@ -217,7 +152,5 @@ public class GraphJenaImpl implements Graph {
         }
         */
 		return null;
-
-
 	}
 }

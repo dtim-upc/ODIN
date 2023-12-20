@@ -2,25 +2,21 @@ package edu.upc.essi.dtim.NextiaCore.graph;
 
 import java.util.*;
 public class URI {
-	public String getURI() {
-		return URI;
-	}
-
-	public void setURI(String URI) {
-		this.URI = URI;
-	}
-
-	public URI() {
-	}
-
 	private String URI;
 
+	public URI() {}
 	public URI(String value) {
 		this.URI = value;
 	}
 
-	// Sobreescribimos el método equals para poder comparar URIs
-	@Override
+	public String getURI() {
+		return this.URI;
+	}
+	public void setURI(String URI) {
+		this.URI = URI;
+	}
+
+	@Override // We override the method so we can compare URIs
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -28,8 +24,7 @@ public class URI {
 		return Objects.equals(URI, uri.URI);
 	}
 
-	// Sobreescribimos el método hashCode para poder comparar URIs
-	@Override
+	@Override // We override the method so we can compare URIs
 	public int hashCode() {
 		return Objects.hash(URI);
 	}

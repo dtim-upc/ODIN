@@ -1,13 +1,13 @@
-package edu.upc.essi.dtim.nextiabs;
+package edu.upc.essi.dtim.nextiabs.implementations;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
-import edu.upc.essi.dtim.nextiabs.temp.PrintGraph;
+import edu.upc.essi.dtim.nextiabs.bootstrap.IBootstrap;
+import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
 import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
 import edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS;
 import edu.upc.essi.dtim.nextiabs.utils.DataSource;
@@ -18,26 +18,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 
 /**
- * Generates an RDFS-compliant representation of a CSV file schema
+ * Generates an RDFS-compliant representation of an XML file schema
  * @author snadal
  */
-public class XMLBootstrap_with_DataFrame_MM_without_Jena extends DataSource implements IBootstrap<Graph>, NextiaBootstrapInterface {
-
+public class XMLBootstrap extends DataSource implements IBootstrap<Graph>, Bootstrap {
+	// Using DataFrame_MM and without Jena
 	public String path;
 
-	public XMLBootstrap_with_DataFrame_MM_without_Jena(String id, String name, String path) {
+	public XMLBootstrap(String id, String name, String path) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.path = path;
-	}
-
-	public XMLBootstrap_with_DataFrame_MM_without_Jena() {
-	}
-
-	@Override
-	public Graph bootstrapSchema() {
-		return bootstrapSchema(false);
 	}
 
 	@Override
@@ -45,7 +37,6 @@ public class XMLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 		G_target = CoreGraphFactory.createGraphInstance("local");
 //		setPrefixes();
 		try {
-
 			//build the XML DOM
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -56,7 +47,7 @@ public class XMLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 			Element root = document.getDocumentElement();
 			String rootName = root.getNodeName();
 			System.out.println("Root element: " + rootName);
-			for (int n = 0; n < root.getChildNodes().getLength(); n++) System.out.println("  "+n+"-"+root.getChildNodes().item(n).getNodeName());
+			for (int n = 0; n < root.getChildNodes().getLength(); n++) System.out.println("  " + n + "-" + root.getChildNodes().item(n).getNodeName());
 
 			//Add the triples to the graph
 			G_target.addTriple(createIRI(rootName), RDF.type, DataFrame_MM.DataFrame);
@@ -181,29 +172,16 @@ public class XMLBootstrap_with_DataFrame_MM_without_Jena extends DataSource impl
 //		G_target.addTripleLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.getURI(), wrapper);
 	}
 
-	public static void main(String[] args) {
-
-		String pathcsv = "src/main/resources/museums-and-galleries-1.xml";
-		XMLBootstrap_with_DataFrame_MM_without_Jena csv = new XMLBootstrap_with_DataFrame_MM_without_Jena("12","artworks", pathcsv);
-		Graph m =csv.bootstrapSchema(true);
-
-		PrintGraph.printGraph(m);
-
+	@Override
+	public Graph bootstrapSchema() {
+		return bootstrapSchema(false);
 	}
 
 	@Override
-	public BootstrapResult bootstrap(Dataset dataset) {
-		XMLBootstrap_with_DataFrame_MM_without_Jena xml = new XMLBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((XmlDataset) dataset).getPath());
-		Graph bootstrapG = xml.bootstrapSchema();
-		String wrapperG = xml.wrapper;
-
-		return new BootstrapResult(bootstrapG, wrapperG);
+	public BootstrapResult bootstrapDataset(Dataset dataset) {
+		bootstrapSchema();
+		return new BootstrapResult(G_target, wrapper);
 	}
 
-	@Override
-	public Graph bootstrapGraph(Dataset dataset) {
-		XMLBootstrap_with_DataFrame_MM_without_Jena xml = new XMLBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((XmlDataset) dataset).getPath());
-		return xml.bootstrapSchema();
-	}
 }
 

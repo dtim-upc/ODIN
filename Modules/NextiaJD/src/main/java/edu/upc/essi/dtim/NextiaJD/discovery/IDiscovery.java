@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaJD;
+package edu.upc.essi.dtim.NextiaJD.discovery;
 
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
@@ -10,13 +10,17 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public interface IDiscovery {
 
-    double calculateJoinQualityDiscrete(String table1, String table2, String att1, String att2) throws SQLException, ClassNotFoundException, IOException, InterruptedException;
+    double calculateJoinQualityDiscreteFromCSV(String CSVPath1, String CSVPath2, String att1, String att2);
 
-    double calculateJoinQualityContinuous(String table1, String table2, String att1, String att2) throws SQLException, ClassNotFoundException, IOException, InterruptedException;
+    double calculateJoinQualityContinuousFromCSV(String CSVPath1, String CSVPath2, String att1, String att2);
+
+    LinkedList<Map<String, Object>> calculateQualitiesFromDatasets(String CSVPath1, String CSVPath2, String qualityType);
 
     JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, ClassNotFoundException, IOException;
 

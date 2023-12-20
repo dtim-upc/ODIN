@@ -1,15 +1,14 @@
 package edu.upc.essi.dtim.NextiaCore.datasources.dataset;
 
-public class ParquetDataset extends Dataset{
+public class XMLDataset extends Dataset{
     private String path;
-
-    public ParquetDataset(){
+    public XMLDataset(){
         super();
     }
 
-    public ParquetDataset(String id, String name, String description, String path) {
+    public XMLDataset(String id, String name, String description, String path) {
         super(id, name, description);
-        if (!path.endsWith(".parquet")) {
+        if (!path.endsWith(".xml")) {
             throw new IllegalArgumentException("Invalid file format. Only JSON files are supported.");
         }
         this.path = path;

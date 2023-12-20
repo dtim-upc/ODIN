@@ -1,9 +1,11 @@
-package edu.upc.essi.dtim.NextiaJD;
+package edu.upc.essi.dtim.NextiaJD.predictQuality;
 
+import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -11,12 +13,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static edu.upc.essi.dtim.NextiaJD.FeatureGeneration.*;
-import static edu.upc.essi.dtim.NextiaJD.Utils.getNumberOfValues;
+import static edu.upc.essi.dtim.NextiaJD.predictQuality.FeatureGeneration.*;
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.getNumberOfValues;
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.preprocessing;
 
 public class Profile {
 
@@ -31,7 +34,7 @@ public class Profile {
         // Create table from file and preprocess the data
         Statement stmt = conn.createStatement();
         stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + path + "', header=True, all_varchar=True, ignore_errors=True)");
-        executePreprocessing();
+        preprocessing(conn, tableName);
 
         // Generate the profile of the table: for each column, its profile is generated and added to the features variable
         LinkedList<Map<String,Object>> features = new LinkedList<>();
@@ -62,7 +65,7 @@ public class Profile {
         return json;
     }
 
-    private void writeJSON(LinkedList<Map<String, Object>> features, String path, String pathToStoreProfile, String resultingProfileName) throws IOException {
+    public void writeJSON(LinkedList<Map<String, Object>> features, String path, String pathToStoreProfile, String resultingProfileName) throws IOException {
         String profileFileName = pathToStoreProfile + "\\" + resultingProfileName + ".json";
         if (resultingProfileName.isEmpty()) {
             String fileName = Paths.get(path).getFileName().toString();
@@ -84,7 +87,7 @@ public class Profile {
         file.close();
     }
 
-    private Map<String,Object> createProfileOfColumn(String column) throws SQLException {
+    public Map<String,Object> createProfileOfColumn(String column) throws SQLException {
         Map<String, Object> columnFeatures = new HashMap<>();
         addCardinalityFeatures(column, columnFeatures);
         addValueDistributionFeatures(column, columnFeatures);
@@ -94,7 +97,7 @@ public class Profile {
         return columnFeatures;
     }
 
-    private void addCardinalityFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
+    public void addCardinalityFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
         Map<String, Object> newFeatures = generateCardinalityFeatures(conn, tableName, column);
         columnFeatures.put("cardinality", newFeatures.get("cardinality"));
         columnFeatures.put("uniqueness", newFeatures.get("uniqueness"));
@@ -104,7 +107,7 @@ public class Profile {
         columnFeatures.put("entropy", newFeatures.get("entropy"));
     }
 
-    private void addValueDistributionFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
+    public void addValueDistributionFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
         Map<String, Object> newFeatures = generateFrequenciesAndPercentages(conn, tableName, column);
         columnFeatures.put("frequency_avg", newFeatures.get("frequency_avg"));
         columnFeatures.put("frequency_min", newFeatures.get("frequency_min"));
@@ -130,7 +133,7 @@ public class Profile {
         columnFeatures.put("frequency_7qo", newFeatures.get("frequency_7qo"));
     }
 
-    private void addSyntacticFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
+    public void addSyntacticFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
         Map<String, Object> newFeatures = generateDatatypes(conn, tableName, column);
         columnFeatures.put("datatype", newFeatures.get("datatype"));
         columnFeatures.put("specificType", newFeatures.get("specificType"));
@@ -155,7 +158,7 @@ public class Profile {
         columnFeatures.put("wordsCntSd", newFeatures.get("wordsCntSd"));
     }
 
-    private void addOtherFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
+    public void addOtherFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
         Map<String, Object> newFeatures = generateFirstAndLastWord(conn, tableName, column);
         columnFeatures.put("firstWord", newFeatures.get("firstWord"));
         columnFeatures.put("lastWord", newFeatures.get("lastWord"));
@@ -167,20 +170,24 @@ public class Profile {
         columnFeatures.put("isEmpty", newFeatures.get("isEmpty"));
     }
 
-    // Trim (remove spaces at either side of the string) and lowercase (transform all characters to lowercase)
-    private void executePreprocessing() throws SQLException {
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS");
-        while (rs.next()) {
-            if (rs.getString(2).equals(tableName)) {
-                stmt.execute(
-            "UPDATE \"" + tableName + "\" " +
-                "SET \"" + rs.getString(1) + "\" = CASE " +
-                    "WHEN \"" + rs.getString(1) + "\" IN ('', ' ') THEN NULL " +
-                    "ELSE LOWER(TRIM(\"" + rs.getString(1) + "\")) " +
-                    "END");
+    public static void generateAllProfilesOfAllDataInAFolder(String path, String pathToStore) throws Exception {
+        Connection conn = DuckDB.getConnection();
+        // Path of the folder that contains the files to obtain profiles from
+        Set<String> listOfFiles = Stream.of(Objects.requireNonNull(new File(path).listFiles()))
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+        int counter = 1;
+        for (String file: listOfFiles) {
+            System.out.println("File " + counter + " out of " + listOfFiles.size());
+            if (counter > 225) { // This if is to place conditions to isolate some of the files
+                Profile p = new Profile(conn);
+                if (!file.equals(".DS_Store")) {
+                    JSONArray profile1 = p.createProfile(path + "/" + file, pathToStore, "");
+                }
             }
+            counter++;
         }
-
     }
+
 }

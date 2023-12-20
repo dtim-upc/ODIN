@@ -65,7 +65,7 @@ public class DatasetController {
         try {
             DataRepository repository = datasetService.getRepositoryById(repositoryId);
             switch (repository.getRepositoryType()) { // Depending on the type of repo, we execute a different operation
-                case "ApiRepository":
+                case "APIRepository":
                     datasetService.postAPIDataset(attachFiles, datasetDescription, repositoryId, endpoint, apiDatasetName, projectID);
                     break;
                 case "LocalRepository":

@@ -114,7 +114,7 @@ public class IntegrationService {
         ProjectService projectService = new ProjectService(appConfig);
 
         // Retrieve the project using its unique identifier.
-        return projectService.getProjectById(projectId);
+        return projectService.getProject(projectId);
     }
 
     /**

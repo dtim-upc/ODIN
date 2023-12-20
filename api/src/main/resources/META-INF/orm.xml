@@ -138,7 +138,7 @@
         </attributes>
     </entity>
 
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.ApiRepository">
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository">
         <table name="ApiRepository"/>
         <attributes>
             <basic name="url">
@@ -204,21 +204,21 @@
         </attributes>
     </entity>
 
-    <entity name="CsvDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.CsvDataset">
-        <table name="CsvDataset"/>
+    <entity name="CSVDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.CSVDataset">
+        <table name="CSVDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>
     </entity>
 
-    <entity name="JsonDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset">
-        <table name="JsonDataset"/>
+    <entity name="JSONDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.JSONDataset">
+        <table name="JSONDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>
     </entity>
 
-    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XmlDataset">
+    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XMLDataset">
         <table name="XmlDataset"/>
         <attributes>
             <basic name="path"/>

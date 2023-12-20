@@ -20,16 +20,8 @@ import java.util.List;
 @RestController
 public class ProjectController {
     private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
-    private final ProjectService projectService;
-
-    /**
-     * Constructs a new ProjectController with the specified ProjectService.
-     *
-     * @param projectService The ProjectService to be used.
-     */
-    ProjectController(@Autowired ProjectService projectService) {
-        this.projectService = projectService;
-    }
+    @Autowired
+    private ProjectService projectService;
 
     /**
      * Saves a project.
@@ -38,8 +30,8 @@ public class ProjectController {
      * @return A ResponseEntity containing the saved project and HTTP status 201 (Created).
      */
     @PostMapping("/projects")
-    public ResponseEntity<Project> saveProject(@RequestBody Project project) {
-        logger.info("Post request received for saving project");
+    public ResponseEntity<Project> postProject(@RequestBody Project project) {
+        logger.info("Post request received for creating project");
         Project savedProject = projectService.saveProject(project);
         return new ResponseEntity<>(savedProject, HttpStatus.CREATED);
     }
@@ -47,19 +39,15 @@ public class ProjectController {
     /**
      * Retrieves a project by its ID.
      *
-     * @param id The ID of the project to retrieve.
+     * @param projectID The ID of the project to retrieve.
      * @return A ResponseEntity containing the retrieved project and HTTP status 200 (OK) if found,
      * or HTTP status 404 (Not Found) if not found.
      */
-    @GetMapping("/projects/{id}")
-    public ResponseEntity<Project> getProject(@PathVariable("id") String id) {
-        logger.info("GET request received for retrieving project with ID: {}", id);
-        Project project = projectService.getProjectById(id);
-        if (project.getProjectId() != null) {
-            return ResponseEntity.ok(project);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/projects/{projectID}")
+    public ResponseEntity<Project> getProject(@PathVariable("projectID") String projectID) {
+        logger.info("Get request received for retrieving project with ID: " + projectID);
+        Project project = projectService.getProject(projectID);
+        return new ResponseEntity<>(project, HttpStatus.OK);
     }
 
     /**
@@ -71,7 +59,7 @@ public class ProjectController {
     public ResponseEntity<List<Project>> getAllProjects() {
         logger.info("GET request received for retrieving all projects");
         List<Project> projects = projectService.getAllProjects();
-        return ResponseEntity.ok(projects);
+        return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
     /**
@@ -84,18 +72,8 @@ public class ProjectController {
     @DeleteMapping("/deleteProject/{id}")
     public ResponseEntity<Boolean> deleteProject(@PathVariable("id") String id) {
         logger.info("DELETE request received for deleting project with ID: {}", id);
-
-        // Call the projectService to delete the project and get the result
-        boolean deleted = projectService.deleteProject(id);
-
-        // Check if the project was deleted successfully
-        if (deleted) {
-            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
-            return ResponseEntity.ok(true);
-        } else {
-            // Return a ResponseEntity with HTTP status 404 (Not Found)
-            return ResponseEntity.notFound().build();
-        }
+        projectService.deleteProject(id);
+        return ResponseEntity.ok(true);
     }
 
     /**
@@ -106,21 +84,10 @@ public class ProjectController {
      * or HTTP status 404 (Not Found) if the project was not found.
      */
     @PostMapping("/editProject")
-    public ResponseEntity<Boolean> editProject(@RequestBody Project project) {
-        logger.info("EDIT request received for editing project with ID: {}", project.getProjectId());
-        logger.info("EDIT request received for editing project with ID: {}", project.getProjectName());
-
-        // Call the projectService to edit the project and get the result
-        boolean edited = projectService.editProject(project);
-
-        // Check if the project was edited successfully
-        if (edited) {
-            // Return a ResponseEntity with HTTP status 200 (OK) and the boolean value true
-            return ResponseEntity.ok(true);
-        } else {
-            // Return a ResponseEntity with HTTP status 404 (Not Found)
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Boolean> putProject(@RequestBody Project project) {
+        logger.info("EDIT request received for editing project with ID: " + project.getProjectId());
+        projectService.putProject(project);
+        return ResponseEntity.ok(true);
     }
 
     /**
@@ -133,16 +100,9 @@ public class ProjectController {
     @PostMapping("/cloneProject/{projectId}")
     public ResponseEntity<Project> cloneProject(@PathVariable("id") String projectId) {
         logger.info("Clone request received for cloning project with id: " +  projectId);
+        Project projectClone = projectService.cloneProject(projectId);
+        return new ResponseEntity<>(projectClone, HttpStatus.CREATED); // HTTP status 201 (Created)
 
-        // Call the projectService to clone the project and get the result
-        Project projectToClone = projectService.getProjectById(projectId);
-        Project projectClone = projectService.cloneProject(projectToClone);
-
-        if (!projectClone.getProjectId().equals(projectId)) {
-            return new ResponseEntity<>(projectClone, HttpStatus.CREATED); // HTTP status 201 (Created)
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.NOT_MODIFIED); // HTTP status 304 (Not Modified)
-        }
     }
 
     /**
@@ -155,7 +115,7 @@ public class ProjectController {
     public ResponseEntity<InputStreamResource> downloadProjectSchema(
             @PathVariable("id") String projectID
     ) {
-        Project project = projectService.getProjectById(projectID);
+        Project project = projectService.getProject(projectID);
 
         Model model = project.getIntegratedGraph().getGraph();
         StringWriter writer = new StringWriter();
@@ -181,18 +141,8 @@ public class ProjectController {
     @GetMapping("/project/{id}/repositories")
     public ResponseEntity<List<DataRepository>> getRepositoriesOfProject(@PathVariable("id") String projectId) {
         logger.info("GET request received for retrieving repositories of project " + projectId);
-
-        // Call the service to retrieve repositories associated with the project
         List<DataRepository> repositoriesOfProject = projectService.getRepositoriesOfProject(projectId);
-
-        // Check if repositories were found
-        if (!repositoriesOfProject.isEmpty()) {
-            // Return a successful response with the list of repositories
-            return ResponseEntity.ok(repositoriesOfProject);
-        } else {
-            // Return a 404 response if no repositories were found
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(repositoriesOfProject);
     }
 
     /**
@@ -204,15 +154,7 @@ public class ProjectController {
     @GetMapping("/project/{projectId}/datasources")
     public ResponseEntity<Object> getDatasetsFromProject(@PathVariable String projectId) {
         logger.info("Get all datasets from project " + projectId);
-        try {
-            List<Dataset> datasets = projectService.getDatasetsOfProject(projectId);
-            if (datasets.isEmpty()) {
-                return new ResponseEntity<>("The project does not contain datasets", HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(datasets, HttpStatus.OK); // Return the datasets
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<Dataset> datasets = projectService.getDatasetsOfProject(projectId);
+        return new ResponseEntity<>(datasets, HttpStatus.OK);
     }
 }

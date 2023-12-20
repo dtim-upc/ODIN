@@ -7,29 +7,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class DataSource implements IDataSource {
-    //used for the RDFS graph
+    // Used for the RDFS graph
     public Graph G_target;
     public String wrapper;
 
     public String id;
     public String name;
-    public String description;
-//    dataSourceName
+
     public Map<String, String> prefixes;
 
     public DataSource(){
-//        G_target = new LocalGraph(new URI(""),new HashSet<Triple>());
-        G_target = CoreGraphFactory.createGraphInstance("normal");
-        id = "";
-        prefixes = new HashMap<>();
+        this.G_target = CoreGraphFactory.createGraphInstance("normal");
+        this.id = "";
+        this.prefixes = new HashMap<>();
 //        setPrefixes();
     }
 
     public String createIRI(String name){
-        if(id.equals("")){
+        if (id.isEmpty()){
             return DataSourceVocabulary.Schema.getURI() + name;
         }
-        return DataSourceVocabulary.Schema.getURI() + id+"/"+ name;
+        return DataSourceVocabulary.Schema.getURI() + id + "/" + name;
     }
 
 //    public void setPrefixes(){

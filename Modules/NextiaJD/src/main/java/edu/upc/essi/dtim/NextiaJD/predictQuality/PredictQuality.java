@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaJD;
+package edu.upc.essi.dtim.NextiaJD.predictQuality;
 
 import jakarta.xml.bind.JAXBException;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -11,7 +11,7 @@ import java.io.*;
 import java.sql.Connection;
 import java.util.*;
 
-import static edu.upc.essi.dtim.NextiaJD.Utils.writeJSON;
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.writeJSON;
 
 public class PredictQuality {
 
@@ -21,7 +21,7 @@ public class PredictQuality {
             "len_max_word", "len_min_word", "len_avg_word", "wordsCntMax", "wordsCntMin", "wordsCntAvg",
             "numberWords", "wordsCntSd"
     ));
-    Map<String, Integer> distancePattern = Map.ofEntries(
+    Map<String, Integer> distancePattern = Map.<String, Integer>ofEntries(
             Map.entry("cardinality", 0), Map.entry("uniqueness", 0), Map.entry("entropy", 0),
             Map.entry("incompleteness", 0), Map.entry("frequency_avg", 0), Map.entry("frequency_min", 0),
             Map.entry("frequency_max", 0), Map.entry("frequency_sd", 0), Map.entry("val_pct_min", 0),
@@ -48,6 +48,7 @@ public class PredictQuality {
     public double predictQuality(String path1, String path2, String att1, String att2) throws IOException, ParseException, JAXBException, SAXException {
         LinkedList<Map<String, Object>> profiles1 = readJSONFile(path1);
         LinkedList<Map<String, Object>> profiles2 = readJSONFile(path2);
+        // Remove null rows
         profiles1.removeAll(Collections.singleton(null));
         profiles2.removeAll(Collections.singleton(null));
 

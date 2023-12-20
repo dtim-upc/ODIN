@@ -103,7 +103,6 @@ public class ORMStoreJpaImpl implements ORMStoreInterface {
         EntityManager em = emf.createEntityManager();
         boolean success = false;
         try {
-            logger.info("Delete process started");
             em.getTransaction().begin();
 
             T objectToRemove = em.find(entityClass, id);

@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaJD;
+package edu.upc.essi.dtim.NextiaJD.utils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;

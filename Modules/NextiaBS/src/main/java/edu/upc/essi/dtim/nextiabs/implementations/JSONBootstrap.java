@@ -1,13 +1,15 @@
-package edu.upc.essi.dtim.nextiabs;
+package edu.upc.essi.dtim.nextiabs.implementations;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JsonDataset;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JSONDataset;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataSourceVocabulary;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.Formats;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
+import edu.upc.essi.dtim.nextiabs.bootstrap.IBootstrap;
+import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
 import edu.upc.essi.dtim.nextiabs.temp.PrintGraph;
 import edu.upc.essi.dtim.nextiabs.utils.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
@@ -27,8 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource implements IBootstrap<Graph>, NextiaBootstrapInterface {
-
+public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Bootstrap {
+    // Using DataFrame_MM and without Jena
     protected Graph G_source; //used for the graph in the source metamodel
 
     public String path;
@@ -38,11 +40,10 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
     protected List<String> resourcesLabelSWJ;
     protected List<Pair<String,String>> lateralViews;
 
-    private int ObjectCounter = 0;
-    private int ArrayCounter = 0;
+    private int ObjectCounter;
+    private int ArrayCounter;
 
-
-    public JSONBootstrap_with_DataFrame_MM_without_Jena(String id, String name, String path){
+    public JSONBootstrap(String id, String name, String path){
         super();
         this.id = id;
         this.name = name;
@@ -57,17 +58,8 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
         lateralViews = Lists.newArrayList();
     }
 
-    public JSONBootstrap_with_DataFrame_MM_without_Jena() {
-    }
-
-
     @Override
-    public Graph bootstrapSchema() throws IOException {
-        return bootstrapSchema(false);
-    }
-
-    @Override
-    public Graph bootstrapSchema(Boolean generateMetadata) throws IOException {
+    public Graph bootstrapSchema(Boolean generateMetadata) {
 //      setPrefixes();
         Document(path,name);
 //      G_source.getModel().setNsPrefixes(prefixes);
@@ -119,16 +111,27 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
         G_target.addTripleLiteral( ds , DataSourceVocabulary.HAS_WRAPPER.getURI(), wrapper);
     }
 
+    @Override
+    public Graph bootstrapSchema() {
+        return bootstrapSchema(false);
+    }
+
+    @Override
+    public BootstrapResult bootstrapDataset(Dataset dataset) {
+        bootstrapSchema(false);
+        return new BootstrapResult(G_source, wrapper);
+    }
+
 
     private void Document(String path, String D) {
-        InputStream fis = null;
+        InputStream fis;
         try {
             fis = new FileInputStream(path);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException("File not found");
         }
-        G_source.addTriple(createIRI(D), RDF.type, DataFrame_MM.DataSource);
 
+        G_source.addTriple(createIRI(D), RDF.type, DataFrame_MM.DataSource);
 //		try {
         Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
 //		} catch (ClassCastException e){
@@ -152,17 +155,19 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
             resourcesLabelSWJ.add(k_prime);
             String iri_k = createIRI( k_prime );
             G_source.addTriple(iri_k, RDF.type,DataFrame_MM.Data);
-            if( v.getValueType() == JsonValue.ValueType.OBJECT || v.getValueType() == JsonValue.ValueType.ARRAY)
-                G_source.addTripleLiteral(iri_k, RDFS.label, "has_"+k_prime);
+            if (v.getValueType() == JsonValue.ValueType.OBJECT || v.getValueType() == JsonValue.ValueType.ARRAY) {
+                G_source.addTripleLiteral(iri_k, RDFS.label, "has_" + k_prime);
+            }
             else {
                 G_source.addTripleLiteral(iri_k, RDFS.label, k_prime);
             }
             G_source.addTriple(iri_u_prime,DataFrame_MM.hasData,iri_k);
-            String path_tmp = p.getPath() +"."+k;
-            if(p.getPath().isEmpty())
+            String path_tmp = p.getPath() + "." + k;
+            if (p.getPath().isEmpty()) {
                 path_tmp = k;
+            }
 
-            DataType(v, new JSON_Aux(k, k_prime, path_tmp) );
+            DataType(v, new JSON_Aux(k, k_prime, path_tmp));
         });
         G_source.addTriple(createIRI(p.getLabel()),DataFrame_MM.hasDataType, iri_u_prime);
     }
@@ -183,7 +188,7 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
         String iri_u_prime = createIRI(u_prime);
         G_source.addTriple(iri_u_prime,RDF.type,DataFrame_MM.Array);
         G_source.addTripleLiteral(iri_u_prime, RDFS.label, p.getKey());
-        if (D.size() > 0) {
+        if (!D.isEmpty()) {
             DataType(D.get(0), new JSON_Aux(  u_prime, p.getLabel() ,  replaceLast(p.getPath(),p.getKey(), p.getKey()+"_view"  )  ));
         } else {
             // TODO: some ds have empty array, check below example images array
@@ -235,6 +240,10 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
         ArrayCounter = ArrayCounter + 1;
         return "Array_" + ArrayCounter;
     }
+}
+
+
+
 
 //    private void productionRules_JSON_to_RDFS() {
 //        // Rule 1. Instances of J:Object are translated to instances of rdfs:Class .
@@ -279,7 +288,7 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
 //            G_target.add(res.getResource("k").getURI(),RDFS.range,res.getResource("v")); System.out.println("#5 - "+res.getResource("k").getURI()+", "+RDFS.range+", "+res.getResource("v"));
 //        });
 
-        //6- Range of arrays (objects)
+//6- Range of arrays (objects)
 //		G_source.runAQuery("SELECT ?k ?x WHERE { ?k <"+JSON_MM.hasValue+"> ?v . ?v <"+JSON_MM.hasValue+">+ ?x . " +
 //				"?k <"+RDF.type+"> <"+JSON_MM.Key+"> . ?v <"+RDF.type+"> <"+JSON_MM.Array+"> . " +
 //				"?x <"+RDF.type+"> <"+JSON_MM.Object+">}").forEachRemaining(res -> {
@@ -322,104 +331,3 @@ public class JSONBootstrap_with_DataFrame_MM_without_Jena extends DataSource imp
  //		});
  **/
 //    }
-
-
-    public static void main(String[] args) throws IOException {
-        String D = "stations.json";
-        JSONBootstrap_with_DataFrame_MM_without_Jena j = new JSONBootstrap_with_DataFrame_MM_without_Jena("stations", D,"src/main/resources/prueba_presentacion3.json");
-
-
-
-//		Model M = j.bootstrapSchema("ds1", D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
-        Graph M = j.bootstrapSchema();
-
-//        DF_MMtoRDFS translate = new DF_MMtoRDFS();
-//        Graph x = translate.productionRulesDataframe_to_RDFS(M);
-
-        PrintGraph.printGraph(M);
-
-
-//        x.setPrefixes(M.getModel().getNsPrefixMap());
-//        x.write("src/main/resources/out/stations_targetPRUEBA.ttl", "Lang.TURTLE");
-
-//        Graph G = new Graph();
-//        java.nio.file.Path temp = Files.createTempFile("bootstrap",".ttl");
-//        System.out.println("Graph written to "+temp);
-//        G.write(temp.toString(), Lang.TURTLE);
-//
-//        System.out.println("Attributes");
-//        System.out.println(j.getAttributesSWJ());
-//
-//        System.out.println("Source attributes");
-//        System.out.println(j.getSourceAttributes());
-//
-//        System.out.println("Lateral views");
-//        System.out.println(j.getLateralViews());
-//
-//
-//        HashMap<String, JSON_Aux> attributes = j.getAttributesSWJ();
-//        List<Pair<String,String>> lateralViews = j.getLateralViews();
-//
-//        String SELECT = attributes.entrySet().stream().map( p -> {
-//            if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath();
-////			else if (p.getKey().contains("ContainerMembershipProperty")) return p.getValue();
-//            return  p.getValue().getPath() + " AS " + p.getValue().getLabel();
-//        }).collect(Collectors.joining(","));
-//
-//
-////		String SELECT = attributes.stream().map(p -> {
-////			if (p.getLeft().equals(p.getRight())) return p.getLeft();
-////			else if (p.getLeft().contains("ContainerMembershipProperty")) return p.getRight();
-////			return p.getRight() + " AS " + p.getRight().replace(".","_");
-////		}).collect(Collectors.joining(","));
-//        String FROM = D;
-//        String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode("+p.getLeft()+") AS "+p.getRight()).collect(Collectors.joining("\n"));
-//
-//        String impl = "SELECT " + SELECT + " FROM " + D + " " + LATERAL;
-//        System.out.println(impl);
-
-
-//        j.getG_source().write("src/main/resources/out/stations_source2.ttl", Lang.TURTLE);
-//        j.getG_target().write("src/main/resources/out/stations_target2.ttl", Lang.TURTLE);
-    }
-
-    @Override
-    public BootstrapResult bootstrap(Dataset dataset) {
-        Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-        String wrapperG;
-        String path = "";
-        if (dataset instanceof APIDataset) {
-            path = ((APIDataset) dataset).getJsonPath();
-        }
-        else if (dataset instanceof JsonDataset) {
-            path = ((JsonDataset) dataset).getPath();
-        }
-        JSONBootstrap_with_DataFrame_MM_without_Jena json = new JSONBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), path);
-
-        try {
-            bootstrapG = json.bootstrapSchema();
-            wrapperG = json.wrapper;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new BootstrapResult(bootstrapG, wrapperG);
-    }
-
-    @Override
-    public Graph bootstrapGraph(Dataset dataset) {
-        Graph bootstrapG = CoreGraphFactory.createGraphInstance("normal");
-        String wrapperG;
-
-        JSONBootstrap_with_DataFrame_MM_without_Jena json = new JSONBootstrap_with_DataFrame_MM_without_Jena(dataset.getId(), dataset.getDatasetName(), ((JsonDataset) dataset).getPath());
-        try {
-            bootstrapG = json.bootstrapSchema();
-            wrapperG = json.wrapper;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return bootstrapG;
-    }
-
-}

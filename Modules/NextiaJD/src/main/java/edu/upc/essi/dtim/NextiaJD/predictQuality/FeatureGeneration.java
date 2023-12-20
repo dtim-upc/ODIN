@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaJD;
+package edu.upc.essi.dtim.NextiaJD.predictQuality;
 
 import org.apache.commons.codec.language.Soundex;
 
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static edu.upc.essi.dtim.NextiaJD.Utils.getNumberOfValues;
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.getNumberOfValues;
 
 public class FeatureGeneration {
 
@@ -22,7 +22,7 @@ public class FeatureGeneration {
         return rs.getDouble(1);
     }
 
-    static Map<String, Object> generateCardinalityFeatures(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateCardinalityFeatures(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
         Double numberOfRows = getNumberOfRows(conn, tableName);
@@ -38,7 +38,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateEntropy(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateEntropy(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -50,7 +50,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateFrequenciesAndPercentages(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateFrequenciesAndPercentages(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateFrequentWordContainment(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateFrequentWordContainment(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -91,7 +91,7 @@ public class FeatureGeneration {
         LinkedList<String> frequentWordsSoundex = new LinkedList<>();
         while (rs.next()) {
             frequentWords.add(rs.getString(1));
-            String soundex = "";
+            String soundex;
             try {
                 soundex = Soundex.US_ENGLISH.encode(rs.getString(1));
             }
@@ -108,7 +108,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateOctiles(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateOctiles(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -134,7 +134,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateDatatypes(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateDatatypes(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -151,34 +151,34 @@ public class FeatureGeneration {
         ResultSet rs = stmt.executeQuery("SELECT \"" + column + "\" FROM \"" + tableName + "\"");
         while (rs.next()) {
             String string = rs.getString(1);
-            if (string == null || string.equals("")) { ++datatypes[3]; ++specificDatatypes[10]; } // NonAlphanumeric & Other
+            if (string == null || string.isEmpty()) { ++datatypes[3]; ++specificDatatypes[10]; } // NonAlphanumeric & Other
             else if (string.equals(" ")) { ++datatypes[1]; ++specificDatatypes[6]; } // Alphanumeric & General
-            else if (string.matches("^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]|(?:Jan|Mar|May|Jul|Aug|Oct|Dec)))" +
-                    "\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[1,3-9]|1[0-2]|(?:Jan|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|" +
-                    "Dec))\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)(?:0?2|(?:Feb))\\3(?:(?:(?:1[6-" +
-                    "9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?" +
-                    ":0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9]|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep))|(?:" +
-                    "1[0-2]|(?:Oct|Nov|Dec)))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$")) { ++datatypes[4]; ++specificDatatypes[7]; } // Datetime & Date
-            else if (string.matches("[-]?[0-9]+[,.]?[0-9]*([\\/][0-9]+[,.]?[0-9]*)*"))
+            else if (string.matches("^(?:31([/\\-.])(?:0?[13578]|1[02]|(?:Jan|Mar|May|Jul|Aug|Oct|Dec))" +
+                    "\\1|(?:29|30)([/\\-.])(?:0?[1,3-9]|1[0-2]|(?:Jan|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec" +
+                    "))\\2)(?:1[6-9]|[2-9]\\d)?\\d{2}$|^29([/\\-.])(?:0?2|Feb)\\3(?:(?:1[6-9]|[2-" +
+                    "9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:16|[2468][048]|[3579][26])00)$|^(?" +
+                    ":0?[1-9]|1\\d|2[0-8])([/\\-.])(?:(?:0?[1-9]|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep))|(?:" +
+                    "1[0-2]|(?:Oct|Nov|Dec)))\\4(?:1[6-9]|[2-9]\\d)?\\d{2}$")) { ++datatypes[4]; ++specificDatatypes[7]; } // Datetime & Date
+            else if (string.matches("-?[0-9]+[,.]?[0-9]*(/[0-9]+[,.]?[0-9]*)*"))
             { ++datatypes[0]; ++specificDatatypes[10]; } // Numeric & Other
-            else if (string.matches("^([a-z0-9_\\.\\+-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$"))
+            else if (string.matches("^([a-z0-9_.+-]+)@([\\da-z.-]+)\\.([a-z.]{2,6})$"))
             { ++datatypes[1]; ++specificDatatypes[1]; } // Alphanumeric & Email
             else if (string.matches("^(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5" +
                     "])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])$"))
             { ++datatypes[1]; ++specificDatatypes[3]; } // Alphanumeric & IP
-            else if (string.matches("^(?:(?:\\(?(?:00|\\+)([1-4]\\d\\d|[1-9]\\d?)\\)?)?[\\-\\.\\ \\\\\\/]?)" +
-                    "?((?:\\(?\\d{1,}\\)?[\\-\\. \\\\\\/]?){0,})(?:[\\-\\.\\ \\\\\\/]?(?:#|ext\\.?|extensio" +
-                    "n|x)[\\-\\.\\ \\\\\\/]?(\\d+))?$"))
+            else if (string.matches("^(?:(?:\\(?(?:00|\\+)([1-4]\\d\\d|[1-9]\\d?)\\)?)?[\\-. \\\\/]?)" +
+                    "?((?:\\(?\\d+\\)?[\\-. \\\\/]?)*)(?:[\\-. \\\\/]?(?:#|ext\\.?|extensio" +
+                    "n|x)[\\-. \\\\/]?(\\d+))?$"))
             { ++datatypes[1]; ++specificDatatypes[8]; } // Alphanumeric & Phone
-            else if (string.matches("^((([0]?[1-9]|1[0-2])(:|\\.)[0-5][0-9]((:|\\.)[0-5][0-9])?( )?(AM|am|aM|" +
-                    "Am|PM|pm|pM|Pm))|(([0]?[0-9]|1[0-9]|2[0-3])(:|\\.)[0-5][0-9]((:|\\.)[0-5][0-9])?))$"))
+            else if (string.matches("^(((0?[1-9]|1[0-2])([:.])[0-5][0-9](([:.])[0-5][0-9])?( )?(AM|am|aM|" +
+                    "Am|PM|pm|pM|Pm))|((0?[0-9]|1[0-9]|2[0-3])([:.])[0-5][0-9](([:.])[0-5][0-9])?))$"))
             { ++datatypes[4]; ++specificDatatypes[1]; } // Datetime & Time
-            else if (string.matches("^((((([13578])|(1[0-2]))[\\-\\/\\s]?(([1-9])|([1-2][0-9])|(3[01])))|" +
-                    "((([469])|(11))[\\-\\/\\s]?(([1-9])|([1-2][0-9])|(30)))|(2[\\-\\/\\s]?(([1-9])|([1-2][0-9]" +
-                    "))))[\\-\\/\\s]?\\d{4})(\\s((([1-9])|(1[02]))\\:([0-5][0-9])((\\s)|(\\:([0-5][0-9])\\s))([" +
-                    "AM|PM|am|pm]{2,2})))?$"))
+            else if (string.matches("^((((([13578])|(1[0-2]))[\\-/\\s]?(([1-9])|([1-2][0-9])|(3[01])))|" +
+                    "((([469])|(11))[\\-/\\s]?(([1-9])|([1-2][0-9])|(30)))|(2[\\-/\\s]?(([1-9])|([1-2][0-9]" +
+                    "))))[\\-/\\s]?\\d{4})(\\s((([1-9])|(1[02])):([0-5][0-9])((\\s)|(:([0-5][0-9])\\s))([" +
+                    "AM|PM|am|pm]{2})))?$"))
             { ++datatypes[4]; ++specificDatatypes[9]; } // Datetime & Datetime
-            else if (string.matches("((mailto\\:|www\\.|(news|(ht|f)tp(s?))\\:\\/\\/){1}\\S+)"))
+            else if (string.matches("((mailto:|www\\.|(news|(ht|f)tp(s?))://)\\S+)"))
             { ++datatypes[1]; ++specificDatatypes[2]; } // Alphanumeric & URL
             else if (string.matches("^[a-zA-Z]+$")) {++datatypes[2]; ++specificDatatypes[10];} // Alphabetic & Other (otherST)
             else if (string.matches("^[a-z0-9_-]{3,16}$")) {++datatypes[1]; ++specificDatatypes[4];} // Alphanumeric & Username
@@ -211,7 +211,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateLengths(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateLengths(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -231,7 +231,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateWordCount(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateWordCount(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -250,7 +250,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateFirstAndLastWord(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateFirstAndLastWord(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -267,7 +267,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateIsBinary(Connection conn, String column) throws SQLException {
+    public static Map<String, Object> generateIsBinary(Connection conn, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 
@@ -283,7 +283,7 @@ public class FeatureGeneration {
         return features;
     }
 
-    static Map<String, Object> generateIsEmpty(Connection conn, String tableName, String column) throws SQLException {
+    public static Map<String, Object> generateIsEmpty(Connection conn, String tableName, String column) throws SQLException {
         Statement stmt = conn.createStatement();
         Map<String, Object> features = new HashMap<>();
 

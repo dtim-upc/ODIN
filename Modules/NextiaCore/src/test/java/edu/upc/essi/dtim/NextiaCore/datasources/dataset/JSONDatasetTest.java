@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class JsonDatasetTest {
+class JSONDatasetTest {
 
     private final String TEST_FILE = "..\\NextiaCore\\src\\test\\java\\resources\\jsonTestFile.json";
     private final String TEST_ID = "test_id";
@@ -16,7 +16,7 @@ class JsonDatasetTest {
 
     @Test
     public void testConstructor() {
-        JsonDataset dataset = new JsonDataset(TEST_ID, TEST_NAME, TEST_DESC, TEST_FILE);
+        JSONDataset dataset = new JSONDataset(TEST_ID, TEST_NAME, TEST_DESC, TEST_FILE);
 
         assertEquals(TEST_NAME, dataset.getDatasetName());
         assertEquals(TEST_DESC, dataset.getDatasetDescription());
@@ -27,7 +27,7 @@ class JsonDatasetTest {
     public void testConstructorExceptionCsvFile() {
         String WRONG_FORMAT_FILE_JSON = "..\\NextiaCore\\src\\test\\java\\resources\\csvTestFile.csv".replace("\\", "/");
         // Act
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> new JsonDataset(TEST_ID, TEST_NAME, TEST_DESC, WRONG_FORMAT_FILE_JSON));
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> new JSONDataset(TEST_ID, TEST_NAME, TEST_DESC, WRONG_FORMAT_FILE_JSON));
 
         // Assert
         String expectedMessage = "Invalid file format. Only JSON files are supported.";
@@ -40,7 +40,7 @@ class JsonDatasetTest {
     public void testConstructorExceptionTxtFile() {
         String WRONG_FORMAT_FILE_TXT = "..\\NextiaCore\\src\\test\\java\\resources\\test.txt".replace("\\", "/").replace("\\", "/");
         // Act
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> new JsonDataset(TEST_ID, TEST_NAME, TEST_DESC, WRONG_FORMAT_FILE_TXT));
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> new JSONDataset(TEST_ID, TEST_NAME, TEST_DESC, WRONG_FORMAT_FILE_TXT));
 
         // Assert
         String expectedMessage = "Invalid file format. Only JSON files are supported.";
@@ -51,11 +51,11 @@ class JsonDatasetTest {
 
     @Test
     public void testJsonDatasetConstructorValidExtension() {
-        assertDoesNotThrow(() -> new JsonDataset("id", "name", "description", "file.json"));
+        assertDoesNotThrow(() -> new JSONDataset("id", "name", "description", "file.json"));
     }
 
     @Test
     public void testJsonDatasetConstructorInvalidExtension() {
-        assertThrows(IllegalArgumentException.class, () -> new JsonDataset("id", "name", "description", "file.txt"));
+        assertThrows(IllegalArgumentException.class, () -> new JSONDataset("id", "name", "description", "file.txt"));
     }
 }

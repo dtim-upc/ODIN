@@ -17,7 +17,6 @@ public class APIDataset extends Dataset{
     public String getJsonPath() {
         return jsonPath;
     }
-
     public void setJsonPath(String jsonPath) {
         this.jsonPath = jsonPath;
     }
@@ -25,7 +24,6 @@ public class APIDataset extends Dataset{
     public String getEndpoint() {
         return endpoint;
     }
-
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }

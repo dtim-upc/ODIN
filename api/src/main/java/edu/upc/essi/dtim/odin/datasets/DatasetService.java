@@ -38,7 +38,9 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * The service class for managing datasets in a project.
@@ -192,10 +194,10 @@ public class DatasetService {
 
         switch (format) { // Create a new dataset object with the extracted data based on the format
             case "csv":
-                dataset = new CsvDataset(null, datasetName, datasetDescription, filePath);
+                dataset = new CSVDataset(null, datasetName, datasetDescription, filePath);
                 break;
             case "json":
-                dataset = new JsonDataset(null, datasetName, datasetDescription, filePath);
+                dataset = new JSONDataset(null, datasetName, datasetDescription, filePath);
                 break;
             case "api":
                 dataset = new APIDataset(null, datasetName, datasetDescription, endpoint, filePath);
@@ -206,7 +208,7 @@ public class DatasetService {
                 dataset = new SQLDataset(null, datasetName, datasetDescription, datasetName, ((RelationalJDBCRepository) repository).retrieveHostname(), ((RelationalJDBCRepository) repository).retrievePort(), username, password);
                 break;
             case "xml":
-                dataset = new XmlDataset(null, datasetName, datasetDescription, filePath);
+                dataset = new XMLDataset(null, datasetName, datasetDescription, filePath);
                 break;
             case "parquet":
                 dataset = new ParquetDataset(null, datasetName, datasetDescription, filePath);
@@ -360,20 +362,47 @@ public class DatasetService {
      * @param datasetID The ID of the dataset to delete.
      */
     public void deleteDataset(String projectID, String datasetID) {
-        Dataset dataset = getDatasetById(datasetID);
         if (projectContains(projectID, datasetID)) {
-            // Remove from project
-            projectService.deleteDatasetFromProject(projectID, datasetID);
-            // Delete rdf file (\jenaFiles)
-            GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
-            graphStore.deleteGraph(dataset.getLocalGraph());
-            // Remove from Data layer
-            DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-            dlInterface.deleteDataset(dataset.getUUID());
+            deleteDatasetFromProject(projectID, datasetID);
         }
         else {
             throw new RuntimeException("Dataset " + datasetID + " does not belong to project " + projectID);
         }
+    }
+
+    /**
+     * Deletes a dataset from the specified project.
+     *
+     * @param projectId The ID of the project to delete the dataset from.
+     * @param datasetId The ID of the dataset to delete.
+     * @throws IllegalArgumentException If the project with the given ID is not found.
+     */
+    public void deleteDatasetFromProject(String projectId, String datasetId) {
+        Project project = projectService.getProject(projectId);
+        List<DataRepository> repositoriesOfProject = project.getRepositories();
+        boolean datasetFound = false;
+
+        // Iterate through the data repositories
+        for (DataRepository repoInProject : repositoriesOfProject) {
+            // Iterate through the datasets in each data repository
+            Iterator<Dataset> datasetIterator = repoInProject.getDatasets().iterator();
+            while (datasetIterator.hasNext()) {
+                Dataset dataset = datasetIterator.next();
+                if (datasetId.equals(dataset.getId())) {
+                    datasetFound = true;
+                    datasetIterator.remove(); // Remove the dataset from the data repository
+                    // Save the updated list of data repositories and update the project's list
+                    project.setRepositories(repositoriesOfProject);
+                    break;
+                }
+            }
+        }
+        // Check if the dataset was not found in any data repository
+        if (!datasetFound) {
+            throw new NoSuchElementException("Dataset not found with id: " + datasetId);
+        }
+        // Save the updated project
+        projectService.saveProject(project);
     }
 
     /**
@@ -519,7 +548,7 @@ public class DatasetService {
      * @param datasetID The ID of the dataset whose schema is assigned to the project.
      */
     public void setDatasetSchemaAsProjectSchema(String projectID, String datasetID) {
-        Project project = projectService.getProjectById(projectID);
+        Project project = projectService.getProject(projectID);
         Dataset dataset = getDatasetById(datasetID);
 
         // Assign the schema of the dataset to the project's INTEGRATED GRAPH

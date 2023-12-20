@@ -4,7 +4,7 @@ public class DataFrame_MM {
     /**
      * The namespace of the vocabulary as a string
      */
-    public static final String uri="https://www.essi.upc.edu/dtim/dataframe-metamodel#";
+    public static final String uri = "https://www.essi.upc.edu/dtim/dataframe-metamodel#";
 
     protected static String resource(String local )
     { return uri + local; }
@@ -22,8 +22,8 @@ public class DataFrame_MM {
     public static final String Number = Init.Number();
 
 
-    public static final String hasData     = Init.hasData();
-    public static final String hasDataType     = Init.hasDataType();
+    public static final String hasData = Init.hasData();
+    public static final String hasDataType = Init.hasDataType();
 
 
 
@@ -45,10 +45,6 @@ public class DataFrame_MM {
         public static String hasDataType() { return property( "hasDataType"); }
     }
 
-    /**
-     returns the URI for this schema
-     @return the URI for this schema
-     */
     public static String getURI() {
         return uri;
     }

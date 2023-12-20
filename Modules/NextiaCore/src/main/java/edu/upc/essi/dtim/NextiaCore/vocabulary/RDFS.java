@@ -3,9 +3,6 @@ package edu.upc.essi.dtim.NextiaCore.vocabulary;
 public class RDFS {
     public static final String uri = "http://www.w3.org/2000/01/rdf-schema#";
 
-    /** returns the URI for this schema
-     @return the URI for this schema
-     */
     public static String getURI() {
         return uri;
     }

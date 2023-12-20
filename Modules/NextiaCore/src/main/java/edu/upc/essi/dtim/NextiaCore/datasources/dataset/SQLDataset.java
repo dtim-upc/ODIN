@@ -7,6 +7,9 @@ public class SQLDataset extends Dataset{
     String username;
     String password;
 
+    public SQLDataset() {
+        super();
+    }
     public SQLDataset(String id, String name, String description) {
         super(id, name, description);
     }
@@ -20,15 +23,9 @@ public class SQLDataset extends Dataset{
         this.port = port;
     }
 
-    public SQLDataset() {
-        super();
-    }
-
-
     public String getTableName() {
         return tableName;
     }
-
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
@@ -36,7 +33,6 @@ public class SQLDataset extends Dataset{
     public String getHostname() {
         return hostname;
     }
-
     public void setHostname(String hostname) {
         this.hostname = hostname;
     }
@@ -44,7 +40,6 @@ public class SQLDataset extends Dataset{
     public String getPort() {
         return port;
     }
-
     public void setPort(String port) {
         this.port = port;
     }
@@ -52,7 +47,6 @@ public class SQLDataset extends Dataset{
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
@@ -60,7 +54,6 @@ public class SQLDataset extends Dataset{
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
