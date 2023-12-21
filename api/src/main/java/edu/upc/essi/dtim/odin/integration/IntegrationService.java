@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.integration;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
@@ -8,6 +9,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.odin.integration.pojos.IntegrationTemporalResponse;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
@@ -23,8 +25,11 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleInterface;
 import edu.upc.essi.dtim.odin.projects.Project;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
+import javassist.compiler.ast.Pair;
 import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -43,7 +48,10 @@ public class IntegrationService {
     /**
      * The dependency on the ProjectService class.
      */
-    private final ProjectService projectService;
+    @Autowired
+    private ProjectService projectService;
+    @Autowired
+    private DatasetService datasetService;
     private final RepositoryService repositoryService;
     private final AppConfig appConfig;
 
@@ -52,48 +60,69 @@ public class IntegrationService {
      *
      * @param appConfig The application configuration.
      */
-    public IntegrationService(@Autowired AppConfig appConfig, @Autowired ProjectService projectService, @Autowired RepositoryService repositoryService) {
+    public IntegrationService(@Autowired AppConfig appConfig, @Autowired RepositoryService repositoryService) {
         this.appConfig = appConfig;
-        this.projectService = projectService;
         this.repositoryService = repositoryService;
+    }
+
+    public IntegrationTemporalResponse integrate(String projectID, IntegrationData iData) {
+        Project project = projectService.getProject(projectID);
+
+        // Count the total number of datasets within all repositories of the project. If there is only one, we can not integrate
+        int totalDatasets = 0;
+        for (DataRepository repository : project.getRepositories()) {
+            totalDatasets += repository.getDatasets().size();
+        }
+
+        if (totalDatasets > 1) {
+            // Integrate the new data source onto the existing integrated graph and add overwrite it in the project
+            Graph integratedGraph = integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
+            Project projectToSave = updateTemporalIntegratedGraphProject(project, integratedGraph);
+
+            // Generate a new global graph and add it to the project
+            Graph globalGraph = generateGlobalGraph(project.getIntegratedGraph());
+            projectToSave = updateGlobalGraphProject(projectToSave, globalGraph);
+
+            Project projectWithNewGraph = projectService.saveProject(projectToSave); // Project with new temporal integrated graph
+            // Add the integrated dataset to the set of temporal integrated datasets
+            projectWithNewGraph = projectService.addTemporalIntegratedDataset(projectWithNewGraph.getProjectId(), iData.getDsB().getId());
+
+            List<JoinAlignment> joinProperties = generateJoinAlignments(projectWithNewGraph.getIntegratedGraph(), iData.getDsB().getLocalGraph(), iData);
+            System.out.println(joinProperties);
+
+            return new IntegrationTemporalResponse(projectWithNewGraph, joinProperties);
+        } else {
+            // If there are not enough datasets to integrate, return a bad request status
+            throw new RuntimeException("Not enough datasets");
+//            return new ResponseEntity<>(new IntegrationTemporalResponse(null, null), HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**
      * Integrates data from a second RDF graph into the provided integrated RDF graph based on specified alignments.
      *
      * @param integratedGraph The integrated RDF graph to which data will be integrated.
-     * @param dsB             The dataset containing the second RDF graph.
+     * @param datasetToIntegrate             The dataset containing the second RDF graph.
      * @param alignments      A list of alignments specifying how the data should be integrated.
      * @return The integrated RDF graph with the integrated data.
      * @throws RuntimeException If there is an error while performing the integration.
      */
-    public Graph integrateData(GraphJenaImpl integratedGraph, Dataset dsB, List<Alignment> alignments) {
-        // Retrieve the name of the second RDF graph.
-        String graphNameB = dsB.getLocalGraph().getGraphName();
-
-        // Create an interface to interact with the graph store.
+    public Graph integrateData(GraphJenaImpl integratedGraph, Dataset datasetToIntegrate, List<Alignment> alignments) {
         GraphStoreInterface graphStoreInterface;
         try {
             graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
         } catch (Exception e) {
-            // Throw a runtime exception if there is an error while obtaining the graph store.
             throw new RuntimeException(e);
         }
 
-        // Retrieve the local graph corresponding to graphNameB from the graph store.
-        Graph localGraph = graphStoreInterface.getGraph(graphNameB);
+        // Search in jenaFiles for the graph of the new dataset to integrate and assign it to the dataset
+        String graphToIntegrateName = datasetToIntegrate.getLocalGraph().getGraphName();
+        Graph graphToIntegrate = graphStoreInterface.getGraph(graphToIntegrateName);
+        datasetToIntegrate.setLocalGraph((LocalGraphJenaImpl) graphToIntegrate);
 
-        // Set the local graph of dsB to the retrieved local graph.
-        dsB.setLocalGraph((LocalGraphJenaImpl) localGraph);
-
-        // Get the local graph of dsB.
-        Graph graphB = dsB.getLocalGraph();
-
-        // Create an instance of the integration module.
+        // Integrate the data from datasetToIntegrate into the integratedGraph based on the alignments.
         integrationModuleInterface integrationInterface = new integrationModuleImpl();
-
-        // Integrate the data from graphB into the integratedGraph based on alignments.
-        Graph newIntegratedGraph = integrationInterface.integrate(integratedGraph, graphB, alignments);
+        Graph newIntegratedGraph = integrationInterface.integrate(integratedGraph, graphToIntegrate, alignments);
 
         // Generate a visual schema for the new integrated graph and assign it.
         nextiaGraphyModuleInterface visualLibInterface = new nextiaGraphyModuleImpl();
@@ -140,7 +169,6 @@ public class IntegrationService {
      * @return A list of JoinAlignment objects representing potential join alignments.
      */
     public List<JoinAlignment> generateJoinAlignments(Graph graphA, Graph graphB, IntegrationData iData) {
-
         // Create an instance of the integration module using the implementation.
         integrationModuleInterface integrationInterface = new integrationModuleImpl();
 
@@ -259,19 +287,14 @@ public class IntegrationService {
     }
 
     public Project updateTemporalIntegratedGraphProject(Project project, Graph integratedGraph) {
-        // Create an instance of an integrated graph from the CoreGraphFactory.
+        // Create a new integrated graph and set its data with the incoming graph
         Graph integratedImpl = CoreGraphFactory.createIntegratedGraph();
-
-        // Set the graph data of the integrated graph to the data from the provided integratedGraph.
         integratedImpl.setGraph(integratedGraph.getGraph());
 
-        // Set the integrated graph in the project.
+        // Set the integrated graph in the project and its graphical representation
         project.setTemporalIntegratedGraph((IntegratedGraphJenaImpl) integratedImpl);
+//        project.getTemporalIntegratedGraph().setGraphicalSchema(integratedGraph.getGraphicalSchema());
 
-        // Set the graphical schema of the integrated graph in the project.
-        project.getTemporalIntegratedGraph().setGraphicalSchema(integratedGraph.getGraphicalSchema());
-
-        // Return the updated project with the new integrated graph.
         return project;
     }
 
@@ -283,19 +306,14 @@ public class IntegrationService {
      * @return The updated project with the new global graph.
      */
     public Project updateGlobalGraphProject(Project project, Graph globalGraph) {
-        // Create an instance of a global graph from the CoreGraphFactory.
+        // Create a new global graph and set its data with the incoming graph
         Graph globalImpl = CoreGraphFactory.createGlobalGraph();
-
-        // Set the graph data of the global graph to the data from the provided globalGraph.
         globalImpl.setGraph(globalGraph.getGraph());
 
-        // Set the global graph within the project's integrated graph.
+        // Set the global graph within the project's integrated graph and its graphical representation
         project.getIntegratedGraph().setGlobalGraph((GlobalGraphJenaImpl) globalImpl);
-
-        // Set the graphical schema of the global graph within the project.
         project.getIntegratedGraph().getGlobalGraph().setGraphicalSchema(globalGraph.getGraphicalSchema());
 
-        // Return the updated project with the new global graph.
         return project;
     }
 
@@ -317,46 +335,17 @@ public class IntegrationService {
     }
 
     /**
-     * Generates a global graph by integrating an integrated graph (integratedGraph), a dataset (dsB), and a list of alignments.
+     * Generates a global graph by integrating an integrated graph (integratedGraph) and a dataset (dsB)
      *
      * @param integratedGraph The integrated graph to which the global graph will be added.
-     * @param dsB             The dataset representing the second graph to be integrated.
-     * @param alignments      The list of alignments specifying how the graphs should be integrated.
      * @return The generated global graph resulting from the integration.
      * @throws RuntimeException If an error occurs during graph integration or when accessing the graph store.
      */
-    public Graph generateGlobalGraph(GraphJenaImpl integratedGraph, Dataset dsB, List<Alignment> alignments) {
-        // Obtain the name of the second graph from the dataset.
-        String graphNameB = dsB.getLocalGraph().getGraphName();
-
-        GraphStoreInterface graphStoreInterface;
-        try {
-            // Get an instance of the graph store using the provided appConfig.
-            graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
-        } catch (Exception e) {
-            // Throw a runtime exception if an error occurs while getting the graph store instance.
-            throw new RuntimeException(e);
-        }
-
-        // Get the local graph corresponding to graphNameB from the graph store.
-        Graph localGraph = graphStoreInterface.getGraph(graphNameB);
-
-        // Set the local graph of dataset dsB to the obtained localGraph.
-        dsB.setLocalGraph((LocalGraphJenaImpl) localGraph);
-
-        // Retrieve the local graph of dataset dsB.
-        Graph graphB = dsB.getLocalGraph();
-
-        // Create an instance of the integration module.
+    public Graph generateGlobalGraph(GraphJenaImpl integratedGraph) {
+        // Get the global graph from the new integrated graph
         integrationModuleInterface integrationInterface = new integrationModuleImpl();
-
-        // Integrate the integrated graph, graphB, and alignments to generate the global graph.
         Graph globalGraph = integrationInterface.generateGlobalGraph(integratedGraph);
 
-        // Write the global graph to a file or location (e.g., "api\\dbFiles\\ttl\\globalGraph.ttl").
-        globalGraph.write("api\\dbFiles\\ttl\\globalGraph.ttl");
-
-        // Print a message indicating that the global graph has been generated.
         System.out.println("+++++++++++++++++++++++++++++++++++++++ GLOBAL GRAPH GENERATED");
 
         // Generate the visual schema of the global graph and set it.
@@ -364,7 +353,6 @@ public class IntegrationService {
         String newGraphicalSchema = visualLibInterface.generateVisualGraph(globalGraph);
         globalGraph.setGraphicalSchema(newGraphicalSchema);
 
-        // Return the generated global graph.
         return globalGraph;
     }
 
@@ -395,32 +383,20 @@ public class IntegrationService {
         return projectService.addIntegratedDataset(projectId, id);
     }
 
-    public Project addTemporalIntegratedDataset(String projectId, String id) {
-        return projectService.addTemporalIntegratedDataset(projectId, id);
-    }
-
-    public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
-        DatasetService datasetService = new DatasetService(appConfig, projectService, repositoryService);
-        Project project = getProject(projectId);
-
-        Dataset datasetB = datasetService.getDatasetById(datasetId);
+    public List<Alignment> getAlignments(String projectID, String datasetToIntegrateID) throws SQLException, IOException, ClassNotFoundException {
+        Project project = getProject(projectID);
+        // TODO: This is wrong, because we are computing the alignments of the new dataset with ONLY the first of the
+        // TODO: integrated datasets, when it should be all of them. Fix when we have the query algorithm done
         Dataset datasetA = datasetService.getDatasetById(project.getIntegratedDatasets().get(0).getId());
+        Dataset datasetB = datasetService.getDatasetById(datasetToIntegrateID);
 
-        Graph graphA = project.getIntegratedGraph();
-
-        Graph graphB = datasetB.getLocalGraph();
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // TODO review
         jdModuleInterface jdInterface = new jdModuleImpl(appConfig);
+        List<Alignment> alignments = jdInterface.getAlignments(datasetA, datasetB);
 
-        List<Alignment> alignments;
-        alignments = jdInterface.getAlignments(datasetA, datasetB);
-
+        // TODO: review Alignment class
         List<Alignment> alignmentsWithFilter = new ArrayList<>();
         float minSimilarity = 0.3F;
         for (Alignment a : alignments) {
-            System.out.println(a.getSimilarity());
             if (a.getSimilarity() >= minSimilarity) {
                 a.setLabelA(a.getAttributeA().getName());
                 a.setLabelB(a.getAttributeB().getName());
@@ -432,8 +408,6 @@ public class IntegrationService {
                 alignmentsWithFilter.add(a);
             }
         }
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         return alignmentsWithFilter;
     }
 }

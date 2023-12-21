@@ -7,21 +7,21 @@ import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
 import edu.upc.essi.dtim.nextiabs.bootstrap.IBootstrap;
-import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
-import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
-import edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS;
-import edu.upc.essi.dtim.nextiabs.utils.DataSource;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
 
 import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 
+import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+
 /**
  * Generates an RDFS-compliant representation of an XML file schema
  * @author snadal
  */
-public class XMLBootstrap extends DataSource implements IBootstrap<Graph>, Bootstrap {
+public class XMLBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
 	// Using DataFrame_MM and without Jena
 	public String path;
 
@@ -67,8 +67,7 @@ public class XMLBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 //			generateMetadata();
 //		G_target.setPrefixes(prefixes);
 
-		DF_MMtoRDFS translate = new DF_MMtoRDFS();
-		G_target = translate.productionRulesDataframe_to_RDFS(G_target);
+		G_target = productionRulesDataframe_to_RDFS(G_target);
 
 		return G_target;
 	}

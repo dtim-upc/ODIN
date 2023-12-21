@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Model;
 import java.util.List;
 import java.util.Map;
 
-public class LocalGraphJenaImpl extends GraphJenaImpl implements LocalGraph, Graph {
+public class LocalGraphJenaImpl extends GraphJenaImpl implements LocalGraph {
     String localGraphAttribute;
 
     public LocalGraphJenaImpl() {

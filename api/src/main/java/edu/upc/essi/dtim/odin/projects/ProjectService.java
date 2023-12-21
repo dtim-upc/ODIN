@@ -25,7 +25,6 @@ public class ProjectService {
     ORMStoreInterface ormProject;
     private final AppConfig appConfig;
 
-
     /**
      * Constructs a new ProjectService.
      */
@@ -47,7 +46,7 @@ public class ProjectService {
     public Project saveProject(Project project) {
         Project savedProject = ormProject.save(project); // Save the project using the ORM store
 
-        // Check if the project has an integrated or temporal integrated graph. If that is the case, set a name for them
+        // Check if the project has an integrated or temporal integrated graph. If that is the case, set a name for them and store them
         if (savedProject.getIntegratedGraph() != null && savedProject.getIntegratedGraph().getGraphName() != null) {
             try {
                 GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
@@ -352,14 +351,13 @@ public class ProjectService {
     }
 
     public Project addTemporalIntegratedDataset(String projectID, String datasetID) {
-
         Project project = getProject(projectID);
         // Check if the dataset has already been integrated in the project
         List<Dataset> temporalIntegratedDatasets = project.getTemporalIntegratedDatasets();
         if (isDatasetIntegrated(temporalIntegratedDatasets, datasetID)) {
             return project;
-        } else {
-
+        }
+        else {
             Dataset dataset = ormProject.findById(Dataset.class, datasetID);
             if (dataset != null) {
                 temporalIntegratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets

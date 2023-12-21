@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.nextiabs.temp;
+package edu.upc.essi.dtim.nextiabs.utils;
 
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import org.apache.jena.atlas.lib.Pair;
@@ -20,7 +20,7 @@ public class PrintGraph {
                 results.put(prefixed(t.get("s").toString()), l);
             }
 
-            Pair p = new Pair(prefixed(t.get("p").toString()), prefixed(t.get("o").toString()));
+            Pair<String,String> p = new Pair<>(prefixed(t.get("p").toString()), prefixed(t.get("o").toString()));
             results.get(prefixed(t.get("s").toString())).add(p);
         }
         for (Map.Entry<String, List<Pair<String, String>>> entry : results.entrySet()) {

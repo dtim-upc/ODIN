@@ -7,7 +7,6 @@ import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import java.util.List;
 
 public class Project {
-
     private String projectId;
     private String projectName;
     private String projectDescription;

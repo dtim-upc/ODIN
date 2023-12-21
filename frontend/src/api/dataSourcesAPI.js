@@ -48,9 +48,6 @@ export default {
   editDatasource(data, successCallback) {
     return odinApi.post('/editDataset', data)
   },
-  createDSPersistent(projectID, datasource, token) {
-    return odinApi.post('/project/' + projectID + '/datasources/persist', datasource, {headers: {Authorization: `Bearer ${token}`}})
-  },
   getTriples(projectID, datasourceID, token) {
     return odinApi.get('/project/' + projectID + '/datasources/triples/' + datasourceID, {headers: {Authorization: `Bearer ${token}`}})
   },

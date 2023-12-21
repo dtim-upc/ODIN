@@ -1,14 +1,12 @@
 package edu.upc.essi.dtim.nextiabs.bootstrap;
 
-import edu.upc.essi.dtim.nextiabs.utils.IDataSource;
-
-import java.io.IOException;
+import edu.upc.essi.dtim.nextiabs.implementations.IDataSource;
 
 public interface IBootstrap<T> extends IDataSource {
 
-    //each class's constructor will take the appropriate arguments and then run bootstrapSchema
-    T bootstrapSchema() throws IOException;
-    T bootstrapSchema(Boolean generateMetadata) throws IOException;
+    // Each class's constructor will take the appropriate arguments and then run bootstrapSchema
+    T bootstrapSchema();
+    T bootstrapSchema(Boolean generateMetadata);
 
     void generateMetadata();
 

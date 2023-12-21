@@ -7,10 +7,8 @@ import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
 import edu.upc.essi.dtim.nextiabs.bootstrap.IBootstrap;
-import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
-import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
-import edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS;
-import edu.upc.essi.dtim.nextiabs.utils.DataSource;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetFileReader;
@@ -19,12 +17,14 @@ import org.apache.parquet.schema.MessageType;
 
 import java.io.IOException;
 
+import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+
 
 /**
  * Generates an RDFS-compliant representation of a Parquet file schema
  * @author Juane Olivan
  */
-public class ParquetBootstrap extends DataSource implements IBootstrap<Graph>, Bootstrap {
+public class ParquetBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
 	// Using DataFrame_MM and without Jena
 	public String path;
 
@@ -71,13 +71,12 @@ public class ParquetBootstrap extends DataSource implements IBootstrap<Graph>, B
 //			generateMetadata();
 //		G_target.setPrefixes(prefixes);
 
-		DF_MMtoRDFS translate = new DF_MMtoRDFS();
-		G_target = translate.productionRulesDataframe_to_RDFS(G_target);
+		G_target = productionRulesDataframe_to_RDFS(G_target);
 		return G_target;
 	}
 
 	private String getType(String type) {
-		if(type.contains("INT")) return DataFrame_MM.Number;
+		if (type.contains("INT")) return DataFrame_MM.Number;
 		return DataFrame_MM.String;
 	}
 
@@ -103,7 +102,7 @@ public class ParquetBootstrap extends DataSource implements IBootstrap<Graph>, B
 
 	@Override
 	public BootstrapResult bootstrapDataset(Dataset dataset) {
-		bootstrapSchema(false);
+		bootstrapSchema();
 		// Shouldn't we operate over G_source??
 		return new BootstrapResult(G_target, wrapper);
 	}

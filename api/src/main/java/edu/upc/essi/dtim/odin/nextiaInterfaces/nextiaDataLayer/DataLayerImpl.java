@@ -19,25 +19,16 @@ public class DataLayerImpl implements DataLayerInterface {
     @Override
     public boolean uploadToDataLayer(Dataset dataset) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        try {
-            dl.uploadToLandingZone(dataset);
-            dl.uploadToFormattedZone(dataset, dataset.getUUID());
-            return false;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return true;
-        }
+        dl.uploadToLandingZone(dataset);
+        dl.uploadToFormattedZone(dataset, dataset.getUUID());
+        return false;
     }
 
     @Override
     public void deleteDataset(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        try {
-            dl.removeFromLandingZone(UUID);
-            dl.removeFromFormattedZone(UUID);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        dl.removeFromLandingZone(UUID);
+        dl.removeFromFormattedZone(UUID);
     }
 
     @Override

@@ -3,13 +3,13 @@ package edu.upc.essi.dtim.nextiabs;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CSVDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.implementations.*;
-import edu.upc.essi.dtim.nextiabs.temp.PrintGraph;
-import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
-import edu.upc.essi.dtim.nextiabs.utils.PostgresSQLImpl;
+import edu.upc.essi.dtim.nextiabs.utils.PrintGraph;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
+import edu.upc.essi.dtim.nextiabs.databaseConnection.PostgresSQLImpl;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         CSVDataset d1 = new CSVDataset("id", "titanic", "description", "C:\\Work\\Files\\test_datasets\\hooke.csv");
         CSVBootstrap cbs = new CSVBootstrap(d1.getId(), d1.getDatasetName(), d1.getPath());
 
@@ -61,8 +61,6 @@ public class Main {
         String D = "stations.json";
         JSONBootstrap j = new JSONBootstrap("stations", D,"src/main/resources/prueba_presentacion3.json");
 
-
-
 //		Model M = j.bootstrapSchema("ds1", D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
         Graph M = j.bootstrapSchema();
 
@@ -70,7 +68,6 @@ public class Main {
 //        Graph x = translate.productionRulesDataframe_to_RDFS(M);
 
         PrintGraph.printGraph(M);
-
 
 //        x.setPrefixes(M.getModel().getNsPrefixMap());
 //        x.write("src/main/resources/out/stations_targetPRUEBA.ttl", "Lang.TURTLE");
@@ -89,7 +86,6 @@ public class Main {
 //        System.out.println("Lateral views");
 //        System.out.println(j.getLateralViews());
 //
-//
 //        HashMap<String, JSON_Aux> attributes = j.getAttributesSWJ();
 //        List<Pair<String,String>> lateralViews = j.getLateralViews();
 //
@@ -98,7 +94,6 @@ public class Main {
 ////			else if (p.getKey().contains("ContainerMembershipProperty")) return p.getValue();
 //            return  p.getValue().getPath() + " AS " + p.getValue().getLabel();
 //        }).collect(Collectors.joining(","));
-//
 //
 ////		String SELECT = attributes.stream().map(p -> {
 ////			if (p.getLeft().equals(p.getRight())) return p.getLeft();

@@ -28,11 +28,11 @@ public class CalculateQuality {
         double upperBoundK = (1 - mu_v[1]) / sigma_v[1];
 
         // Alternative version
-        // TruncatedNormalDistribution tnd_c = new TruncatedNormalDistribution(mu_v[0], sigma_v[0], lowerBoundC, upperBoundC);
-        // TruncatedNormalDistribution tnd_k = new TruncatedNormalDistribution(mu_v[1], sigma_v[1], lowerBoundK, upperBoundK);
+        TruncatedNormalDistribution tnd_c = new TruncatedNormalDistribution(mu_v[0], sigma_v[0], lowerBoundC, upperBoundC);
+        TruncatedNormalDistribution tnd_k = new TruncatedNormalDistribution(mu_v[1], sigma_v[1], lowerBoundK, upperBoundK);
         // Version that obtains the same results as the Python code
-        TruncatedNormalDistribution tnd_c = new TruncatedNormalDistribution(mu_v[0], sigma_v[0], lowerBoundC * sigma_v[0] + mu_v[0], upperBoundC * sigma_v[0] + mu_v[0]);
-        TruncatedNormalDistribution tnd_k = new TruncatedNormalDistribution(mu_v[1], sigma_v[1], lowerBoundK * sigma_v[1] + mu_v[1], upperBoundK * sigma_v[1] + mu_v[1]);
+        // TruncatedNormalDistribution tnd_c = new TruncatedNormalDistribution(mu_v[0], sigma_v[0], lowerBoundC * sigma_v[0] + mu_v[0], upperBoundC * sigma_v[0] + mu_v[0]);
+        // TruncatedNormalDistribution tnd_k = new TruncatedNormalDistribution(mu_v[1], sigma_v[1], lowerBoundK * sigma_v[1] + mu_v[1], upperBoundK * sigma_v[1] + mu_v[1]);
 
         double cdf_c = tnd_c.cdf(c);
         double cdf_k = tnd_k.cdf(k);

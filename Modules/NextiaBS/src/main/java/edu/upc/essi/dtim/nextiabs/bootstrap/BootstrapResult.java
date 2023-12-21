@@ -1,16 +1,12 @@
-package edu.upc.essi.dtim.nextiabs.utils;
+package edu.upc.essi.dtim.nextiabs.bootstrap;
 
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 
 public class BootstrapResult {
     Graph graph;
-
     String wrapper;
 
-    public BootstrapResult(Graph graph, String wrapper) {
-        this.graph = graph;
-        this.wrapper = wrapper;
-    }
+    public BootstrapResult() {}
 
     public BootstrapResult(Graph graph) {
         this.graph = graph;
@@ -20,13 +16,14 @@ public class BootstrapResult {
         this.wrapper = wrapper;
     }
 
-    public BootstrapResult() {
+    public BootstrapResult(Graph graph, String wrapper) {
+        this.graph = graph;
+        this.wrapper = wrapper;
     }
 
     public Graph getGraph() {
         return graph;
     }
-
     public void setGraph(Graph graph) {
         this.graph = graph;
     }
@@ -34,7 +31,6 @@ public class BootstrapResult {
     public String getWrapper() {
         return wrapper;
     }
-
     public void setWrapper(String wrapper) {
         this.wrapper = wrapper;
     }

@@ -236,7 +236,7 @@ const clickOk = () => {
     default:
       //last step
       console.log("step 4 save integration")
-      integrationStore.saveIntegration(dataSourceStore.persistDataSource)
+      integrationStore.saveIntegration()
   }
 }
 

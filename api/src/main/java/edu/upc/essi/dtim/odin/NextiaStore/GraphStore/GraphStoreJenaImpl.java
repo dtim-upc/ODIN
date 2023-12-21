@@ -66,7 +66,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        modelToSave.close();
+//        modelToSave.close();
     }
 
     /**

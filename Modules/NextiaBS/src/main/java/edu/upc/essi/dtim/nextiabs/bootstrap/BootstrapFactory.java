@@ -1,17 +1,18 @@
-package edu.upc.essi.dtim.nextiabs.utils;
+package edu.upc.essi.dtim.nextiabs.bootstrap;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
-import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
+import edu.upc.essi.dtim.nextiabs.databaseConnection.PostgresSQLImpl;
 import edu.upc.essi.dtim.nextiabs.implementations.*;
 
 public class BootstrapFactory {
-    private static Bootstrap instance = null;
+    private static BootstrapODIN instance = null;
 
     private BootstrapFactory() {
         // Private constructor prevents instantiation from outside the class
     }
 
-    public static Bootstrap getInstance(Dataset dataset) throws Exception {
+    public static BootstrapODIN getInstance(Dataset dataset) throws Exception {
         if (dataset instanceof CSVDataset) {
             instance = new CSVBootstrap(dataset.getId(), dataset.getDatasetName(), ((CSVDataset) dataset).getPath());
         } else if (dataset instanceof JSONDataset) {

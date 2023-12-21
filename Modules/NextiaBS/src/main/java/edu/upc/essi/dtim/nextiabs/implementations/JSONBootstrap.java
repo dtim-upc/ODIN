@@ -1,16 +1,14 @@
 package edu.upc.essi.dtim.nextiabs.implementations;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.JSONDataset;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataSourceVocabulary;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.Formats;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
 import edu.upc.essi.dtim.nextiabs.bootstrap.IBootstrap;
-import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
-import edu.upc.essi.dtim.nextiabs.temp.PrintGraph;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
 import edu.upc.essi.dtim.nextiabs.utils.*;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import org.apache.commons.compress.utils.Lists;
@@ -22,14 +20,15 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Bootstrap {
+import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+
+public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
     // Using DataFrame_MM and without Jena
     protected Graph G_source; //used for the graph in the source metamodel
 
@@ -86,8 +85,7 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
         //G_target.setPrefixes(prefixes);
 //        G_source.setPrefixes(prefixes);
 
-        DF_MMtoRDFS translate = new DF_MMtoRDFS();
-        G_source = translate.productionRulesDataframe_to_RDFS(G_source);
+        G_source = productionRulesDataframe_to_RDFS(G_source);
 
         return G_source;
     }
@@ -118,7 +116,7 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
 
     @Override
     public BootstrapResult bootstrapDataset(Dataset dataset) {
-        bootstrapSchema(false);
+        bootstrapSchema();
         return new BootstrapResult(G_source, wrapper);
     }
 

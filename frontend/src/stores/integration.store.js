@@ -407,10 +407,6 @@ export const useIntegrationStore = defineStore('integration', {
         console.log("integration response...", response)
 
         if (response.status === 200) {
-
-          // this.projectTemporal = response.data
-          if (callback)
-            callback(this.selectedDS[0])
           notify.positive("Integration saved successfully")
         } else {
           notify.negative("There was an error to save the integration")

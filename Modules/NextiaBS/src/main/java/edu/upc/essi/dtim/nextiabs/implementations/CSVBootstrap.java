@@ -8,10 +8,8 @@ import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
 import edu.upc.essi.dtim.nextiabs.bootstrap.IBootstrap;
-import edu.upc.essi.dtim.nextiabs.bootstrap.Bootstrap;
-import edu.upc.essi.dtim.nextiabs.utils.BootstrapResult;
-import edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS;
-import edu.upc.essi.dtim.nextiabs.utils.DataSource;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
+import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 
@@ -21,11 +19,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
+import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+
 /**
  * Generates an RDFS-compliant representation of a CSV file schema
  * @author snadal
  */
-public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Bootstrap {
+public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
 	// Using DataFrame_MM and without Jena
 	public String path;
 
@@ -73,8 +73,7 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 //			generateMetadata();
 //		G_target.setPrefixes(prefixes);
 
-		DF_MMtoRDFS translate = new DF_MMtoRDFS();
-		G_target = translate.productionRulesDataframe_to_RDFS(G_target);
+		G_target = productionRulesDataframe_to_RDFS(G_target);
 		return G_target;
 	}
 
@@ -100,7 +99,7 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 
 	@Override
 	public BootstrapResult bootstrapDataset(Dataset dataset) {
-		bootstrapSchema(false);
+		bootstrapSchema();
         return new BootstrapResult(this.G_target, this.wrapper);
 	}
 }

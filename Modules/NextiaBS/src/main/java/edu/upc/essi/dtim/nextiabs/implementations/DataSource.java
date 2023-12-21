@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.nextiabs.utils;
+package edu.upc.essi.dtim.nextiabs.implementations;
 
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataSourceVocabulary;
