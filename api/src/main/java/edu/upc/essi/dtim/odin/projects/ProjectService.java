@@ -44,6 +44,9 @@ public class ProjectService {
      * @return The saved project.
      */
     public Project saveProject(Project project) {
+        // For some reason, ormProject.save(project) does not store the global graph of the integrated graphs, so we need to
+        // add them manually (last line of each if). This is not a problem in the getProject function, as the global
+        // graphs are calculated anew in the function.
         Project savedProject = ormProject.save(project); // Save the project using the ORM store
 
         // Check if the project has an integrated or temporal integrated graph. If that is the case, set a name for them and store them
@@ -54,6 +57,7 @@ public class ProjectService {
                 // Set the graph name to match the saved project's integrated graph name
                 graph.setGraphName(savedProject.getIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getIntegratedGraph().getGraphName());
                 graphStoreInterface.saveGraph(graph);
+                savedProject.getIntegratedGraph().setGlobalGraph(project.getIntegratedGraph().getGlobalGraph());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -66,6 +70,7 @@ public class ProjectService {
                 // Set the graph name to match the saved project's integrated graph name
                 graph.setGraphName(savedProject.getTemporalIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getTemporalIntegratedGraph().getGraphName());
                 graphStoreInterface.saveGraph(graph);
+                savedProject.getTemporalIntegratedGraph().setGlobalGraph(project.getTemporalIntegratedGraph().getGlobalGraph());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -331,41 +336,6 @@ public class ProjectService {
     public List<DataRepository> getRepositoriesOfProject(String id) {
         Project project = getProject(id);
         return project.getRepositories();
-    }
-
-    public Project addIntegratedDataset(String projectID, String datasetID) {
-        Project project = getProject(projectID);
-        // Check if the dataset has already been integrated in the project
-        List<Dataset> integratedDatasets = project.getIntegratedDatasets();
-        if (isDatasetIntegrated(integratedDatasets, datasetID)) {
-            return project;
-        } else {
-            Dataset dataset = ormProject.findById(Dataset.class, datasetID);
-            if (dataset != null) {
-                integratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets
-                project.setIntegratedDatasets(integratedDatasets); // Update the list of integrated datasets in the project
-                return saveProject(project); // Store the project to persist the changes
-            }
-        }
-        return null; // Project/dataset not found
-    }
-
-    public Project addTemporalIntegratedDataset(String projectID, String datasetID) {
-        Project project = getProject(projectID);
-        // Check if the dataset has already been integrated in the project
-        List<Dataset> temporalIntegratedDatasets = project.getTemporalIntegratedDatasets();
-        if (isDatasetIntegrated(temporalIntegratedDatasets, datasetID)) {
-            return project;
-        }
-        else {
-            Dataset dataset = ormProject.findById(Dataset.class, datasetID);
-            if (dataset != null) {
-                temporalIntegratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets
-                project.setTemporalIntegratedDatasets(temporalIntegratedDatasets); // Update the list of integrated datasets in the project
-                return saveProject(project); // Store the project to persist the changes
-            }
-        }
-        return null; // Project/dataset not found
     }
 
     // Auxiliary function to check if a dataset has already been integrated

@@ -569,7 +569,24 @@ public class DatasetService {
         }
 
         projectService.deleteIntegratedDatasets(projectID); // remove the previous integrated schema
-        projectService.addIntegratedDataset(projectID, datasetID); // add the new dataset to the list of integrated datasets
+        addIntegratedDataset(project, datasetID); // add the new dataset to the list of integrated datasets
+        projectService.saveProject(project);
+    }
+
+    public Project addIntegratedDataset(Project project, String datasetID) {
+        List<Dataset> integratedDatasets = project.getIntegratedDatasets();
+        Dataset dataset = getDatasetById(datasetID);
+        integratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets
+        project.setIntegratedDatasets(integratedDatasets); // Update the list of integrated datasets in the project
+        return project;
+    }
+
+    public Project addTemporalIntegratedDataset(Project project, String datasetID) {
+        List<Dataset> temporalIntegratedDatasets = project.getTemporalIntegratedDatasets();
+        Dataset dataset = getDatasetById(datasetID);
+        temporalIntegratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets
+        project.setTemporalIntegratedDatasets(temporalIntegratedDatasets); // Update the list of integrated datasets in the project
+        return project;
     }
 }
 

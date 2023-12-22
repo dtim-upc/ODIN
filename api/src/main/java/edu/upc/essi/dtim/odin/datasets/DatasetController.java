@@ -158,7 +158,6 @@ public class DatasetController {
                                                              @PathVariable("datasetID") String datasetID) {
         logger.info("Set project " + projectID + " schema request received for dataset" + datasetID);
         datasetService.setDatasetSchemaAsProjectSchema(projectID, datasetID);
-
         return ResponseEntity.ok("Dataset schema set as project schema.");
     }
 
