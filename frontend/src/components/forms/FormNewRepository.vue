@@ -280,7 +280,7 @@ const notify = useNotify()
 const dataRepositoryTypes = ref([]);
 const RepositoryType = ref();
 
-// Función para cargar los tipos de DataRepository desde el endpoint
+// Función para cargar los tipos de DataRepository desde el endFpoint
 const fetchDataRepositoryTypes = async () => {
   try {
     const response = await odinApi.get("/api/data-repository-types");

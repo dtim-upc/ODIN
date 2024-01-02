@@ -8,9 +8,8 @@ public interface DataLayerInterface {
      * Uploads a dataset to the data layer, in a permanent folder/database to be accessed afterward.
      *
      * @param dataset The dataset to be uploaded.
-     * @return A boolean indicating whether the file was uploaded successfully.
      */
-    boolean uploadToDataLayer(Dataset dataset);
+    void uploadToDataLayer(Dataset dataset);
 
     /**
      * Removes a dataset from the data layer

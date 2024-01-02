@@ -9,11 +9,9 @@ import org.apache.spark.sql.SparkSession;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Properties;
 
@@ -76,7 +74,6 @@ public abstract class DataLayer {
         try {
             Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
-                    System.out.println("Deleting: " + path);
                     Files.delete(path);  //delete each file or directory
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -87,23 +84,21 @@ public abstract class DataLayer {
         }
     }
 
-    public static String storeTemporalFile(String path, InputStream inputFile, String newFileDirectory) {
+    public static String storeTemporalFile(String path, InputStream inputFile, String newFileDirectory) throws IOException {
         Path diskPath = Path.of(path);
         Path destinationFile = diskPath.resolve(newFileDirectory); // Resolve the destination file path using the disk path and the modified filename
-        try {
-            Files.createDirectories(destinationFile.getParent()); // Create parent directories if they don't exist
-            Files.copy(inputFile, destinationFile, StandardCopyOption.REPLACE_EXISTING); // Copy the input stream  to the destination file
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        Files.createDirectories(destinationFile.getParent()); // Create parent directories if they don't exist
+        Files.copy(inputFile, destinationFile, StandardCopyOption.REPLACE_EXISTING); // Copy the input stream  to the destination file
+
         return destinationFile.toString(); // Return the absolute path of the stored file
     }
 
-    public String storeTemporalFile(InputStream inputFile, String newFileDirectory) {
+    public String storeTemporalFile(InputStream inputFile, String newFileDirectory) throws IOException {
         return storeTemporalFile(dataStorePath + "tmp", inputFile, newFileDirectory);
     }
 
-    public abstract void uploadToFormattedZone(Dataset d, String tableName);
+    public abstract void uploadToFormattedZone(Dataset d, String tableName) throws SQLException;
 
     public abstract void removeFromFormattedZone(String tableName);
 

@@ -27,7 +27,6 @@ public class IntegrationTemporalResponse {
     public Project getProject() {
         return project;
     }
-
     public void setProject(Project project) {
         this.project = project;
     }
@@ -35,7 +34,6 @@ public class IntegrationTemporalResponse {
     public List<JoinAlignment> getJoins() {
         return joins;
     }
-
     public void setJoins(List<JoinAlignment> joins) {
         this.joins = joins;
     }

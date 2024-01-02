@@ -20,7 +20,6 @@ public class Graphy {
     public List<Nodes> getNodes() {
         return nodes;
     }
-
     public void setNodes(List<Nodes> nodes) {
         this.nodes = nodes;
     }
@@ -28,7 +27,6 @@ public class Graphy {
     public List<Links> getLinks() {
         return links;
     }
-
     public void setLinks(List<Links> links) {
         this.links = links;
     }

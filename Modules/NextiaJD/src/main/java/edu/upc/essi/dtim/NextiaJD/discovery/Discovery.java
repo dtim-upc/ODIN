@@ -40,7 +40,7 @@ public class Discovery implements IDiscovery {
     }
 
     @Override
-    public double calculateJoinQualityContinuousFromCSV(String CSVPath1, String CSVPath2, String att1, String att2){
+    public double calculateJoinQualityContinuousFromCSV(String CSVPath1, String CSVPath2, String att1, String att2) {
         try {
             Connection conn = DuckDB.getConnection();
             CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
@@ -74,45 +74,51 @@ public class Discovery implements IDiscovery {
     }
 
     @Override
-    public double predictJoinQuality(String path1, String path2, String att1, String att2) throws SQLException, ClassNotFoundException, IOException, ParseException, SAXException, JAXBException {
+    public double predictJoinQuality(String path1, String path2, String att1, String att2) throws SQLException, IOException, ParseException, SAXException, JAXBException {
         Connection conn = DuckDB.getConnection();
         PredictQuality pq = new PredictQuality(conn);
         return pq.predictQuality(path1, path2, att1, att2);
     }
 
     @Override
-    public List<Alignment> getAlignments(Dataset d1, Dataset d2) throws Exception {
+    public List<Alignment> getAlignments(Dataset d1, Dataset d2) {
         List<Alignment> alignments = new ArrayList<>();
 
         for (Attribute a1: d1.getAttributes()) {
             for (Attribute a2: d2.getAttributes()) {
-                double containment = 0.0;
-                double cardinality1 = 0.0;
-                double cardinality2 = 0.0;
-                ResultSet rs = dl.executeQuery("SELECT COUNT(DISTINCT " + d1.getUUID() + "." + a1.getName() + ") " +
-                        "FROM " + d1.getUUID() + " " +
-                        "WHERE " + d1.getUUID() + "." + a1.getName() + " IN (SELECT DISTINCT " + d2.getUUID() + "." + a2.getName() + " " +
-                        "FROM " + d2.getUUID() + ")", new Dataset[]{d1, d2});
-                while (rs.next()) {
-                    containment = rs.getDouble(1);
-                }
+                try {
+                    double containment = 0.0;
+                    double cardinality1 = 0.0;
+                    double cardinality2 = 0.0;
+                    ResultSet rs = dl.executeQuery("SELECT COUNT(DISTINCT " + d1.getUUID() + "." + a1.getName() + ") " +
+                            "FROM " + d1.getUUID() + " " +
+                            "WHERE " + d1.getUUID() + "." + a1.getName() + " IN (SELECT DISTINCT " + d2.getUUID() + "." + a2.getName() + " " +
+                            "FROM " + d2.getUUID() + ")", new Dataset[]{d1, d2});
+                    while (rs.next()) {
+                        containment = rs.getDouble(1);
+                    }
 
-                rs = dl.executeQuery("SELECT COUNT(DISTINCT " + a1.getName() + ") FROM " + d1.getUUID(), new Dataset[]{d1, d2});
-                while (rs.next()) {
-                    cardinality1 = rs.getDouble(1);
-                }
+                    rs = dl.executeQuery("SELECT COUNT(DISTINCT " + a1.getName() + ") " +
+                            "FROM " + d1.getUUID(), new Dataset[]{d1, d2});
+                    while (rs.next()) {
+                        cardinality1 = rs.getDouble(1);
+                    }
 
-                rs = dl.executeQuery("SELECT COUNT(DISTINCT " + a2.getName() + ") FROM " + d2.getUUID(), new Dataset[]{d1, d2});
-                while (rs.next()) {
-                    cardinality2 = rs.getDouble(1);
-                }
+                    rs = dl.executeQuery("SELECT COUNT(DISTINCT " + a2.getName() + ") " +
+                            "FROM " + d2.getUUID(), new Dataset[]{d1, d2});
+                    while (rs.next()) {
+                        cardinality2 = rs.getDouble(1);
+                    }
 
-                double cardinality_proportion = Math.min(cardinality1, cardinality2)/Math.max(cardinality1, cardinality2);
-                CalculateQuality cq = new CalculateQuality(1.0,1);
-                double quality = cq.calculateQualityContinuous(containment, cardinality_proportion);
-                Alignment a = new Alignment(a1, a2, "", (float) quality);
-                alignments.add(a);
-                rs.close();
+                    double cardinality_proportion = Math.min(cardinality1, cardinality2) / Math.max(cardinality1, cardinality2);
+                    CalculateQuality cq = new CalculateQuality(1.0, 1);
+                    double quality = cq.calculateQualityContinuous(containment, cardinality_proportion);
+                    Alignment a = new Alignment(a1, a2, "", (float) quality);
+                    alignments.add(a);
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return alignments;

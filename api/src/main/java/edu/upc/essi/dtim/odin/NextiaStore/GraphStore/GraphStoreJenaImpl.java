@@ -5,6 +5,8 @@ import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GlobalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.odin.OdinApplication;
+import edu.upc.essi.dtim.odin.exception.CustomIOException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
@@ -12,10 +14,9 @@ import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleInterface;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.tdb.TDBFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import java.nio.file.Path;
 
 @Component
 public class GraphStoreJenaImpl implements GraphStoreInterface {
+    private static final Logger logger = LoggerFactory.getLogger(OdinApplication.class);
     private final String directory;
 
     public GraphStoreJenaImpl(@Autowired AppConfig appConfig) {
@@ -60,13 +62,10 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
             FileOutputStream fos = new FileOutputStream(filePath);
             modelToSave.write(fos, "RDF/XML");
             fos.close();
-            System.out.println("Model successfully store at: " + filePath);
-        } catch (FileNotFoundException e) {
-            System.out.println("Error when storing the model: " + e.getMessage());
+            logger.info("Model successfully store at: " + filePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomIOException("Error when storing the model: " + e.getMessage());
         }
-//        modelToSave.close();
     }
 
     /**
@@ -91,23 +90,26 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         }
 
         try {
+            // Get the graph
             model.read(new FileInputStream(filePath), "RDF/XML");
             graph.setGraphName(graphName);
             graph.setGraph(model);
 
+            // Generate the visual representation
             nextiaGraphyModuleInterface visualLibInterface = new nextiaGraphyModuleImpl();
             String graphicalSchema = visualLibInterface.generateVisualGraph(graph);
             graph.setGraphicalSchema(graphicalSchema);
 
+            // If graph is integrated, get the global graph
             if (graph.getClass().equals(IntegratedGraphJenaImpl.class)) {
                 integrationModuleInterface integrationInterface = new integrationModuleImpl();
                 Graph globalGraph = integrationInterface.generateGlobalGraph(graph);
                 ((IntegratedGraphJenaImpl) graph).setGlobalGraph((GlobalGraphJenaImpl) globalGraph);
             }
 
-            System.out.println("Model loaded successfully from: " + filePath);
+            logger.info("Model loaded successfully from: " + filePath);
         } catch (FileNotFoundException e) {
-            System.out.println("Error when loading the model: " + e.getMessage());
+            throw new CustomIOException("Error when loading the model: " + e.getMessage());
         }
         return graph;
     }

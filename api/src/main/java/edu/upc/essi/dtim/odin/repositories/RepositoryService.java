@@ -6,6 +6,8 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
+import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,12 @@ public class RepositoryService {
     @Autowired
     private ProjectService projectService;
 
+    /**
+     * Retrieves a repository by its unique identifier
+     *
+     * @param repositoryId The unique identifier of the repository to retrieve.
+     * @return The repository object.
+     */
     public DataRepository getRepositoryById(String repositoryId) {
         DataRepository dataRepository = ormDataResource.findById(DataRepository.class, repositoryId);
         if (dataRepository == null) {
@@ -33,6 +41,13 @@ public class RepositoryService {
         return dataRepository;
     }
 
+    /**
+     * Gets all the necessary information from the frontend to attempt a JDBC connection and tries to connect to it, in
+     * order to check if the connection is possible.
+     *
+     * @param requestData information to connect to the database.
+     * @return A boolean indicating if the connection was successful.
+     */
     public boolean testConnectionFromRequest(Map<String, String> requestData) {
         String url = requestData.get("url");
         String username = requestData.get("username");
@@ -47,6 +62,14 @@ public class RepositoryService {
         return testConnection(url, username, password) || testConnection(customUrl, username, password);
     }
 
+    /**
+     * Attempts to connect to a JDBC database
+     *
+     * @param url      URL of the database.
+     * @param user     user used to connect to the database.
+     * @param password password belonging to the user.
+     * @return A boolean indicating if the connection was successful.
+     */
     private boolean testConnection(String url, String user, String password) {
         // Check that all parameters have values
         if (url != null && !url.isEmpty() && user != null && !user.isEmpty() && password != null && !password.isEmpty()) {
@@ -59,11 +82,12 @@ public class RepositoryService {
     }
 
     /**
-     * Creates a new DataRepository with the specified repository name using the ORMStoreInterface.
+     * Creates a new DataRepository with the specified repository name, assigns all the necessary parameters and stores it.
      *
      * @param repositoryData Data to create the repository
+     * @param projectId      Identification of the project to which the new repository will belong to.
      */
-    public void createRepository(Map<String, String> repositoryData, String projectId) {
+    public void postRepository(Map<String, String> repositoryData, String projectId) {
         DataRepository repository;
 
         switch (repositoryData.get("repositoryType")) {
@@ -108,37 +132,37 @@ public class RepositoryService {
         saveRepository(repository); // Save the DataRepository
     }
 
+    /**
+     * Persists a repository in the ODIN database.
+     *
+     * @param repository Repository to be saved.
+     */
     public void saveRepository(DataRepository repository) {
         ormDataResource.save(repository);
     }
 
-    public List<String> getDatabaseTables(String repositoryId) {
+    /**
+     * Get the information of the tables of a database connection.
+     *
+     * @param repositoryId Identification of the repository whose tables will be retrieved (the repository has a
+     *                     parameter with the database URL, so we can connect to it and extract the information).
+     */
+    public List<TableInfo> retrieveTablesInfo(String repositoryId) {
         DataRepository repository = getRepositoryById(repositoryId);
-
-        if (repository instanceof RelationalJDBCRepository) {
-            return ((RelationalJDBCRepository) repository).retrieveTables();
-        } else {
-            throw new IllegalArgumentException("Repository is not relational");
+        if (!(repository instanceof RelationalJDBCRepository)) {
+            throw new FormatNotAcceptedException("Repository is not relational");
         }
-    }
 
-    public List<TableInfo> getDatabaseTablesInfo(String repositoryId) {
-        DataRepository repository = getRepositoryById(repositoryId);
+        String url = ((RelationalJDBCRepository) repository).getUrl();
+        String username = ((RelationalJDBCRepository) repository).getUsername();
+        String password = ((RelationalJDBCRepository) repository).getPassword();
 
-        if (repository instanceof RelationalJDBCRepository) {
-            return retrieveTablesInfo(((RelationalJDBCRepository) repository).getUrl(), ((RelationalJDBCRepository) repository).getUsername(), ((RelationalJDBCRepository) repository).getPassword());
-        } else {
-            throw new IllegalArgumentException("Repository is not relational");
-        }
-    }
-
-    public List<TableInfo> retrieveTablesInfo(String url, String username, String password) {
         List<TableInfo> tableList = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement();
              Statement statementSize = connection.createStatement();
-             Statement statementLines = connection.createStatement();) {
+             Statement statementLines = connection.createStatement()) {
 
             // Get the table names
             String tableQuery = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
@@ -171,9 +195,8 @@ public class RepositoryService {
                 }
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            throw new InternalServerErrorException("Could not get the data from the database", e.getMessage());
         }
         return tableList;
     }
-
 }

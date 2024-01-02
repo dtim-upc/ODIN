@@ -9,12 +9,19 @@ import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
-import edu.upc.essi.dtim.odin.exception.NoChangesException;
+import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,20 +29,9 @@ import java.util.NoSuchElementException;
 
 @Service
 public class ProjectService {
-    ORMStoreInterface ormProject;
-    private final AppConfig appConfig;
-
-    /**
-     * Constructs a new ProjectService.
-     */
-    public ProjectService(@Autowired AppConfig appConfig) {
-        try {
-            this.ormProject = ORMStoreFactory.getInstance();
-            this.appConfig = appConfig;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    ORMStoreInterface ormProject = ORMStoreFactory.getInstance();
+    @Autowired
+    private  AppConfig appConfig;
 
     /**
      * Saves a project.
@@ -44,12 +40,12 @@ public class ProjectService {
      * @return The saved project.
      */
     public Project saveProject(Project project) {
-        // For some reason, ormProject.save(project) does not store the global graph of the integrated graphs, so we need to
-        // add them manually (last line of each if). This is not a problem in the getProject function, as the global
-        // graphs are calculated anew in the function.
+        // For some reason, ormProject.save(project) does not store the global graph of the integrated graphs, so if we
+        // want to obtain it, we need to execute the function getProject(), which regenerates the global graphs
         Project savedProject = ormProject.save(project); // Save the project using the ORM store
 
-        // Check if the project has an integrated or temporal integrated graph. If that is the case, set a name for them and store them
+        // Check if the project has an integrated and/or temporal integrated graph. If that is the case, set the name
+        // of the RDF file (the number) as the project's graph name, so we can access it later.
         if (savedProject.getIntegratedGraph() != null && savedProject.getIntegratedGraph().getGraphName() != null) {
             try {
                 GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
@@ -57,7 +53,6 @@ public class ProjectService {
                 // Set the graph name to match the saved project's integrated graph name
                 graph.setGraphName(savedProject.getIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getIntegratedGraph().getGraphName());
                 graphStoreInterface.saveGraph(graph);
-                savedProject.getIntegratedGraph().setGlobalGraph(project.getIntegratedGraph().getGlobalGraph());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -67,15 +62,13 @@ public class ProjectService {
             try {
                 GraphStoreInterface graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
                 Graph graph = project.getTemporalIntegratedGraph();
-                // Set the graph name to match the saved project's integrated graph name
+                // Set the graph name to match the saved project's temporal integrated graph name
                 graph.setGraphName(savedProject.getTemporalIntegratedGraph().getGraphName() == null ? "noName" : savedProject.getTemporalIntegratedGraph().getGraphName());
                 graphStoreInterface.saveGraph(graph);
-                savedProject.getTemporalIntegratedGraph().setGlobalGraph(project.getTemporalIntegratedGraph().getGlobalGraph());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-
         return savedProject;
     }
 
@@ -83,13 +76,13 @@ public class ProjectService {
      * Finds a project by its ID.
      *
      * @param projectId The ID of the project to find.
-     * @return The found project, or null if not found.
+     * @return The found project.
      */
     public Project getProject(String projectId) {
         // Retrieve the project with the specified ID from the ORM store
         Project project = ormProject.findById(Project.class, projectId);
         if (project == null) {
-            throw new NoSuchElementException("Project not found with ID: " + projectId);
+            throw new ElementNotFoundException("Project not found with ID: " + projectId);
         }
 
         // Check if the project has an integrated graph or a temporal integrated graph. If so, add it
@@ -112,7 +105,7 @@ public class ProjectService {
             throw new RuntimeException(e);
         }
 
-        return project; // Return the found project (or null if not found)
+        return project;
     }
 
     /**
@@ -133,6 +126,7 @@ public class ProjectService {
         Project p = ormProject.findById(Project.class, id);
         for (DataRepository dr: p.getRepositories()) {
             for (Dataset d: dr.getDatasets()) {
+                // Delete all datasets from the data layer first.
                 deleteDatasetFromProject(id, d.getId());
             }
         }
@@ -144,7 +138,6 @@ public class ProjectService {
      *
      * @param projectId The ID of the project to delete the dataset from.
      * @param datasetId The ID of the dataset to delete.
-     * @throws IllegalArgumentException If the project with the given ID is not found.
      */
     public void deleteDatasetFromProject(String projectId, String datasetId) {
         Project project = getProject(projectId);
@@ -172,55 +165,26 @@ public class ProjectService {
                 }
             }
         }
-        // Check if the dataset was not found in any data repository
+        // Throw an exception if the dataset was not found
         if (!datasetFound) {
             throw new NoSuchElementException("Dataset not found with id: " + datasetId);
         }
-        // Save the updated project
-        saveProject(project);
-    }
-
-    /**
-     * Checks if a project contains a dataset with the given ID.
-     *
-     * @param projectID      The ID of the project to check.
-     * @param datasetID The ID of the dataset to check.
-     * @return true if the project contains the dataset, false otherwise.
-     */
-    public boolean projectContains(String projectID, String datasetID) {
-        Project project = getProject(projectID);
-        List<DataRepository> repos = project.getRepositories();
-
-        // Iterate through the repositories
-        for (DataRepository repo : repos) {
-            List<Dataset> datasets = repo.getDatasets();
-            // Iterate through the datasets
-            for (Dataset dataset : datasets) {
-                String datasetId = dataset.getId();
-                if (datasetId.equals(datasetID)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        saveProject(project); // Save the updated project without the dataset
     }
 
     /**
      * Retrieves the datasets associated with a project.
      *
-     * @param id The ID of the project.
+     * @param projectID The ID of the project.
      * @return A list of datasets belonging to the project.
      */
-    public List<Dataset> getDatasetsOfProject(String id) {
-        Project project = getProject(id);
+    public List<Dataset> getDatasetsOfProject(String projectID) {
+        Project project = getProject(projectID);
         List<Dataset> datasets = new ArrayList<>();
         // Iterate through the repositories in the project and collect their datasets
         for (DataRepository repository : project.getRepositories()) {
             datasets.addAll(repository.getDatasets());
         }
-
-
-
         return datasets;
     }
 
@@ -230,29 +194,17 @@ public class ProjectService {
      * @param project The modified project with updated attributes.
      */
     public void putProject(Project project) {
-        // Retrieve the original project from the database based on its ID
         Project originalProject = getProject(project.getProjectId());
 
-        // Check if any attribute has changed
-        if (!project.getProjectName().equals(originalProject.getProjectName())
-                || !project.getProjectDescription().equals(originalProject.getProjectDescription())
-                || !project.getProjectColor().equals(originalProject.getProjectColor())
-                || !project.getProjectPrivacy().equals(originalProject.getProjectPrivacy())
-        ) {
-            // At least one attribute has changed, update the original project
-            originalProject.setProjectName(project.getProjectName());
-            originalProject.setProjectDescription(project.getProjectDescription());
-            originalProject.setProjectColor(project.getProjectColor());
-            originalProject.setProjectPrivacy(project.getProjectPrivacy());
+        originalProject.setProjectName(project.getProjectName());
+        originalProject.setProjectDescription(project.getProjectDescription());
+        originalProject.setProjectColor(project.getProjectColor());
+        originalProject.setProjectPrivacy(project.getProjectPrivacy());
 
-            // Perform the database update operation to save the changes
-            saveProject(originalProject);
-        }
-        else {
-            throw new NoChangesException("No changes made to the project");
-        }
+        saveProject(originalProject); // Perform the database update operation to save the changes
     }
 
+    // TODO: Remake this
     /**
      * Clones a project, creating a new project with the same structure and data as the original project.
      *
@@ -319,7 +271,6 @@ public class ProjectService {
      *
      * @param projectId    The ID of the project to which the repository should be added.
      * @param repository   Repository to be added
-     * @throws IllegalArgumentException If the project with the given ID is not found.
      */
     public void addRepositoryToProject(String projectId, DataRepository repository) {
         Project project = getProject(projectId);
@@ -338,20 +289,27 @@ public class ProjectService {
         return project.getRepositories();
     }
 
-    // Auxiliary function to check if a dataset has already been integrated
-    private boolean isDatasetIntegrated(List<Dataset> integratedDatasets, String datasetID) {
-        for (Dataset integratedDataset : integratedDatasets) {
-            if (integratedDataset.getId().equals(datasetID)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void deleteIntegratedDatasets(String projectID) {
+    /**
+     * Downloads the project schema in Turtle (TTL) format.
+     *
+     * @param projectID The ID of the project for which the schema will be downloaded.
+     * @return A ResponseEntity containing the input stream resource and necessary headers for the download.
+     */
+    public ResponseEntity<InputStreamResource> downloadProjectSchema(String projectID) {
         Project project = getProject(projectID);
-        project.setIntegratedDatasets(new ArrayList<>());
-        saveProject(project);
+
+        Model model = project.getIntegratedGraph().getGraph();
+        StringWriter writer = new StringWriter();
+        model.write(writer, "TTL");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName() + ".ttl");
+
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle"))
+                .body(resource);
     }
 }
-

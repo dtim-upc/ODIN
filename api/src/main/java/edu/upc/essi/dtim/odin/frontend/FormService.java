@@ -1,5 +1,7 @@
 package edu.upc.essi.dtim.odin.frontend;
 
+import edu.upc.essi.dtim.odin.exception.CustomIOException;
+import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.repositories.POJOs.DataRepositoryTypeInfo;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -21,20 +23,16 @@ public class FormService {
             try {
                 bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new CustomIOException(e.getMessage());
             }
-            String formSchema = new String(bytes);
-            System.out.println("Formschema retrieved");
-            return formSchema;
+            return new String(bytes);
         } else {
-            System.out.println("Formschema not found");
-            return "File not found";
+            throw new ElementNotFoundException("Resource could not be found in " + filePath);
         }
     }
 
     public List<DataRepositoryTypeInfo> getDataRepositoryTypes(String repositoryFormsPath) {
         List<DataRepositoryTypeInfo> dataRepositoryClasses = new ArrayList<>();
-
         File directory = new File(repositoryFormsPath);
 
         if (directory.isDirectory()) {
@@ -49,6 +47,9 @@ public class FormService {
                     dataRepositoryClasses.add(dataRepositoryTypeInfo);
                 }
             }
+        }
+        else {
+            throw new ElementNotFoundException("Directory does not exist: " + repositoryFormsPath);
         }
         return dataRepositoryClasses;
     }

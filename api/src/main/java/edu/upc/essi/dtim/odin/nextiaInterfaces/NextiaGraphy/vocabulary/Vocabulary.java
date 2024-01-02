@@ -1,14 +1,12 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary;
 
 public enum Vocabulary {
+    IntegrationClass(Namespaces.NEXTIADI.getElement() + "IntegratedClass"),
+    IntegrationDProperty(Namespaces.NEXTIADI.getElement() + "IntegratedDatatypeProperty"),
+    IntegrationOProperty(Namespaces.NEXTIADI.getElement() + "IntegratedObjectProperty"),
 
-
-    IntegrationClass(Namespaces.NEXTIADI.val() + "IntegratedClass"),
-    IntegrationDProperty(Namespaces.NEXTIADI.val() + "IntegratedDatatypeProperty"),
-    IntegrationOProperty(Namespaces.NEXTIADI.val() + "IntegratedObjectProperty"),
-
-    JoinProperty(Namespaces.NEXTIADI.val() + "JoinProperty"),
-    JoinObjectProperty(Namespaces.NEXTIADI.val() + "JoinObjectProperty");
+    JoinProperty(Namespaces.NEXTIADI.getElement() + "JoinProperty"),
+    JoinObjectProperty(Namespaces.NEXTIADI.getElement() + "JoinObjectProperty");
 
     private String element;
 
@@ -16,8 +14,11 @@ public enum Vocabulary {
         this.element = element;
     }
 
-    public String val() {
+    public String getElement() {
         return element;
+    }
+    public void setElement(String element) {
+        this.element = element;
     }
 
 

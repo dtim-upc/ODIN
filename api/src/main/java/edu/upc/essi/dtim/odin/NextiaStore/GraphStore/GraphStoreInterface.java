@@ -1,7 +1,6 @@
 package edu.upc.essi.dtim.odin.NextiaStore.GraphStore;
 
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
-import edu.upc.essi.dtim.NextiaCore.graph.URI;
 
 /**
  * Interface for a Graph Store that handles the storage and retrieval of graphs.

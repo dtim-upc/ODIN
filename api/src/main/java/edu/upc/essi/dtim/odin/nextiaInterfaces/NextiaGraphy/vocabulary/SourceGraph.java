@@ -2,12 +2,12 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary;
 
 public enum SourceGraph {
 
-    DATA_SOURCE(Namespaces.S.val() + "DataSource"),
-    WRAPPER(Namespaces.S.val() + "Wrapper"),
-    ATTRIBUTE(Namespaces.S.val() + "Attribute"),
+    DATA_SOURCE(Namespaces.S.getElement() + "DataSource"),
+    WRAPPER(Namespaces.S.getElement() + "Wrapper"),
+    ATTRIBUTE(Namespaces.S.getElement() + "Attribute"),
 
-    HAS_WRAPPER(Namespaces.S.val() + "hasWrapper"),
-    HAS_ATTRIBUTE(Namespaces.S.val() + "hasAttribute");
+    HAS_WRAPPER(Namespaces.S.getElement() + "hasWrapper"),
+    HAS_ATTRIBUTE(Namespaces.S.getElement() + "hasAttribute");
 
 
     private String element;
@@ -16,7 +16,10 @@ public enum SourceGraph {
         this.element = element;
     }
 
-    public String val() {
+    public String getElement() {
         return element;
+    }
+    public void setElement(String element) {
+        this.element = element;
     }
 }

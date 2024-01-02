@@ -6,6 +6,7 @@ import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.NextiaJD.discovery.Discovery;
 import edu.upc.essi.dtim.NextiaJD.discovery.IDiscovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +28,7 @@ public class jdModuleImpl implements jdModuleInterface {
         try {
             return discovery.getAlignments(dataset, dataset2);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new InternalServerErrorException("There was an error when computing the alignments", e.getMessage());
         }
     }
 }

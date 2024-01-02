@@ -3,8 +3,6 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 public interface jdModuleInterface {
@@ -17,5 +15,5 @@ public interface jdModuleInterface {
      * @return A List of the Alignments, each Alignment indicating the names of the columns (one of each dataset) and
      * the degree of similarity.
      */
-    List<Alignment> getAlignments(Dataset dataset, Dataset dataset2) throws SQLException, IOException, ClassNotFoundException;
+    List<Alignment> getAlignments(Dataset dataset, Dataset dataset2);
 }

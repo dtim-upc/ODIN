@@ -40,6 +40,7 @@ const routes = [
       {path: '', name: 'projects', component: () => import('pages/Projects.vue')}
     ]
   },
+  // This is just for testing the visualization of a graph from a .ttl file. Should be removed eventually
   {
     path: '/viewGraph',
     component: () => import('layouts/ProjectLayout.vue'),

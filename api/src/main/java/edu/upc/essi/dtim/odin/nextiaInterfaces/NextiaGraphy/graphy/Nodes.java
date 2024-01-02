@@ -62,18 +62,18 @@ public class Nodes {
      * Computes the type of the node based on its range and IRI type.
      */
     public void computeType() {
-        if (!range.equals("")) { // Everything that contains a range is a property
+        if (!range.isEmpty()) { // Everything that contains a range is a property
             if (range.contains(XSD.getURI())) {
                 type = "datatype";
                 if (iriType != null) {
-                    if (iriType.equals(Vocabulary.IntegrationDProperty.val())) {
+                    if (iriType.equals(Vocabulary.IntegrationDProperty.getElement())) {
                         isIntegrated = true;
                     }
                 }
             } else {
                 type = "object";
                 if (iriType != null) {
-                    if (iriType.equals(Vocabulary.IntegrationOProperty.val())) {
+                    if (iriType.equals(Vocabulary.IntegrationOProperty.getElement())) {
                         isIntegrated = true;
                     }
                 }
@@ -81,7 +81,7 @@ public class Nodes {
         } else {
             type = "class";
             if (iriType != null) {
-                if (iriType.equals(Vocabulary.IntegrationClass.val())) {
+                if (iriType.equals(Vocabulary.IntegrationClass.getElement())) {
                     isIntegrated = true;
                 }
             }
@@ -92,7 +92,6 @@ public class Nodes {
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -100,7 +99,6 @@ public class Nodes {
     public String getIri() {
         return iri;
     }
-
     public void setIri(String iri) {
         this.iri = iri;
     }
@@ -108,7 +106,6 @@ public class Nodes {
     public String getIriType() {
         return iriType;
     }
-
     public void setIriType(String iriType) {
         this.iriType = iriType;
     }
@@ -116,7 +113,6 @@ public class Nodes {
     public String getShortType() {
         return shortType;
     }
-
     public void setShortType(String shortType) {
         this.shortType = shortType;
     }
@@ -124,7 +120,6 @@ public class Nodes {
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
@@ -132,7 +127,6 @@ public class Nodes {
     public String getLabel() {
         return label;
     }
-
     public void setLabel(String label) {
         this.label = label;
     }
@@ -140,7 +134,6 @@ public class Nodes {
     public String getDomain() {
         return domain;
     }
-
     public void setDomain(String domain) {
         this.domain = domain;
     }
@@ -148,7 +141,6 @@ public class Nodes {
     public String getRange() {
         return range;
     }
-
     public void setRange(String range) {
         this.range = range;
     }
@@ -156,7 +148,6 @@ public class Nodes {
     public Boolean getIntegrated() {
         return isIntegrated;
     }
-
     public void setIntegrated(Boolean integrated) {
         isIntegrated = integrated;
     }
@@ -164,7 +155,6 @@ public class Nodes {
     public String getLinkId() {
         return linkId;
     }
-
     public void setLinkId(String linkId) {
         this.linkId = linkId;
     }

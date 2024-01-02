@@ -1,5 +1,7 @@
 package edu.upc.essi.dtim.odin.NextiaStore.RelationalStore;
 
+import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
+import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,14 +33,14 @@ public class ORMStoreJpaImpl implements ORMStoreInterface {
     @Override
     public <T> T save(T object) {
         EntityManager em = emf.createEntityManager();
-        T savedObject = null;
+        T savedObject;
         try {
             em.getTransaction().begin();
             savedObject = em.merge(object);
             em.getTransaction().commit();
             logger.info("Object " + object.getClass() + " saved successfully");
         } catch (Exception e) {
-            logger.error("Error saving object " + object.getClass() + " error: " + e.getMessage());
+            throw new InternalServerErrorException("Error saving object " + object.getClass(), e.getMessage());
         } finally {
             em.close();
         }
@@ -55,11 +57,11 @@ public class ORMStoreJpaImpl implements ORMStoreInterface {
     @Override
     public <T> T findById(Class<T> entityClass, String id) {
         EntityManager em = emf.createEntityManager();
-        T object = null;
+        T object;
         try {
             object = em.find(entityClass, id);
         } catch (Exception e) {
-            logger.warn("Error finding object " + entityClass.getSimpleName() + " error: " + e.getMessage());
+            throw new InternalServerErrorException("Error finding object " + entityClass.getSimpleName(), e.getMessage());
         } finally {
             em.close();
         }
@@ -75,16 +77,15 @@ public class ORMStoreJpaImpl implements ORMStoreInterface {
     @Override
     public <T> List<T> getAll(Class<T> entityClass) {
         EntityManager em = emf.createEntityManager();
-        List<T> objects = null;
+        List<T> objects;
         try {
             String queryString = "SELECT d FROM " + entityClass.getSimpleName() + " d";
             em.getTransaction().begin();
-            @SuppressWarnings("squid:S2077")
             Query query = em.createQuery(queryString);
             objects = query.getResultList();
             em.getTransaction().commit();
         } catch (Exception e) {
-            logger.error("Error retrieving all objects " + entityClass.getSimpleName() + " error: " + e.getMessage());
+            throw new InternalServerErrorException("Error retrieving all objects " + entityClass.getSimpleName(), e.getMessage());
         } finally {
             em.close();
         }
@@ -112,11 +113,11 @@ public class ORMStoreJpaImpl implements ORMStoreInterface {
                 em.getTransaction().commit();
                 success = true;
             } else {
-                logger.warn("Error deleting " + entityClass.getSimpleName() + ". Object not found");
                 em.getTransaction().rollback();
+                throw new ElementNotFoundException("Error deleting " + entityClass.getSimpleName() + ". Object not found");
             }
         } catch (Exception e) {
-            logger.error("Error deleting " + entityClass.getSimpleName() + " error: " + e.getMessage());
+            throw new InternalServerErrorException("Error deleting " + entityClass.getSimpleName(), e.getMessage());
         } finally {
             em.close();
         }

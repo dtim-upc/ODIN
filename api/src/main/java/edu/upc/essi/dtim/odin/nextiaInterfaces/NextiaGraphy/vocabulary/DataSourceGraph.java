@@ -3,23 +3,23 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.vocabulary;
 public enum DataSourceGraph {
 
     // TODO: must extend DataSourceVocabulary
-    SCHEMA(Namespaces.DATASOURCE.val() + "/Schema"),
+    SCHEMA(Namespaces.DATASOURCE.getElement() + "/Schema"),
 
-    HAS_SEPARATOR(Namespaces.DATASOURCE.val() + "/hasSeparator"),
-    HAS_PATH(Namespaces.DATASOURCE.val() + "/path"),
-    HAS_DESCRIPTION(Namespaces.DATASOURCE.val() + "/description"),
-    HAS_FILENAME(Namespaces.DATASOURCE.val() + "/hasFileName"),
-    HAS_FILESIZE(Namespaces.DATASOURCE.val() + "/hasFileSize"),
-    HAS_FORMAT(Namespaces.DATASOURCE.val() + "/hasFormat"),
-    HAS_ID(Namespaces.DATASOURCE.val() + "/hasID"),
+    HAS_SEPARATOR(Namespaces.DATASOURCE.getElement() + "/hasSeparator"),
+    HAS_PATH(Namespaces.DATASOURCE.getElement() + "/path"),
+    HAS_DESCRIPTION(Namespaces.DATASOURCE.getElement() + "/description"),
+    HAS_FILENAME(Namespaces.DATASOURCE.getElement() + "/hasFileName"),
+    HAS_FILESIZE(Namespaces.DATASOURCE.getElement() + "/hasFileSize"),
+    HAS_FORMAT(Namespaces.DATASOURCE.getElement() + "/hasFormat"),
+    HAS_ID(Namespaces.DATASOURCE.getElement() + "/hasID"),
 
-    HAS_PROJECTID(Namespaces.DATASOURCE.val() + "/hasProjectID"),
+    HAS_PROJECTID(Namespaces.DATASOURCE.getElement() + "/hasProjectID"),
 
-    UNUSED_ALIGNMENTS(Namespaces.NEXTIADI.val() + "unusedAlignments"),
-    INTEGRATION_OF(Namespaces.NEXTIADI.val() + "integrationOf"),
-    IS_MINIMAL_OF(Namespaces.NEXTIADI.val() + "isMinimalOf"),
-    GRAPHICAL(DataSourceVocabulary.DataSource.val() + "/graphicalGraph"),
-    MINIMAL(Namespaces.NEXTIADI.val() + "minimal");
+    UNUSED_ALIGNMENTS(Namespaces.NEXTIADI.getElement() + "unusedAlignments"),
+    INTEGRATION_OF(Namespaces.NEXTIADI.getElement() + "integrationOf"),
+    IS_MINIMAL_OF(Namespaces.NEXTIADI.getElement() + "isMinimalOf"),
+    GRAPHICAL(DataSourceVocabulary.DataSource.getElement() + "/graphicalGraph"),
+    MINIMAL(Namespaces.NEXTIADI.getElement() + "minimal");
 
 
     private String element;
@@ -28,8 +28,11 @@ public enum DataSourceGraph {
         this.element = element;
     }
 
-    public String val() {
+    public String getElement() {
         return element;
+    }
+    public void setElement(String element) {
+        this.element = element;
     }
 
 

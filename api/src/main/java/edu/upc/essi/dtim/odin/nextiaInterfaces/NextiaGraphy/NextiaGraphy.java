@@ -63,7 +63,7 @@ public class NextiaGraphy {
                     n.setDomain(statement.getObject().toString());
                 } else if (statement.getPredicate().equals(RDFS.range)) {
                     n.setRange(statement.getObject().toString());
-                } else if (statement.getPredicate().getURI().equals(SourceGraph.HAS_ATTRIBUTE.val()) || statement.getPredicate().getURI().equals(SourceGraph.HAS_WRAPPER.val())) {
+                } else if (statement.getPredicate().getURI().equals(SourceGraph.HAS_ATTRIBUTE.getElement()) || statement.getPredicate().getURI().equals(SourceGraph.HAS_WRAPPER.getElement())) {
 
                     Nodes property = new Nodes();
                     property.setIri(statement.getPredicate().getURI());
@@ -112,16 +112,16 @@ public class NextiaGraphy {
 
         List<String> excluded = new ArrayList<>();
         excluded.add("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource");
-        excluded.add(SCHEMAINTEGRATION.val());
-        excluded.add(GLOBALSCHEMA.val());
+        excluded.add(SCHEMAINTEGRATION.getElement());
+        excluded.add(GLOBALSCHEMA.getElement());
 
         List<String> excludedForProperties = new ArrayList<>();
         excludedForProperties.add("class");
         excludedForProperties.add("integratedClass");
 
-        System.out.println(nodes.size());
+//        System.out.println(nodes.size());
         List<Nodes> nodesReady = nodes.stream().filter(s -> !excluded.contains(s.getIriType()))
-                .filter(s -> !s.getIri().contains(GLOBALSCHEMA.val()) && !s.getIri().contains(SCHEMAINTEGRATION.val())
+                .filter(s -> !s.getIri().contains(GLOBALSCHEMA.getElement()) && !s.getIri().contains(SCHEMAINTEGRATION.getElement())
                         && !s.getIri().contains(RDFS.subPropertyOf.toString()) && !s.getRange().equals("http://schema.org/identifier"))
                 .collect(Collectors.toList());
         List<Nodes> nodesProperties = nodes.stream()

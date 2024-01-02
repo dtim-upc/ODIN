@@ -4,18 +4,16 @@ public class DataRepositoryTypeInfo {
     private String label;
     private String value;
 
+    public DataRepositoryTypeInfo() {}
+
     public DataRepositoryTypeInfo(String label, String value) {
         this.label = label;
         this.value = value;
     }
 
-    public DataRepositoryTypeInfo() {
-    }
-
     public String getLabel() {
         return label;
     }
-
     public void setLabel(String label) {
         this.label = label;
     }
@@ -23,7 +21,6 @@ public class DataRepositoryTypeInfo {
     public String getValue() {
         return value;
     }
-
     public void setValue(String value) {
         this.value = value;
     }

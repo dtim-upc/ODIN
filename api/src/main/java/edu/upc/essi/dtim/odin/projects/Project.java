@@ -19,10 +19,11 @@ public class Project {
     private List<Dataset> integratedDatasets;
     private List<Dataset> temporalIntegratedDatasets;
 
+    public Project() {}
+
     public String getProjectId() {
         return projectId;
     }
-
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
@@ -30,7 +31,6 @@ public class Project {
     public String getProjectName() {
         return projectName;
     }
-
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
@@ -38,7 +38,6 @@ public class Project {
     public String getProjectDescription() {
         return projectDescription;
     }
-
     public void setProjectDescription(String projectDescription) {
         this.projectDescription = projectDescription;
     }
@@ -46,7 +45,6 @@ public class Project {
     public String getProjectPrivacy() {
         return projectPrivacy;
     }
-
     public void setProjectPrivacy(String projectPrivacy) {
         this.projectPrivacy = projectPrivacy;
     }
@@ -54,7 +52,6 @@ public class Project {
     public String getProjectColor() {
         return projectColor;
     }
-
     public void setProjectColor(String projectColor) {
         this.projectColor = projectColor;
     }
@@ -62,7 +59,6 @@ public class Project {
     public String getCreatedBy() {
         return createdBy;
     }
-
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
@@ -70,23 +66,20 @@ public class Project {
     public IntegratedGraphJenaImpl getIntegratedGraph() {
         return integratedGraph;
     }
-
     public void setIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
         this.integratedGraph = integratedGraph;
-    }
-
-    public void setTemporalIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
-        this.temporalIntegratedGraph = integratedGraph;
     }
 
     public IntegratedGraphJenaImpl getTemporalIntegratedGraph() {
         return temporalIntegratedGraph;
     }
+    public void setTemporalIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
+        this.temporalIntegratedGraph = integratedGraph;
+    }
 
     public List<DataRepository> getRepositories() {
         return repositories;
     }
-
     public void setRepositories(List<DataRepository> dataResources) {
         this.repositories = dataResources;
     }
@@ -94,7 +87,6 @@ public class Project {
     public List<Dataset> getIntegratedDatasets() {
         return integratedDatasets;
     }
-
     public void setIntegratedDatasets(List<Dataset> integratedDatasets) {
         this.integratedDatasets = integratedDatasets;
     }
@@ -102,7 +94,6 @@ public class Project {
     public List<Dataset> getTemporalIntegratedDatasets() {
         return this.temporalIntegratedDatasets;
     }
-
     public void setTemporalIntegratedDatasets(final List<Dataset> temporalIntegratedDatasets) {
         this.temporalIntegratedDatasets = temporalIntegratedDatasets;
     }

@@ -7,6 +7,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.odin.exception.EmptyFileException;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationTemporalResponse;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
@@ -26,8 +27,6 @@ import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,43 +43,12 @@ public class IntegrationService {
     private AppConfig appConfig;
 
     /**
-     * Retrieves the domain of a property IRI from the specified graph.
-     *
-     * @param graph       The graph to query for the property's domain.
-     * @param propertyIRI The IRI (Internationalized Resource Identifier) of the property.
-     * @return The domain of the property if found, or null if not found.
-     */
-    private String getDomainOfProperty(Graph graph, String propertyIRI) {
-        // Define a SPARQL query to retrieve the domain of the property and execute the query on the graph
-        String query = "SELECT ?domain WHERE { <" + propertyIRI + "> <" + RDFS.domain.toString() + "> ?domain. }";
-        List<Map<String, Object>> res = graph.query(query);
-
-        // If the query result is not empty we extract and return the domain as a string. Otherwise, return null
-        if (!res.isEmpty()) {
-            return res.get(0).get("domain").toString();
-        }
-        return null;
-    }
-
-    /**
      * Retrieves the RDFS label of a resource IRI from the specified graph.
      *
-     * @param graph       The graph to query for the resource's RDFS label.
-     * @param resourceIRI The IRI (Internationalized Resource Identifier) of the resource.
-     * @return The RDFS label of the resource if found, or null if not found.
+     * @param projectId Identification of the project whose integrated graph will be modified.
+     * @param iData     Object containing the necessary data to perform the integration.
+     * @return a IntegrationTemporalResponse, that is, the project and a list of JoinAlignments
      */
-    private String getRDFSLabel(Graph graph, String resourceIRI) {
-        // Define a SPARQL query to retrieve the RDFS label of the resource and execute the query on the graph
-        String query = "SELECT ?label WHERE { <" + resourceIRI + "> <" + RDFS.label.toString() + "> ?label. }";
-        List<Map<String, Object>> res = graph.query(query);
-
-        // If the query result is not empty we extract and return the RDFS label as a string. Otherwise, return null
-        if (!res.isEmpty()) {
-            return res.get(0).get("label").toString();
-        }
-        return null;
-    }
-
     public IntegrationTemporalResponse integrate(String projectId, IntegrationData iData) {
         Project project = projectService.getProject(projectId);
 
@@ -88,12 +56,12 @@ public class IntegrationService {
         Graph integratedGraph = integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
         Project projectToSave = updateTemporalIntegratedGraphProject(project, integratedGraph);
 
-        // Add the new integrated dataset and save the project
+        // Add the new integrated dataset to the project and save the project
         projectToSave = datasetService.addTemporalIntegratedDataset(projectToSave, iData.getDsB().getId());
         projectService.saveProject(projectToSave);
 
-        // We get the project we have just stored with getProject to regenerate the global graphs (otherwise, the
-        // visual representation will fail)
+        // We get the project we have just stored with the getProject to regenerate the visual representations of the
+        // graphs and the global graphs (otherwise, the visual representation of the frontend will fail)
         Project savedProject = projectService.getProject(projectToSave.getProjectId());
 
         List<JoinAlignment> joinProperties = generateJoinAlignments(project.getIntegratedGraph(), iData.getDsB().getLocalGraph(), iData);
@@ -104,11 +72,10 @@ public class IntegrationService {
     /**
      * Integrates data from a second RDF graph into the provided integrated RDF graph based on specified alignments.
      *
-     * @param integratedGraph The integrated RDF graph to which data will be integrated.
-     * @param datasetToIntegrate             The dataset containing the second RDF graph.
-     * @param alignments      A list of alignments specifying how the data should be integrated.
+     * @param integratedGraph     The integrated RDF graph to which data will be integrated.
+     * @param datasetToIntegrate  The dataset containing the second RDF graph.
+     * @param alignments          A list of alignments specifying how the data should be integrated.
      * @return The integrated RDF graph with the integrated data.
-     * @throws RuntimeException If there is an error while performing the integration.
      */
     public Graph integrateData(GraphJenaImpl integratedGraph, Dataset datasetToIntegrate, List<Alignment> alignments) {
         GraphStoreInterface graphStoreInterface;
@@ -119,21 +86,25 @@ public class IntegrationService {
         }
 
         // Retrieve the local graph of the dataset that we want to integrate
-        String graphToIntegrateName = datasetToIntegrate.getLocalGraph().getGraphName(); // we only have the name
+        String graphToIntegrateName = datasetToIntegrate.getLocalGraph().getGraphName(); // here we only have the name of the graph to integrate
         Graph graphToIntegrate = graphStoreInterface.getGraph(graphToIntegrateName);
-        datasetToIntegrate.setLocalGraph((LocalGraphJenaImpl) graphToIntegrate); // now we have the full graph; we need it for later
+        datasetToIntegrate.setLocalGraph((LocalGraphJenaImpl) graphToIntegrate); // now we have the full graph in the object; we need it for later
 
-        // Integrate the data from graphB into the integratedGraph based on alignments; and generate the visual schema
+        // Integrate the data from graphB into the integratedGraph based on alignments
         integrationModuleInterface integrationInterface = new integrationModuleImpl();
-        Graph newIntegratedGraph = integrationInterface.integrate(integratedGraph, graphToIntegrate, alignments);
-        newIntegratedGraph.setGraphicalSchema(generateVisualSchema(newIntegratedGraph));
-
-        return newIntegratedGraph;
+        return integrationInterface.integrate(integratedGraph, graphToIntegrate, alignments); // return the newly integrated graph
     }
 
+    /**
+     * Updates the temporal integrated graph of a project
+     *
+     * @param project         Project whose temporal integrated graph will be updated.
+     * @param integratedGraph The integrated RDF graph to which data will be integrated.
+     * @return The project with the new temporal integrated graph.
+     */
     public Project updateTemporalIntegratedGraphProject(Project project, Graph integratedGraph) {
         // Create an integrated graph and assign the data from the new integrated graph
-        // NECESSARY FOR CASTING STUFF
+        // NECESSARY DUE TO CASTING STUFF
         IntegratedGraphJenaImpl integratedImpl = CoreGraphFactory.createIntegratedGraph();
         integratedImpl.setGraph(integratedGraph.getGraph());
 
@@ -142,11 +113,6 @@ public class IntegrationService {
         project.getTemporalIntegratedGraph().setGraphicalSchema(integratedGraph.getGraphicalSchema());
 
         return project;
-    }
-
-    private String generateVisualSchema(Graph graph) {
-        nextiaGraphyModuleInterface visualLibInterface = new nextiaGraphyModuleImpl();
-        return visualLibInterface.generateVisualGraph(graph);
     }
 
     /**
@@ -201,6 +167,49 @@ public class IntegrationService {
         return joinProperties;
     }
 
+    /**
+     * Retrieves the domain of a property IRI from the specified graph.
+     *
+     * @param graph       The graph to query for the property's domain.
+     * @param propertyIRI The IRI (Internationalized Resource Identifier) of the property.
+     * @return The domain of the property if found, or null if not found.
+     */
+    private String getDomainOfProperty(Graph graph, String propertyIRI) {
+        // Define a SPARQL query to retrieve the domain of the property and execute the query on the graph
+        String query = "SELECT ?domain WHERE { <" + propertyIRI + "> <" + RDFS.domain.toString() + "> ?domain. }";
+        List<Map<String, Object>> res = graph.query(query);
+
+        // If the query result is not empty we extract and return the domain as a string. Otherwise, return null
+        if (!res.isEmpty()) {
+            return res.get(0).get("domain").toString();
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves the RDFS label of a resource IRI from the specified graph.
+     *
+     * @param graph       The graph to query for the resource's RDFS label.
+     * @param resourceIRI The IRI (Internationalized Resource Identifier) of the resource.
+     * @return The RDFS label of the resource if found, or null if not found.
+     */
+    private String getRDFSLabel(Graph graph, String resourceIRI) {
+        // Define a SPARQL query to retrieve the RDFS label of the resource and execute the query on the graph
+        String query = "SELECT ?label WHERE { <" + resourceIRI + "> <" + RDFS.label.toString() + "> ?label. }";
+        List<Map<String, Object>> res = graph.query(query);
+
+        // If the query result is not empty we extract and return the RDFS label as a string. Otherwise, return null
+        if (!res.isEmpty()) {
+            return res.get(0).get("label").toString();
+        }
+        return null;
+    }
+
+    //TODO: complete the description
+    /**
+     *
+     * @return T
+     */
     public Project reviewJoins(String projectID, List<JoinAlignment> joinAlignments) {
         Project project = projectService.getProject(projectID);
 
@@ -208,9 +217,9 @@ public class IntegrationService {
         Graph integratedSchema = joinIntegration(project.getTemporalIntegratedGraph(), joinAlignments);
         project = updateTemporalIntegratedGraphProject(project, integratedSchema);
 
-        // Save and return the updated project (we use getProject to regenerate the global graphs)
+        // Save and return the updated project (we use getProject to regenerate the visual representation of the graphs
+        // and the global graphs)
         Project savedProject = projectService.saveProject(project);
-
         return projectService.getProject(savedProject.getProjectId());
     }
 
@@ -235,6 +244,12 @@ public class IntegrationService {
         return joinGraph;
     }
 
+    /**
+     * Assign as the project's integrated graph, the temporal integrated graph, and reset the temporal integrated graph
+     *
+     * @param projectID Identification of the project whose integrated graph will be updated
+     * @return The global graph resulting from the join operation.
+     */
     public Project acceptIntegration(String projectID) {
         Project temporalProject = projectService.getProject(projectID);
 
@@ -270,7 +285,7 @@ public class IntegrationService {
         return project;
     }
 
-    public List<Alignment> getAlignments(String projectId, String datasetId) throws SQLException, IOException, ClassNotFoundException {
+    public List<Alignment> getAlignments(String projectId, String datasetId) {
         Project project = projectService.getProject(projectId);
         Dataset datasetA = datasetService.getDatasetById(project.getIntegratedDatasets().get(0).getId());
         Dataset datasetB = datasetService.getDatasetById(datasetId);
@@ -294,8 +309,9 @@ public class IntegrationService {
             }
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        if (alignments.isEmpty()) {
+            throw new EmptyFileException("No automatic alignments were found");
+        }
         return alignmentsWithFilter;
-        //if (alignments.size() == 0) return new ResponseEntity(alignments, HttpStatus.NO_CONTENT); // throw exception
     }
 }

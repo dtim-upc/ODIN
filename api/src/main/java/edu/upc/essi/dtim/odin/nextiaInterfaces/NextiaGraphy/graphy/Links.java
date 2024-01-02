@@ -33,7 +33,6 @@ public class Links {
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -41,7 +40,6 @@ public class Links {
     public String getNodeId() {
         return nodeId;
     }
-
     public void setNodeId(String nodeId) {
         this.nodeId = nodeId;
     }
@@ -49,7 +47,6 @@ public class Links {
     public String getSource() {
         return source;
     }
-
     public void setSource(String source) {
         this.source = source;
     }
@@ -57,7 +54,6 @@ public class Links {
     public String getTarget() {
         return target;
     }
-
     public void setTarget(String target) {
         this.target = target;
     }
@@ -65,7 +61,6 @@ public class Links {
     public String getLabel() {
         return label;
     }
-
     public void setLabel(String label) {
         this.label = label;
     }

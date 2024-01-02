@@ -1,6 +1,5 @@
 package edu.upc.essi.dtim.odin;
 
-import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -27,12 +25,13 @@ public class OdinApplication {
         // Initialize Spring Boot application
         SpringApplication.run(OdinApplication.class, args);
 
-        // Initialize data layer (do not remove this line)
-        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        // Initialize data layer
+        DataLayerSingleton.getInstance(appConfig);
 
         logger.info("Application started. Ready to receive API requests.");
     }
 
+    // Do not remove
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
