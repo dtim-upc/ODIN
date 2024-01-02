@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapFactory;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
+import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 
 public class bsModuleImpl implements bsModuleInterface {
 
@@ -13,7 +14,7 @@ public class bsModuleImpl implements bsModuleInterface {
             bootstrapODINInterface = BootstrapFactory.getInstance(dataset);
             return bootstrapODINInterface.bootstrapDataset(dataset);
         } catch (Exception e) {
-            throw new RuntimeException("Error converting dataset to graph: " + e.getMessage(), e);
+            throw new InternalServerErrorException("Error converting dataset to graph", e.getMessage());
         }
     }
 
