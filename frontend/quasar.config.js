@@ -14,7 +14,7 @@ const { configure } = require('quasar/wrappers');
 
 module.exports = configure(function ( ctx ) {
   return {
-
+    supportTS: true,
 
     // https://v2.quasar.dev/quasar-cli/prefetch-feature
     // preFetch: true,

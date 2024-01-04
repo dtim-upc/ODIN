@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHr LpR lFr">
-    <!-- v-model="drawer" -->
-    <q-drawer show-if-above :mini="miniState" :width="200" :breakpoint="500" bordered @mouseenter="expandDrawer" @mouseleave="contractDrawer">
+    <!-- v-model="drawer" @mouseenter="expandDrawer" @mouseleave="contractDrawer" -->
+    <q-drawer show-if-above :mini="miniState" :width="200" :breakpoint="500" bordered>
       <q-scroll-area class="fit">
         <q-list padding>
 
@@ -276,6 +276,48 @@
                 </q-item-section>
               </q-item>
 
+              <q-item exact manual-focus>
+                <q-item-section v-if="miniState" avatar>
+                  <q-btn flat
+                         no-caps
+                         padding="xs"
+                         icon="mdi-thought-bubble"
+                         :to="{name:'intents'}"
+                         :color="$route.name === 'intents' ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'intents' }">
+                    <q-item-section>
+                      <div class="icon-label-wrapper">
+                        <span class="label-style">Intents</span>
+                      </div>
+                    </q-item-section>
+                    <q-tooltip anchor="center right"
+                               self="center left"
+                               :offset="[10, 10]"
+                               transition-show="fade"
+                               transition-hide="fade">
+                      Intents
+                    </q-tooltip>
+                  </q-btn>
+                </q-item-section>
+                <q-item-section v-else>
+                  <q-btn flat
+                         no-caps
+                         icon="mdi-thought-bubble"
+                         :to="{name:'abstract-planner'}"
+                         :color="$route.name === 'intents' ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'intents' }">
+                    <q-item-section>
+                      <div class="icon-label-wrapper">
+                        <span class="label-style">Intents</span>
+                      </div>
+                    </q-item-section>
+                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
+                      Intents
+                    </q-tooltip>
+                  </q-btn>
+                </q-item-section>
+              </q-item>
+
           </div>
 
           <div class="fixed-bottom">
@@ -333,7 +375,7 @@ import {ref} from "vue";
 import ODIN_short from "components/icons/ODIN_short.vue";
 import {useAuthStore} from 'stores/auth.store.js'
 // import {outlinedHub as hubi}  from "@quasar/extras/material-icons-outlined"
-const miniState = ref(true)
+const miniState = ref(false)
 const authStore = useAuthStore()
 
 function expandDrawer() {

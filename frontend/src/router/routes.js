@@ -17,20 +17,13 @@ const routes = [
       {path: 'schema', name: 'schema', component: () => import('pages/datasources/Schema.vue')},
       {path: 'repositories', name: 'repositories', component: () => import('pages/datasources/Repositories.vue')},
       {path: 'datasources', name: 'datasources', component: () => import('pages/datasources/DataSources.vue')},
-      {
-        path: 'viewTriples/:datasourceID',
-        name: 'viewTriples',
-        component: () => import('pages/datasources/ViewTriples.vue')
-      },
-
-      {
-        path: 'configureIntegration',
-        name: 'dsIntegration',
-        component: () => import('pages/datasources/DataSourceIntegration.vue')
-      },
-
+      {path: 'viewTriples/:datasourceID', name: 'viewTriples', component: () => import('pages/datasources/ViewTriples.vue')},
+      {path: 'configureIntegration', name: 'dsIntegration', component: () => import('pages/datasources/DataSourceIntegration.vue')},
       {path: 'query', name: 'query', component: () => import('pages/datasources/Query.vue')},
-
+      {path: 'intents', name: 'intents', component: () => import('pages/datasources/Intents.vue')},
+      {path: 'abstract-planner', name: 'abstract-planner', component: () => import('pages/datasources/Intents.vue')},
+      {path: 'logical-planner', name: 'logical-planner', component: () => import('pages/datasources/Intents.vue')},
+      {path: 'workflow-planner', name: 'workflow-planner', component: () => import('pages/datasources/Intents.vue')},
     ]
   },
   {
@@ -55,8 +48,7 @@ const routes = [
   //component: () => import('pages/Auth.vue'),
   //},
 
-  // Always leave this as last one,
-  // but you can also remove it
+  // Always leave this as last one, but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue')
