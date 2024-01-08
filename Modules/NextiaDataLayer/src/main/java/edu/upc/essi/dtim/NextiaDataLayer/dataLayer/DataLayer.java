@@ -69,7 +69,7 @@ public abstract class DataLayer {
         return spark.sql(d.getWrapper());
     }
 
-    protected void deleteFilesFromDirectory(String directoryPath) {
+    public void deleteFilesFromDirectory(String directoryPath) {
         Path dir = Paths.get(directoryPath);
         try {
             Files.walk(dir).sorted(Comparator.reverseOrder()).forEach(path -> {

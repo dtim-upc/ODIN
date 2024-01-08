@@ -33,7 +33,6 @@ public class DataLayerImpl implements DataLayerInterface {
     public void deleteDataset(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         try {
-            dl.removeFromLandingZone(UUID);
             dl.removeFromFormattedZone(UUID);
         } catch (Exception e) {
             throw new InternalServerErrorException("Error when deleting the dataset from the data layer", e.getMessage());
@@ -48,5 +47,12 @@ public class DataLayerImpl implements DataLayerInterface {
         } catch (IOException e) {
             throw new CustomIOException("Error when storing the temporal file");
         }
+    }
+
+    @Override
+    public void deleteTemporalFiles() {
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        dl.deleteFilesFromDirectory(appConfig.getDataLayerPath() + "/tmp");
+        dl.deleteFilesFromDirectory(appConfig.getDataLayerPath() + "/landingZone");
     }
 }

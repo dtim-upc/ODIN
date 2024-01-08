@@ -28,4 +28,6 @@ public interface DataLayerInterface {
      * @return A boolean indicating whether the file was uploaded successfully.
      */
     String storeTemporalFile(MultipartFile multipartFile, String repositoryIdAndName);
+
+    void deleteTemporalFiles();
 }

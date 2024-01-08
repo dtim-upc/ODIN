@@ -85,6 +85,7 @@ public class DatasetService {
             default: // Throw an exception for unsupported file formats
                 throw new FormatNotAcceptedException("Unsupported repository type: " + repository.getRepositoryType());
         }
+        deleteTemporalFiles();
     }
 
     /**
@@ -378,6 +379,14 @@ public class DatasetService {
     }
 
     /**
+     * Deletes all the temporal files used to create a dataset (i.e. it removes the folders)
+     */
+    public void deleteTemporalFiles() {
+        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+        dlInterface.deleteTemporalFiles();
+    }
+
+    /**
      * Saves a Dataset object using the ORMStoreInterface.
      *
      * @param dataset The Dataset object to save.
@@ -459,7 +468,6 @@ public class DatasetService {
         DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
         dlInterface.uploadToDataLayer(dataset);
     }
-
 
     /**
      * Downloads the schema of a dataset, in .ttl format.
