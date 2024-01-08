@@ -20,7 +20,6 @@
                 <q-btn label="Reset" type="reset" class="q-ml-sm"/>
                 
             </div>
-            <pre>{{ intentsStore.datasets }}</pre>
         </q-form>
     </q-page>
 </template>
@@ -29,9 +28,11 @@
 import {ref, onMounted} from 'vue'
 import {useIntentsStore} from 'stores/intents.store.js'
 import {useRoute, useRouter} from "vue-router";
+import { useQuasar } from 'quasar'
 
 const router = useRouter()
 const route = useRoute()
+const $q = useQuasar()
 
 const intentsStore = useIntentsStore()
 
@@ -39,7 +40,8 @@ const intentName = ref(null)
 const dataset = ref(null)
 const problem = ref(null)
 
-const handleSubmit = () => {
+const handleSubmit = async() => {
+  $q.loading.show({message: 'Running abstract planner'})
   const data = {
     'intent_name': intentName.value,
     'dataset': intentsStore.datasets[dataset.value],
@@ -50,8 +52,8 @@ const handleSubmit = () => {
     router.push({ path: route.path.substring(0, route.path.lastIndexOf("/")) + "/logical-planner" })
   }
 
-  console.log(data)
-  intentsStore.setAbstractPlans(data, successCallback)
+  await intentsStore.setAbstractPlans(data, successCallback)
+  $q.loading.hide()
 }
 
 const resetForm = () => {

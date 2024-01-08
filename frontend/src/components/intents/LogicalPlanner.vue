@@ -5,13 +5,15 @@
                 <h4> Logical planner </h4>
                 <h6> Select the Abstract Plans to send to the Logical Planner: </h6>
             </div>
-                <div class="col-12 col-lg-4 text-left">
+                <div class="col-6 text-left">
                 <q-list bordered separator>
                     <q-item v-for="(method, index) in methods" :key="method.id" class="q-my-sm">
                         <q-item-section avatar>
                             <q-checkbox v-model="method.selected"/>
                         </q-item-section>
-                        <q-item-section> {{ method.name }}</q-item-section>
+                        <q-item-section> 
+                          <text-body1 style="font-size: 17px;"> {{ method.name }} </text-body1>
+                        </q-item-section>
                         <q-item-section avatar>
                             <q-btn color="primary" icon="mdi-eye-outline" @click="openDialog(method.plan)">
                             </q-btn>
@@ -56,22 +58,34 @@
 import {ref, onBeforeMount} from 'vue'
 import {useIntentsStore} from 'stores/intents.store.js'
 import VisualizePlan from "../../components/intents/VisualizePlan.vue";
+import {useRoute, useRouter} from "vue-router";
+import { useQuasar } from 'quasar'
 
+const router = useRouter()
+const route = useRoute()
 const intentsStore = useIntentsStore()
+const $q = useQuasar()
 
 const methods = ref([])
 const dialog = ref(false)
 const maximizedToggle = ref(true)
 const visualizedPlan = ref(null)
         
-const handleSubmit = () => {
+const handleSubmit = async() => {
+  $q.loading.show({message: 'Running logical planner'})
+  const successCallback = () => {
+    router.push({ path: route.path.substring(0, route.path.lastIndexOf("/")) + "/workflow-planner" })
+  }
+
   let data = []
   methods.value.map(method => {
     if (method.selected) {
       data.push(method.id)
     }
   })
-  intentsStore.setLogicalPlans(data)
+
+  await intentsStore.setLogicalPlans(data, successCallback)
+  $q.loading.hide()
 }
 
 const selectAll = () => {

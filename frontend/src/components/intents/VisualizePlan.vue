@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
@@ -11,7 +11,7 @@ import ELK from 'elkjs/lib/elk.bundled.js'
 const props = defineProps(['plan'])
 const { onConnect, addEdges } = useVueFlow()
 
-/*
+/* Reference structure of the nodes and edges
 const nodes = ref<Node[]>([
   { id: 'https://extremexp.eu/ontology/cbox#DataLoading', type: 'input', label: 'DataLoading', position: { x: 0, y: 0 }, sourcePosition: Position.Right, class: 'grey-node'},
   { id: 'https://extremexp.eu/ontology/cbox#DataStoring', type: 'output', label: 'DataStoring', position: { x: 800, y: 0 }, targetPosition: Position.Left, class: 'grey-node'},
@@ -117,15 +117,10 @@ async function plan_layout(plan: { [key: string]: string[] }) {
         target: edge.targets.at(0) as string,
       })
     })
-
-
-    //console.log(nodes.value)
-    //console.log(edges.value)
-
+    console.log(nodes.value)
 }
 
 plan_layout(props.plan)
-console.log(props.plan)
 
 onConnect((params) => {
   addEdges([params])

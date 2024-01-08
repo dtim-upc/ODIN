@@ -28,4 +28,24 @@ export default {
   setWorkflowPlans(data) {
     return intentsApi.post('/workflow_planner', data)
   },
+
+  getWorkflowPlans() {
+    return intentsApi.get('/workflow_plans')
+  },
+
+  downloadRDF(planID) {
+    return intentsApi.get('/workflow_plans/rdf/' + planID)
+  },
+
+  downloadKNIME(planID) {
+    return intentsApi.get('/workflow_plans/knime/' + planID)
+  },
+
+  downloadAllRDF() {
+    return intentsApi.get('/workflow_plans/rdf/all', {responseType: 'blob'})
+  },
+
+  downloadAllKNIME() {
+    return intentsApi.get('/workflow_plans/knime/all', {responseType: 'blob'})
+  },
 }
