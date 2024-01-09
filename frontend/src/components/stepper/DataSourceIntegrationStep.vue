@@ -90,6 +90,8 @@ import Graph from 'components/graph/Graph.vue'
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useRouter} from "vue-router";
+import {useRepositoriesStore} from "src/stores/repositories.store.js";
+
 
 
 // -------------------------------------------------------------
@@ -101,6 +103,7 @@ import {useRouter} from "vue-router";
 // -------------------------------------------------------------
 const dataSourceStore = useDataSourceStore();
 const integrationStore = useIntegrationStore();
+const repositoriesStore = useRepositoriesStore();
 
 const projectID = ref(null);
 const datasetsNumber = ref(0);
@@ -117,10 +120,10 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await dataSourceStore.getRepositories(projectID.value)
+    await repositoriesStore.getRepositories(projectID.value)
     // Count the datasets by summing the datasets in each repository
     let totalDatasets = 0;
-    dataSourceStore.repositories.forEach((repository) => {
+    repositoriesStore.repositories.forEach((repository) => {
       totalDatasets += repository.datasets.length;
     });
     datasetsNumber.value = totalDatasets;

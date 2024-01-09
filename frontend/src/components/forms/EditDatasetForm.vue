@@ -48,6 +48,7 @@ import {ref, reactive, onMounted} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useDataSourceStore} from "stores/datasources.store";
+import {useRepositoriesStore} from "stores/repositories.store.js";
 
 // -------------------------------------------------------------
 //                         PROPS & EMITS
@@ -64,6 +65,7 @@ const props = defineProps({
 const emit = defineEmits(["update:show"])
 
 const storeDS = useDataSourceStore();
+const repositoriesStore = useRepositoriesStore();
 
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
@@ -82,7 +84,7 @@ const setInitialValues = () => {
 // Function to find the repositoryId based on the datasetId
 const getDatasetRepositoryId = (datasetId) => {
   let repositoryId = null;
-  storeDS.repositories.forEach((repo) => {
+  repositoriesStore.repositories.forEach((repo) => {
     const foundDataset = repo.datasets.find((dataset) => dataset.id === datasetId);
     if (foundDataset) {
       repositoryId = repo.id;
@@ -93,7 +95,7 @@ const getDatasetRepositoryId = (datasetId) => {
 
 const getRepositoryName = (repositoryId) => {
   let repositoryName = null;
-  storeDS.repositories.forEach((repo) => {
+  repositoriesStore.repositories.forEach((repo) => {
     if (repo.id === repositoryId) {
       repositoryName = repo.name;
     }
@@ -107,7 +109,7 @@ const onRepositoryChange = () => {
     newDatasource.repositoryId = null;
   } else {
     // User selected an existing repository
-    const selectedRepo = storeDS.repositories.find(repo => repo.id === newDatasource.repositoryId);
+    const selectedRepo = repositoriesStore.repositories.find(repo => repo.id === newDatasource.repositoryId);
     if (selectedRepo) {
       newDatasource.repositoryId = selectedRepo.id;
     } else {
@@ -130,8 +132,8 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await storeDS.getRepositories(projectID.value)
-    if (storeDS.repositories.length === 0) createNewRepository.value = true;
+    await repositoriesStore.getRepositories(projectID.value)
+    if (repositoriesStore.repositories.length === 0) createNewRepository.value = true;
   }
   setInitialValues();
 

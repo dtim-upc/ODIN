@@ -128,6 +128,7 @@ public class ProjectService {
             for (Dataset d: dr.getDatasets()) {
                 // Delete all datasets from the data layer first.
                 deleteDatasetFromProject(id, d.getId());
+                // It is not necessary to delete the repositories manually, as they are removed when the project is deleted
             }
         }
         ormProject.deleteOne(Project.class, id);
@@ -311,5 +312,40 @@ public class ProjectService {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("text/turtle"))
                 .body(resource);
+    }
+
+    /**
+     * Deletes a repository from the specified project, and its associated datasets.
+     *
+     * @param projectId     The ID of the project to delete the repository from.
+     * @param repositoryID  The ID of the repository to delete.
+     */
+    public void deleteRepositoryFromProject(String projectId, String repositoryID) {
+        Project project = getProject(projectId);
+        List<DataRepository> repositoriesOfProject = project.getRepositories();
+        boolean projectFound = false;
+        // Iterate through the data repositories
+        for (DataRepository repoInProject : repositoriesOfProject) {
+            if (repoInProject.getId().equals(repositoryID)) {
+                projectFound = true;
+                // Iterate through the datasets in the repository and delete the RDF file and from the Data Layer
+                for (Dataset dataset : repoInProject.getDatasets()) {
+                    // Delete rdf file (\jenaFiles)
+                    GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+                    graphStore.deleteGraph(dataset.getLocalGraph());
+                    // Remove from Data layer
+                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+                    dlInterface.deleteDataset(dataset.getUUID());
+                }
+                repositoriesOfProject.remove(repoInProject);
+                break;
+            }
+        }
+        project.setRepositories(repositoriesOfProject); // Save and set the updated list of data repositories
+        // Throw an exception if the repository was not found
+        if (!projectFound) {
+            throw new NoSuchElementException("Project not found with id: " + repositoryID);
+        }
+        saveProject(project); // Save the updated project without the repository
     }
 }

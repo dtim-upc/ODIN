@@ -56,5 +56,35 @@ public class RepositoryController {
         repositoryService.postRepository(repositoryData, projectId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    /**
+     * Deletes a repository from a specific project, and its associated datasets.
+     *
+     * @param projectID     The ID of the project from which to delete the repository.
+     * @param repositoryID  The ID of the repository to delete.
+     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     */
+    @DeleteMapping("/project/{projectID}/repository/{repositoryID}")
+    public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectID") String projectID,
+                                                 @PathVariable("repositoryID") String repositoryID) {
+        logger.info("Delete repository " + repositoryID + " from project: " +  projectID);
+        repositoryService.deleteRepositoryFromProject(projectID, repositoryID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Edits a repository (name) in a specific project.
+     *
+     * @param repositoryID   The ID of the repository to edit.
+     * @param repositoryName The new name for the repository.
+     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     */
+    @PostMapping("/editRepository")
+    public ResponseEntity<Boolean> editDataset(@RequestParam("repositoryID") String repositoryID,
+                                               @RequestParam("repositoryName") String repositoryName) {
+        logger.info("Edit request received for editing repository with ID: " +  repositoryID);
+        repositoryService.editDataset(repositoryID, repositoryName);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
 

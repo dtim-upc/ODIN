@@ -71,7 +71,7 @@ public class DatasetController {
     public ResponseEntity<Boolean> editDataset(@RequestParam("datasetId") String datasetId,
                                                @RequestParam("datasetName") String datasetName,
                                                @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription) {
-        logger.info("Edit request received for editing dataset with ID: " +  datasetId +  ", name: " + datasetName);
+        logger.info("Edit request received for editing dataset with ID: " +  datasetId);
         datasetService.editDataset(datasetId, datasetName, datasetDescription);
         return new ResponseEntity<>(HttpStatus.OK);
     }

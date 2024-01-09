@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
@@ -198,5 +199,23 @@ public class RepositoryService {
             throw new InternalServerErrorException("Could not get the data from the database", e.getMessage());
         }
         return tableList;
+    }
+
+    /**
+     * Deletes a repository from the specified project, and its associated datasets.
+     *
+     * @param projectId     The ID of the project to delete the repository from.
+     * @param repositoryID  The ID of the repository to delete.
+     */
+    public void deleteRepositoryFromProject(String projectId, String repositoryID) {
+        projectService.deleteRepositoryFromProject(projectId, repositoryID);
+    }
+
+    public void editDataset(String repositoryID, String repositoryName) {
+        DataRepository originalRepository = getRepositoryById(repositoryID);
+
+        originalRepository.setRepositoryName(repositoryName);
+
+        saveRepository(originalRepository);
     }
 }

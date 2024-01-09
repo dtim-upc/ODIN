@@ -15,10 +15,6 @@ export const useDataSourceStore = defineStore('datasource', {
   state: () => ({
     project: {},
     datasources: [],
-    repositories: [],
-    selectedRepositoryId: null,
-    selectedRepositoryType: null,
-    selectedRepositoryName: null,
   }),
 
   getters: {
@@ -45,26 +41,10 @@ export const useDataSourceStore = defineStore('datasource', {
         return state.project.temporalIntegratedGraph.graphicalSchema
       return ""
     },
-    getRepos(state) {
-      return state.repositories
-    },
-    getSelectedRepositoryId(state) {
-      return state.selectedRepositoryId;
-    },
   },
   actions: {
 
     async init() {
-    },
-
-    setSelectedRepositoryId(repositoryId) {
-      this.selectedRepositoryId = repositoryId;
-      this.setSelectedRepositoryName(repositoryId);
-      this.selectedRepositoryType = this.repositories.some(repository => repository.id === this.selectedRepositoryId) ? this.repositories.find(repository => repository.id === this.selectedRepositoryId).repositoryType : "ERROR 404 No type";
-    },
-
-    setSelectedRepositoryName(repositoryId) {
-      this.selectedRepositoryName = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId).repositoryName : "ERROR 404 No name";
     },
 
     async setProject(proj) {
@@ -189,40 +169,6 @@ export const useDataSourceStore = defineStore('datasource', {
             notify.negative("Something went wrong on the server while editing the data.");
           }
         });
-    },
-
-    async getRepositories(projectId) {
-      const notify = useNotify()
-      const authStore = useAuthStore()
-      console.log("Pinia getting repositories...")
-      const res = await api.getRepositories(projectId, authStore.user.accessToken).then(response => {
-        console.log("repos received", response.data)
-
-        if (response.data === "") { // when no datasources, api answer ""
-          this.repositories = []
-          notify.positive("There are no repositories yet. Add sources to see them.")
-        } else if (response.status === 204) {
-          this.repositories = []
-          notify.positive("There are no repositories yet. Add sources to see them.")
-        } else {
-          this.repositories = response.data
-        }
-
-        console.log(this.repositories)
-      }).catch(err => {
-        console.log("error retrieving data sources")
-        console.log(err)
-        if (err.response && err.response.status === 401) {
-          // Handle unauthorized error
-          // Notify the user or perform any other necessary actions
-          notify.negative("Unauthorized access.")
-        } else if (err.response && err.response.status === 404) {
-          this.repositories = []
-          notify.negative("Repositories not found.")
-        } else {
-          notify.negative("Cannot connect to the server.")
-        }
-      });
     },
 
     finishPreview() {

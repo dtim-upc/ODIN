@@ -416,6 +416,7 @@
 import {computed, onBeforeMount, onMounted, defineProps, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js';
 import {useIntegrationStore} from 'src/stores/integration.store.js';
+import {useRepositoriesStore} from 'src/stores/repositories.store.js';
 import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 import {useRouter} from "vue-router";
@@ -508,6 +509,7 @@ const gridEnable = ref(false)
 const notify = useNotify()
 const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore();
+const repositoriesStore = useRepositoriesStore();
 onBeforeMount(() => {
   storeDS.setProject()
   integrationStore.init()
@@ -561,7 +563,7 @@ const hasSourceGraph = (props) => {
 
 const getRepositoryName = (datasetId) => {
   // Obtiene la lista de repositorios del store
-  const repositories = storeDS.repositories;
+  const repositories = repositoriesStore.repositories;
 
   // Itera a través de la lista de repositorios para buscar el dataset
   for (const repository of repositories) {

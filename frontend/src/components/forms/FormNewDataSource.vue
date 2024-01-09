@@ -8,8 +8,8 @@
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
           <div class="text-h4">Create new dataset</div>
-          <div class="text-h5">Parent Repository: {{ storeDS.selectedRepositoryName }}</div>
-          <div class="text-h6">Repository Type: {{ storeDS.selectedRepositoryType }}</div>
+          <div class="text-h5">Parent Repository: {{ repositoriesStore.selectedRepositoryName }}</div>
+          <div class="text-h6">Repository Type: {{ repositoriesStore.selectedRepositoryType }}</div>
 
           <!-- Sección 2: Información del Conjunto de Datos -->
           <q-card-section v-if="uploadedItems.length > 0">
@@ -192,6 +192,7 @@ import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
+import {useRepositoriesStore} from "src/stores/repositories.store.js";
 import {odinApi} from "../../boot/axios";
 
 
@@ -231,12 +232,12 @@ async function downloadFile() {
 async function makeRequest() {
   let endpoint = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
 
-  let id_buscar = storeDS.getSelectedRepositoryId; // Define el ID que deseas buscar
+  let id_buscar = repositoriesStore.selectedRepositoryId; // Define el ID que deseas buscar
 
   let repositorio_encontrado = null; // Inicializa con null, no con None
 
   // Supongamos que storeDS.repositories es una lista de objetos con propiedades "id" y "url"
-  for (const repo of storeDS.repositories) {
+  for (const repo of repositoriesStore.repositories) {
     if (repo.id === id_buscar) {
       repositorio_encontrado = repo;
       break;
@@ -305,6 +306,7 @@ const showS = computed({
 })
 
 const storeDS = useDataSourceStore();
+const repositoriesStore = useRepositoriesStore()
 
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
@@ -336,16 +338,16 @@ async function initializeComponent() {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await storeDS.getRepositories(projectID.value);
+    await repositoriesStore.getRepositories(projectID.value);
 
     console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
 
     //qué tipo de repositorio es?
     //storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
 
-    isLocalRepository.value = storeDS.selectedRepositoryType === "LocalRepository";
-    isJDBCRepository.value = storeDS.selectedRepositoryType === "RelationalJDBCRepository";
-    isAPIRepository.value = storeDS.selectedRepositoryType === "ApiRepository";
+    isLocalRepository.value = repositoriesStore.selectedRepositoryType === "LocalRepository";
+    isJDBCRepository.value = repositoriesStore.selectedRepositoryType === "RelationalJDBCRepository";
+    isAPIRepository.value = repositoriesStore.selectedRepositoryType === "APIRepository";
     console.log(isLocalRepository);
 
     if (isJDBCRepository.value) {
@@ -353,7 +355,7 @@ async function initializeComponent() {
 
       //call backend end point for retrieving db information and adding the response to uploadedItems
       try {
-        const repositoryId = storeDS.selectedRepositoryId;
+        const repositoryId = repositoriesStore.selectedRepositoryId;
 
         // Realiza la solicitud GET al punto final del backend con el repositoryId como parámetro
         const response = await odinApi.get(`/` + repositoryId + `/tables`);
@@ -409,8 +411,8 @@ const options = [
 ];
 
 const newDatasource = reactive({
-  repositoryId: storeDS.selectedRepositoryId,
-  repositoryName: storeDS.selectedRepositoryName,
+  repositoryId: repositoriesStore.selectedRepositoryId,
+  repositoryName: repositoriesStore.selectedRepositoryName,
   datasetDescription: '',
 });
 
@@ -418,7 +420,7 @@ const uploadedItems = ref([]);
 const DataSourceType = ref(options[0]);
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
   newDatasource.repositoryId = null;
-  storeDS.selectedRepositoryId = null;
+  repositoriesStore.selectedRepositoryId = null;
   newDatasource.repositoryName = '';
   newDatasource.datasetDescription = '';
   newDatasource.endpoint = '';
@@ -450,7 +452,7 @@ const onSubmit = () => {
 
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
-  data.append("repositoryId", storeDS.selectedRepositoryId); // Set as empty string if repositoryId is null
+  data.append("repositoryId", repositoriesStore.selectedRepositoryId); // Set as empty string if repositoryId is null
   console.log(newDatasource.repositoryId, "++++++++++++++++++++++++++");
 
   const attachTables = [];
@@ -500,7 +502,7 @@ const successCallback = (datasource) => {
 
   integrationStore.addSelectedDatasource(datasource)
   storeDS.getDatasources(route.params.id)
-  storeDS.getRepositories(route.params.id)
+  repositoriesStore.getRepositories(route.params.id)
 }
 
 // Método para abrir el selector de archivos

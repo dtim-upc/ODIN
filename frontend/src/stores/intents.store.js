@@ -1,7 +1,6 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import intentsAPI from "src/api/intentsAPI.js";
-import JSZip from 'jszip';
 
 export const useIntentsStore = defineStore('intents', {
 

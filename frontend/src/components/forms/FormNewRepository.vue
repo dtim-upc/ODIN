@@ -208,6 +208,8 @@ import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
+import {useRepositoriesStore} from "stores/repositories.store.js";
+
 import {odinApi} from "../../boot/axios";
 
 
@@ -235,6 +237,7 @@ const showS = computed({
 })
 
 const storeDS = useDataSourceStore();
+const repositoriesStore = useRepositoriesStore();
 
 // -------------------------------------------------------------
 //                         STORES & GLOBALS
@@ -262,7 +265,7 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await storeDS.getRepositories(projectID.value)
+    await repositoriesStore.getRepositories(projectID.value)
   }
 });
 
@@ -335,7 +338,7 @@ defineExpose({
 })
 
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
-  storeDS.selectedRepositoryId = null;
+  repositoriesStore.selectedRepositoryId = null;
 }
 
 function isJDBC(type) {
@@ -425,7 +428,7 @@ const successCallback = (datasource) => {
 
   showS.value = false;
 
-  storeDS.getRepositories(route.params.id);
+  repositoriesStore.getRepositories(route.params.id);
 }
 </script>
 

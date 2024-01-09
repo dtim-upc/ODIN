@@ -119,6 +119,21 @@
 
     <FormNewRepository v-model:show="addDataRepository"></FormNewRepository>
 
+    <q-dialog v-model="editRepository">
+      <q-card flat bordered class="my-card" style="min-width: 30vw;">
+        <q-card-section class="q-pt-none">
+          <EditRepositoryForm
+            @submit-success="editRepository=false"
+            @cancel-form="editRepository=false"
+            :repositoryData="selectedRepository"
+          ></EditRepositoryForm>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <ConfirmDialog v-model:show="showConfirmDialog" title="Confirm deletion of repository" 
+                    body="Do you really want to delete the repository? All associated datasets will be deleted"
+                    :onConfirm="confirmDelete"/>
   </div>
 </template>
 
@@ -128,6 +143,12 @@ import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useNotify} from 'src/use/useNotify.js'
 import FormNewRepository from "components/forms/FormNewRepository.vue";
+import {useRepositoriesStore} from "src/stores/repositories.store.js";
+import {useRoute} from "vue-router";
+import ConfirmDialog from "src/components/ConfirmDialog.vue";
+import EditRepositoryForm from "src/components/forms/EditRepositoryForm.vue";
+
+const route = useRoute()
 
 /*
   props
@@ -144,20 +165,24 @@ const gridEnable = ref(false)
 const notify = useNotify()
 const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore();
+const repositoriesStore = useRepositoriesStore()
 
 onBeforeMount(() => {
   storeDS.setProject()
   integrationStore.init()
 })
 
+const selectedRepository = ref(null);
 const title = "Repositories";
 const search = ref("")
 const visibleColumns = ["id", "repositoryName", "repositoryType", "expand", "actions"]; // Columns to be displayed
 
 const addDataRepository = ref(false)
+const showConfirmDialog = ref(false)
+const editRepository = ref(false)
 
 const rows = computed(() => {
-  return storeDS.repositories.map((repo) => {
+  return repositoriesStore.repositories.map((repo) => {
     return {
       ...repo,
       datasets: repo.datasets, // Obtener la lista de Datasets asociados
@@ -170,28 +195,24 @@ const columns = [
   {name: "repositoryName", label: "Repository Name", align: "center", field: "repositoryName", sortable: true},
   {name: "repositoryType", label: "Repository Type", align: "center", field: "repositoryType", sortable: true},
   {name: "expand", label: "Datasets", align: "center", field: "expand", sortable: false},
+  {name: 'actions', label: 'Actions', align: 'center', field: 'actions', sortable: false,},
 ];
 
-const views = {
-  "integration": ['Id', 'Name', 'Type'],
-  "repositories": ['id', 'repositoryName', 'expand'], // Include 'expand' in the visibleColumns list
-}
-
 onMounted(() => {
-  const url = window.location.href; // Get the current URL
-  const regex = /project\/(\d+)\//;
-  const match = url.match(regex);
-  let projectId;
-  if (match) {
-    projectId = match[1];
-    console.log(projectId); // Output: 1
-  }
-
-  storeDS.getRepositories(projectId)
+  repositoriesStore.getRepositories(route.params.id,)
 })
 
-const deleteRow = (props2) => {
-  storeDS.deleteDataSource(props2.row)
+let confirmDelete = () => {}
+const deleteRow = (propsRow) => {
+  showConfirmDialog.value = true
+  confirmDelete = () => {
+    repositoriesStore.deleteRepository(route.params.id, propsRow.row.id)
+  }
+}
+
+const editRow = (propsRow) => {
+  editRepository.value = true
+  selectedRepository.value = propsRow.row
 }
 </script>
 

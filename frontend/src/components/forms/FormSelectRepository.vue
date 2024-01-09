@@ -5,7 +5,7 @@
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <div class="text-h5">Select your repository</div>
           <q-card-section>
-            <template v-if="storeDS.repositories.length === 0">
+            <template v-if="repositoriesStore.repositories.length === 0">
               <div class="text-h6 text-warning">
                 No repositories available. Please create a new repository.
               </div>
@@ -14,7 +14,7 @@
               <q-select
                 filled
                 v-model="newDatasource.repositoryId"
-                :options="storeDS.repositories"
+                :options="repositoriesStore.repositories"
                 label="Repository"
                 class="q-mt-none"
                 emit-value
@@ -33,7 +33,7 @@
         <q-card-section>
           <div v-if="showFormButtons" align="right">
             <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup />
-            <q-btn v-if="storeDS.repositories.length === 0" label="Create Repository" color="primary" :to="{name:'repositories'}"/>
+            <q-btn v-if="repositoriesStore.repositories.length === 0" label="Create Repository" color="primary" :to="{name:'repositories'}"/>
             <q-btn v-else label="Next" type="submit" color="primary" @click="nextStep"/>
           </div>
         </q-card-section>
@@ -46,6 +46,7 @@
 import { ref, reactive, onMounted, computed } from "vue";
 import { useNotify } from 'src/use/useNotify.js'
 import { useDataSourceStore } from "../../stores/datasources.store";
+import { useRepositoriesStore } from "src/stores/repositories.store";
 
 const props = defineProps({
   show: { type: Boolean, default: false, required: true },
@@ -63,14 +64,15 @@ const showS = computed({
 });
 
 onMounted(async () => {
-  storeDS.selectedRepositoryId = null;
+  repositoriesStore.selectedRepositoryId = null;
   onReset();
 });
 
 const storeDS = useDataSourceStore();
+const repositoriesStore = useRepositoriesStore();
 
 const onRepositoryChange = () => {
-  const selectedRepo = storeDS.repositories.find(repo => repo.id === newDatasource.repositoryId);
+  const selectedRepo = repositoriesStore.repositories.find(repo => repo.id === newDatasource.repositoryId);
   if (selectedRepo) {
     newDatasource.repositoryId = selectedRepo.id;
   } else {
@@ -91,9 +93,9 @@ const nextStep = () => {
   // Emitir un evento personalizado con los datos seleccionados
   const selectedRepositoryId = newDatasource.repositoryId;
   console.log(selectedRepositoryId,"---------------------------- REPOOOOOOOOOOO IDDDD SEEEEND");
-  storeDS.selectedRepositoryId = selectedRepositoryId;
+  repositoriesStore.selectedRepositoryId = selectedRepositoryId;
 
-  storeDS.setSelectedRepositoryId(selectedRepositoryId);
+  repositoriesStore.setSelectedRepositoryId(selectedRepositoryId);
 
   emit("repository-selected", selectedRepositoryId);
 };
