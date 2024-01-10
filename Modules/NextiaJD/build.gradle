@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'edu.upc.essi.dim'
+group = 'edu.upc.essi.dtim'
 version = 'unspecified'
 
 repositories {
