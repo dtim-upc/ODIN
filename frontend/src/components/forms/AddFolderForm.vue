@@ -111,11 +111,8 @@ const cancelForm = () => {
 const onSubmit = () => {
   project.projectPrivacy = project.projectPrivacy.value;
   if (props.projectData) {
-    // If projectData is available, it means we are editing an existing project
-    // Perform edit logic here
     projectsStore.editProject(project, success);
   } else {
-    // If projectData is not available, it means we are creating a new project
     projectsStore.createProject(project, success);
   }
 };

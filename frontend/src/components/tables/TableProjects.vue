@@ -16,56 +16,16 @@
     </template>
 
     <template v-slot:top-right="props">
-
-      <!--      <q-input outlined dense debounce="400" color="primary" v-model="search">-->
-      <!--        <template v-slot:append>-->
-      <!--          <q-icon name="search"/>-->
-      <!--        </template>-->
-      <!--      </q-input>-->
-      <!-- <q-btn flat padding="xs" icon="list" color="primary600 " style="background-color:#F6F6F9"></q-btn> -->
       <q-btn unelevated padding="none" color="primary700" icon="list"
              @click="gridEnable = !gridEnable"/>
-
-      <!-- <q-btn flat round dense :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-             @click="props.toggleFullscreen">
-        <q-tooltip :disable="$q.platform.is.mobile" v-close-popup>
-          {{ props.inFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen" }}
-        </q-tooltip>
-      </q-btn> -->
     </template>
-
-    <!-- <template v-slot:body-cell-actions="props">
-      <q-td :props="props">
-        <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
-      </q-td>
-    </template>
-
-    <template v-slot:body-cell-identifier="props">
-      <q-td :props="props">
-        hola{{props.row.identifier}}
-        <q-checkbox v-model="props.row.identifier" color="teal" />
-      </q-td>
-    </template> -->
 
     <template v-slot:item="props">
       <div v-if="props.rowIndex==0" class="q-pa-md col-xs-12 col-sm-6 col-md-2 col-lg-2">
         <AddFolder @add-folder="showDialog=!showDialog"></AddFolder>
       </div>
       <div class="q-pa-md col-xs-12 col-sm-6 col-md-2 col-lg-2">
-
-
         <Folder :row="props.row" :folderColor="props.row.color"></Folder>
-        <!-- <q-card>
-          <q-card-section class="text-center">
-            Calories for
-            <br>
-            <strong>{{ props.row.name }}</strong>
-          </q-card-section>
-          <q-separator />
-          <q-card-section class="flex flex-center" :style="{ fontSize: props.row.calories + 'px' }">
-            <div>{{ props.row.calories }} g</div>
-          </q-card-section>
-        </q-card> -->
       </div>
     </template>
 
@@ -103,9 +63,6 @@
           </defs>
         </svg>
         <p style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">There are no projects. Create one and start using ODIN.</p>
-        <!--
-
-             <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon"/>-->
       </div>
     </template>
   </q-table>

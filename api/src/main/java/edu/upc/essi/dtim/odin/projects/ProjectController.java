@@ -2,6 +2,8 @@ package edu.upc.essi.dtim.odin.projects;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,4 +137,13 @@ public class ProjectController {
         logger.info("Downloading project schema for project: " +  projectID);
         return projectService.downloadProjectSchema(projectID);
     }
+
+    //TODO: description
+    @GetMapping("/project/{projectID}/queries")
+    public ResponseEntity<Object> getQueriesOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all queries from project " + projectID);
+        List<Query> queries = projectService.getQueriesOfProject(projectID);
+        return new ResponseEntity<>(queries, HttpStatus.OK);
+    }
+
 }

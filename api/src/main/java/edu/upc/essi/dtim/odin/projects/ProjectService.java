@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
@@ -12,6 +13,7 @@ import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -347,5 +349,10 @@ public class ProjectService {
             throw new NoSuchElementException("Project not found with id: " + repositoryID);
         }
         saveProject(project); // Save the updated project without the repository
+    }
+
+    public List<Query> getQueriesOfProject(String projectID) {
+        Project project = getProject(projectID);
+        return project.getQueries();
     }
 }

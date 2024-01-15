@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.integration.pojos;
 
-import edu.upc.essi.dtim.odin.projects.Project;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 
 import java.util.List;
 

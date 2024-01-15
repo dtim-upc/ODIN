@@ -21,7 +21,7 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDI.integrationModuleInterface;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaJD.jdModuleInterface;
-import edu.upc.essi.dtim.odin.projects.Project;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
 import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;

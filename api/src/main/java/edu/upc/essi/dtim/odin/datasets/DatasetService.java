@@ -23,8 +23,8 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleInterface;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
-import edu.upc.essi.dtim.odin.projects.Project;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.rdf.model.Model;
@@ -43,9 +43,10 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.upc.essi.dtim.odin.utils.Utils.generateUUID;
 
 @Service
 public class DatasetService {
@@ -319,22 +320,6 @@ public class DatasetService {
         return new Attribute(attributeName, "string");
     }
 
-    /**
-     * Generates a universal unique identifier to be assigned to a dataset
-     * @return A string containing the new UUID
-     */
-    public String generateUUID() {
-        // Generate a random 16-character string as part of the filename
-        final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder sb = new StringBuilder(16);
-        SecureRandom random = new SecureRandom();
-        sb.append("UUID_");
-        for (int i = 0; i < 16; i++) {
-            int randomIndex = random.nextInt(characters.length());
-            sb.append(characters.charAt(randomIndex));
-        }
-        return sb.toString();
-    }
 
     /**
      * Transforms a Dataset object into a Graph object representing the data in RDF format.

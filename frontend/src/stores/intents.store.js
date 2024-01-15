@@ -5,11 +5,13 @@ import intentsAPI from "src/api/intentsAPI.js";
 export const useIntentsStore = defineStore('intents', {
 
   state: () => ({
-    datasets: [],
+    queries: [],
+    queryUri: "",
     problems: [],
+    selectedQuery: [],
     abstractPlans: [],
     logicalPlans: [],
-    workflowPlans: [],
+    selectedPlans: [],
   }),
 
   getters: {},
@@ -18,31 +20,48 @@ export const useIntentsStore = defineStore('intents', {
 
     },
 
-    getDatasets() {
-      intentsAPI.getDatasets()
+    async getQueries(projectID) {
+      await intentsAPI.getQueries(projectID)
         .then(response => {
-
-          console.log("Intent datasets received")
+          console.log("Queries received")
           console.log(response.data)
 
-          if (response.data === "") { // when no datasources, api answer ""
-            this.datasets = []
+          if (response.data === "") { // when no queries, api answer ""
+            this.queries = []
           } else {
-            this.datasets = response.data
+            this.queries = response.data
           }
 
         }).catch(err => {
-        console.log("error retrieving Intent datasets")
+        console.log("error retrieving queries")
         console.log(err)
       })
+    },
+
+    async annotateDataset(data) {
+      const notify = useNotify();
+      console.log("Annotating dataset")
+
+      await intentsAPI.annotateDataset(data).then((response) => {
+        console.log(response)
+        if (response.status === 200) {
+          notify.positive(`Dataset annotated`)
+          this.queryUri = Object.values(response.data)[0]
+        } else {
+          notify.negative("Dataset could not be annotated")
+        }
+      }).catch((error) => {
+        console.log("error is: " + error)
+        if (error.response) {
+          notify.negative("Something went wrong in the server when annotating a dataset.")
+        }
+      });
     },
 
     getProblems() {
       intentsAPI.getProblems()
         .then(response => {
-
           console.log("Intent problems received")
-          console.log(response.data)
 
           if (response.data === "") {
             this.problems = []
@@ -58,11 +77,23 @@ export const useIntentsStore = defineStore('intents', {
 
     async setAbstractPlans(data, successCallback) {
       const notify = useNotify();
-      console.log("Running abstract planner with data ", data)
+      console.log("Running abstract planner")
 
       await intentsAPI.setAbstractPlans(data).then((response) => {
-        if (response.status === 204) {
+        if (response.status === 200) {
           notify.positive(`Abstract plans created`)
+          // Formatting the plans to be displayed in the UI
+          for (let plan in response.data) {
+            const newObject = {
+              name: plan.split('#').at(-1),
+              id: plan,
+              selected: false,
+              plan: response.data[plan]
+            }
+            this.abstractPlans.push(newObject)
+          }
+          this.logicalPlans = []
+          this.selectedPlans = []
           successCallback();
         } else {
           notify.negative("Abstract plans could not be created")
@@ -75,6 +106,7 @@ export const useIntentsStore = defineStore('intents', {
       });
     },
 
+    /*
     async getAbstractPlans() {
       console.log("Getting abstract plans")
       const notify = useNotify();
@@ -96,15 +128,42 @@ export const useIntentsStore = defineStore('intents', {
           notify.negative("Something went wrong in the server when getting the abstract plans")
         }
       });
-    },
+    },*/
 
     async setLogicalPlans(data, successCallback) {
       const notify = useNotify();
       console.log("Running logical planner with data ", data)
 
       await intentsAPI.setLogicalPlans(data).then((response) => {
-        if (response.status === 204) {
+        console.log(response)
+        if (response.status === 200) {
           notify.positive(`Logical plans created`)
+          // Formatting the plans to be displayed in the UI
+          const keys = Object.keys(response.data);
+          this.logicalPlans = [];
+        
+          for (let key of keys) {
+            let found = false
+            const plan = {
+              id: key,
+              selected: false,
+              plan: response.data[key]
+            }
+            this.logicalPlans.map(logPlan => {
+              if (logPlan.id === this.removeLastPart(key)) {
+                logPlan.plans.push(plan)
+                found = true
+              }
+            })
+            if (!found) {
+              this.logicalPlans.push({
+                id: this.removeLastPart(key),
+                selected: false,
+                plans: [plan]
+              })
+            }
+          }
+          this.selectedPlans = []
           successCallback();
         } else {
           notify.negative("Logical plans could not be created")
@@ -117,6 +176,17 @@ export const useIntentsStore = defineStore('intents', {
       });
     },
 
+    removeLastPart(inputString) {
+      const parts = inputString.split(' ');
+      if (parts.length > 1) {
+          parts.pop(); // Remove the last part
+          return parts.join(' ');
+      } else {
+          return inputString; // Return the original string if there's only one part
+      }
+    },
+
+    /*
     async getLogicalPlans() {
       console.log("Getting logical plans")
       const notify = useNotify();
@@ -138,8 +208,9 @@ export const useIntentsStore = defineStore('intents', {
           notify.negative("Something went wrong in the server when getting the logical plans")
         }
       });
-    },
+    },*/
 
+    /*
     setWorkflowPlans(data, successCallback) {
       const notify = useNotify();
       console.log("Running workflow planner with data ", data)
@@ -180,7 +251,7 @@ export const useIntentsStore = defineStore('intents', {
           notify.negative("Something went wrong in the server when getting the workflow plans")
         }
       });
-    },
+    },*/    
 
     async downloadRDF(planID) {
       console.log("Downloading RDF file for plan " + planID)
@@ -220,11 +291,11 @@ export const useIntentsStore = defineStore('intents', {
       });
     },
 
-    async downloadAllRDF() {
+    async downloadAllRDF(selectedPlanIds) {
       console.log("Downloading all RDF files")
       const notify = useNotify();
 
-      await intentsAPI.downloadAllRDF().then((response) => {
+      await intentsAPI.downloadAllRDF(selectedPlanIds).then((response) => {
         if (response.status === 200) {
           this.createDownload(response.data, "rdf.zip")
           notify.positive(`Files downloaded`)
@@ -239,11 +310,11 @@ export const useIntentsStore = defineStore('intents', {
       });
     },
 
-    async downloadAllKNIME(planID) {
+    async downloadAllKNIME(selectedPlanIds) {
       console.log("Downloading All KNIME files")
       const notify = useNotify();
 
-      await intentsAPI.downloadAllKNIME(planID).then((response) => {
+      await intentsAPI.downloadAllKNIME(selectedPlanIds).then((response) => {
         if (response.status === 200) {
           this.createDownload(response.data, "knime.zip")
           notify.positive(`Files downloaded`)
@@ -265,6 +336,24 @@ export const useIntentsStore = defineStore('intents', {
       link.setAttribute('download', name);
       document.body.appendChild(link);
       link.click();
-    }
+    },
+
+    async storeWorkflow(projectID, data) {
+      const queryID = this.selectedQuery.queryID
+      const notify = useNotify();
+
+      await intentsAPI.storeWorkflow(projectID, queryID, data).then((response) => {
+        if (response.status === 200) {
+          notify.positive(`Workflow stored`)
+        } else {
+          notify.negative("Error storing the workflow")
+        }
+      }).catch((error) => {
+        console.log("error is: " + error)
+        if (error.response) {
+          notify.negative("Something went wrong in the server when storing the workflow")
+        }
+      });
+    },
   }
 })

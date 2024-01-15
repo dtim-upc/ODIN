@@ -9,4 +9,7 @@ export default {
   queryGraph(data, projectID, token) {
     return odinApi.post('/query/' + projectID + '/graphical', data, headers(token))
   },
+  storeQuery(data) {
+    return odinApi.post('/storeQuery', data)
+  },
 }

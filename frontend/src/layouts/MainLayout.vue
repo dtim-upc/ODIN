@@ -318,6 +318,48 @@
                 </q-item-section>
               </q-item>
 
+              <q-item exact manual-focus>
+                <q-item-section v-if="miniState" avatar>
+                  <q-btn flat
+                         no-caps
+                         padding="xs"
+                         icon="mdi-sitemap"
+                         :to="{name:'workflows'}"
+                         :color="$route.name === 'workflows' ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'workflows' }">
+                    <q-item-section>
+                      <div class="icon-label-wrapper">
+                        <span class="label-style">Queries</span>
+                      </div>
+                    </q-item-section>
+                    <q-tooltip anchor="center right"
+                               self="center left"
+                               :offset="[10, 10]"
+                               transition-show="fade"
+                               transition-hide="fade">
+                      Queries
+                    </q-tooltip>
+                  </q-btn>
+                </q-item-section>
+                <q-item-section v-else>
+                  <q-btn flat
+                         no-caps
+                         icon="mdi-sitemap"
+                         :to="{name:'queries'}"
+                         :color="$route.name === 'queries' ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'queries' }">
+                    <q-item-section>
+                      <div class="icon-label-wrapper">
+                        <span class="label-style">Queries</span>
+                      </div>
+                    </q-item-section>
+                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
+                      Queries
+                    </q-tooltip>
+                  </q-btn>
+                </q-item-section>
+              </q-item>
+
           </div>
 
           <div class="fixed-bottom">

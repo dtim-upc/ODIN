@@ -31,9 +31,9 @@ const props = defineProps({
     onConfirm: {type: Function, required: true}
 });
 
-const emits = defineEmits(['update:show'])
-
 const dialogVisible = ref(props.show);
+
+const emits = defineEmits(['update:show'])
 
 watch(() => props.show, (newVal) => {
   dialogVisible.value = newVal
@@ -45,6 +45,6 @@ const confirm = () => {
 }
 
 const cancel = () => {
-    emits('update:show', false)
+  emits('update:show', false)
 }
 </script>

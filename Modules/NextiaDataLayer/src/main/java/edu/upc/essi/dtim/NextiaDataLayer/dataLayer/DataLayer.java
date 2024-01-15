@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
@@ -38,10 +39,6 @@ public abstract class DataLayer {
     public void uploadToTemporalLandingZone(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
         df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "tmp\\" + d.getUUID());
-    }
-
-    public void removeFromLandingZone(String UUID) {
-        deleteFilesFromDirectory(dataStorePath + "landingZone\\" + UUID);
     }
 
     protected org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) {
@@ -89,7 +86,7 @@ public abstract class DataLayer {
         Path destinationFile = diskPath.resolve(newFileDirectory); // Resolve the destination file path using the disk path and the modified filename
 
         Files.createDirectories(destinationFile.getParent()); // Create parent directories if they don't exist
-        Files.copy(inputFile, destinationFile, StandardCopyOption.REPLACE_EXISTING); // Copy the input stream  to the destination file
+        Files.copy(inputFile, destinationFile, StandardCopyOption.REPLACE_EXISTING); // Copy the input stream to the destination file
 
         return destinationFile.toString(); // Return the absolute path of the stored file
     }
@@ -112,4 +109,6 @@ public abstract class DataLayer {
         org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(parquetPath);
         df.show();
     }
+
+    public abstract void storeQuery(Query query);
 }

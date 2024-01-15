@@ -1,138 +1,54 @@
 <template>
-  <!-- style="position:relative" -->
   <q-page class="row items-stretch">
-
-    <!-- <q-layout view="lhh LpR lff" container style="min-height: inherit;" class="shadow-2 rounded-borders">
-   <div>
-
- <q-drawer show-if-above  :breakpoint="500" bordered >
-      <q-scroll-area class="fit">
-        <q-list padding>
-
-<q-item clickable v-ripple>
-        <q-item-section>Single line item</q-item-section>
-      </q-item>
-
-      <q-item clickable v-ripple>
-        <q-item-section>
-          <q-item-label>Item with caption</q-item-label>
-          <q-item-label caption>Caption</q-item-label>
-        </q-item-section>
-      </q-item>
-
-      <q-item clickable v-ripple>
-        <q-item-section>
-          <q-item-label overline>OVERLINE</q-item-label>
-          <q-item-label>Item with caption</q-item-label>
-        </q-item-section>
-      </q-item>
-
-        </q-list>
-      </q-scroll-area>
-    </q-drawer>
-
-     </div>
-
-
-<q-page-container>
-        <q-page class="row items-stretch"  style="min-height: inherit;">
-<Graph></Graph>
-</q-page>
-</q-page-container>
-    </q-layout> -->
-
-    <!-- </q-layout> -->
-    <!-- <q-drawer show-if-above  :breakpoint="500" bordered > -->
-
-
     <div class="col-2 columnHeader">
       <q-scroll-area class="fit">
-        <!-- class="q-pa-md" -->
         <q-list>
           <q-item-section>
             <q-item>
               <h5> Query</h5>
             </q-item>
           </q-item-section>
-
-          <!-- <q-expansion-item label="Global schema" expand-icon="arrow_drop_down" default-opened>
-            <q-list dense>
-
-              <q-item >
-                  <q-btn  flat padding="xs" label="project" class="full-width" :class="selectedSchema == 'project'? 'activebg': ''" align="left" @Click="setGlobalSchema()"/>
-              </q-item>
-
-              </q-list>
-          </q-expansion-item>
-
-          <q-expansion-item label="Local schemata" expand-icon="arrow_drop_down">
-            <q-list dense>
-
-              <q-item v-for="ds in storeDS.datasources">
-                  <q-btn  flat padding="xs" :label="ds.name" class="full-width" :class="selectedSchema == ds.id? 'activebg': ''" align="left" @Click="setSchema(ds)"/>
-              </q-item>
-
-            </q-list>
-          </q-expansion-item> -->
-
-
         </q-list>
       </q-scroll-area>
     </div>
 
     <div class="col-10">
       <Graph :graphical="graphical" :enableSelection="true" :enableQuery="true" :queryFunc="query"></Graph>
-      <!-- <div class="column  justify-center" style="height: 100%;">
-          <div class="col-2">
-              Menu...
-          </div>
-          <div class="col-auto">
-
-
-          </div> -->
-      <!--  -->
-      <!-- <Graph :nodes="storeDS.datasources[0].schema.graphicalSchema.nodes" :links="storeDS.datasources[0].schema.graphicalSchema.links"></Graph> -->
-      <!-- <div class="row">
-          Menu
-      </div>
-      <div class="row">
-          <div class="col-12">
-              <Graph :graphical="graphical" ></Graph>
-          </div>
-
-      </div> -->
-
-
-      <!-- </div> -->
     </div>
 
 
-    <q-dialog v-model="alert" full-width>
+    <q-dialog v-model="alert" full-width persistent>
       <q-card>
-        <!-- <q-card-section>
-          <div class="text-h6">Alert</div>
-        </q-card-section> -->
-
         <q-card-section>
           <TableQueryResult :columns="columns" :rows="rows" :no_shadow=true />
         </q-card-section>
 
-        <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" v-close-popup/>
+        <q-card-actions align="between">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn label="Persist data" color="primary" @click="persistQuery=true" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
+    <q-dialog v-model="persistQuery">
+      <q-card>
+        <q-card-section>
+          <q-form @submit="storeQuery" class="text-right">
+            <q-input v-model="queryName" label="Query name" :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
+            <q-select v-model="queryLabel" label="Query label" :options="queryColumns" :rules="[ val => val && val.length > 0 || 'Insert a label']"/>
 
-    <!-- </q-drawer> -->
-
+            <q-btn type="submit" color="primary" label="Persist" v-close-popup/>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
   </q-page>
 </template>
 
 
 <script setup>
-import {ref, onMounted, onBeforeMount} from "vue";
+import {ref, onBeforeMount} from "vue";
 import TableQueryResult from "components/tables/TableQueryResult.vue";
 import Graph from 'components/graph/Graph.vue'
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
@@ -146,6 +62,12 @@ const authStore = useAuthStore();
 const alert = ref(false);
 const notify = useNotify();
 
+const persistQuery = ref(false);
+const queryColumns = ref([]);
+const queryName = ref("");
+const queryLabel = ref("");
+
+const CSVPath = ref('') 
 const graphical = ref('')
 const graphID = ref('')
 let graphType = ""
@@ -212,14 +134,36 @@ const query = (data) => {
   queryAPI.queryGraph(data, storeDS.project.projectId, authStore.user.accessToken).then(response => {
 
     console.log("query success", response)
-    // console.log("**", response.data)
     if (response.data == '')
       notify.positive("Query result is empty")
     if (response.data)
       if (response.data != '') {
+        CSVPath.value = response.data.csvpath
+        queryColumns.value = response.data.columns
         showResultQuery(response.data.columns, response.data.rows)
       }
   }).catch(err => {
+    console.log("error query graph", err)
+  })
+
+}
+
+const storeQuery = () => {
+  console.log("Storing query")
+  const data2 = new FormData();
+  data2.append("CSVPath", CSVPath.value);
+  data2.append("projectID", storeDS.project.projectId);
+  data2.append("queryName", queryName.value);
+  data2.append("queryLabel", queryLabel.value);
+
+  queryAPI.storeQuery(data2).then(response => {
+
+    console.log("query success", response)
+    if (response.status === 200) {
+      notify.positive("Query stored successfully")
+    }
+  }).catch(err => {
+    notify.negative("Error storing query")
     console.log("error query graph", err)
   })
 

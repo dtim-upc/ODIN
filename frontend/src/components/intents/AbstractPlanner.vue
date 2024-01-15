@@ -8,10 +8,10 @@
                 <q-input label="Intent name" outlined v-model="intentName" class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
 
-                <q-select label="Dataset" outlined v-model="dataset" :options=Object.keys(intentsStore.datasets) class="q-mb-sm"
+                <q-select label="Query" outlined v-model="query" :options="intentsStore.queries.map(query => query.queryName)" class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Select a dataset']"/>
                 
-                <q-select label="Problem" outlined v-model="problem" :options=Object.keys(intentsStore.problems)
+                <q-select label="Problem" outlined v-model="problem" :options=Object.keys(intentsStore.problems) class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Select a problem']"/>
                 
             </div>
@@ -37,16 +37,26 @@ const $q = useQuasar()
 const intentsStore = useIntentsStore()
 
 const intentName = ref(null)
-const dataset = ref(null)
+const query = ref(null)
 const problem = ref(null)
 
 const handleSubmit = async() => {
-  $q.loading.show({message: 'Running abstract planner'})
-  const data = {
+  $q.loading.show({message: 'Annotating query...'}) // First, annotate the dataset and define the new ontology
+  const selectedQuery = intentsStore.queries.find(queryStore => queryStore.queryName === query.value);
+  intentsStore.selectedQuery = selectedQuery
+  let data = {
+    'path': selectedQuery.csvpath,
+    'label': selectedQuery.label,
+  }
+  await intentsStore.annotateDataset(data)
+
+  $q.loading.show({message: 'Running abstract planner...'}) // Then, run the planner
+  data = {
     'intent_name': intentName.value,
-    'dataset': intentsStore.datasets[dataset.value],
+    'dataset': intentsStore.queryUri,
     'problem': intentsStore.problems[problem.value],
   }
+  console.log(data)
 
   const successCallback = () => {
     router.push({ path: route.path.substring(0, route.path.lastIndexOf("/")) + "/logical-planner" })
@@ -58,12 +68,12 @@ const handleSubmit = async() => {
 
 const resetForm = () => {
   intentName.value = null
-  dataset.value = null
+  query.value = null
   problem.value = null
 }
 
 onMounted(() => {
-  intentsStore.getDatasets()
+  intentsStore.getQueries(route.params.id)
   intentsStore.getProblems()
 })
 

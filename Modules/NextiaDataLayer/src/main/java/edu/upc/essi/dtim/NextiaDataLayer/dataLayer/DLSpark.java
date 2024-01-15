@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.ResultSetSpark;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -39,5 +40,10 @@ public class DLSpark extends DataLayer {
     public void close() {
         // Remove all the files in the temporal zone (/tmp)
         deleteFilesFromDirectory(dataStorePath + "tmp");
+    }
+
+    @Override
+    public void storeQuery(Query query) {
+
     }
 }

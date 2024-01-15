@@ -12,7 +12,7 @@
     </persistence-unit-metadata><-->
 
     <!--> MAPPING PROJECT CLASS<-->
-    <entity class="edu.upc.essi.dtim.odin.projects.Project" name="Project">
+    <entity class="edu.upc.essi.dtim.odin.projects.pojo.Project" name="Project">
         <table name="Project">
             <unique-constraint>
                 <column-name>PROJECTID</column-name>
@@ -71,7 +71,14 @@
                 </cascade>
             </one-to-one>
 
-            <!--> element-collections, transient and other properties here <-->
+            <one-to-many orphan-removal="true" name="queries"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.Query">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+
+
         </attributes>
 
     </entity>
@@ -251,4 +258,34 @@
         </attributes>
     </entity>
 
+    <entity name="Query" class="edu.upc.essi.dtim.NextiaCore.queries.Query">
+        <table name="Query">
+            <unique-constraint>
+                <column-name>queryID</column-name>
+            </unique-constraint>
+        </table>
+        <attributes>
+            <id name="queryID">
+                <generated-value strategy="AUTO"/>
+            </id>
+            <basic name="CSVPath"/>
+            <basic name="queryName"/>
+            <basic name="UUID"/>
+            <basic name="label"/>
+            <one-to-many name="workflows" orphan-removal="true"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.Workflow">
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity name="Workflow" class="edu.upc.essi.dtim.NextiaCore.queries.Workflow">
+        <table name="Workflow"/>
+        <attributes>
+            <id name="workflowID">
+                <generated-value strategy="AUTO"/>
+            </id>
+            <basic name="workflowName"/>
+            <basic name="visualRepresentation"/>
+        </attributes>
+    </entity>
 </entity-mappings>

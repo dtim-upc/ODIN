@@ -24,7 +24,8 @@ const routes = [
       {path: 'abstract-planner', name: 'abstract-planner', component: () => import('pages/datasources/Intents.vue')},
       {path: 'logical-planner', name: 'logical-planner', component: () => import('pages/datasources/Intents.vue')},
       {path: 'workflow-planner', name: 'workflow-planner', component: () => import('pages/datasources/Intents.vue')},
-      {path: 'workflows', name: 'workflows', component: () => import('pages/datasources/Intents.vue')},
+      {path: 'intent-workflows', name: 'intent-workflows', component: () => import('pages/datasources/Intents.vue')},
+      {path: 'queries', name: 'queries', component: () => import('pages/Queries.vue')},
     ]
   },
   {

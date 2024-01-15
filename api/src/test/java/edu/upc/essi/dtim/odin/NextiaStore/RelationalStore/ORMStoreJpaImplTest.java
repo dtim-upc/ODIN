@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.NextiaStore.RelationalStore;
 
-import edu.upc.essi.dtim.odin.projects.Project;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.junit.jupiter.api.*;
 
 import javax.persistence.EntityManager;

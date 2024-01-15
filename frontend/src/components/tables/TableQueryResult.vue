@@ -27,6 +27,7 @@
           v-if="enableExport"
         />
 
+
         <q-btn flat round dense :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
                @click="props.toggleFullscreen">
           <q-tooltip :disable="$q.platform.is.mobile" v-close-popup>

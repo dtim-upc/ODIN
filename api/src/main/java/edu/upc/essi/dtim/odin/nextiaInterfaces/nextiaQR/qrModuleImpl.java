@@ -2,10 +2,12 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.odin.query.pojos.Property;
 import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
-import edu.upc.essi.dtim.odin.query.pojos.RDFSResult;
+import edu.upc.essi.dtim.odin.query.pojos.QueryResult;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
@@ -15,29 +17,83 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class qrModuleImpl implements qrModuleInterface {
     @Override
-    public RDFSResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset> integratedDatasets, QueryDataSelection body) {
+    public QueryResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset> integratedDatasets, QueryDataSelection body) {
+        QueryResult res = new QueryResult();
+        // Code to read the first lines of a ResultSet, just in case
+//        ResultSet rs = null; // NextiaQRcall()
+//        try {
+//            ResultSetMetaData rsmd = rs.getMetaData();
+//            // First, get the names of the columns
+//            List<String> columns = new LinkedList<>();
+//            int columnCount = rsmd.getColumnCount();
+//            for (int i = 1; i <= columnCount; i++ ) { // The column count starts from 1
+//                columns.add(rsmd.getColumnName(i));
+//            }
+//            res.setColumns(columns);
+//            // Get a sample of the data (first x rows)
+//            List<String> rows = new LinkedList<>();
+//            int count = 0;
+//            while (rs.next() && count < 50) {
+//                Map<String, String> adaptedRow = new HashMap<>();
+//                for (int i = 1; i <= columnCount; i++) {
+//                    adaptedRow.put(rsmd.getColumnName(i), rs.getString(i));
+//                }
+//                String rowJson = convertMapToJsonString(adaptedRow);
+//                rows.add(rowJson);
+//                ++count;
+//            }
+//            res.setRows(rows);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        // Hardcoded dataset
         // TODO modificar siguiente llamada a la del módulo de la query que debería retornar un Dataset<Row>
-        Dataset<Row> dataFrame = hardcodeDataFrame(body.getProperties());
+//        Dataset<Row> dataFrame = hardcodeDataFrame(body.getProperties());
+//
+//        // global of the integrated one
+//        integratedGraph.getGlobalGraph(); // es pot treure?
+//        // local graph
+//        integratedDatasets.get(0).getLocalGraph(); // es pot treure?
+//
+//        res.setColumns(getColumnsFromDataFrame(dataFrame));
+//
+//        res.setRows(getRowsFromDataFrame(dataFrame));
 
-        // global of the integrated one
-        integratedGraph.getGlobalGraph();
+        String CSVPath = "C:\\Projects\\ODIN\\api\\dbFiles\\DataLayer\\tmp\\titanic.csv"; // NextiaQRcall()
+        try (CSVReader csvReader = new CSVReader(new FileReader(CSVPath))) {
+            List<String> adaptedRows = new ArrayList<>();
+            // Read the header to get the column names
+            String[] header = csvReader.readNext();
+            List<String> columnNames = Arrays.asList(header);
+            res.setColumns(columnNames);
 
-        // local graph
-        integratedDatasets.get(0).getLocalGraph();
-
-        // Crear una instancia de RDFSResult
-        RDFSResult res = new RDFSResult();
-
-        // Configurar las columnas
-        res.setColumns(getColumnsFromDataFrame(dataFrame));
-
-        // Configurar las filas
-        res.setRows(getRowsFromDataFrame(dataFrame));
-
+            // Read the remaining lines with values
+            String[] line;
+            int lineCount = 0;
+            while ((line = csvReader.readNext()) != null && lineCount < 20) { // only the first 20
+                List<String> values = Arrays.asList(line);
+                Map<String, String> adaptedRow = new HashMap<>();
+                for (int i = 0; i< values.size(); ++i) {
+                    adaptedRow.put(res.getColumns().get(i), values.get(i));
+                }
+                String rowJson = convertMapToJsonString(adaptedRow);
+                adaptedRows.add(rowJson);
+                lineCount++;
+            }
+            res.setRows(adaptedRows);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
+        }
+        res.setCSVPath(CSVPath);
         return res;
     }
 

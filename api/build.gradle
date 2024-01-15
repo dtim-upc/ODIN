@@ -58,7 +58,8 @@ dependencies {
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
     implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.16'
     implementation group: 'org.apache.spark', name: 'spark-sql_2.13', version: '3.3.2'
-  implementation('org.codehaus.janino:commons-compiler'){
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.9'
+    implementation('org.codehaus.janino:commons-compiler'){
         version {
             strictly '3.0.16'
         }
@@ -68,6 +69,7 @@ dependencies {
             strictly '3.0.16'
         }
     }
+
 
 
 

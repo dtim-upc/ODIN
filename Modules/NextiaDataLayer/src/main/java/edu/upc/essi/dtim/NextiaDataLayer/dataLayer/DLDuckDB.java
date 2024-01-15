@@ -2,9 +2,11 @@ package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollector;
 import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollectorAPI;
 import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollectorSQL;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -36,6 +38,7 @@ public class DLDuckDB extends DataLayer {
         // Create directory if it does not exist
         try {
             Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake"));
+            Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake\\queries"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +55,7 @@ public class DLDuckDB extends DataLayer {
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         try {
-            stmt.execute("CREATE TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+            stmt.execute("CREATE TABLE for_" + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -63,7 +66,7 @@ public class DLDuckDB extends DataLayer {
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         try {
-            stmt.execute("CREATE TEMP TABLE " + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+            stmt.execute("CREATE TEMP TABLE for_" + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +75,7 @@ public class DLDuckDB extends DataLayer {
     @Override
     public void removeFromFormattedZone(String tableName) {
         try {
-            stmt.execute("DROP TABLE " + tableName);
+            stmt.execute("DROP TABLE for_" + tableName);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -155,5 +158,24 @@ public class DLDuckDB extends DataLayer {
         }
         // Remove all the files in the temporal zone (/tmp)
         deleteFilesFromDirectory(dataStorePath + "tmp");
+    }
+
+    @Override
+    public void storeQuery(Query query) {
+        String oldPath = query.getCSVPath();
+        String newPath = dataStorePath + "DuckDBDataLake\\queries\\" + query.getUUID() + ".csv";
+        try {
+            // Create the new table in the exploitation zone
+            stmt.execute("CREATE TABLE exp_" + query.getUUID() + " AS SELECT * FROM read_csv_auto('" + oldPath + "')");
+            // Copy the csv from the temporal folder to the persistent folder
+            File source = new File(oldPath);
+            File destination = new File(newPath);
+            FileUtils.copyFile(source, destination);
+            query.setCSVPath(System.getProperty("user.dir") + "\\" +  newPath); // Full path, as it will be used by another API
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
