@@ -31,7 +31,7 @@ public class DatasetController {
      * @param datasetDescription The description of the dataset.
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
-    @PostMapping(value = "/project/{projectID}")
+    @PostMapping(value = "/project/{projectID}/dataset")
     public ResponseEntity<Object> postDataset(@PathVariable("projectID") String projectID,
                                               @RequestParam String repositoryId,
                                               @RequestPart(required = false) List<MultipartFile> attachFiles,
@@ -51,7 +51,7 @@ public class DatasetController {
      * @param datasetID The ID of the datasource to delete.
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
-    @DeleteMapping("/project/{projectID}/datasource/{datasetID}")
+    @DeleteMapping("/project/{projectID}/dataset/{datasetID}")
     public ResponseEntity<Boolean> deleteDataset(@PathVariable("projectID") String projectID,
                                                  @PathVariable("datasetID") String datasetID) {
         logger.info("Delete dataset " + datasetID + " from project: " +  projectID);
@@ -67,10 +67,10 @@ public class DatasetController {
      * @param datasetDescription The new description for the dataset (optional, default is an empty string).
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
-    @PostMapping("/editDataset")
-    public ResponseEntity<Boolean> editDataset(@RequestParam("datasetId") String datasetId,
-                                               @RequestParam("datasetName") String datasetName,
-                                               @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription) {
+    @PutMapping("/project/{projectID}/dataset/{datasetID}")
+    public ResponseEntity<Boolean> putDataset(@PathVariable("datasetID") String datasetId,
+                                              @RequestParam("datasetName") String datasetName,
+                                              @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription) {
         logger.info("Edit request received for editing dataset with ID: " +  datasetId);
         datasetService.editDataset(datasetId, datasetName, datasetDescription);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -82,8 +82,8 @@ public class DatasetController {
      * @param datasetID The ID of the dataset to download the schema for.
      * @return If the task was successful return a ResponseEntity containing the Turtle schema file.
      */
-    @GetMapping("/project/{datasetID}/datasources/download/datasetschema")
-    public ResponseEntity<InputStreamResource> downloadDatasetSchema(@RequestParam("datasetID") String datasetID) {
+    @GetMapping("/project/{projectID}/dataset/{datasetID}/schema")
+    public ResponseEntity<InputStreamResource> downloadDatasetSchema(@PathVariable("datasetID") String datasetID) {
         logger.info("Downloading schema for dataset: " +  datasetID);
         return datasetService.downloadDatasetSchema(datasetID);
     }
@@ -95,7 +95,7 @@ public class DatasetController {
      * @param datasetID The ID of the dataset whose schema should be set as the project schema.
      * @return If the task was successful return a ResponseEntity containing the API response.
      */
-    @PostMapping("/project/{projectID}/dataset/{datasetID}/setProjectSchema")
+    @PostMapping("/project/{projectID}/dataset/{datasetID}/set-project-schema")
     public ResponseEntity<?> setDatasetSchemaAsProjectSchema(@PathVariable("projectID") String projectID,
                                                              @PathVariable("datasetID") String datasetID) {
         logger.info("Set project " + projectID + " schema request received for dataset" + datasetID);

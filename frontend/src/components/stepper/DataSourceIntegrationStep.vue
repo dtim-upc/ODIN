@@ -2,13 +2,6 @@
   <q-stepper style="width:100%;margin-top:15px" v-model="step" ref="stepper" color="primary" animated
              class="no-padding-stepper">
 
-    <!--
-    <q-step :name="1" title="Uploaded data sources" icon="settings" :done="step > 1" style="min-height: 70vh">
-      Here are the uploaded data sources that have not yet been integrated into the project
-      <TableTemporalDataSources :no_shadow="true"></TableTemporalDataSources>
-    </q-step>
-    -->
-
     <!-- v-if="integrationStore.project.numberOfDS == '0'" -->
     <!-- <div> -->
     <q-step :name="2" title="Preview dataset" icon="settings" :done="step > 1" style="min-height: 70vh;height: 1px"
@@ -120,7 +113,7 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await repositoriesStore.getRepositories(projectID.value)
+    await repositoriesStore.getAllRepositories(projectID.value)
     // Count the datasets by summing the datasets in each repository
     let totalDatasets = 0;
     repositoriesStore.repositories.forEach((repository) => {
@@ -215,7 +208,7 @@ const clickOk = () => {
       break;
     case 3:
       console.log("integrate with project. Step value", step.value)
-      integrationStore.integrateTemporal(function () {
+      integrationStore.integrate(function () {
         if (integrationStore.joinAlignments.length === 0) {
           step.value = 5
         } else {
@@ -231,7 +224,7 @@ const clickOk = () => {
     case 4:
 
       console.log("step 4 review alignments")
-      integrationStore.integrateJoins(function () {
+      integrationStore.reviewAlignments(function () {
         step.value++
       })
 
@@ -239,7 +232,7 @@ const clickOk = () => {
     default:
       //last step
       console.log("step 4 save integration")
-      integrationStore.saveIntegration()
+      integrationStore.persistIntegration()
   }
 }
 

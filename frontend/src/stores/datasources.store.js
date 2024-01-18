@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 // import {odinApi} from "boot/axios";
-import api from "src/api/dataSourcesAPI.js";
+import api from "src/api/datasetsAPI.js";
 import {useAuthStore} from 'stores/auth.store.js'
 import {useRoute, useRouter} from "vue-router";
 import projectAPI from 'src/api/projectAPI';
@@ -61,7 +61,7 @@ export const useDataSourceStore = defineStore('datasource', {
 
       } else if (!this.project.projectName || this.project.projectId != route.params.id) {
         console.log("dfs", route.params.id)
-        const response = await projectAPI.getProjectByID(route.params.id, authStore.user.accessToken)
+        const response = await projectAPI.getProject(route.params.id, authStore.user.accessToken)
 
         if (response.status == 200) {
           this.project = response.data
@@ -105,7 +105,7 @@ export const useDataSourceStore = defineStore('datasource', {
       console.log("updating project info")
       const authStore = useAuthStore()
       const integrationStore = useIntegrationStore()
-      const response = await projectAPI.getProjectByID(this.project.projectId, authStore.user.accessToken)
+      const response = await projectAPI.getProject(this.project.projectId, authStore.user.accessToken)
 
       if (response.status == 200) {
         this.project = response.data
@@ -118,7 +118,7 @@ export const useDataSourceStore = defineStore('datasource', {
       const notify = useNotify()
       const authStore = useAuthStore()
       console.log("Pinia getting data sources...")
-      const res = await api.getAll(projectId, authStore.user.accessToken).then(response => {
+      const res = await api.getAllDatasets(projectId, authStore.user.accessToken).then(response => {
 
         console.log("ds received", response.data)
 
@@ -149,12 +149,11 @@ export const useDataSourceStore = defineStore('datasource', {
       });
 
     },
-    editDatasource(data, successCallback) {
-      const authStore = useAuthStore();
+    editDatasource(projectID, datasetID, data, successCallback) {
       const notify = useNotify();
       const datasetName = data.datasetName
 
-      api.editDatasource(data, authStore.user.accessToken)
+      api.putDataset(projectID, datasetID, data)
         .then((response) => {
           if (response.status === 200) {
             notify.positive(`Dataset successfully edited`);
@@ -179,54 +178,12 @@ export const useDataSourceStore = defineStore('datasource', {
       this.router.go(-1)
     },
 
-    persistDataSource(datasource) {
-      // const router2 = useRouter();
-      const notify = useNotify()
-      const authStore = useAuthStore()
-      const integrationStore = useIntegrationStore()
-
-
-      console.log("persist data source...", datasource)
-
-      api.createDSPersistent(this.project.projectId, datasource, authStore.user.accessToken)
-        .then((response) => {
-          console.log("createPersistentDS()", response)
-          if (response.status == 201) {
-
-
-            this.datasources.push(response.data)
-
-            // remove from temporal
-
-
-            integrationStore.finishIntegration(datasource)
-            //to update project info
-            this.updateProjectInfo()
-
-
-            // we use go since the user can come from home or table sources pages
-            this.router.go(-1)
-            // this.router.push({name:"datasources"})
-
-          } else {
-            // console.log("error")
-            notify.negative("Cannot integrate datasource with project. Something went wrong in the server.")
-          }
-        }).catch((error) => {
-        console.log("error integrating ds with project: ", error)
-        notify.negative("Something went wrong in the server.")
-      });
-
-      // console.log(ds)
-      // this.datasources.push(ds)
-      // console.log(this.datasources)
-    },
-    setDatasetAsProjectSchema(ds) {
+    setDatasetSchemaAsProjectSchema(ds) {
       const authStore = useAuthStore()
       const notify = useNotify()
-      api.setDatasetSchemaAsProjectOne(this.project.projectId, ds.id, authStore.user.accessToken)
+      api.setDatasetSchemaAsProjectSchema(this.project.projectId, ds.id, authStore.user.accessToken)
         .then((response) => {
-          console.log(response + " fffffffffffffffffffffffffffffffffff");
+          console.log(response);
           if (response.status == 200) {
             notify.positive("Schema successfully set")
             this.updateProjectInfo()
@@ -244,7 +201,7 @@ export const useDataSourceStore = defineStore('datasource', {
     deleteDataSource(ds) {
       const authStore = useAuthStore()
       const notify = useNotify()
-      api.deleteDatasource(this.project.projectId, ds.id, authStore.user.accessToken)
+      api.deleteDataset(this.project.projectId, ds.id, authStore.user.accessToken)
         .then((response) => {
           if (response.status == 200) {
             notify.positive("Successfully deleted")
@@ -272,11 +229,7 @@ export const useDataSourceStore = defineStore('datasource', {
     },
     async downloadSource(dsID) {
       console.log("download....", dsID)
-
-
-      const authStore = useAuthStore()
-      const notify = useNotify()
-      const response = await api.downloadSourceGraph(this.project.projectId, dsID, authStore.user.accessToken);
+      const response = await api.downloadDatasetGraph(this.project.projectId, dsID);
 
       const content = response.headers['content-type'];
       download(response.data, "prueba.ttl", content)
@@ -293,21 +246,5 @@ export const useDataSourceStore = defineStore('datasource', {
       // })
 
     },
-    async downloadProjectS() {
-      console.log("download project....")
-
-
-      const authStore = useAuthStore()
-      const notify = useNotify()
-      const response = await api.downloadProjectGraph(this.project.projectId, authStore.user.accessToken);
-
-      const content = response.headers['content-type'];
-      download(response.data, "source_graph.ttl", content)
-
-    }
-
-
   }
-
-
 })

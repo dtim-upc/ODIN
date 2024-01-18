@@ -49,8 +49,8 @@ public class RepositoryController {
      * @param repositoryData object with the necessary data to create the new repository.
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
-    @PostMapping(value = "/project/{id}/newRepository")
-    public ResponseEntity<Object> postRepository(@PathVariable("id") String projectId,
+    @PostMapping(value = "/project/{projectID}/repository")
+    public ResponseEntity<Object> postRepository(@PathVariable("projectID") String projectId,
                                                  @RequestBody Map<String, String> repositoryData) {
         logger.info("Post repository received for project " + projectId + " with repo name " + repositoryData.get("repositoryName") + " and type " + repositoryData.get("repositoryType"));
         repositoryService.postRepository(repositoryData, projectId);
@@ -79,9 +79,9 @@ public class RepositoryController {
      * @param repositoryName The new name for the repository.
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
-    @PostMapping("/editRepository")
-    public ResponseEntity<Boolean> editDataset(@RequestParam("repositoryID") String repositoryID,
-                                               @RequestParam("repositoryName") String repositoryName) {
+    @PutMapping("project/{projectID}/repository/{repositoryID}")
+    public ResponseEntity<Boolean> putRepository(@RequestParam("repositoryID") String repositoryID,
+                                                 @RequestParam("repositoryName") String repositoryName) {
         logger.info("Edit request received for editing repository with ID: " +  repositoryID);
         repositoryService.editDataset(repositoryID, repositoryName);
         return new ResponseEntity<>(HttpStatus.OK);

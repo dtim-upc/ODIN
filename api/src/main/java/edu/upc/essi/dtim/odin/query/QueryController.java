@@ -23,21 +23,20 @@ public class QueryController {
     private QueryService queryService;
 
     // TODO: Description
-    @PostMapping(value = "/query/{id}/graphical")
-    public ResponseEntity<QueryResult> queryFromGraphicalToSPARQL(@PathVariable("id") String id,
+    @PostMapping("/project/{projectID}/query-graph")
+    public ResponseEntity<QueryResult> queryFromGraphicalToSPARQL(@PathVariable("projectID") String projectID,
                                                                   @RequestBody QueryDataSelection body) {
         logger.info("Getting query");
-        QueryResult res = queryService.getQueryResult(body, id);
+        QueryResult res = queryService.getQueryResult(body, projectID);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     // TODO: Description
-    // TODO; change path to /project/{projectID}/query
-    @PostMapping("/storeQuery")
-    public ResponseEntity<Boolean> storeQuery(@RequestParam("CSVPath") String CSVPath,
-                                              @RequestParam("queryName") String queryName,
-                                              @RequestParam("projectID") String projectID,
-                                              @RequestParam("queryLabel") String queryLabel) {
+    @PostMapping("/project/{projectID}/query")
+    public ResponseEntity<Boolean> postQuery(@PathVariable("projectID") String projectID,
+                                             @RequestParam("CSVPath") String CSVPath,
+                                             @RequestParam("queryName") String queryName,
+                                             @RequestParam("queryLabel") String queryLabel) {
         logger.info("Storing query");
         queryService.storeQuery(CSVPath, queryName, projectID, queryLabel);
         return new ResponseEntity<>(HttpStatus.OK);

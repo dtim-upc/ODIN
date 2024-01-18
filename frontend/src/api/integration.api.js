@@ -1,25 +1,20 @@
 import {odinApi} from 'boot/axios';
 
-
 export default {
+  integrate(projectID, data) {
+    return odinApi.post('/project/' + projectID + '/integration', data)
+  },
+  reviewAlignments(projectID, joins) {
+    return odinApi.post('/project/' + projectID + '/integration/review-alignments', joins)
+  },
+  persistIntegration(projectID) {
+    return odinApi.post('/project/' + projectID + '/integration/persist')
+  },
+  getAutomaticAlignments(projectID, datasetToIntegrateID) {
+    return odinApi.post('/project/' + projectID + '/integration/compute-automatic-alignments/' + datasetToIntegrateID)
+  },
 
-  integrateJoins(projectID, joins, token) {
-    return odinApi.post('/project/' + projectID + '/integration/join', joins, {headers: {Authorization: `Bearer ${token}`}})
-  },
-  integrate(projectID, data, token) {
-    return odinApi.post('/project/' + projectID + '/integration', data, {headers: {Authorization: `Bearer ${token}`}})
-  },
-  finishIntegration(projectID, token) {
-    return odinApi.post('/project/' + projectID + '/integration/persist', null, {headers: {Authorization: `Bearer ${token}`}})
-  },
-  surveyAlignments(projectID, data, token) {
-    return odinApi.post('/project/' + projectID + '/integration/survey', data, {
-      headers: {
-        'Content-Type': 'text/plain',
-        Authorization: `Bearer ${token}`
-      }
-    })
-  },
+  
   downloadSourceGraph(projectID, datasourceID, token) {
     return odinApi.get('/project/' + projectID + '/integration/download/sourcegraph', {
       headers: {Authorization: `Bearer ${token}`},

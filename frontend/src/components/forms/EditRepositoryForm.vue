@@ -37,7 +37,7 @@ const editedRepository = reactive({
 })
 
 const successCallback = () => {
-  repositoriesStore.getRepositories(route.params.id) // get the repositories again to refresh the list of the store
+  repositoriesStore.getAllRepositories(route.params.id) // get the repositories again to refresh the list of the store
 }
 
 
@@ -45,7 +45,7 @@ const onSubmit = () => {
   const data = new FormData();
   data.append("repositoryID", editedRepository.id);
   data.append("repositoryName", editedRepository.name);
-  repositoriesStore.editRepository(data, successCallback)
+  repositoriesStore.putRepository(editedRepository.id, route.params.id, data, successCallback)
 }
 
 const onReset = () => {

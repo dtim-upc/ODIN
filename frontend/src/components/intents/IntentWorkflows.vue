@@ -66,7 +66,7 @@
 
 <script setup>
 import {ref} from 'vue'
-import {useIntentsStore} from 'stores/intents.store.js'
+import {useIntentsStore} from 'stores/intentsStore.js'
 import DialogWithVisualizedPlan from "../../components/intents/DialogWithVisualizedPlan.vue";
 import {useRoute} from "vue-router";
 

@@ -194,6 +194,7 @@ import {useIntegrationStore} from 'src/stores/integration.store.js'
 import {useDataSourceStore} from "../../stores/datasources.store";
 import {useRepositoriesStore} from "src/stores/repositories.store.js";
 import {odinApi} from "../../boot/axios";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
@@ -338,7 +339,7 @@ async function initializeComponent() {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await repositoriesStore.getRepositories(projectID.value);
+    await repositoriesStore.getAllRepositories(projectID.value);
 
     console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
 
@@ -449,7 +450,6 @@ const onSubmit = () => {
   const data = new FormData();
   console.log("Contenido de uploadedItems:", uploadedItems.value);
 
-
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
   data.append("repositoryId", repositoriesStore.selectedRepositoryId); // Set as empty string if repositoryId is null
@@ -483,7 +483,7 @@ const onSubmit = () => {
 
   data.append('attachTables', attachTables);
 
-  console.log(data)
+  console.log(data.get('repositoryId'))
 
   integrationStore.addDataSource(route.params.id, data, successCallback);
 
@@ -502,7 +502,7 @@ const successCallback = (datasource) => {
 
   integrationStore.addSelectedDatasource(datasource)
   storeDS.getDatasources(route.params.id)
-  repositoriesStore.getRepositories(route.params.id)
+  repositoriesStore.getAllRepositories(route.params.id)
 }
 
 // Método para abrir el selector de archivos

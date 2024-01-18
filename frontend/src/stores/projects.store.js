@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import projectAPI from "src/api/projectAPI.js";
 import {useAuthStore} from 'stores/auth.store.js'
+import download from 'downloadjs'
 
 export const useProjectsStore = defineStore('projects', {
 
@@ -38,14 +39,14 @@ export const useProjectsStore = defineStore('projects', {
         console.log(err)
       })
     },
-    createProject(project, successCallback) {
+    postProject(project, successCallback) {
       const authStore = useAuthStore();
       const notify = useNotify();
 
       console.log("create project store...")
       project.createdBy = "Dios todo poderoso"//authStore.user.username
       console.log("send project: ", project)
-      projectAPI.createProject(project, authStore.user.accessToken).then((response) => {
+      projectAPI.postProject(project, authStore.user.accessToken).then((response) => {
         if (response.status === 201) {
           console.log(response)
           notify.positive(`Project ${project.projectName} successfully created`)
@@ -61,11 +62,11 @@ export const useProjectsStore = defineStore('projects', {
         }
       });
     },
-    deleteProjectByID(id, successCallback) {
+    deleteProject(id, successCallback) {
       const authStore = useAuthStore();
       const notify = useNotify();
 
-      projectAPI.deleteProjectByID(id, authStore.user.accessToken)
+      projectAPI.deleteProject(id, authStore.user.accessToken)
         .then((response) => {
           if (response.status === 200) {
             const index = this.projects.findIndex(project => project.projectId === id);
@@ -88,11 +89,10 @@ export const useProjectsStore = defineStore('projects', {
           }
         });
     },
-    editProject(project, successCallback) {
-      const authStore = useAuthStore();
+    putProject(project, successCallback) {
       const notify = useNotify();
 
-      projectAPI.editProject(project, authStore.user.accessToken)
+      projectAPI.putProject(project.projectID, project)
         .then((response) => {
           if (response.status === 200) {
             const index = this.projects.findIndex(p => p.projectId === project.projectId);
@@ -116,10 +116,9 @@ export const useProjectsStore = defineStore('projects', {
         });
     },
     cloneProject(id, successCallback) {
-      const authStore = useAuthStore();
       const notify = useNotify();
 
-      projectAPI.cloneProject(id, authStore.user.accessToken)
+      projectAPI.cloneProject(id)
         .then((response) => {
           if (response.status === 201) {
             notify.positive(`Project ${id} successfully cloned`);
@@ -135,6 +134,16 @@ export const useProjectsStore = defineStore('projects', {
             notify.negative("Something went wrong on the server while cloning the project.");
           }
         });
+    },
+    async downloadProjectSchema(projectID) {
+      console.log("download project....")
+
+      const notify = useNotify()
+      const response = await projectAPI.downloadProjectGraph(projectID);
+
+      const content = response.headers['content-type'];
+      download(response.data, "source_graph.ttl", content)
+
     }
   }
 })

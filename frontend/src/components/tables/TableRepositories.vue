@@ -20,7 +20,7 @@
           <q-badge color="orange" floating>{{ integrationStore.datasources.length }}</q-badge>
         </q-btn>
 
-        <q-btn label="Integrated schema" dense color="primary" icon="download" @click="storeDS.downloadProjectS"
+        <q-btn label="Integrated schema" dense color="primary" icon="download" @click="projectsStore.downloadProjectSchema(route.params.id)"
                style="margin-right:10px"></q-btn>
 
         <q-input outlined dense debounce="400" color="primary" v-model="search">
@@ -141,6 +141,7 @@
 import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useProjectsStore} from 'src/stores/projects.store.js'
 import {useNotify} from 'src/use/useNotify.js'
 import FormNewRepository from "components/forms/FormNewRepository.vue";
 import {useRepositoriesStore} from "src/stores/repositories.store.js";
@@ -166,6 +167,7 @@ const notify = useNotify()
 const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore();
 const repositoriesStore = useRepositoriesStore()
+const projectsStore = useProjectsStore()
 
 onBeforeMount(() => {
   storeDS.setProject()
@@ -199,7 +201,7 @@ const columns = [
 ];
 
 onMounted(() => {
-  repositoriesStore.getRepositories(route.params.id,)
+  repositoriesStore.getAllRepositories(route.params.id,)
 })
 
 let confirmDelete = () => {}

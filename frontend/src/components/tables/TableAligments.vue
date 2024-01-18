@@ -211,7 +211,7 @@ const getAutomaticAlignments = async () => {
 
   try {
     // Make your asynchronous request here
-    await integrationStore.getAlignmentsSurvey();
+    await integrationStore.getAutomaticAlignments();
   } catch (error) {
     // Handle any errors here
   } finally {

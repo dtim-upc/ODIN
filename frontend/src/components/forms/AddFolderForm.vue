@@ -111,9 +111,9 @@ const cancelForm = () => {
 const onSubmit = () => {
   project.projectPrivacy = project.projectPrivacy.value;
   if (props.projectData) {
-    projectsStore.editProject(project, success);
+    projectsStore.putProject(project, success);
   } else {
-    projectsStore.createProject(project, success);
+    projectsStore.postProject(project, success);
   }
 };
 

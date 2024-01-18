@@ -2,10 +2,6 @@ import {intentsApi} from 'boot/axios';
 import {odinApi} from 'boot/axios';
 
 export default {
-  getQueries(projectID) {
-    return odinApi.get('/project/' + projectID + '/queries')
-  },
-
   annotateDataset(data) {
     return intentsApi.post('/annotate_dataset', data)
   },

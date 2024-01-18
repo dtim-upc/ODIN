@@ -265,7 +265,7 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await repositoriesStore.getRepositories(projectID.value)
+    await repositoriesStore.getAllRepositories(projectID.value)
   }
 });
 
@@ -405,7 +405,7 @@ const onSubmit = async () => {
       const isConnected = await testConnection();
 
       if (isConnected) {
-        integrationStore.addDataRepository(route.params.id, data, successCallback);
+        repositoriesStore.postRepository(route.params.id, data, successCallback);
         onReset();
       } else {
       }
@@ -414,7 +414,7 @@ const onSubmit = async () => {
       notify.negative("Error connecting with the database:", error);
     }
   } else {
-    integrationStore.addDataRepository(route.params.id, data, successCallback);
+    repositoriesStore.postRepository(route.params.id, data, successCallback);
   }
 };
 
@@ -428,7 +428,7 @@ const successCallback = (datasource) => {
 
   showS.value = false;
 
-  repositoriesStore.getRepositories(route.params.id);
+  repositoriesStore.getAllRepositories(route.params.id);
 }
 </script>
 

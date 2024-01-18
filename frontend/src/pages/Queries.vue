@@ -94,7 +94,7 @@
 <script setup>
 import {computed, onMounted, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
-import {useIntentsStore} from 'src/stores/intents.store.js'
+import {useQueriesStore} from 'src/stores/queriesStore.js'
 import {useNotify} from 'src/use/useNotify.js'
 import {useRepositoriesStore} from "src/stores/repositories.store.js";
 import {useRoute} from "vue-router";
@@ -113,13 +113,13 @@ const visualizedPlan = ref(null)
 */
 const notify = useNotify()
 const storeDS = useDataSourceStore();
-const intentsStore = useIntentsStore();
+const queriesStore = useQueriesStore();
 const repositoriesStore = useRepositoriesStore()
 
 onMounted(async() => {
   storeDS.setProject()
-  await intentsStore.getQueries(route.params.id)
-  console.log("queries", intentsStore.queries)
+  await queriesStore.getQueries(route.params.id)
+  console.log("queries", queriesStore.queries)
 })
 
 const selectedRepository = ref(null);
@@ -130,7 +130,7 @@ const showConfirmDialog = ref(false)
 const editRepository = ref(false)
 
 const rows = computed(() => {
-  return intentsStore.queries.map((query) => {
+  return queriesStore.queries.map((query) => {
     return {
       ...query,
       workflows: query.workflows,

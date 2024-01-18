@@ -8,7 +8,7 @@
                 <q-input label="Intent name" outlined v-model="intentName" class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
 
-                <q-select label="Query" outlined v-model="query" :options="intentsStore.queries.map(query => query.queryName)" class="q-mb-sm"
+                <q-select label="Query" outlined v-model="query" :options="queriesStore.queries.map(query => query.queryName)" class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Select a dataset']"/>
                 
                 <q-select label="Problem" outlined v-model="problem" :options=Object.keys(intentsStore.problems) class="q-mb-sm"
@@ -26,7 +26,8 @@
 
 <script setup>
 import {ref, onMounted} from 'vue'
-import {useIntentsStore} from 'stores/intents.store.js'
+import {useIntentsStore} from 'stores/intentsStore.js'
+import {useQueriesStore} from 'stores/queriesStore.js'
 import {useRoute, useRouter} from "vue-router";
 import { useQuasar } from 'quasar'
 
@@ -35,6 +36,7 @@ const route = useRoute()
 const $q = useQuasar()
 
 const intentsStore = useIntentsStore()
+const queriesStore = useQueriesStore()
 
 const intentName = ref(null)
 const query = ref(null)
@@ -42,7 +44,7 @@ const problem = ref(null)
 
 const handleSubmit = async() => {
   $q.loading.show({message: 'Annotating query...'}) // First, annotate the dataset and define the new ontology
-  const selectedQuery = intentsStore.queries.find(queryStore => queryStore.queryName === query.value);
+  const selectedQuery = queriesStore.queries.find(queryStore => queryStore.queryName === query.value);
   intentsStore.selectedQuery = selectedQuery
   let data = {
     'path': selectedQuery.csvpath,
@@ -73,7 +75,7 @@ const resetForm = () => {
 }
 
 onMounted(() => {
-  intentsStore.getQueries(route.params.id)
+  queriesStore.getQueries(route.params.id)
   intentsStore.getProblems()
 })
 

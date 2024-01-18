@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
-import api from "src/api/dataSourcesAPI.js";
+import api from "src/api/datasetsAPI";
 import integrationAPI from "src/api/integration.api.js";
 import {useAuthStore} from 'stores/auth.store.js'
 import {useRoute} from "vue-router";
@@ -91,24 +91,7 @@ export const useIntegrationStore = defineStore('integration', {
   actions: {
 
     async init() {
-
-      // console.log("integration stores init...")
-      // // const notify  = useNotify()
-      // const authStore = useAuthStore()
-      // const route = useRoute()
-      // if(authStore.user.accessToken && !this.project.name){
-      //   const response = await projectAPI.getProjectByID(route.params.id, authStore.user.accessToken)
-
-      //     if(response.status == 200) {
-      //       this.project = response.data
-      //       // console.log("project assigned ", this.project)
-      //     } else {
-      //       console.log("something wrong with response: ", response)
-      //     }
-      // }
-      // if(authStore.user.accessToken && this.datasources.length === 0) {
-      //    this.getTemporalDatasources()
-      //  }
+      
     },
     async setProject(p) {
       const route = useRoute()
@@ -120,7 +103,7 @@ export const useIntegrationStore = defineStore('integration', {
 
       } else if (!this.project.projectName) {
 
-        const response = await projectAPI.getProjectByID(route.params.id, authStore.user.accessToken)
+        const response = await projectAPI.getProject(route.params.id, authStore.user.accessToken)
 
         if (response.status === 200) {
           this.project = response.data
@@ -135,49 +118,6 @@ export const useIntegrationStore = defineStore('integration', {
         this.getTemporalDatasources()
         this.alignments = []
       }
-
-    },
-    deleteTemporalDS(ds) {
-      const notify = useNotify()
-      const authStore = useAuthStore()
-      api.deleteTemporal(this.project.projectId, ds.id, authStore.user.accessToken).then(response => {
-
-        console.log("delete ds temporal")
-        console.log(response.data)
-
-        if (response.status === 204) {
-          let index = this.datasources.indexOf(ds)
-          if (index > -1) {
-            console.log("dele index")
-            this.datasources.splice(index, 1)
-          } else {
-            console.log("something wrong, could not find data source in array to delete it")
-            // this.selectedDS =
-          }
-
-          if (this.selectedDS.length > 0) {
-
-            if (this.selectedDS[0].id === ds.id) {
-              console.log("data source deleter from selection")
-              this.selectedDS = []
-            }
-
-
-          }
-
-
-        } else {
-          console.log("check status!!! something wrong: ", response)
-        }
-
-
-      }).catch(err => {
-        console.log("error deleting data sources")
-        // check how to get err status e.g., 401
-        console.log(err)
-        notify.negative("Error deleting data source")
-      })
-
 
     },
 
@@ -215,9 +155,7 @@ export const useIntegrationStore = defineStore('integration', {
     // this will upload the data source
     addDataSource(projectID, data, success) {
       const notify = useNotify()
-      const authStore = useAuthStore()
-      console.log("adding data source...", data)
-      api.bootstrap(projectID, authStore.user.accessToken, data)
+      api.postDataset(projectID, data)
         .then((response) => {
           console.log("dataset created ", response)
           if (response.status === 200) {
@@ -237,33 +175,6 @@ export const useIntegrationStore = defineStore('integration', {
         }).catch((error) => {
         console.log("error addding ds: ", error)
         notify.negative("Something went wrong in the server. Dataset not created")
-      });
-    },
-
-    addDataRepository(projectID, data, success) {
-      const notify = useNotify()
-      const authStore = useAuthStore()
-      console.log("adding data source...", data)
-      api.addRepository(projectID, authStore.user.accessToken, data)
-        .then((response) => {
-          console.log("dataset created ", response)
-          if (response.status === 200) {
-
-            // this should be in temporal landing
-            //this.project.datasets.push(response.data)
-
-            // this.temporalDatasources.push(response.data)
-
-            success(response.data);
-            // storeDS.addDataSource(response.data)
-
-          } else {
-            // console.log("error")
-            notify.negative("Cannot create datasource. Something went wrong in the server.")
-          }
-        }).catch((error) => {
-        console.log("error addding ds: ", error)
-        notify.negative("Something went wrong in the server.")
       });
     },
 
@@ -298,20 +209,6 @@ export const useIntegrationStore = defineStore('integration', {
         // this.selectedDS =
       }
     },
-    finishIntegration(ds) {
-      this.deleteSelectedDatasource(ds);
-
-      let index = this.datasources.indexOf(ds)
-      if (index > -1) {
-        console.log("dele index")
-        this.datasources.splice(index, 1)
-      } else {
-        console.log("something wrong, could not find data source in array to delete it")
-        // this.selectedDS =
-      }
-
-    },
-
 
     addAligment(aligment, refactor) {
       console.log("alignment store: ", aligment)
@@ -333,8 +230,7 @@ export const useIntegrationStore = defineStore('integration', {
 
       this.alignments.push(a)
     },
-    integrateTemporal(callback) {
-      const authStore = useAuthStore()
+    integrate(callback) {
       const notify = useNotify()
 
       var data = {
@@ -342,7 +238,7 @@ export const useIntegrationStore = defineStore('integration', {
         alignments: this.alignments
       }
 
-      integrationAPI.integrate(this.project.projectId, data, authStore.user.accessToken).then((response) => {
+      integrationAPI.integrate(this.project.projectId, data).then((response) => {
         console.log("integration response...", response)
         //   console.log(response)
         if (response.status === 201 || response.status) {
@@ -360,13 +256,12 @@ export const useIntegrationStore = defineStore('integration', {
         notify.negative("Something went wrong in the server. No possible to integrate it " + error)
       });
     },
-    integrateJoins(callback) {
-      const authStore = useAuthStore()
+    reviewAlignments(callback) {
       const notify = useNotify()
 
       if (this.joinAlignments.length > 0) {
 
-        integrationAPI.integrateJoins(this.project.projectId, this.joinAlignments, authStore.user.accessToken).then((response) => {
+        integrationAPI.reviewAlignments(this.project.projectId, this.joinAlignments).then((response) => {
           console.log("join integration response...", response)
 
           if (response.status === 201 || response.status) {
@@ -394,18 +289,13 @@ export const useIntegrationStore = defineStore('integration', {
 
 
     },
-    saveIntegration(callback) {
-
-      const authStore = useAuthStore()
+    persistIntegration() {
       const notify = useNotify()
 
-
-      console.log("save intregration store...", authStore.user.accessToken)
       console.log("project id ", this.project.projectId)
       // acceptIntegration
-      integrationAPI.finishIntegration(this.project.projectId, authStore.user.accessToken).then((response) => {
+      integrationAPI.persistIntegration(this.project.projectId).then((response) => {
         console.log("integration response...", response)
-
         if (response.status === 200) {
           notify.positive("Integration saved successfully")
         } else {
@@ -434,13 +324,11 @@ export const useIntegrationStore = defineStore('integration', {
       this.joinAlignments.splice(index, 1)
 
     },
-    getAlignmentsSurvey() {
+    getAutomaticAlignments() {
       console.log("getting alignments survey....", this.selectedDS[0].id)
-      const authStore = useAuthStore()
       const notify = useNotify()
 
-
-      integrationAPI.surveyAlignments(this.project.projectId, this.selectedDS[0].id, authStore.user.accessToken).then((response) => {
+      integrationAPI.getAutomaticAlignments(this.project.projectId, this.selectedDS[0].id).then((response) => {
         console.log("survey alignments response...", response)
 
         if (response.status === 200) {

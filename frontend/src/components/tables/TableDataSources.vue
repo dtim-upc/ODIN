@@ -42,8 +42,8 @@
 
       <template v-slot:body-cell-View_triples="props">
         <q-td :props="props">
-          <q-btn dense round flat color="grey"
-                 icon="mdi-graphql" :to="{name: 'viewTriples', params: {datasourceID: props.row.id}}"></q-btn>
+          <q-btn dense round flat color="grey" label="AAAAAAAAAAAA"
+                 icon="mdi-graphql" :to="{name: 'viewTriples', params: {datasourceID: props.row.id}}" ></q-btn>
         </q-td>
       </template>
 
@@ -187,7 +187,7 @@
 
       <template v-slot:top-left="">
         <div class="q-table__title">
-          <q-btn label="Integrated schema" dense color="primary" icon="download" @click="storeDS.downloadProjectS"
+          <q-btn label="Integrated schema" dense color="primary" icon="download" @click="projectsStore.downloadProjectSchema(route.params.id)"
                  style="margin-right:10px"></q-btn>
         </div>
       </template>
@@ -417,15 +417,17 @@ import {computed, onBeforeMount, onMounted, defineProps, ref} from "vue";
 import {useDataSourceStore} from 'src/stores/datasources.store.js';
 import {useIntegrationStore} from 'src/stores/integration.store.js';
 import {useRepositoriesStore} from 'src/stores/repositories.store.js';
+import {useProjectsStore} from 'src/stores/projects.store.js';
 import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
-import {useRouter} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 import EditDatasetForm from "components/forms/EditDatasetForm.vue";
 import Graph from "../graph/Graph.vue";
 import { QBtn, QMenu, QItem, QTooltip } from 'quasar';
 import FormSelectRepository from "../forms/FormSelectRepository.vue";
 
 const router = useRouter()
+const route = useRoute()
 
 const showEditDialog = ref(false);
 const selectedDataset = ref(false);
@@ -455,10 +457,8 @@ const cancelSetSchema = () => {
 
 const acceptSetSchema = () => {
   if(selectedRow){
-    // Call storeDS.setDatasetAsProjectSchema(props.row) here
-    storeDS.setDatasetAsProjectSchema(selectedRow.value);
+    storeDS.setDatasetSchemaAsProjectSchema(selectedRow.value);
 
-    // Close the dialog
     showSetSchemaDialog.value = false;
   }
   else notify.negative("Something went wrong, try it again later.");
@@ -509,6 +509,7 @@ const gridEnable = ref(false)
 const notify = useNotify()
 const storeDS = useDataSourceStore();
 const integrationStore = useIntegrationStore();
+const projectsStore = useProjectsStore();
 const repositoriesStore = useRepositoriesStore();
 onBeforeMount(() => {
   storeDS.setProject()

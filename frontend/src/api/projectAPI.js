@@ -1,27 +1,25 @@
 import {odinApi} from 'boot/axios';
 
-
-const headers = (token) => {
-  return {headers: {Authorization: `Bearer ${token}`}}
-}
-
 export default {
   getAllProjects(token) {
     return odinApi.get('/projects'/*, headers(token)*/)
   },
-  createProject(data, token) {
-    return odinApi.post('/projects', data /*headers(token)*/)
+  postProject(data, token) {
+    return odinApi.post('/project', data /*headers(token)*/)
   },
-  getProjectByID(id, token) {
-    return odinApi.get('/projects/' + id /*, headers(token) */)
+  getProject(projectID, token) {
+    return odinApi.get('/project/' + projectID /*, headers(token) */)
   },
-  deleteProjectByID(id, token) {
-    return odinApi.delete('/deleteProject/' + id /*, headers(token) */)
+  deleteProject(projectID, token) {
+    return odinApi.delete('/project/' + projectID /*, headers(token) */)
   },
-  editProject(project, successCallback) {
-    return odinApi.post('/editProject', project)
+  putProject(projectID, data) {
+    return odinApi.put('/project/' + projectID, data)
   },
-  cloneProject(id, successCallback) {
-    return odinApi.post('/cloneProject/' + id)
+  cloneProject(projectID) {
+    return odinApi.post('/project/' + projectID + '/clone')
+  },
+  downloadProjectGraph(projectID) {
+    return odinApi.get('/project/' + projectID + '/schema', {responseType: 'blob'})
   }
 }

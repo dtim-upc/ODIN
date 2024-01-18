@@ -5,7 +5,6 @@ import intentsAPI from "src/api/intentsAPI.js";
 export const useIntentsStore = defineStore('intents', {
 
   state: () => ({
-    queries: [],
     queryUri: "",
     problems: [],
     selectedQuery: [],
@@ -18,24 +17,6 @@ export const useIntentsStore = defineStore('intents', {
   actions: {
     async init() {
 
-    },
-
-    async getQueries(projectID) {
-      await intentsAPI.getQueries(projectID)
-        .then(response => {
-          console.log("Queries received")
-          console.log(response.data)
-
-          if (response.data === "") { // when no queries, api answer ""
-            this.queries = []
-          } else {
-            this.queries = response.data
-          }
-
-        }).catch(err => {
-        console.log("error retrieving queries")
-        console.log(err)
-      })
     },
 
     async annotateDataset(data) {

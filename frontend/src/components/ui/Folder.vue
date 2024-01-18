@@ -149,7 +149,7 @@ const token = 'your_token_value_here';
 
 const deleteItem = (id) => {
   // Perform deletion logic here
-  projectsStore.deleteProjectByID(id, token);
+  projectsStore.deleteProject(id, token);
 };
 
 const openEditDialog = (project) => {

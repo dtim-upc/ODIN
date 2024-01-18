@@ -2,7 +2,7 @@ import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import {Dark} from 'quasar'
 import {useProjectsStore} from 'stores/projects.store.js'
-import api from "src/api/auth.api.js";
+import api from "src/api/authAPI.js";
 import {LocalStorage, SessionStorage} from 'quasar'
 
 // let notify;

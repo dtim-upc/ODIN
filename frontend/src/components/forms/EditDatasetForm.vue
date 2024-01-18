@@ -132,7 +132,7 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await repositoriesStore.getRepositories(projectID.value)
+    await repositoriesStore.getAllRepositories(projectID.value)
     if (repositoriesStore.repositories.length === 0) createNewRepository.value = true;
   }
   setInitialValues();
@@ -172,13 +172,9 @@ const onReset = () => {
 
 const onSubmit = () => {
     const data = new FormData();
-    data.append("datasetId", newDatasource.datasetId);
     data.append("datasetName", newDatasource.datasetName);
     data.append("datasetDescription", newDatasource.datasetDescription);
-    data.append("repositoryName", newDatasource.repositoryName);
-    data.append("repositoryId", newDatasource.repositoryId === null || createNewRepository.value ? '' : newDatasource.repositoryId); // Set as empty string if repositoryId is null
-    data.append("projectId", projectID.value)
-    storeDS.editDatasource(data, successCallback)
+    storeDS.editDatasource(projectID.value, newDatasource.datasetId, data, successCallback)
 }
 
 const successCallback = () => {

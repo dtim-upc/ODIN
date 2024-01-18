@@ -25,11 +25,28 @@ export const useRepositoriesStore = defineStore('repositories', {
           this.selectedRepositoryName = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId).repositoryName : "ERROR 404 No name";
         },
 
-        async getRepositories(projectId) {
+        postRepository(projectID, data, success) {
+          const notify = useNotify()
+          console.log("adding data source...", data)
+          repositoryAPI.postRepository(projectID, data)
+            .then((response) => {
+              console.log("dataset created ", response)
+              if (response.status === 200) {
+                success(response.data)
+              } else {
+                notify.negative("Cannot create datasource. Something went wrong in the server.")
+              }
+            }).catch((error) => {
+            console.log("error addding ds: ", error)
+            notify.negative("Something went wrong in the server.")
+          });
+        },
+
+        async getAllRepositories(projectId) {
             const notify = useNotify()
             console.log("Getting repositories...")
 
-            await repositoryAPI.getRepositories(projectId).then(response => {
+            await repositoryAPI.getAllRepositories(projectId).then(response => {
               console.log("repos received", response.data)
               if (response.data === "") { // when no datasources, api answer ""
                 this.repositories = []
@@ -56,10 +73,10 @@ export const useRepositoriesStore = defineStore('repositories', {
             });
           },
 
-          editRepository(data, successCallback) {
+          putRepository(repositoryID, projectID, data, successCallback) {
             const notify = useNotify();
       
-            repositoryAPI.editRepository(data)
+            repositoryAPI.putRepository(repositoryID, projectID, data)
               .then((response) => {
                 if (response.status === 200) {
                   notify.positive(`Repository successfully edited`);

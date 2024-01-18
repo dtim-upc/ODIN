@@ -26,7 +26,7 @@ public class ProjectController {
      * @param project The project to create.
      * @return A ResponseEntity containing the newly created project and an OK HTTP code.
      */
-    @PostMapping("/projects")
+    @PostMapping("/project")
     public ResponseEntity<Project> postProject(@RequestBody Project project) {
         logger.info("Post request received for creating project");
         Project newProject = projectService.saveProject(project);
@@ -39,7 +39,7 @@ public class ProjectController {
      * @param projectID The ID of the project to retrieve.
      * @return A ResponseEntity containing the retrieved project and HTTP status 200 (OK).
      */
-    @GetMapping("/projects/{projectID}")
+    @GetMapping("/project/{projectID}")
     public ResponseEntity<Project> getProject(@PathVariable("projectID") String projectID) {
         logger.info("Get request received for retrieving project with ID: " + projectID);
         Project project = projectService.getProject(projectID);
@@ -65,7 +65,7 @@ public class ProjectController {
      * @param projectId The ID of the project to retrieve datasets from.
      * @return A ResponseEntity object containing the list of datasets or an error message.
      */
-    @GetMapping("/project/{projectId}/datasources")
+    @GetMapping("/project/{projectId}/datasets")
     public ResponseEntity<Object> getDatasetsFromProject(@PathVariable String projectId) {
         logger.info("Get all datasets from project " + projectId);
         List<Dataset> datasets = projectService.getDatasetsOfProject(projectId);
@@ -91,7 +91,7 @@ public class ProjectController {
      * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was deleted,
      * or HTTP status 404 (Not Found) if the project was not found.
      */
-    @DeleteMapping("/deleteProject/{projectID}")
+    @DeleteMapping("/project/{projectID}")
     public ResponseEntity<Boolean> deleteProject(@PathVariable("projectID") String projectID) {
         logger.info("DELETE request received for deleting project with ID: {}", projectID);
         projectService.deleteProject(projectID);
@@ -105,7 +105,7 @@ public class ProjectController {
      * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was edited,
      * or HTTP status 404 (Not Found) if the project was not found.
      */
-    @PostMapping("/editProject")
+    @PutMapping("/project/{projectID}")
     public ResponseEntity<Boolean> putProject(@RequestBody Project project) {
         logger.info("EDIT request received for editing project with ID: " + project.getProjectId());
         projectService.putProject(project);
@@ -118,7 +118,7 @@ public class ProjectController {
      * @param projectId The ID of the project to clone.
      * @return A ResponseEntity containing the cloned project and HTTP status 201 (Created).
      */
-    @PostMapping("/cloneProject/{projectId}")
+    @PostMapping("/project/{projectId}/clone")
     public ResponseEntity<Project> cloneProject(@PathVariable("id") String projectId) {
         logger.info("Clone request received for cloning project with id: " +  projectId);
         Project projectClone = projectService.cloneProject(projectId);
@@ -132,7 +132,7 @@ public class ProjectController {
      * @param projectID The ID of the project for which the schema will be downloaded.
      * @return A ResponseEntity containing the input stream resource and necessary headers for the download.
      */
-    @GetMapping("/project/{projectID}/download/projectschema")
+    @GetMapping("/project/{projectID}/schema")
     public ResponseEntity<InputStreamResource> downloadProjectSchema(@PathVariable("projectID") String projectID) {
         logger.info("Downloading project schema for project: " +  projectID);
         return projectService.downloadProjectSchema(projectID);
