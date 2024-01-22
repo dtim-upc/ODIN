@@ -2,6 +2,10 @@ import {intentsApi} from 'boot/axios';
 import {odinApi} from 'boot/axios';
 
 export default {
+  postIntent(projectID, data) {
+    return odinApi.post('/project/' + projectID + '/intent', data)
+  },
+
   annotateDataset(data) {
     return intentsApi.post('/annotate_dataset', data)
   },
@@ -52,7 +56,7 @@ export default {
     return intentsApi.get(`/workflow_plans/knime/all?ids=${ids}`, {responseType: 'blob'})
   },
 
-  storeWorkflow(projectID, queryID, data) {
-    return odinApi.post('/project/' + projectID + '/query/' + queryID + '/workflow', data)
+  storeWorkflow(projectID, intentID, data) {
+    return odinApi.post('/project/' + projectID + '/intent/' + intentID + '/workflow', data)
   },
 }

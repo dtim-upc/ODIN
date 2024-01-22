@@ -5,6 +5,7 @@ import intentsAPI from "src/api/intentsAPI.js";
 export const useIntentsStore = defineStore('intents', {
 
   state: () => ({
+    intentID: "",
     queryUri: "",
     problems: [],
     selectedQuery: [],
@@ -17,6 +18,26 @@ export const useIntentsStore = defineStore('intents', {
   actions: {
     async init() {
 
+    },
+
+    async postIntent(projectID, data) {
+      const notify = useNotify();
+      console.log("Creating intent")
+
+      await intentsAPI.postIntent(projectID, data).then((response) => {
+        if (response.status === 200) {
+          notify.positive("Intent created")
+          console.log(response.data)
+          this.intentID = response.data
+        } else {
+          notify.negative("Intent could not be created")
+        }
+      }).catch((error) => {
+        console.log("error is: " + error)
+        if (error.response) {
+          notify.negative("Something went wrong when creating an intent.")
+        }
+      });
     },
 
     async annotateDataset(data) {
@@ -320,10 +341,9 @@ export const useIntentsStore = defineStore('intents', {
     },
 
     async storeWorkflow(projectID, data) {
-      const queryID = this.selectedQuery.queryID
       const notify = useNotify();
 
-      await intentsAPI.storeWorkflow(projectID, queryID, data).then((response) => {
+      await intentsAPI.storeWorkflow(projectID, this.intentID, data).then((response) => {
         if (response.status === 200) {
           notify.positive(`Workflow stored`)
         } else {

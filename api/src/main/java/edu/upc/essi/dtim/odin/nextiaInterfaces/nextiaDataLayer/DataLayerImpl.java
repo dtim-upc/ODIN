@@ -1,7 +1,7 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.CustomIOException;
@@ -58,8 +58,14 @@ public class DataLayerImpl implements DataLayerInterface {
     }
 
     @Override
-    public void storeQuery(Query query) {
+    public void copyToExploitationZone(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        dl.storeQuery(query);
+        dl.copyToExploitationZone(UUID);
+    }
+
+    @Override
+    public String materialize(Dataset dataset, String zone, String format) {
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        return dl.materialize(dataset, zone, format);
     }
 }

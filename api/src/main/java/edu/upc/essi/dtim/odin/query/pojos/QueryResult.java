@@ -5,7 +5,7 @@ import java.util.List;
 public class QueryResult {
     List<String> columns;
     List<String> rows;
-    String CSVPath;
+    String dataProductUUID;
 
     public List<String> getColumns() {
         return columns;
@@ -21,6 +21,6 @@ public class QueryResult {
         this.rows = rows;
     }
 
-    public String getCSVPath() { return CSVPath; }
-    public void setCSVPath(String CSVPath) { this.CSVPath = CSVPath; }
+    public String getDataProductUUID() { return dataProductUUID; }
+    public void setDataProductUUID(String dataProductUUID) { this.dataProductUUID = dataProductUUID; }
 }

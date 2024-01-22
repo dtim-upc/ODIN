@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.odin.projects;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.slf4j.Logger;
@@ -139,11 +140,11 @@ public class ProjectController {
     }
 
     //TODO: description
-    @GetMapping("/project/{projectID}/queries")
-    public ResponseEntity<Object> getQueriesOfProject(@PathVariable("projectID") String projectID) {
-        logger.info("Getting all queries from project " + projectID);
-        List<Query> queries = projectService.getQueriesOfProject(projectID);
-        return new ResponseEntity<>(queries, HttpStatus.OK);
+    @GetMapping("/project/{projectID}/data-products")
+    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all dataProducts from project " + projectID);
+        List<DataProduct> dataProducts = projectService.getDataProductsOfProject(projectID);
+        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
     }
 
 }

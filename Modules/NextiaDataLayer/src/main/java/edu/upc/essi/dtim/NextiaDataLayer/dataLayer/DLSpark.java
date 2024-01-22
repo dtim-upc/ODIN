@@ -37,13 +37,37 @@ public class DLSpark extends DataLayer {
     }
 
     @Override
+    public ResultSet executeQuery(String sql) {
+        return new ResultSetSpark(spark.sql(sql));
+    }
+
+    @Override
+    public void execute(String sql) {
+
+    }
+
+    @Override
     public void close() {
         // Remove all the files in the temporal zone (/tmp)
         deleteFilesFromDirectory(dataStorePath + "tmp");
     }
 
     @Override
-    public void storeQuery(Query query) {
+    public void copyToExploitationZone(String UUID) {
+
+    }
+
+    @Override
+    public void uploadToTemporalExploitationZone(String sql, String UUID) {
+    }
+
+    @Override
+    public String materialize(Dataset dataset, String zone, String format) {
+        return null;
+    }
+
+    @Override
+    public void test() {
 
     }
 }

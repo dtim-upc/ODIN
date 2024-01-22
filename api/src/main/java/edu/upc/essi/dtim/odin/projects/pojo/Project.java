@@ -3,6 +3,8 @@ package edu.upc.essi.dtim.odin.projects.pojo;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
+import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.NextiaCore.queries.Query;
 
 import java.util.List;
@@ -19,7 +21,8 @@ public class Project {
     private IntegratedGraphJenaImpl temporalIntegratedGraph;
     private List<Dataset> integratedDatasets;
     private List<Dataset> temporalIntegratedDatasets;
-    private List<Query> queries;
+    private List<DataProduct> dataProducts;
+    private List<Intent> intents;
 
     public Project() {}
 
@@ -100,8 +103,12 @@ public class Project {
         this.temporalIntegratedDatasets = temporalIntegratedDatasets;
     }
 
-    public List<Query> getQueries() { return queries; }
-    public void setQueries(List<Query> queries) { this.queries = queries; }
-    public void addQuery(Query query) { this.queries.add(query); }
+    public List<DataProduct> getDataProducts() { return dataProducts; }
+    public void setDataProducts(List<DataProduct> dataProducts) { this.dataProducts = dataProducts; }
+    public void addDataProduct(DataProduct dataProduct) { this.dataProducts.add(dataProduct); }
+
+    public List<Intent> getIntents() { return intents; }
+    public void setIntents(List<Intent> intents) { this.intents = intents;}
+    public void addIntent(Intent intent) { this.intents.add(intent);}
 }
 

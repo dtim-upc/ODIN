@@ -291,7 +291,7 @@ public class IntegrationService {
         Dataset datasetB = datasetService.getDatasetById(datasetId);
 
         ////////////////////////////////////// TODO review
-        jdModuleInterface jdInterface = new jdModuleImpl(appConfig);
+        jdModuleInterface jdInterface = new jdModuleImpl();
         List<Alignment> alignments = jdInterface.getAlignments(datasetA, datasetB);
 
         List<Alignment> alignmentsWithFilter = new ArrayList<>();

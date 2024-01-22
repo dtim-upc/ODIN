@@ -2,7 +2,7 @@ package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
@@ -100,6 +100,8 @@ public abstract class DataLayer {
     public abstract void removeFromFormattedZone(String tableName);
 
     public abstract ResultSet executeQuery(String sql, Dataset[] datasets);
+    public abstract ResultSet executeQuery(String sql);
+    public abstract void execute(String sql);
 
     public abstract void close();
 
@@ -110,5 +112,11 @@ public abstract class DataLayer {
         df.show();
     }
 
-    public abstract void storeQuery(Query query);
+    public abstract void copyToExploitationZone(String UUID);
+
+    public abstract void uploadToTemporalExploitationZone(String sql, String UUID);
+    public abstract String materialize(Dataset dataset, String zone, String format);
+
+
+    public abstract void test();
 }

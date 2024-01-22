@@ -13,12 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 public class jdModuleImpl implements jdModuleInterface {
-
+    @Autowired
     private static AppConfig appConfig;
-
-    public jdModuleImpl(@Autowired AppConfig appConfig) {
-        jdModuleImpl.appConfig = appConfig;
-    }
 
     @Override
     public List<Alignment> getAlignments(Dataset dataset, Dataset dataset2) {

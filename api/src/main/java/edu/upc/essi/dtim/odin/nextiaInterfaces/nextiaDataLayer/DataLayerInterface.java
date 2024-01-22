@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,5 +33,7 @@ public interface DataLayerInterface {
 
     void deleteTemporalFiles();
 
-    void storeQuery(Query query);
+    void copyToExploitationZone(String UUID);
+
+    String materialize(Dataset dataset, String zone, String format);
 }

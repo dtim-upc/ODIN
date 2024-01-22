@@ -71,8 +71,15 @@
                 </cascade>
             </one-to-one>
 
-            <one-to-many orphan-removal="true" name="queries"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.Query">
+            <one-to-many orphan-removal="true" name="dataProducts"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.DataProduct">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+
+            <one-to-many orphan-removal="true" name="intents"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.Intent">
                 <cascade>
                     <cascade-all/>
                 </cascade>
@@ -258,22 +265,28 @@
         </attributes>
     </entity>
 
-    <entity name="Query" class="edu.upc.essi.dtim.NextiaCore.queries.Query">
-        <table name="Query">
-            <unique-constraint>
-                <column-name>queryID</column-name>
-            </unique-constraint>
-        </table>
+    <entity name="DataProduct" class="edu.upc.essi.dtim.NextiaCore.queries.DataProduct">
+        <table name="DataProduct"/>
         <attributes>
-            <id name="queryID">
+
+        </attributes>
+    </entity>
+
+    <entity name="Intent" class="edu.upc.essi.dtim.NextiaCore.queries.Intent">
+        <table name="Intent"/>
+        <attributes>
+            <id name="intentID">
                 <generated-value strategy="AUTO"/>
             </id>
-            <basic name="CSVPath"/>
-            <basic name="queryName"/>
-            <basic name="UUID"/>
-            <basic name="label"/>
-            <one-to-many name="workflows" orphan-removal="true"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.Workflow">
+            <basic name="intentName"/>
+            <basic name="problem"/>
+            <many-to-one name="dataProduct"
+                         target-entity="edu.upc.essi.dtim.NextiaCore.queries.DataProduct">
+            </many-to-one>
+            <one-to-many name="workflows" target-entity="edu.upc.essi.dtim.NextiaCore.queries.Workflow">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
             </one-to-many>
         </attributes>
     </entity>

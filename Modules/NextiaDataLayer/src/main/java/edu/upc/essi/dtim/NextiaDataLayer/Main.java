@@ -83,6 +83,8 @@ public class Main {
         dlm.uploadToLandingZone(d2);
         dlm.uploadToFormattedZone(d2, d2.getUUID());
 
+        dlm.test();
+
 //        dlm.show(d1);
         dlm.show(d2);
     }

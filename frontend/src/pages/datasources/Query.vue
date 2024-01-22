@@ -25,17 +25,16 @@
 
         <q-card-actions align="between">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn label="Persist data" color="primary" @click="persistQuery=true" />
+          <q-btn label="Persist data" color="primary" @click="persistData=true" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <q-dialog v-model="persistQuery">
+    <q-dialog v-model="persistData">
       <q-card>
         <q-card-section>
-          <q-form @submit="postQuery" class="text-right">
-            <q-input v-model="queryName" label="Query name" :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
-            <q-select v-model="queryLabel" label="Query label" :options="queryColumns" :rules="[ val => val && val.length > 0 || 'Insert a label']"/>
+          <q-form @submit="postDataProduct" class="text-right">
+            <q-input v-model="dataProductName" label="Data product name" :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
 
             <q-btn type="submit" color="primary" label="Persist" v-close-popup/>
           </q-form>
@@ -53,21 +52,20 @@ import TableQueryResult from "components/tables/TableQueryResult.vue";
 import Graph from 'components/graph/Graph.vue'
 import {useDataSourceStore} from 'src/stores/datasources.store.js'
 import {useQueriesStore} from 'src/stores/queriesStore.js'
-import {useAuthStore} from 'stores/auth.store.js'
+import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
 import {useNotify} from 'src/use/useNotify.js'
 
-const miniState = ref(true)
 const storeDS = useDataSourceStore()
 const queriesStore = useQueriesStore();
+const dataProductsStore = useDataProductsStore();
 const alert = ref(false);
 const notify = useNotify();
 
-const persistQuery = ref(false);
-const queryColumns = ref([]);
-const queryName = ref("");
-const queryLabel = ref("");
+const persistData = ref(false);
+const dataProductColumns = ref([]);
+const dataProductName = ref("");
 
-const CSVPath = ref('') 
+const dataProductUUID = ref('') 
 const graphical = ref('')
 const graphID = ref('')
 let graphType = ""
@@ -89,7 +87,6 @@ const rows = ref([]);
 
 
 const showResultQuery = (columnsQ, rowsQ) => {
-  notify.positive("Query done");
   const qcol = []
   for (const col in columnsQ) {
     var c = new Object();
@@ -131,22 +128,22 @@ const queryGraph = (data) => {
   data.graphType = graphType
 
   const successCallback = (responseData) => {
-    CSVPath.value = responseData.csvpath
-    queryColumns.value = responseData.columns
+    dataProductUUID.value = responseData.dataProductUUID
+    dataProductColumns.value = responseData.columns
     showResultQuery(responseData.columns, responseData.rows)
   }
 
   queriesStore.queryGraph(storeDS.project.projectId, data, successCallback)
 }
 
-const postQuery = () => {
-  console.log("Storing query")
+const postDataProduct = () => {
+  console.log("Storing data product")
   const data = new FormData();
-  data.append("CSVPath", CSVPath.value);
-  data.append("queryName", queryName.value);
-  data.append("queryLabel", queryLabel.value);
+  data.append("dataProductUUID", dataProductUUID.value);
+  data.append("dataProductName", dataProductName.value);
+  data.append("columns", dataProductColumns.value);
 
-  queriesStore.postQuery(storeDS.project.projectId, data)
+  dataProductsStore.postDataProduct(storeDS.project.projectId, data)
 
 }
 
