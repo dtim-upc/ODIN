@@ -118,19 +118,6 @@ public class ProjectController {
     }
 
     /**
-     * Retrieves all data products from a specific project.
-     *
-     * @param projectID The ID of the project to retrieve data products from.
-     * @return A ResponseEntity object containing the list of data products or an error message.
-     */
-    @GetMapping("/project/{projectID}/data-products")
-    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
-        logger.info("Getting all dataProducts from project " + projectID);
-        List<DataProduct> dataProducts = projectService.getDataProductsOfProject(projectID);
-        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
-    }
-
-    /**
      * Retrieves all intents from a specific project.
      *
      * @param projectID The ID of the project to retrieve intents from.

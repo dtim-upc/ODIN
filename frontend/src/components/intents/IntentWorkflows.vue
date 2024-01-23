@@ -67,13 +67,13 @@
 <script setup>
 import {ref} from 'vue'
 import {useIntentsStore} from 'stores/intentsStore.js'
-import {useWorkflowStore} from 'stores/workflowStore.js'
+import {useWorkflowsStore} from 'stores/workflowStore.js'
 import DialogWithVisualizedPlan from "../../components/intents/DialogWithVisualizedPlan.vue";
 import {useRoute} from "vue-router";
 
 const route = useRoute()
 const intentsStore = useIntentsStore()
-const workflowStore = useWorkflowStore()
+const workflowStore = useWorkflowsStore()
 
 const storeWorkflowDialogBoolean = ref(false)
 const dialog = ref(false)

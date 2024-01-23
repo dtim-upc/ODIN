@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.dataProducts;
 
+import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.odin.intents.IntentController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,19 @@ public class DataProductController {
         logger.info("Deleting data product " + dataProductID + " from project: " +  projectID);
         dataProductService.deleteDataProduct(projectID, dataProductID);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Retrieves all data products from a specific project.
+     *
+     * @param projectID The ID of the project to retrieve data products from.
+     * @return A ResponseEntity object containing the list of data products or an error message.
+     */
+    @GetMapping("/project/{projectID}/data-products")
+    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all dataProducts from project " + projectID);
+        List<DataProduct> dataProducts = dataProductService.getDataProductsOfProject(projectID);
+        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
     }
 
     // ---------------- Other operations

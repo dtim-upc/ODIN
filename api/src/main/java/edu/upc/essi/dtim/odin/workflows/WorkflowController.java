@@ -15,6 +15,7 @@ public class WorkflowController {
     @Autowired
     private WorkflowService workflowService;
 
+    // ---------------- CRUD Operations
     /**
      * Adds a new workflow into the system.
      *
@@ -52,7 +53,7 @@ public class WorkflowController {
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
     @DeleteMapping("/project/{projectID}/intent/{intentID}/workflow/{workflowID}")
-    public ResponseEntity<Boolean> deleteIntent(@PathVariable("intentID") String intentID,
+    public ResponseEntity<Boolean> deleteWorkflow(@PathVariable("intentID") String intentID,
                                                 @PathVariable("workflowID") String workflowID) {
         logger.info("Deleting workflow " + workflowID + " from intent: " +  intentID);
         workflowService.deleteWorkflow(intentID, workflowID);

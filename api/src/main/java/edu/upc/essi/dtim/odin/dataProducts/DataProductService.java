@@ -125,6 +125,17 @@ public class DataProductService {
         projectService.saveProject(project); // Save the updated project without the repository
     }
 
+    /**
+     * Retrieves the list of data products associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of DataProduct objects belonging to the project.
+     */
+    public List<DataProduct> getDataProductsOfProject(String projectID) {
+        Project project = projectService.getProject(projectID);
+        return project.getDataProducts();
+    }
+
     // ---------------- Other operations
 
     /**

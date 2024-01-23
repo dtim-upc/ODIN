@@ -1,149 +1,90 @@
-import {defineStore} from 'pinia'
-import {useNotify} from 'src/use/useNotify.js'
+import { defineStore } from 'pinia';
+import { useNotify } from 'src/use/useNotify.js';
 import projectAPI from "src/api/projectAPI.js";
-import {useAuthStore} from 'src/stores/authStore.js'
-import download from 'downloadjs'
+import download from 'downloadjs';
+
+const notify = useNotify();
 
 export const useProjectsStore = defineStore('projects', {
-
   state: () => ({
+    currentProject: {},
     projects: [],
   }),
 
-  getters: {},
   actions: {
-    init() {
-      console.log("projects store init")
-      // this.initStores();
-      const authStore = useAuthStore();
-      if (authStore.user.accessToken && this.projects.length === 0) {
-        this.getProjects()
+    async init() {
+      if (this.projects.length === 0) {
+        await this.getProjects();
       }
     },
-    getProjects() {
-      const authStore = useAuthStore();
-      projectAPI.getAllProjects(authStore.user.accessToken)
-        .then(response => {
 
-          console.log("projects received")
-          console.log(response.data)
-
-          if (response.data === "") { // when no datasources, api answer ""
-            this.projects = []
-          } else {
-            this.projects = response.data
-          }
-
-        }).catch(err => {
-        console.log("error retrieving data sources")
-        console.log(err)
-      })
+    async getProjects() {
+      try {
+        const response = await projectAPI.getAllProjects();
+        this.projects = response.data === "" ? [] : response.data;
+      } catch (error) {
+        notify.negative("Could not retrieve projects");
+        console.error("Error:", error);
+      }
     },
-    postProject(project, successCallback) {
-      const authStore = useAuthStore();
-      const notify = useNotify();
 
-      console.log("create project store...")
-      project.createdBy = "Dios todo poderoso"//authStore.user.username
-      console.log("send project: ", project)
-      projectAPI.postProject(project, authStore.user.accessToken).then((response) => {
-        if (response.status === 201) {
-          console.log(response)
-          notify.positive(`Project ${project.projectName} successfully created`)
-          this.projects.push(response.data)
-          successCallback()
-        } else {
-          notify.negative("Cannot create project. Something went wrong in the server.")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server for creating a project.")
-        }
-      });
-    },
-    deleteProject(id, successCallback) {
-      const authStore = useAuthStore();
-      const notify = useNotify();
+    async postProject(project, successCallback) {
+      project.createdBy = "Admin"; //authStore.user.username, when users are implemented
+      try {
+        const response = await projectAPI.postProject(project);
+        notify.positive(`Project ${project.projectName} successfully created`);
+        this.projects.push(response.data);
+        successCallback();
+      } catch (error) {
+        notify.negative("Something went wrong in the server for creating a project.");
+        console.error("Error:", error);
 
-      projectAPI.deleteProject(id, authStore.user.accessToken)
-        .then((response) => {
-          if (response.status === 200) {
-            const index = this.projects.findIndex(project => project.projectId === id);
-            if (index !== -1) {
-              // Remove the project from the projects array using splice
-              this.projects.splice(index, 1);
-              notify.positive(`Project ${id} successfully deleted`);
-              successCallback();
-            } else {
-              notify.negative("Project not found in the list.");
-            }
-          } else {
-            notify.negative("Cannot delete project. Something went wrong on the server.");
-          }
-        })
-        .catch((error) => {
-          console.log("Error is: " + error);
-          if (error.response) {
-            notify.negative("Something went wrong on the server while deleting a project.");
-          }
-        });
+      }
     },
-    putProject(project, successCallback) {
-      const notify = useNotify();
 
-      projectAPI.putProject(project.projectID, project)
-        .then((response) => {
-          if (response.status === 200) {
-            const index = this.projects.findIndex(p => p.projectId === project.projectId);
-            if (index !== -1) {
-              // Update the project in the projects array
-              this.projects[index] = project;
-              notify.positive(`Project ${project.projectId} successfully edited`);
-              successCallback();
-            } else {
-              notify.negative("Project not found in the list.");
-            }
-          } else {
-            notify.negative("Cannot edit project. Something went wrong on the server.");
-          }
-        })
-        .catch((error) => {
-          console.log("Error is: " + error);
-          if (error.response) {
-            notify.negative("Something went wrong on the server while editing the project.");
-          }
-        });
+    async deleteProject(projectID) {
+      try {
+        await projectAPI.deleteProject(projectID);
+        notify.positive(`Project deleted`);
+        this.getProjects();
+      } catch (error) {
+        notify.negative("Something went wrong on the server while deleting a project.");
+        console.error("Error:", error);
+      }
     },
-    cloneProject(id, successCallback) {
-      const notify = useNotify();
 
-      projectAPI.cloneProject(id)
-        .then((response) => {
-          if (response.status === 201) {
-            notify.positive(`Project ${id} successfully cloned`);
-            this.projects.push(response.data)
-            successCallback();
-          } else {
-            notify.negative("Cannot clone project. Something went wrong on the server.");
-          }
-        })
-        .catch((error) => {
-          console.log("Error is: " + error);
-          if (error.response) {
-            notify.negative("Something went wrong on the server while cloning the project.");
-          }
-        });
+    async putProject(project, successCallback) {
+      try {
+        await projectAPI.putProject(project.projectID, project);
+        notify.positive(`Project ${project.projectId} successfully edited`);
+        this.getProjects();
+        successCallback();
+      } catch (error) {
+        notify.negative("Something went wrong on the server while editing a project.");
+        console.error("Error:", error);
+      }
     },
+
+    async cloneProject(id, successCallback) {
+      try {
+        await projectAPI.cloneProject(id);
+        notify.positive(`Project successfully cloned`);
+        this.getProjects();
+        successCallback();
+      } catch (error) {
+        notify.negative("Something went wrong on the server while cloning the project.");
+        console.error("Error:", error);
+      }
+    },
+
     async downloadProjectSchema(projectID) {
-      console.log("download project....")
-
-      const notify = useNotify()
-      const response = await projectAPI.downloadProjectGraph(projectID);
-
-      const content = response.headers['content-type'];
-      download(response.data, "source_graph.ttl", content)
-
+      try {
+        const response = await projectAPI.downloadProjectGraph(projectID);
+        const content = response.headers['content-type'];
+        download(response.data, "source_graph.ttl", content);
+      } catch (error) {
+        notify.negative("Something went wrong on the server while downloading the project schema.");
+      }
     }
   }
-})
+});

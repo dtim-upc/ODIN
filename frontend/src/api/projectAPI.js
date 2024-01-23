@@ -1,17 +1,17 @@
 import {odinApi} from 'boot/axios';
 
 export default {
-  getAllProjects(token) {
-    return odinApi.get('/projects'/*, headers(token)*/)
+  getAllProjects() {
+    return odinApi.get('/projects')
   },
-  postProject(data, token) {
-    return odinApi.post('/project', data /*headers(token)*/)
+  postProject(data) {
+    return odinApi.post('/project', data)
   },
-  getProject(projectID, token) {
-    return odinApi.get('/project/' + projectID /*, headers(token) */)
+  getProject(projectID) {
+    return odinApi.get('/project/' + projectID)
   },
-  deleteProject(projectID, token) {
-    return odinApi.delete('/project/' + projectID /*, headers(token) */)
+  deleteProject(projectID) {
+    return odinApi.delete('/project/' + projectID)
   },
   putProject(projectID, data) {
     return odinApi.put('/project/' + projectID, data)

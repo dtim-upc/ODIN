@@ -115,10 +115,6 @@ const props = defineProps({
 
 const integrationStore = useIntegrationStore()
 
-// onMounted(() => {
-//   integrationStore.setProject()
-// })
-
 const alignment = reactive({
 
   type: '', //both resource must be same type

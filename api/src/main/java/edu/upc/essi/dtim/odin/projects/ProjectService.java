@@ -190,17 +190,6 @@ public class ProjectService {
     }
 
     /**
-     * Retrieves the list of data products associated with a project.
-     *
-     * @param projectID The ID of the project.
-     * @return A list of DataProduct objects belonging to the project.
-     */
-    public List<DataProduct> getDataProductsOfProject(String projectID) {
-        Project project = getProject(projectID);
-        return project.getDataProducts();
-    }
-
-    /**
      * Retrieves the list of intents associated with a project.
      *
      * @param projectID The ID of the project.

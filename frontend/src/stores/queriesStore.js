@@ -1,35 +1,27 @@
-import {defineStore} from 'pinia'
-import {useNotify} from 'src/use/useNotify.js'
+import { defineStore } from 'pinia';
+import { useNotify } from 'src/use/useNotify.js';
 import queryAPI from "src/api/queryAPI.js";
 
-export const useQueriesStore = defineStore('queries', {
+const notify = useNotify();
 
+export const useQueriesStore = defineStore('queries', {
   state: () => ({
     queries: [],
     selectedDataProductPath: null,
   }),
 
-  getters: {},
   actions: {
-    async init() {
-
-    },
-
-    queryGraph(projectID, data, successCallback) {
-      const notify = useNotify();
-
-      console.log("dd", data)
-      queryAPI.queryGraph(projectID, data).then(response => {
-        console.log("query success", response)
-        if (response.data == '')
-          notify.positive("Query result is empty")
-        else {
-          successCallback(response.data)
+    async queryGraph(projectID, data, successCallback) {
+      try {
+        const response = await queryAPI.queryGraph(projectID, data);
+        if (response.data === '') {
+          notify.positive("Query result is empty");
+        } else {
+          successCallback(response.data);
         }
-      }).catch(err => {
-        console.log("error query graph", err)
-      })
-    
+      } catch (error) {
+        notify.negative("Error querying graph");
+      }
     },
   }
-})
+});
