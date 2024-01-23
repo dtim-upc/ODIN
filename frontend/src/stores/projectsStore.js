@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import projectAPI from "src/api/projectAPI.js";
-import {useAuthStore} from 'stores/auth.store.js'
+import {useAuthStore} from 'src/stores/authStore.js'
 import download from 'downloadjs'
 
 export const useProjectsStore = defineStore('projects', {

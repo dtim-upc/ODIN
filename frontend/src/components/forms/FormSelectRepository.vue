@@ -45,8 +45,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { useNotify } from 'src/use/useNotify.js'
-import { useDataSourceStore } from "../../stores/datasources.store";
-import { useRepositoriesStore } from "src/stores/repositories.store";
+import { useDataSourceStore } from "../../stores/datasourcesStore";
+import { useRepositoriesStore } from "src/stores/repositoriesStore";
 
 const props = defineProps({
   show: { type: Boolean, default: false, required: true },

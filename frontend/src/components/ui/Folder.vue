@@ -105,7 +105,7 @@
 import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
 import {colors} from 'quasar'
-import {useProjectsStore} from "stores/projects.store";
+import {useProjectsStore} from "stores/projectsStore";
 import AddFolderForm from 'components/forms/AddFolderForm.vue';
 import {optionsPrivacy} from "./PrivacyOptions";
 

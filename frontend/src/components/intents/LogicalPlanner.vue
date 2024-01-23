@@ -1,5 +1,5 @@
 <template>
-    <q-page padding>
+    <q-page>
         <q-form class="row q-col-gutter-md text-center justify-center" @submit.prevent="handleSubmit">            
             <div class="col-12">
                 <h4> Logical planner </h4>

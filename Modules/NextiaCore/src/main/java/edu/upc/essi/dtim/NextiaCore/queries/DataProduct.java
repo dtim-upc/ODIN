@@ -7,8 +7,9 @@ public class DataProduct extends Dataset {
     public DataProduct() {
 
     }
-    public DataProduct(String UUID, String queryName) {
+    public DataProduct(String UUID, String dataProductName, String dataProductDescription) {
         this.setUUID(UUID);
-        this.setDatasetName(queryName);
+        this.setDatasetName(dataProductName);
+        this.setDatasetDescription(dataProductDescription);
     }
 }

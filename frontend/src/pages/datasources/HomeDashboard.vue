@@ -148,11 +148,11 @@
 import {ref, onBeforeMount} from "vue";
 import {useRouter} from "vue-router";
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
-import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import home_pattern from "components/icons/home_pattern.vue";
 
-import {useAuthStore} from 'stores/auth.store.js'
+import {useAuthStore} from 'stores/authStore.js'
 
 const addDataSource = ref(false)
 const active = ref(false)

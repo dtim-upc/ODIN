@@ -3,7 +3,7 @@
     <div class="text-h6">Edit repository</div>
   </q-card-section>
   <q-card-section>
-    <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+    <q-form ref="form" @submit="onSubmit" class="q-gutter-md">
 
       <q-input filled v-model="editedRepository.name" label="Repository name" lazy-rules
                   :rules="[(val) => (val && val.length > 0) || 'Please type a name', ]"/>
@@ -18,7 +18,7 @@
 
 <script setup>
 import { defineProps, reactive} from "vue";
-import { useRepositoriesStore } from "src/stores/repositories.store";
+import { useRepositoriesStore } from "src/stores/repositoriesStore";
 import { useRoute } from "vue-router";
 
 
@@ -29,7 +29,6 @@ const props = defineProps({
   repositoryData:{type: Object, default: null},
 });
 
-console.log(props.repositoryData)
 
 const editedRepository = reactive({
   id: props.repositoryData ? props.repositoryData.id : null,
@@ -47,11 +46,5 @@ const onSubmit = () => {
   data.append("repositoryName", editedRepository.name);
   repositoriesStore.putRepository(editedRepository.id, route.params.id, data, successCallback)
 }
-
-const onReset = () => {
-
-}
-
-
 
 </script>

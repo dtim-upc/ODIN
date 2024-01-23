@@ -44,7 +44,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static edu.upc.essi.dtim.odin.utils.Utils.generateUUID;
 
@@ -59,6 +61,9 @@ public class DatasetService {
     @Autowired
     private RestTemplate restTemplate;
     private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
+
+
+    // ---------------- POST Operation
 
     /**
      * Indicates the function to execute the generation of a new dataset based on the type of repository the dataset belongs to.
@@ -320,7 +325,6 @@ public class DatasetService {
         return new Attribute(attributeName, "string");
     }
 
-
     /**
      * Transforms a Dataset object into a Graph object representing the data in RDF format.
      *
@@ -354,34 +358,6 @@ public class DatasetService {
     }
 
     /**
-     * Deletes a dataset from the specified project.
-     *
-     * @param projectId The ID of the project to delete the dataset from.
-     * @param datasetId The ID of the dataset to delete.
-     */
-    public void deleteDatasetFromProject(String projectId, String datasetId) {
-        projectService.deleteDatasetFromProject(projectId, datasetId);
-    }
-
-    /**
-     * Deletes all the temporal files used to create a dataset (i.e. it removes the folders)
-     */
-    public void deleteTemporalFiles() {
-        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-        dlInterface.deleteTemporalFiles();
-    }
-
-    /**
-     * Saves a Dataset object using the ORMStoreInterface.
-     *
-     * @param dataset The Dataset object to save.
-     * @return The saved Dataset object.
-     */
-    public Dataset saveDataset(Dataset dataset) {
-        return ormDataResource.save(dataset);
-    }
-
-    /**
      * Sets a local graph to a Dataset and saves it.
      *
      * @param savedDataset The Dataset object to which the local graph will be set.
@@ -402,20 +378,16 @@ public class DatasetService {
         return saveDataset(savedDataset);
     }
 
+    // ---------------- CRUD/ORM operations
+
     /**
-     * Edits a dataset's attributes in the database
+     * Saves a Dataset object
      *
-     * @param datasetID          Identification of the dataset to be edited
-     * @param datasetName        New name to be given to the dataset.
-     * @param datasetDescription New description to be given to the dataset.
+     * @param dataset The Dataset object to save.
+     * @return The saved Dataset object.
      */
-    public void editDataset(String datasetID, String datasetName, String datasetDescription) {
-        Dataset originalDataset = getDatasetById(datasetID);
-
-        originalDataset.setDatasetName(datasetName);
-        originalDataset.setDatasetDescription(datasetDescription);
-
-        saveDataset(originalDataset);
+    public Dataset saveDataset(Dataset dataset) {
+        return ormDataResource.save(dataset);
     }
 
     /**
@@ -424,7 +396,7 @@ public class DatasetService {
      * @param datasetID The unique identifier of the dataset to retrieve.
      * @return The dataset object with its associated graph.
      */
-    public Dataset getDatasetById(String datasetID) {
+    public Dataset getDataset(String datasetID) {
         // Retrieve the dataset by its unique identifier
         Dataset dataset = ormDataResource.findById(Dataset.class, datasetID);
         if (dataset == null) {
@@ -445,6 +417,63 @@ public class DatasetService {
     }
 
     /**
+     * Edits a dataset's attributes in the database
+     *
+     * @param datasetID          Identification of the dataset to be edited
+     * @param datasetName        New name to be given to the dataset.
+     * @param datasetDescription New description to be given to the dataset.
+     */
+    public void putDataset(String datasetID, String datasetName, String datasetDescription) {
+        Dataset originalDataset = getDataset(datasetID);
+
+        originalDataset.setDatasetName(datasetName);
+        originalDataset.setDatasetDescription(datasetDescription);
+
+        saveDataset(originalDataset);
+    }
+
+    /**
+     * Deletes a dataset from the specified project.
+     *
+     * @param projectId The ID of the project to delete the dataset from.
+     * @param datasetId The ID of the dataset to delete.
+     */
+    public void deleteDatasetFromProject(String projectId, String datasetId) {
+        Project project = projectService.getProject(projectId);
+        List<DataRepository> repositoriesOfProject = project.getRepositories();
+        boolean datasetFound = false;
+
+        // Iterate through the data repositories
+        for (DataRepository repoInProject : repositoriesOfProject) {
+            // Iterate through the datasets in each data repository
+            Iterator<Dataset> datasetIterator = repoInProject.getDatasets().iterator();
+            while (datasetIterator.hasNext()) {
+                Dataset dataset = datasetIterator.next();
+                if (datasetId.equals(dataset.getId())) {
+                    datasetFound = true;
+                    // Remove the dataset from the ORM data repository and, as such, from the ORM project
+                    datasetIterator.remove();
+                    project.setRepositories(repositoriesOfProject); // Save and set the updated list of data repositories
+                    // Delete rdf file (\jenaFiles)
+                    GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+                    graphStore.deleteGraph(dataset.getLocalGraph());
+                    // Remove from Data layer
+                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+                    dlInterface.deleteDatasetFromFormattedZone(dataset.getUUID());
+                    break;
+                }
+            }
+        }
+        // Throw an exception if the dataset was not found
+        if (!datasetFound) {
+            throw new NoSuchElementException("Dataset not found with id: " + datasetId);
+        }
+        projectService.saveProject(project); // Save the updated project without the dataset
+    }
+
+    // ---------------- Data Layer operations
+
+    /**
      * Uploads a dataset in the data layer, persisting the data of the original files
      *
      * @param dataset The dataset whose data will be stored.
@@ -455,31 +484,14 @@ public class DatasetService {
     }
 
     /**
-     * Downloads the schema of a dataset, in .ttl format.
-     *
-     * @param datasetID Identification of the dataset whose schema will be downloaded
-     * @return A ResponseEntity with the headers and the schema
+     * Deletes all the temporal files used to create a dataset (i.e. it removes the folders)
      */
-    public ResponseEntity<InputStreamResource> downloadDatasetSchema(String datasetID) {
-        Dataset dataset = getDatasetById(datasetID);
-
-        Model model = dataset.getLocalGraph().getGraph(); // Get the RDF model (graph) from the dataset
-        StringWriter writer = new StringWriter();
-
-        model.write(writer, "TTL"); // Write the model (graph) to a StringWriter in Turtle format
-
-        HttpHeaders headers = new HttpHeaders();
-        // Set the HTTP headers to specify the content disposition as an attachment with the dataset name and .ttl extension
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dataset.getDatasetName() + ".ttl");
-
-        // Create an InputStreamResource from the StringWriter
-        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
-        // Return a ResponseEntity with the Turtle schema file, content type, and headers
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("text/turtle"))
-                .body(resource);
+    public void deleteTemporalFiles() {
+        DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+        dlInterface.deleteTemporalFiles();
     }
+
+    // ---------------- Graph/Integration related
 
     /**
      * Assigns the schema of a dataset to the integrated graph of a project.
@@ -489,7 +501,7 @@ public class DatasetService {
      */
     public void setDatasetSchemaAsProjectSchema(String projectID, String datasetID) {
         Project project = projectService.getProject(projectID);
-        Dataset dataset = getDatasetById(datasetID);
+        Dataset dataset = getDataset(datasetID);
 
         // Assign the schema of the dataset to the project's INTEGRATED GRAPH
         Graph integratedGraph = CoreGraphFactory.createIntegratedGraph();
@@ -517,7 +529,7 @@ public class DatasetService {
      */
     public Project addIntegratedDataset(Project project, String datasetID) {
         List<Dataset> integratedDatasets = project.getIntegratedDatasets();
-        Dataset dataset = getDatasetById(datasetID);
+        Dataset dataset = getDataset(datasetID);
         integratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets
         project.setIntegratedDatasets(integratedDatasets); // Update the list of integrated datasets in the project
         return project;
@@ -531,11 +543,40 @@ public class DatasetService {
      */
     public Project addTemporalIntegratedDataset(Project project, String datasetID) {
         List<Dataset> temporalIntegratedDatasets = project.getTemporalIntegratedDatasets();
-        Dataset dataset = getDatasetById(datasetID);
+        Dataset dataset = getDataset(datasetID);
         temporalIntegratedDatasets.add(dataset); // Add the new dataset to the list of integrated datasets
         project.setTemporalIntegratedDatasets(temporalIntegratedDatasets); // Update the list of integrated datasets in the project
         return project;
     }
+
+    /**
+     * Downloads the schema of a dataset, in .ttl format.
+     *
+     * @param datasetID Identification of the dataset whose schema will be downloaded
+     * @return A ResponseEntity with the headers and the schema
+     */
+    public ResponseEntity<InputStreamResource> downloadDatasetSchema(String datasetID) {
+        Dataset dataset = getDataset(datasetID);
+
+        Model model = dataset.getLocalGraph().getGraph(); // Get the RDF model (graph) from the dataset
+        StringWriter writer = new StringWriter();
+
+        model.write(writer, "TTL"); // Write the model (graph) to a StringWriter in Turtle format
+
+        HttpHeaders headers = new HttpHeaders();
+        // Set the HTTP headers to specify the content disposition as an attachment with the dataset name and .ttl extension
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + dataset.getDatasetName() + ".ttl");
+
+        // Create an InputStreamResource from the StringWriter
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+        // Return a ResponseEntity with the Turtle schema file, content type, and headers
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle"))
+                .body(resource);
+    }
+
+    // ---------------- Getting data from source
 
     /**
      * Downloads a file, obtained from the data of a given URL.

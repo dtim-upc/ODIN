@@ -17,6 +17,7 @@ public class DatasetController {
     @Autowired
     private DatasetService datasetService;
 
+    // ---------------- CRUD Operations
     /**
      * Adds a new dataset into the system, which requires to create the dataset object, execute a bootstrap operation,
      * transform the data into a graph and store it to the databases (ODIN and data layer).
@@ -44,6 +45,23 @@ public class DatasetController {
     }
 
     /**
+     * Edits a dataset (name of the dataset and description) in a specific project.
+     *
+     * @param datasetId          The ID of the dataset to edit.
+     * @param datasetName        The new name for the dataset.
+     * @param datasetDescription The new description for the dataset (optional, default is an empty string).
+     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     */
+    @PutMapping("/project/{projectID}/dataset/{datasetID}")
+    public ResponseEntity<Boolean> putDataset(@PathVariable("datasetID") String datasetId,
+                                              @RequestParam("datasetName") String datasetName,
+                                              @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription) {
+        logger.info("Edit request received for editing dataset with ID: " +  datasetId);
+        datasetService.putDataset(datasetId, datasetName, datasetDescription);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
      * Deletes a dataset from a specific project.
      *
      * @param projectID The ID of the project from which to delete the datasource.
@@ -58,23 +76,7 @@ public class DatasetController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /**
-     * Edits a dataset (name of the dataset and description) in a specific project.
-     *
-     * @param datasetId          The ID of the dataset to edit.
-     * @param datasetName        The new name for the dataset.
-     * @param datasetDescription The new description for the dataset (optional, default is an empty string).
-     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
-     */
-    @PutMapping("/project/{projectID}/dataset/{datasetID}")
-    public ResponseEntity<Boolean> putDataset(@PathVariable("datasetID") String datasetId,
-                                              @RequestParam("datasetName") String datasetName,
-                                              @RequestParam(value = "datasetDescription", required = false, defaultValue = "") String datasetDescription) {
-        logger.info("Edit request received for editing dataset with ID: " +  datasetId);
-        datasetService.editDataset(datasetId, datasetName, datasetDescription);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
+    // ---------------- Schema operations
     /**
      * Downloads the schema of a specific dataset as a Turtle (.ttl) file.
      *
@@ -102,6 +104,7 @@ public class DatasetController {
         return new ResponseEntity<>("Dataset schema set as project schema.", HttpStatus.OK);
     }
 
+    // ---------------- Getting data from source
     /**
      * Downloads file(s) from a given URL
      *
@@ -120,7 +123,7 @@ public class DatasetController {
      * @param url URL of the API to be requested.
      * @return If the task was successful return a ResponseEntity object containing the data from the API.
      */
-    @GetMapping(value = "/makeRequest", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/make-request", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
         logger.info("Make request to URL received: " + url);
         return datasetService.makeRequestFromURL(url);

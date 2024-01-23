@@ -22,6 +22,24 @@ public class IntegrationController {
     private  IntegrationService integrationService;
 
     /**
+     * STEP 0 OF THE INTEGRATION (OPTIONAL)
+     * Sends a request to compute the automatic alignments between two datasets
+     *
+     * @param projectID             The ID of the project. The integrated graph of the project will be one of the
+     *                              datasets used to compute the alignments.
+     * @param datasetToIntegrateID  The ID of the second dataset used to compute the alignments.
+     * @return A ResponseEntity containing the updated Project with integrated data or an error status.
+     */
+    @PostMapping(value = "/project/{projectID}/integration/compute-automatic-alignments/{datasetToIntegrateID}")
+    public ResponseEntity<List<Alignment>> computeAutomaticAlignments(@PathVariable("projectID") String projectID,
+                                                                      @PathVariable("datasetToIntegrateID") String datasetToIntegrateID) {
+        logger.info("Generating automatic alignments in project " + projectID);
+        List<Alignment> alignments = integrationService.getAlignments(projectID, datasetToIntegrateID);
+        return new ResponseEntity<>(alignments, HttpStatus.OK);
+    }
+
+    /**
+     * STEP 1 OF THE INTEGRATION
      * Handles the integration of datasets for a project. That is, for two datasets and a set of alignments, it
      * generates the integrated graph of the graphs of the datasets and a set of JoinAlignments.
      * THIS IS EXECUTED AFTER ALIGNMENTS ARE COMPUTED AND/OR INTRODUCED.
@@ -39,6 +57,7 @@ public class IntegrationController {
     }
 
     /**
+     * STEP 2 OF THE INTEGRATION (OPTIONAL)
      * Handles the integration of join alignments into the project's integrated graph.
      * THIS IS EXECUTED ONLY IF SOME JOINS NEED TO BE REVIEWED
      *
@@ -55,6 +74,7 @@ public class IntegrationController {
     }
 
     /**
+     * STEP 3 OF THE INTEGRATION
      * Accepts and persists the integration results for a specific project.
      * THIS IS EXECUTED ONCE THE USER CONFIRMS TO PERSIST THE INTEGRATION
      *
@@ -66,22 +86,6 @@ public class IntegrationController {
         logger.info("Persisting project integration");
         Project savedProject = integrationService.acceptIntegration(projectID);
         return new ResponseEntity<>(savedProject, HttpStatus.OK);
-    }
-
-    /**
-     * Sends a request to compute the automatic alignments between two datasets
-     *
-     * @param projectID             The ID of the project. The integrated graph of the project will be one of the
-     *                              datasets used to compute the alignments.
-     * @param datasetToIntegrateID  The ID of the second dataset used to compute the alignments.
-     * @return A ResponseEntity containing the updated Project with integrated data or an error status.
-     */
-    @PostMapping(value = "/project/{projectID}/integration/compute-automatic-alignments/{datasetToIntegrateID}")
-    public ResponseEntity<List<Alignment>> computeAutomaticAlignments(@PathVariable("projectID") String projectID,
-                                                                      @PathVariable("datasetToIntegrateID") String datasetToIntegrateID) {
-        logger.info("Generating automatic alignments in project " + projectID);
-        List<Alignment> alignments = integrationService.getAlignments(projectID, datasetToIntegrateID);
-        return new ResponseEntity<>(alignments, HttpStatus.OK);
     }
 
 }

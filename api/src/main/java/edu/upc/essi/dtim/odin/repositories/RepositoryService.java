@@ -5,11 +5,17 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
 import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
+import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +27,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class RepositoryService {
     private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private AppConfig appConfig;
 
     /**
      * Retrieves a repository by its unique identifier
@@ -129,8 +138,12 @@ public class RepositoryService {
 
         repository.setRepositoryName(repositoryData.get("repositoryName"));
         repository.setVirtual(Boolean.valueOf(repositoryData.get("isVirtual")));
-        projectService.addRepositoryToProject(projectId, repository);
-        saveRepository(repository); // Save the DataRepository
+
+        Project project = projectService.getProject(projectId);
+        project.getRepositories().add(repository);
+
+        projectService.saveProject(project);
+        saveRepository(repository);
     }
 
     /**
@@ -208,7 +221,32 @@ public class RepositoryService {
      * @param repositoryID  The ID of the repository to delete.
      */
     public void deleteRepositoryFromProject(String projectId, String repositoryID) {
-        projectService.deleteRepositoryFromProject(projectId, repositoryID);
+        Project project = projectService.getProject(projectId);
+        List<DataRepository> repositoriesOfProject = project.getRepositories();
+        boolean projectFound = false;
+        // Iterate through the data repositories
+        for (DataRepository repoInProject : repositoriesOfProject) {
+            if (repoInProject.getId().equals(repositoryID)) {
+                projectFound = true;
+                // Iterate through the datasets in the repository and delete the RDF file and from the Data Layer
+                for (Dataset dataset : repoInProject.getDatasets()) {
+                    // Delete rdf file (\jenaFiles)
+                    GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+                    graphStore.deleteGraph(dataset.getLocalGraph());
+                    // Remove from Data layer
+                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+                    dlInterface.deleteDatasetFromFormattedZone(dataset.getUUID());
+                }
+                repositoriesOfProject.remove(repoInProject);
+                break;
+            }
+        }
+        project.setRepositories(repositoriesOfProject); // Save and set the updated list of data repositories
+        // Throw an exception if the repository was not found
+        if (!projectFound) {
+            throw new NoSuchElementException("Repository not found with id: " + repositoryID);
+        }
+        projectService.saveProject(project); // Save the updated project without the repository
     }
 
     public void editDataset(String repositoryID, String repositoryName) {

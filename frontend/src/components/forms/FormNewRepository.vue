@@ -206,9 +206,9 @@ export default {
 import {ref, reactive, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
-import {useIntegrationStore} from 'src/stores/integration.store.js'
-import {useDataSourceStore} from "../../stores/datasources.store";
-import {useRepositoriesStore} from "stores/repositories.store.js";
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
+import {useDataSourceStore} from "../../stores/datasourcesStore";
+import {useRepositoriesStore} from "stores/repositoriesStore.js";
 
 import {odinApi} from "../../boot/axios";
 

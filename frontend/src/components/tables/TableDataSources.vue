@@ -1,10 +1,7 @@
 <template>
   <div class="q-pa-md">
-    <!-- style="min-height: 70vh;margin-top:15px" -->
-    <!-- @selection="validateSelection2" -->
-
     <div>
-      <!-- Tabla para nuevos datasets (no integrados) -->
+      <!-- Table for non-integrated datasets -->
       <h5>New Datasets</h5>
       <q-table :grid="gridEnable" ref="tableRef" :rows="storeDS.datasources.filter(dataset => !isDatasetIntegrated(dataset))" :columns="columns" :filter="search"
              :class="{ 'no-shadow': no_shadow }" row-key="id"
@@ -414,10 +411,10 @@
 
 <script setup>
 import {computed, onBeforeMount, onMounted, defineProps, ref} from "vue";
-import {useDataSourceStore} from 'src/stores/datasources.store.js';
-import {useIntegrationStore} from 'src/stores/integration.store.js';
-import {useRepositoriesStore} from 'src/stores/repositories.store.js';
-import {useProjectsStore} from 'src/stores/projects.store.js';
+import {useDataSourceStore} from 'src/stores/datasourcesStore.js';
+import {useIntegrationStore} from 'src/stores/integrationStore.js';
+import {useRepositoriesStore} from 'src/stores/repositoriesStore.js';
+import {useProjectsStore} from 'src/stores/projectsStore.js';
 import {useNotify} from 'src/use/useNotify.js';
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
 import {useRouter, useRoute} from "vue-router";

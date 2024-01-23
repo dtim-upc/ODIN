@@ -1,8 +1,8 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import api from "src/api/datasetsAPI";
-import integrationAPI from "src/api/integration.api.js";
-import {useAuthStore} from 'stores/auth.store.js'
+import integrationAPI from "src/api/integrationAPI.js";
+import {useAuthStore} from 'src/stores/authStore.js'
 import {useRoute} from "vue-router";
 import projectAPI from 'src/api/projectAPI';
 import download from 'downloadjs'
@@ -345,21 +345,7 @@ export const useIntegrationStore = defineStore('integration', {
       });
 
     },
-    async downloadSourceTemporal(dsID) {
-      console.log("download....", dsID)
-
-
-      const authStore = useAuthStore()
-      const notify = useNotify()
-      const response = await integrationAPI.downloadSourceGraph(this.project.projectId, dsID, authStore.user.accessToken);
-
-      const content = response.headers['content-type'];
-      download(response.data, "source_graph.ttl", content)
-
-    },
-
 
   }
-
 
 })

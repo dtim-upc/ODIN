@@ -31,12 +31,13 @@
     </q-dialog>
 
     <q-dialog v-model="persistData">
-      <q-card>
+      <q-card style="width: 300px; height: 230px;">
         <q-card-section>
           <q-form @submit="postDataProduct" class="text-right">
             <q-input v-model="dataProductName" label="Data product name" :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
+            <q-input v-model="dataProductDescription" label="Data product description"/>
 
-            <q-btn type="submit" color="primary" label="Persist" v-close-popup/>
+            <q-btn type="submit" color="primary" label="Persist" v-close-popup class="q-mt-md"/>
           </q-form>
         </q-card-section>
       </q-card>
@@ -50,7 +51,7 @@
 import {ref, onBeforeMount} from "vue";
 import TableQueryResult from "components/tables/TableQueryResult.vue";
 import Graph from 'components/graph/Graph.vue'
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
+import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
 import {useQueriesStore} from 'src/stores/queriesStore.js'
 import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
 import {useNotify} from 'src/use/useNotify.js'
@@ -64,6 +65,7 @@ const notify = useNotify();
 const persistData = ref(false);
 const dataProductColumns = ref([]);
 const dataProductName = ref("");
+const dataProductDescription = ref("");
 
 const dataProductUUID = ref('') 
 const graphical = ref('')
@@ -141,6 +143,7 @@ const postDataProduct = () => {
   const data = new FormData();
   data.append("dataProductUUID", dataProductUUID.value);
   data.append("dataProductName", dataProductName.value);
+  data.append("dataProductDescription", dataProductDescription.value);
   data.append("columns", dataProductColumns.value);
 
   dataProductsStore.postDataProduct(storeDS.project.projectId, data)

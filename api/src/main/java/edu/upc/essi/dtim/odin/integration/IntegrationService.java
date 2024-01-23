@@ -43,14 +43,56 @@ public class IntegrationService {
     private AppConfig appConfig;
 
     /**
-     * Retrieves the RDFS label of a resource IRI from the specified graph.
+     * STEP 0 OF THE INTEGRATION (OPTIONAL)
+     * Sends a request to compute the automatic alignments between two datasets
      *
-     * @param projectId Identification of the project whose integrated graph will be modified.
-     * @param iData     Object containing the necessary data to perform the integration.
-     * @return a IntegrationTemporalResponse, that is, the project and a list of JoinAlignments
+     * @param projectID             The ID of the project. The integrated graph of the project will be one of the
+     *                              datasets used to compute the alignments.
+     * @param datasetToIntegrateID  The ID of the second dataset used to compute the alignments.
+     * @return A List with the calculated alignments
      */
-    public IntegrationTemporalResponse integrate(String projectId, IntegrationData iData) {
-        Project project = projectService.getProject(projectId);
+    public List<Alignment> getAlignments(String projectID, String datasetToIntegrateID) {
+        Project project = projectService.getProject(projectID);
+        Dataset datasetA = datasetService.getDataset(project.getIntegratedDatasets().get(0).getId());
+        Dataset datasetB = datasetService.getDataset(datasetToIntegrateID);
+
+        //////////////////////////////////////////////////////////////////////////////////////////// TODO review
+        jdModuleInterface jdInterface = new jdModuleImpl();
+        List<Alignment> alignments = jdInterface.getAlignments(datasetA, datasetB);
+
+        List<Alignment> alignmentsWithFilter = new ArrayList<>();
+        float minSimilarity = 0.3F;
+        for (Alignment a : alignments) {
+            if (a.getSimilarity() >= minSimilarity) {
+                a.setLabelA(a.getAttributeA().getName());
+                a.setLabelB(a.getAttributeB().getName());
+                a.setL(a.getAttributeA().getName() + "_" + a.getAttributeB().getName());
+                a.setType("datatype");
+                a.setIdentifier(true);
+                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getId() + "/" + a.getAttributeA().getName());
+                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getId() + "/" + a.getAttributeB().getName());
+                alignmentsWithFilter.add(a);
+            }
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (alignments.isEmpty()) {
+            throw new EmptyFileException("No automatic alignments were found");
+        }
+        return alignmentsWithFilter;
+    }
+
+    /**
+     * STEP 1 OF THE INTEGRATION
+     * Handles the integration of datasets for a project. That is, for two datasets and a set of alignments, it
+     * generates the integrated graph of the graphs of the datasets and a set of JoinAlignments.
+     * THIS IS EXECUTED AFTER ALIGNMENTS ARE COMPUTED AND/OR INTRODUCED.
+     *
+     * @param projectID The ID of the project.
+     * @param iData     The IntegrationData containing datasets and alignments.
+     * @return A ResponseEntity containing the IntegrationTemporalResponse (i.e. the project and a set of joins).
+     */
+    public IntegrationTemporalResponse integrate(String projectID, IntegrationData iData) {
+        Project project = projectService.getProject(projectID);
 
         // Integrate the new data source onto the existing TEMPORAL integrated graph and overwrite it
         Graph integratedGraph = integrateData(project.getIntegratedGraph(), iData.getDsB(), iData.getAlignments());
@@ -205,10 +247,14 @@ public class IntegrationService {
         return null;
     }
 
-    //TODO: complete the description
     /**
+     * STEP 2 OF THE INTEGRATION (OPTIONAL)
+     * Handles the integration of join alignments into the project's integrated graph.
+     * THIS IS EXECUTED ONLY IF SOME JOINS NEED TO BE REVIEWED
      *
-     * @return T
+     * @param projectID      The ID of the project.
+     * @param joinAlignments The list of JoinAlignment objects representing the join alignments to integrate.
+     * @return A Project with the integrated joins.
      */
     public Project reviewJoins(String projectID, List<JoinAlignment> joinAlignments) {
         Project project = projectService.getProject(projectID);
@@ -245,10 +291,12 @@ public class IntegrationService {
     }
 
     /**
-     * Assign as the project's integrated graph, the temporal integrated graph, and reset the temporal integrated graph
+     * STEP 3 OF THE INTEGRATION
+     * Accepts and persists the integration results for a specific project.
+     * THIS IS EXECUTED ONCE THE USER CONFIRMS TO PERSIST THE INTEGRATION
      *
-     * @param projectID Identification of the project whose integrated graph will be updated
-     * @return The global graph resulting from the join operation.
+     * @param projectID The ID of the project for which integration results are accepted and persisted.
+     * @return A ResponseEntity containing the updated Project with integrated data or an error status.
      */
     public Project acceptIntegration(String projectID) {
         Project temporalProject = projectService.getProject(projectID);
@@ -283,35 +331,5 @@ public class IntegrationService {
         project.getIntegratedGraph().setGraphicalSchema(temporalIntegratedGraph.getGraphicalSchema());
 
         return project;
-    }
-
-    public List<Alignment> getAlignments(String projectId, String datasetId) {
-        Project project = projectService.getProject(projectId);
-        Dataset datasetA = datasetService.getDatasetById(project.getIntegratedDatasets().get(0).getId());
-        Dataset datasetB = datasetService.getDatasetById(datasetId);
-
-        ////////////////////////////////////// TODO review
-        jdModuleInterface jdInterface = new jdModuleImpl();
-        List<Alignment> alignments = jdInterface.getAlignments(datasetA, datasetB);
-
-        List<Alignment> alignmentsWithFilter = new ArrayList<>();
-        float minSimilarity = 0.3F;
-        for (Alignment a : alignments) {
-            if (a.getSimilarity() >= minSimilarity) {
-                a.setLabelA(a.getAttributeA().getName());
-                a.setLabelB(a.getAttributeB().getName());
-                a.setL(a.getAttributeA().getName() + "_" + a.getAttributeB().getName());
-                a.setType("datatype");
-                a.setIdentifier(true);
-                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getId() + "/" + a.getAttributeA().getName());
-                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getId() + "/" + a.getAttributeB().getName());
-                alignmentsWithFilter.add(a);
-            }
-        }
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (alignments.isEmpty()) {
-            throw new EmptyFileException("No automatic alignments were found");
-        }
-        return alignmentsWithFilter;
     }
 }

@@ -31,10 +31,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
 
     public GraphStoreJenaImpl(@Autowired AppConfig appConfig) {
         this.directory = appConfig.getJenaPath();
-        boolean created = new File(directory).mkdirs(); // Create the directory to store the graphs (if it is necessary)
-        if (!created) {
-            throw new CustomIOException("Folder could not be created in " + this.directory);
-        }
+        new File(directory).mkdirs(); // Create the directory to store the graphs (if it is necessary)
     }
 
     /**

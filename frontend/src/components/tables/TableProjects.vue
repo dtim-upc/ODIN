@@ -83,7 +83,7 @@
 <script setup>
 import {computed, ref, onMounted} from 'vue'
 import {useQuasar} from "quasar";
-import {useProjectsStore} from 'stores/projects.store.js'
+import {useProjectsStore} from 'stores/projectsStore.js'
 import AddFolderForm from 'components/forms/AddFolderForm.vue';
 import Folder from 'components/ui/Folder.vue'
 import AddFolder from 'components/ui/AddFolder.vue'

@@ -80,10 +80,10 @@ import {ref, onMounted} from '@vue/runtime-core'
 import TableAligments from 'components/tables/TableAligments.vue';
 import TableJoinAlignments from 'components/tables/TableJoinAlignments.vue';
 import Graph from 'components/graph/Graph.vue'
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
-import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import {useRouter} from "vue-router";
-import {useRepositoriesStore} from "src/stores/repositories.store.js";
+import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
 
 
 

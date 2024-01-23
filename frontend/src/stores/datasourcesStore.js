@@ -2,10 +2,10 @@ import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 // import {odinApi} from "boot/axios";
 import api from "src/api/datasetsAPI.js";
-import {useAuthStore} from 'stores/auth.store.js'
+import {useAuthStore} from 'src/stores/authStore.js'
 import {useRoute, useRouter} from "vue-router";
 import projectAPI from 'src/api/projectAPI';
-import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import download from 'downloadjs'
 // const notify = useNotify()
 
@@ -76,29 +76,6 @@ export const useDataSourceStore = defineStore('datasource', {
         this.getDatasources(proj.id)
       }
       return this.project;
-    },
-    async getTriples(project, dsID) {
-      // TODO: change pinias to setup structure, route is only supported one time in this structure. Changing will make things easier
-      //https://stackoverflow.com/questions/71249575/i-cant-access-my-routes-from-the-store-pinia-vuejs3
-
-      const authStore = useAuthStore()
-
-      // console.log("***")
-      // console.log("dfs", route.params.id)
-      // console.log("gettriples", route.params.id)
-      let response = await api.getTriples(project.projectId, dsID, authStore.user.accessToken)
-      return response.data
-      // .then((response => {
-
-      //   console.log("response",response)
-      //   if(response.status == 200){
-      //     return response.data
-      //   }
-      //   return []
-
-      // }))
-
-
     },
 
     async updateProjectInfo() {
@@ -172,8 +149,6 @@ export const useDataSourceStore = defineStore('datasource', {
 
     finishPreview() {
       this.updateProjectInfo()
-
-      console.log("LLEGAMOS AL MENOS 1 ROUTER+++++++++++++++++++++++++++++")
       // we use go since the user can come from home or table sources pages
       this.router.go(-1)
     },

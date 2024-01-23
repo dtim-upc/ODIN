@@ -47,8 +47,8 @@
 import {ref, reactive, onMounted} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
-import {useDataSourceStore} from "stores/datasources.store";
-import {useRepositoriesStore} from "stores/repositories.store.js";
+import {useDataSourceStore} from "stores/datasourcesStore";
+import {useRepositoriesStore} from "stores/repositoriesStore.js";
 
 // -------------------------------------------------------------
 //                         PROPS & EMITS

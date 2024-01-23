@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import {Dark} from 'quasar'
-import {useProjectsStore} from 'stores/projects.store.js'
+import {useProjectsStore} from 'src/stores/projectsStore.js'
 import api from "src/api/authAPI.js";
 import {LocalStorage, SessionStorage} from 'quasar'
 
@@ -141,7 +141,7 @@ export const useAuthStore = defineStore('auth', {
 
 // import { defineStore } from 'pinia'
 // import {useNotify} from 'src/use/useNotify.js'
-// import { useProjectsStore } from 'stores/projects.store.js'
+// import { useProjectsStore } from 'stores/projectsStore.js'
 // import api from "src/api/auth.api.js";
 
 // let notify;

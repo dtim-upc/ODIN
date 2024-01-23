@@ -1,8 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface DataLayerInterface {
@@ -14,11 +12,18 @@ public interface DataLayerInterface {
     void uploadToDataLayer(Dataset dataset);
 
     /**
-     * Removes a dataset from the data layer
+     * Removes a dataset from the data layer (formatted zone)
      *
      * @param UUID The identifier of the dataset to be removed
      */
-    void deleteDataset(String UUID);
+    void deleteDatasetFromFormattedZone(String UUID);
+
+    /**
+     * Removes a dataset from the data layer (formatted zone)
+     *
+     * @param UUID The identifier of the dataset to be removed
+     */
+    void deleteDatasetFromExploitationZone(String UUID);
 
     /**
      * Stores a file in the data layer. This storage will be temporary and will eventually be deleted, which is required

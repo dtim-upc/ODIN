@@ -1,7 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.CustomIOException;
@@ -31,12 +30,22 @@ public class DataLayerImpl implements DataLayerInterface {
     }
 
     @Override
-    public void deleteDataset(String UUID) {
+    public void deleteDatasetFromFormattedZone(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         try {
             dl.removeFromFormattedZone(UUID);
         } catch (Exception e) {
-            throw new InternalServerErrorException("Error when deleting the dataset from the data layer", e.getMessage());
+            throw new InternalServerErrorException("Error when deleting the dataset from the data layer (formatted zone)", e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteDatasetFromExploitationZone(String UUID) {
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        try {
+            dl.removeFromExploitationZone(UUID);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error when deleting the dataset from the data layer (exploitation zone)", e.getMessage());
         }
     }
 

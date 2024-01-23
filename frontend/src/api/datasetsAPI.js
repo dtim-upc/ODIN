@@ -19,9 +19,4 @@ export default {
   setDatasetSchemaAsProjectSchema(projectID, datasetID) {
     return odinApi.post('/project/' + projectID + '/dataset/' + datasetID + '/set-project-schema')
   },
-
-  
-  getTriples(projectID, datasourceID, token) {
-    return odinApi.get('/project/' + projectID + '/datasources/triples/' + datasourceID, {headers: {Authorization: `Bearer ${token}`}})
-  },
 }

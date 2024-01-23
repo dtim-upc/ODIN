@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import {useAuthStore} from 'stores/auth.store.js'
+import {useAuthStore} from 'stores/authStore.js'
 
 
 // const notify = useNotify()

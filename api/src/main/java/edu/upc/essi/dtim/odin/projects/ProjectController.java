@@ -3,7 +3,7 @@ package edu.upc.essi.dtim.odin.projects;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,21 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
+    // ---------------- CRUD Operations
+
+    /**
+     * Retrieves a project by its ID.
+     *
+     * @param projectID The ID of the project to retrieve.
+     * @return A ResponseEntity containing the retrieved project and HTTP status 200 (OK).
+     */
+    @GetMapping("/project/{projectID}")
+    public ResponseEntity<Project> getProject(@PathVariable("projectID") String projectID) {
+        logger.info("Get request received for retrieving project with ID: " + projectID);
+        Project project = projectService.getProject(projectID);
+        return new ResponseEntity<>(project, HttpStatus.OK);
+    }
+
     /**
      * Creates a new project
      *
@@ -35,17 +50,46 @@ public class ProjectController {
     }
 
     /**
-     * Retrieves a project by its ID.
+     * Retrieves all projects of the system.
      *
-     * @param projectID The ID of the project to retrieve.
-     * @return A ResponseEntity containing the retrieved project and HTTP status 200 (OK).
+     * @return A ResponseEntity containing a list of all projects and an OK HTTP code.
      */
-    @GetMapping("/project/{projectID}")
-    public ResponseEntity<Project> getProject(@PathVariable("projectID") String projectID) {
-        logger.info("Get request received for retrieving project with ID: " + projectID);
-        Project project = projectService.getProject(projectID);
-        return new ResponseEntity<>(project, HttpStatus.OK);
+    @GetMapping("/projects")
+    public ResponseEntity<List<Project>> getAllProjects() {
+        logger.info("GET request received for retrieving all projects");
+        List<Project> projects = projectService.getAllProjects();
+        return new ResponseEntity<>(projects, HttpStatus.OK);
     }
+
+    /**
+     * Edits a project.
+     *
+     * @param project The project to edit.
+     * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was edited,
+     * or HTTP status 404 (Not Found) if the project was not found.
+     */
+    @PutMapping("/project/{projectID}")
+    public ResponseEntity<Boolean> putProject(@RequestBody Project project) {
+        logger.info("EDIT request received for editing project with ID: " + project.getProjectId());
+        projectService.putProject(project);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Deletes a project by its ID.
+     *
+     * @param projectID The ID of the project to delete.
+     * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was deleted,
+     * or HTTP status 404 (Not Found) if the project was not found.
+     */
+    @DeleteMapping("/project/{projectID}")
+    public ResponseEntity<Boolean> deleteProject(@PathVariable("projectID") String projectID) {
+        logger.info("DELETE request received for deleting project with ID: {}", projectID);
+        projectService.deleteProject(projectID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // ---------------- Operations to get data from the project's attributes
 
     /**
      * Get the repositories associated with a specific project.
@@ -74,44 +118,32 @@ public class ProjectController {
     }
 
     /**
-     * Retrieves all projects of the system.
+     * Retrieves all data products from a specific project.
      *
-     * @return A ResponseEntity containing a list of all projects and an OK HTTP code.
+     * @param projectID The ID of the project to retrieve data products from.
+     * @return A ResponseEntity object containing the list of data products or an error message.
      */
-    @GetMapping("/projects")
-    public ResponseEntity<List<Project>> getAllProjects() {
-        logger.info("GET request received for retrieving all projects");
-        List<Project> projects = projectService.getAllProjects();
-        return new ResponseEntity<>(projects, HttpStatus.OK);
+    @GetMapping("/project/{projectID}/data-products")
+    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all dataProducts from project " + projectID);
+        List<DataProduct> dataProducts = projectService.getDataProductsOfProject(projectID);
+        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
     }
 
     /**
-     * Deletes a project by its ID.
+     * Retrieves all intents from a specific project.
      *
-     * @param projectID The ID of the project to delete.
-     * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was deleted,
-     * or HTTP status 404 (Not Found) if the project was not found.
+     * @param projectID The ID of the project to retrieve intents from.
+     * @return A ResponseEntity object containing the list of intents or an error message.
      */
-    @DeleteMapping("/project/{projectID}")
-    public ResponseEntity<Boolean> deleteProject(@PathVariable("projectID") String projectID) {
-        logger.info("DELETE request received for deleting project with ID: {}", projectID);
-        projectService.deleteProject(projectID);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping("/project/{projectID}/intents")
+    public ResponseEntity<Object> getIntentsOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all intents from project " + projectID);
+        List<Intent> intents = projectService.getIntentsOfProject(projectID);
+        return new ResponseEntity<>(intents, HttpStatus.OK);
     }
 
-    /**
-     * Edits a project.
-     *
-     * @param project The project to edit.
-     * @return A ResponseEntity with HTTP status 200 (OK) and the boolean value true if the project was edited,
-     * or HTTP status 404 (Not Found) if the project was not found.
-     */
-    @PutMapping("/project/{projectID}")
-    public ResponseEntity<Boolean> putProject(@RequestBody Project project) {
-        logger.info("EDIT request received for editing project with ID: " + project.getProjectId());
-        projectService.putProject(project);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    // ---------------- Other operations
 
     /**
      * Clones a project by its ID.
@@ -137,14 +169,6 @@ public class ProjectController {
     public ResponseEntity<InputStreamResource> downloadProjectSchema(@PathVariable("projectID") String projectID) {
         logger.info("Downloading project schema for project: " +  projectID);
         return projectService.downloadProjectSchema(projectID);
-    }
-
-    //TODO: description
-    @GetMapping("/project/{projectID}/data-products")
-    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
-        logger.info("Getting all dataProducts from project " + projectID);
-        List<DataProduct> dataProducts = projectService.getDataProductsOfProject(projectID);
-        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
     }
 
 }

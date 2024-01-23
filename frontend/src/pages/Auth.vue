@@ -175,7 +175,7 @@
 import {ref, reactive, onMounted} from "vue";
 // import api from "src/api/dataSourcesAPI.js";
 // import {useNotify} from 'src/use/useNotify.js'
-import {useAuthStore} from 'stores/auth.store.js'
+import {useAuthStore} from 'stores/authStore.js'
 
 // import Particles from "vue3-particles";
 import {loadFull} from "tsparticles";

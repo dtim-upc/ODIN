@@ -9,31 +9,14 @@ import java.util.List;
  * A POJO (Plain Old Java Object) class representing integration data.
  */
 public class IntegrationData {
-
-    /**
-     * The first dataset (dsA) to be integrated.
-     */
-    private Dataset dsA;
-
-    /**
-     * The second dataset (dsB) to be integrated.
-     */
-    private Dataset dsB;
-
-    /**
-     * The name of the integrated dataset.
-     */
-    private String integratedName;
-
-    /**
-     * A list of alignments between the datasets.
-     */
+    private Dataset dsA; // The first dataset to be integrated
+    private Dataset dsB; // The second dataset to be integrated.
+    private String integratedName; // Name of the integrated data
     private List<Alignment> alignments;
 
     public Dataset getDsA() {
         return dsA;
     }
-
     public void setDsA(Dataset dsA) {
         this.dsA = dsA;
     }
@@ -41,7 +24,6 @@ public class IntegrationData {
     public Dataset getDsB() {
         return dsB;
     }
-
     public void setDsB(Dataset dsB) {
         this.dsB = dsB;
     }
@@ -49,7 +31,6 @@ public class IntegrationData {
     public String getIntegratedName() {
         return integratedName;
     }
-
     public void setIntegratedName(String integratedName) {
         this.integratedName = integratedName;
     }
@@ -57,7 +38,6 @@ public class IntegrationData {
     public List<Alignment> getAlignments() {
         return alignments;
     }
-
     public void setAlignments(List<Alignment> alignments) {
         this.alignments = alignments;
     }

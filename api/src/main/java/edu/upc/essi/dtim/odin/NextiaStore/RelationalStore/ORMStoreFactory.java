@@ -11,13 +11,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ORMStoreFactory {
-
     private static final Logger logger = LoggerFactory.getLogger(ORMStoreFactory.class);
     private static ORMStoreInterface ormStoreInterfaceInstance = null;
 
-    /**
-     * Private constructor prevents instantiation from outside the class.
-     */
     private ORMStoreFactory() {
         // Private constructor to prevent instantiation from outside the class
     }

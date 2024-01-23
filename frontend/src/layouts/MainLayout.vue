@@ -239,7 +239,7 @@
                   <q-btn flat
                          no-caps
                          padding="xs"
-                         icon="mdi-selection-search"
+                         icon="mdi-chat-question"
                          :to="{name:'query'}"
                          :color="$route.name === 'query' ? 'primary600': 'neutral500' "
                          :class="{ activebg: $route.name === 'query' }">
@@ -260,7 +260,7 @@
                 <q-item-section v-else>
                   <q-btn flat
                          no-caps
-                         icon="mdi-selection-search"
+                         icon="mdi-chat-question"
                          :to="{name:'query'}"
                          :color="$route.name === 'query' ? 'primary600': 'neutral500' "
                          :class="{ activebg: $route.name === 'query' }">
@@ -281,13 +281,13 @@
                   <q-btn flat
                          no-caps
                          padding="xs"
-                         icon="mdi-thought-bubble"
-                         :to="{name:'intents'}"
-                         :color="$route.name === 'intents' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'intents' }">
+                         icon="mdi-selection-search"
+                         :to="{name:'data-products'}"
+                         :color="$route.name === 'data-products' ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'data-products' }">
                     <q-item-section>
                       <div class="icon-label-wrapper">
-                        <span class="label-style">Intents</span>
+                        <span class="label-style">Data products</span>
                       </div>
                     </q-item-section>
                     <q-tooltip anchor="center right"
@@ -295,24 +295,24 @@
                                :offset="[10, 10]"
                                transition-show="fade"
                                transition-hide="fade">
-                      Intents
+                      Data products
                     </q-tooltip>
                   </q-btn>
                 </q-item-section>
                 <q-item-section v-else>
                   <q-btn flat
                          no-caps
-                         icon="mdi-thought-bubble"
-                         :to="{name:'abstract-planner'}"
-                         :color="$route.name === 'intents' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'intents' }">
+                         icon="mdi-selection-search"
+                         :to="{name:'data-products'}"
+                         :color="$route.name === 'data-products' ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'data-products' }">
                     <q-item-section>
                       <div class="icon-label-wrapper">
-                        <span class="label-style">Intents</span>
+                        <span class="label-style">Data products</span>
                       </div>
                     </q-item-section>
                     <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Intents
+                      Data products
                     </q-tooltip>
                   </q-btn>
                 </q-item-section>
@@ -323,13 +323,13 @@
                   <q-btn flat
                          no-caps
                          padding="xs"
-                         icon="mdi-sitemap"
-                         :to="{name:'workflows'}"
-                         :color="$route.name === 'workflows' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'workflows' }">
+                         icon="mdi-thought-bubble"
+                         :to="{name:'intents-list'}"
+                         :color=" ['intents-list', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows'].includes($route.name) ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'intents-list' }">
                     <q-item-section>
                       <div class="icon-label-wrapper">
-                        <span class="label-style">Queries</span>
+                        <span class="label-style">Intents</span>
                       </div>
                     </q-item-section>
                     <q-tooltip anchor="center right"
@@ -337,24 +337,24 @@
                                :offset="[10, 10]"
                                transition-show="fade"
                                transition-hide="fade">
-                      Queries
+                      Intents
                     </q-tooltip>
                   </q-btn>
                 </q-item-section>
                 <q-item-section v-else>
                   <q-btn flat
                          no-caps
-                         icon="mdi-sitemap"
-                         :to="{name:'queries'}"
-                         :color="$route.name === 'queries' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'queries' }">
+                         icon="mdi-thought-bubble"
+                         :to="{name:'intents-list'}"
+                         :color=" ['intents-list', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows'].includes($route.name) ? 'primary600': 'neutral500' "
+                         :class="{ activebg: $route.name === 'intents-list' }">
                     <q-item-section>
                       <div class="icon-label-wrapper">
-                        <span class="label-style">Queries</span>
+                        <span class="label-style">Intents</span>
                       </div>
                     </q-item-section>
                     <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Queries
+                      Intents
                     </q-tooltip>
                   </q-btn>
                 </q-item-section>
@@ -415,7 +415,7 @@
 <script setup>
 import {ref} from "vue";
 import ODIN_short from "components/icons/ODIN_short.vue";
-import {useAuthStore} from 'stores/auth.store.js'
+import {useAuthStore} from 'stores/authStore.js'
 // import {outlinedHub as hubi}  from "@quasar/extras/material-icons-outlined"
 const miniState = ref(false)
 const authStore = useAuthStore()

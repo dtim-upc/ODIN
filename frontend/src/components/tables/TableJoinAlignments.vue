@@ -114,7 +114,7 @@
 import {computed, ref, onMounted} from 'vue'
 import {useQuasar} from "quasar";
 import ManualAlignmentsForm from 'components/forms/ManualAlignmentsForm.vue';
-import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
 // import alerts from "components/hooks/alerts"
 // -------------------------------------------------------------
 //                         PROPS & EMITS

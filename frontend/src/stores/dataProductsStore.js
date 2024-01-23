@@ -57,7 +57,46 @@ export const useDataProductsStore= defineStore('dataProducts', {
           console.log("error query graph", err)
         })
       
-      }
+      },
+
+      putDataProduct(dataProductID, projectID, data) {
+        const notify = useNotify();
+  
+        dataProductAPI.putDataProduct(projectID, dataProductID, data)
+          .then((response) => {
+            if (response.status === 200) {
+              notify.positive(`Data product successfully edited`);
+              this.getDataProducts(projectID)
+            } else {
+              notify.negative("Cannot edit data. Something went wrong on the server.");
+            }
+          })
+          .catch((error) => {
+            console.log("Error is: " + error);
+            if (error.response) {
+              notify.negative("Something went wrong on the server while editing the data.");
+            }
+          });
+      },
+
+      deleteDataProduct(projectID, dataProductID) {
+        const notify = useNotify();
+        console.log("Deleting data product with ID ", dataProductID)
+
+        dataProductAPI.deleteDataProduct(projectID, dataProductID).then((response) => {
+            if (response.status === 200) {
+              notify.positive(`Data product deleted successfully`)
+              this.getDataProducts(projectID)
+            } else {
+              notify.negative("Data product could not be deleted.")
+            }
+        }).catch((error) => {
+            console.log("error is: " + error)
+            if (error.response) {
+                notify.negative("Something went wrong in the server when deleting a data product.")
+            }
+        });
+    }
 
   }
 })

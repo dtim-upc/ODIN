@@ -5,7 +5,7 @@ import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ProjectService {
@@ -36,8 +34,10 @@ public class ProjectService {
     @Autowired
     private  AppConfig appConfig;
 
+    // ---------------- CRUD/ORM operations
+
     /**
-     * Saves a project.
+     * Saves a project into the ORM. (Also serves as post operation)
      *
      * @param project The project to save.
      * @return The saved project.
@@ -117,79 +117,9 @@ public class ProjectService {
      * @return A list of all projects.
      */
     public List<Project> getAllProjects() {
+        // We do not need all the data that is gathered in the getProject function, as we only want to show the name
+        // of the project. Once a user selects a project, then all the information about graphs and so is gathered
         return ormProject.getAll(Project.class);
-    }
-
-    /**
-     * Deletes a project by its ID.
-     *
-     * @param id The ID of the project to delete.
-     */
-    public void deleteProject(String id) {
-        Project p = ormProject.findById(Project.class, id);
-        for (DataRepository dr: p.getRepositories()) {
-            for (Dataset d: dr.getDatasets()) {
-                // Delete all datasets from the data layer first.
-                deleteDatasetFromProject(id, d.getId());
-                // It is not necessary to delete the repositories manually, as they are removed when the project is deleted
-            }
-        }
-        ormProject.deleteOne(Project.class, id);
-    }
-
-    /**
-     * Deletes a dataset from the specified project.
-     *
-     * @param projectId The ID of the project to delete the dataset from.
-     * @param datasetId The ID of the dataset to delete.
-     */
-    public void deleteDatasetFromProject(String projectId, String datasetId) {
-        Project project = getProject(projectId);
-        List<DataRepository> repositoriesOfProject = project.getRepositories();
-        boolean datasetFound = false;
-
-        // Iterate through the data repositories
-        for (DataRepository repoInProject : repositoriesOfProject) {
-            // Iterate through the datasets in each data repository
-            Iterator<Dataset> datasetIterator = repoInProject.getDatasets().iterator();
-            while (datasetIterator.hasNext()) {
-                Dataset dataset = datasetIterator.next();
-                if (datasetId.equals(dataset.getId())) {
-                    datasetFound = true;
-                    // Remove the dataset from the data repository
-                    datasetIterator.remove();
-                    project.setRepositories(repositoriesOfProject); // Save and set the updated list of data repositories
-                    // Delete rdf file (\jenaFiles)
-                    GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
-                    graphStore.deleteGraph(dataset.getLocalGraph());
-                    // Remove from Data layer
-                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-                    dlInterface.deleteDataset(dataset.getUUID());
-                    break;
-                }
-            }
-        }
-        // Throw an exception if the dataset was not found
-        if (!datasetFound) {
-            throw new NoSuchElementException("Dataset not found with id: " + datasetId);
-        }
-        saveProject(project); // Save the updated project without the dataset
-    }
-
-    /**
-     * Retrieves the datasets associated with a project.
-     *
-     * @param projectID The ID of the project.
-     * @return A list of datasets belonging to the project.
-     */
-    public List<Dataset> getDatasetsOfProject(String projectID) {
-        Project project = getProject(projectID);
-        List<Dataset> datasets = new ArrayList<>();
-        // Iterate through the repositories in the project and collect their datasets
-        for (DataRepository repository : project.getRepositories()) {
-            datasets.addAll(repository.getDatasets());
-        }
-        return datasets;
     }
 
     /**
@@ -208,8 +138,107 @@ public class ProjectService {
         saveProject(originalProject); // Perform the database update operation to save the changes
     }
 
-    // TODO: Remake this
     /**
+     * Deletes a project by its ID.
+     *
+     * @param id The ID of the project to delete.
+     */
+    public void deleteProject(String id) {
+        Project p = ormProject.findById(Project.class, id);
+        for (DataRepository dr: p.getRepositories()) {
+            for (Dataset d: dr.getDatasets()) {
+                // Delete rdf file (\jenaFiles)
+                GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+                graphStore.deleteGraph(d.getLocalGraph());
+                // Remove from Data layer
+                DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
+                dlInterface.deleteDatasetFromFormattedZone(d.getUUID());
+                // Both the dataset and the repository in the ORM store are deleted when the project is deleted,
+                // so no need to do that manually
+            }
+        }
+        ormProject.deleteOne(Project.class, id);
+    }
+
+    // ---------------- Operations to get entities of a project
+
+    /**
+     * Retrieves the datasets associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of datasets belonging to the project.
+     */
+    public List<Dataset> getDatasetsOfProject(String projectID) {
+        Project project = getProject(projectID);
+        List<Dataset> datasets = new ArrayList<>();
+        // Iterate through the repositories in the project and collect their datasets
+        for (DataRepository repository : project.getRepositories()) {
+            datasets.addAll(repository.getDatasets());
+        }
+        return datasets;
+    }
+
+    /**
+     * Retrieves the list of data repositories associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of DataRepository objects belonging to the project.
+     */
+    public List<DataRepository> getRepositoriesOfProject(String projectID) {
+        Project project = getProject(projectID);
+        return project.getRepositories();
+    }
+
+    /**
+     * Retrieves the list of data products associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of DataProduct objects belonging to the project.
+     */
+    public List<DataProduct> getDataProductsOfProject(String projectID) {
+        Project project = getProject(projectID);
+        return project.getDataProducts();
+    }
+
+    /**
+     * Retrieves the list of intents associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of Intent objects belonging to the project.
+     */
+    public List<Intent> getIntentsOfProject(String projectID) {
+        Project project = getProject(projectID);
+        return project.getIntents();
+    }
+
+    // ---------------- Other operations
+
+    /**
+     * Downloads the project schema in Turtle (TTL) format.
+     *
+     * @param projectID The ID of the project for which the schema will be downloaded.
+     * @return A ResponseEntity containing the input stream resource and necessary headers for the download.
+     */
+    public ResponseEntity<InputStreamResource> downloadProjectSchema(String projectID) {
+        Project project = getProject(projectID);
+
+        Model model = project.getIntegratedGraph().getGraph();
+        StringWriter writer = new StringWriter();
+        model.write(writer, "TTL");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName() + ".ttl");
+
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle"))
+                .body(resource);
+    }
+
+     // TODO: Remake this
+     /**
      * Clones a project, creating a new project with the same structure and data as the original project.
      *
      * @param originalProjectID Identification of the project to be cloned.
@@ -268,92 +297,5 @@ public class ProjectService {
 
         // Save the cloned project and return it
         return saveProject(projectToClone);
-    }
-
-    /**
-     * Adds a data repository to a project.
-     *
-     * @param projectId    The ID of the project to which the repository should be added.
-     * @param repository   Repository to be added
-     */
-    public void addRepositoryToProject(String projectId, DataRepository repository) {
-        Project project = getProject(projectId);
-        project.getRepositories().add(repository);
-        saveProject(project);
-    }
-
-    /**
-     * Retrieves the list of data repositories associated with a project.
-     *
-     * @param id The ID of the project.
-     * @return A list of DataRepository objects belonging to the project.
-     */
-    public List<DataRepository> getRepositoriesOfProject(String id) {
-        Project project = getProject(id);
-        return project.getRepositories();
-    }
-
-    /**
-     * Downloads the project schema in Turtle (TTL) format.
-     *
-     * @param projectID The ID of the project for which the schema will be downloaded.
-     * @return A ResponseEntity containing the input stream resource and necessary headers for the download.
-     */
-    public ResponseEntity<InputStreamResource> downloadProjectSchema(String projectID) {
-        Project project = getProject(projectID);
-
-        Model model = project.getIntegratedGraph().getGraph();
-        StringWriter writer = new StringWriter();
-        model.write(writer, "TTL");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName() + ".ttl");
-
-        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("text/turtle"))
-                .body(resource);
-    }
-
-    /**
-     * Deletes a repository from the specified project, and its associated datasets.
-     *
-     * @param projectId     The ID of the project to delete the repository from.
-     * @param repositoryID  The ID of the repository to delete.
-     */
-    public void deleteRepositoryFromProject(String projectId, String repositoryID) {
-        Project project = getProject(projectId);
-        List<DataRepository> repositoriesOfProject = project.getRepositories();
-        boolean projectFound = false;
-        // Iterate through the data repositories
-        for (DataRepository repoInProject : repositoriesOfProject) {
-            if (repoInProject.getId().equals(repositoryID)) {
-                projectFound = true;
-                // Iterate through the datasets in the repository and delete the RDF file and from the Data Layer
-                for (Dataset dataset : repoInProject.getDatasets()) {
-                    // Delete rdf file (\jenaFiles)
-                    GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
-                    graphStore.deleteGraph(dataset.getLocalGraph());
-                    // Remove from Data layer
-                    DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
-                    dlInterface.deleteDataset(dataset.getUUID());
-                }
-                repositoriesOfProject.remove(repoInProject);
-                break;
-            }
-        }
-        project.setRepositories(repositoriesOfProject); // Save and set the updated list of data repositories
-        // Throw an exception if the repository was not found
-        if (!projectFound) {
-            throw new NoSuchElementException("Project not found with id: " + repositoryID);
-        }
-        saveProject(project); // Save the updated project without the repository
-    }
-
-    public List<DataProduct> getDataProductsOfProject(String projectID) {
-        Project project = getProject(projectID);
-        return project.getDataProducts();
     }
 }

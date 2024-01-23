@@ -197,6 +197,15 @@ public class DLDuckDB extends DataLayer {
         }
     }
 
+    @Override
+    public void removeFromExploitationZone(String tableName) {
+        try {
+            stmt.execute("DROP TABLE exp_" + tableName);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // TODO: extend this to different formats and zones
     @Override
     public String materialize(Dataset dataset, String zone, String format) {

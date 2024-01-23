@@ -190,9 +190,9 @@
 import {ref, reactive, onMounted, watch, computed, onBeforeMount} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
-import {useIntegrationStore} from 'src/stores/integration.store.js'
-import {useDataSourceStore} from "../../stores/datasources.store";
-import {useRepositoriesStore} from "src/stores/repositories.store.js";
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
+import {useDataSourceStore} from "../../stores/datasourcesStore";
+import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
 import {odinApi} from "../../boot/axios";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
@@ -249,7 +249,7 @@ async function makeRequest() {
     notify.positive("REQUEST MADE: " + repositorio_encontrado.url + endpoint);
 
     try {
-      const response = await odinApi.get(`/makeRequest?url=${encodeURIComponent(repositorio_encontrado.url + endpoint)}`, {
+      const response = await odinApi.get(`/make-request?url=${encodeURIComponent(repositorio_encontrado.url + endpoint)}`, {
         responseType: 'arraybuffer',
       });
 

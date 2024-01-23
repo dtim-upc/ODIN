@@ -5,6 +5,7 @@ import intentsAPI from "src/api/intentsAPI.js";
 export const useIntentsStore = defineStore('intents', {
 
   state: () => ({
+    intents: [],
     intentID: "",
     queryUri: "",
     problems: [],
@@ -38,6 +39,60 @@ export const useIntentsStore = defineStore('intents', {
           notify.negative("Something went wrong when creating an intent.")
         }
       });
+    },
+
+    deleteIntent(projectID, intentID) {
+      const notify = useNotify();
+      console.log("Deleting intent with ID ", intentID)
+
+      intentsAPI.deleteIntent(projectID, intentID).then((response) => {
+          if (response.status === 200) {
+            notify.positive(`Intent deleted successfully`)
+            this.getAllIntents(projectID) // Refresh the list of intents
+          } else {
+            notify.negative("Intent could not be deleted.")
+          }
+      }).catch((error) => {
+          console.log("error is: " + error)
+          if (error.response) {
+              notify.negative("Something went wrong in the server when deleting an intent.")
+          }
+      });
+    },
+
+    putIntent(intentID, projectID, data) {
+      const notify = useNotify();
+
+      intentsAPI.putIntent(intentID, projectID, data)
+        .then((response) => {
+          if (response.status === 200) {
+            notify.positive(`Intent successfully edited`);
+            successCallback()
+          } else {
+            notify.negative("Cannot edit data. Something went wrong on the server.");
+          }
+        })
+        .catch((error) => {
+          console.log("Error is: " + error);
+          if (error.response) {
+            notify.negative("Something went wrong on the server while editing the data.");
+          }
+        });
+    },
+
+    async getAllIntents(projectID) {
+      intentsAPI.getAllIntents(projectID).then(response => {
+          console.log("Intents received")
+          if (response.data === "") {
+            this.intents = []
+          } else {
+            this.intents = response.data
+          }
+
+        }).catch(err => {
+        console.log("error retrieving intents")
+        console.log(err)
+      })
     },
 
     async annotateDataset(data) {
@@ -84,6 +139,7 @@ export const useIntentsStore = defineStore('intents', {
       await intentsAPI.setAbstractPlans(data).then((response) => {
         if (response.status === 200) {
           notify.positive(`Abstract plans created`)
+          this.abstractPlans = [] // Reset the list of abstract plans to avoid duplicates
           // Formatting the plans to be displayed in the UI
           for (let plan in response.data) {
             const newObject = {

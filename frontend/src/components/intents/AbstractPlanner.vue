@@ -1,6 +1,6 @@
 <template>
-    <q-page padding>
-        <q-form class="row q-col-gutter-md text-center justify-center" @submit.prevent="handleSubmit" @reset="resetForm">            
+    <q-page>
+        <q-form class="row text-center justify-center" @submit.prevent="handleSubmit" @reset="resetForm">            
             <div class="col-12">
                 <h4> Abstract planner </h4>
             </div>
@@ -41,7 +41,6 @@ const route = useRoute()
 const $q = useQuasar()
 
 const intentsStore = useIntentsStore()
-const queriesStore = useQueriesStore()
 const dataProductsStore = useDataProductsStore()
 
 const intentName = ref(null)
@@ -54,8 +53,8 @@ const handleSubmit = async() => {
 
   $q.loading.show({message: 'Creating intent...'}) // First, create the intent object in the backend
   let data = new FormData();
-  data.append("intentName", intentName);
-  data.append("problem", problem);
+  data.append("intentName", intentName.value);
+  data.append("problem", intentsStore.problems[problem.value]);
   data.append("dataProductID", selectedDataProduct.id)
   
   await intentsStore.postIntent(route.params.id, data)
@@ -109,3 +108,8 @@ onMounted(async() => {
 
 
 </script>
+
+<style scoped>
+
+
+</style>

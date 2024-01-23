@@ -62,6 +62,11 @@ public class DLSpark extends DataLayer {
     }
 
     @Override
+    public void removeFromExploitationZone(String tableName) {
+
+    }
+
+    @Override
     public String materialize(Dataset dataset, String zone, String format) {
         return null;
     }

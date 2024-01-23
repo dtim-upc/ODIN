@@ -139,12 +139,12 @@
 
 <script setup>
 import {computed, defineComponent, onBeforeMount, onMounted, defineProps, ref} from "vue";
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
-import {useIntegrationStore} from 'src/stores/integration.store.js'
-import {useProjectsStore} from 'src/stores/projects.store.js'
+import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
+import {useProjectsStore} from 'src/stores/projectsStore.js'
 import {useNotify} from 'src/use/useNotify.js'
 import FormNewRepository from "components/forms/FormNewRepository.vue";
-import {useRepositoriesStore} from "src/stores/repositories.store.js";
+import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
 import {useRoute} from "vue-router";
 import ConfirmDialog from "src/components/ConfirmDialog.vue";
 import EditRepositoryForm from "src/components/forms/EditRepositoryForm.vue";

@@ -1,5 +1,4 @@
 <template>
-  <!-- class="flex flex-center" -->
   <q-page>
     <TableRepositories/>
   </q-page>
@@ -11,6 +10,6 @@ import TableRepositories from "../../components/tables/TableRepositories.vue";
 import { onBeforeMount } from "vue";
 
 onBeforeMount(() => {
-  document.title = "Repositories"; // Título de la pestaña
+  document.title = "Repositories";
 });
 </script>

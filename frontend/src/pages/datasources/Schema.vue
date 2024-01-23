@@ -61,7 +61,7 @@
 <script setup>
 import {ref, onMounted, computed} from "vue";
 import Graph from 'components/graph/Graph.vue'
-import {useDataSourceStore} from 'src/stores/datasources.store.js'
+import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
 
 import { onBeforeMount } from "vue";
 

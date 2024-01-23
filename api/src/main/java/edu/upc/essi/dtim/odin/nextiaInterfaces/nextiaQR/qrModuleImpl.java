@@ -2,11 +2,8 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
-import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
@@ -14,8 +11,6 @@ import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
 import edu.upc.essi.dtim.odin.query.pojos.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
@@ -31,8 +26,8 @@ public class qrModuleImpl implements qrModuleInterface {
         String UUID = generateUUID();
 
         // This is a mock of the NextiaQR call: create a new dataset in the formatted zone (the dataset should already be created by ODIN)
-        // and call the uploadToTemporalExploitationZone with the necessary sql (this is was nextiaQR does). This is
-        // done like this to prevent having to handle a result set, and instead directly storing the result of the query.
+        // and call the uploadToTemporalExploitationZone with the necessary sql (this is what nextiaQR does). This is
+        // done as so to prevent having to handle a result set, and instead directly storing the result of the query.
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         dl.execute("CREATE TABLE IF NOT EXISTS for_titanic AS SELECT * FROM read_csv_auto('C:\\Work\\Files\\titanic1.csv')");
         dl.uploadToTemporalExploitationZone("SELECT PassengerId, Survived, Name FROM for_titanic", UUID);

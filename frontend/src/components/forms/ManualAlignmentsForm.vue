@@ -105,7 +105,7 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
 import Graph from 'components/graph/Graph.vue'
-import {useIntegrationStore} from 'src/stores/integration.store.js'
+import {useIntegrationStore} from 'src/stores/integrationStore.js'
 
 const props = defineProps({
   dsA: {type: Object, default: {id: "", name: "", type: "", graphicalGraph: "", iri: "", path: ""}},
