@@ -20,7 +20,7 @@
 
           <q-expansion-item :label="'Integrated schemas (' + integratedSchemasLength + ' items)'" expand-icon="arrow_drop_down" :disable="integratedSchemasLength === 0">
             <q-list dense>
-              <q-item v-for="ds in storeDS.project.integratedDatasets" :key="ds.id">
+              <q-item v-for="ds in projectsStore.currentProject.integratedDatasets" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
                        :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
               </q-item>
@@ -31,7 +31,7 @@
 
           <q-expansion-item :label="'Local schemas (' + localSchemasLength + ' items)'" expand-icon="arrow_drop_down" :disable="localSchemasLength ===0">
             <q-list dense>
-              <q-item v-for="ds in storeDS.datasources" :key="ds.id">
+              <q-item v-for="ds in storeDS.datasets" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
                        :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
               </q-item>
@@ -61,7 +61,8 @@
 <script setup>
 import {ref, onMounted, computed} from "vue";
 import Graph from 'components/graph/Graph.vue'
-import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+import {useDatasetsStore} from 'src/stores/datasetsStore.js'
+import {useProjectsStore} from 'src/stores/projectsStore.js'
 
 import { onBeforeMount } from "vue";
 
@@ -69,7 +70,8 @@ onBeforeMount(() => {
   document.title = "Schema"; // Título de la pestaña
 });
 
-const storeDS = useDataSourceStore()
+const storeDS = useDatasetsStore()
+const projectsStore = useProjectsStore()
 
 const graphical = ref('');
 const selectedSchema = ref('');
@@ -81,9 +83,8 @@ const setSchema = datasource => {
 
 const setGlobalSchema = () => {
   console.log("setting global schema view")
-  console.log(storeDS.getGlobalSchema)
   selectedSchema.value = 'project'
-  graphical.value = storeDS.getGlobalSchema
+  graphical.value = projectsStore.getGlobalSchema
 }
 
 onMounted(async () => {
@@ -96,9 +97,9 @@ onMounted(async () => {
       projectId = match[1];
       console.log(projectId);
     }
-    await storeDS.getDatasources(projectId);
+    await storeDS.getDatasets(projectId);
 
-    if (storeDS.datasources.length > 0) {
+    if (storeDS.datasets.length > 0) {
       setGlobalSchema();
     }
 
@@ -107,8 +108,8 @@ onMounted(async () => {
   }
 });
 
-const integratedSchemasLength = computed(() => storeDS.project.integratedDatasets ? storeDS.project.integratedDatasets.length : 0);
-const localSchemasLength = computed(() => storeDS.datasources ? storeDS.datasources.length : 0);
+const integratedSchemasLength = computed(() => projectsStore.currentProject.integratedDatasets ? projectsStore.currentProject.integratedDatasets.length : 0);
+const localSchemasLength = computed(() => storeDS.datasets ? storeDS.datasets.length : 0);
 </script>
 
 

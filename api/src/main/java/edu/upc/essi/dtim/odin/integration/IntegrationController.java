@@ -21,6 +21,9 @@ public class IntegrationController {
     @Autowired
     private  IntegrationService integrationService;
 
+
+    // ---------------- Integration steps
+
     /**
      * STEP 0 OF THE INTEGRATION (OPTIONAL)
      * Sends a request to compute the automatic alignments between two datasets

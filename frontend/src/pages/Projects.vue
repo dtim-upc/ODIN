@@ -1,5 +1,4 @@
 <template>
-
   <q-page class="q-pa-md">
     <TableProjects></TableProjects>
   </q-page>
@@ -15,8 +14,3 @@ onBeforeMount(() => {
 });
 
 </script>
-
-<style lang="scss">
-
-
-</style>

@@ -1,16 +1,13 @@
 const routes = [
   {
     path: '/',
-    // component: () => import('layouts/MainLayout.vue'),
     redirect: to => {
-      // the function receives the target route as the argument
-      // we return a redirect path/location here.
+      // the function receives the target route as the argument and we return a redirect path/location here.
       return {path: '/projects', name: 'projects'}
     },
   },
   {
     path: '/project/:id',
-    // name: 'dashboard',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {path: 'home', name: 'home', component: () => import('pages/datasources/HomeDashboard.vue')},
@@ -35,22 +32,8 @@ const routes = [
       {path: '', name: 'projects', component: () => import('pages/Projects.vue')}
     ]
   },
-  // This is just for testing the visualization of a graph from a .ttl file. Should be removed eventually
-  {
-    path: '/viewGraph',
-    component: () => import('layouts/ProjectLayout.vue'),
-    children: [
-      {path: '', name: 'vg', component: () => import('pages/datasources/ViewGraph.vue')}
-    ]
 
-  },
-  //{
-  //  path: '/auth',
-  //name: 'auth',
-  //component: () => import('pages/Auth.vue'),
-  //},
-
-  // Always leave this as last one, but you can also remove it
+  // When the specified route is not found, redirect to the 404 page
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue')

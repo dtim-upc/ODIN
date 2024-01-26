@@ -292,7 +292,7 @@ public class DatasetService {
             saveDataset(datasetWithGraph);
 
         } catch (Exception e) {
-            deleteDatasetFromProject(projectID, dataset.getId());
+            //deleteDatasetFromProject(projectID, dataset.getId());
             throw new InternalServerErrorException("Error when uploading the data to the data layer", e.getMessage());
         }
     }
@@ -414,6 +414,22 @@ public class DatasetService {
         dataset.setLocalGraph((LocalGraphJenaImpl) datasetGraph);
 
         return dataset;
+    }
+
+    /**
+     * Retrieves the datasets associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of datasets belonging to the project.
+     */
+    public List<Dataset> getDatasetsOfProject(String projectID) {
+        Project project = projectService.getProject(projectID);
+        List<Dataset> datasets = new ArrayList<>();
+        // Iterate through the repositories in the project and collect their datasets
+        for (DataRepository repository : project.getRepositories()) {
+            datasets.addAll(repository.getDatasets());
+        }
+        return datasets;
     }
 
     /**

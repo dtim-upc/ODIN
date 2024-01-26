@@ -1,7 +1,4 @@
-
-
 export function useGeometry() {
-
 
     const getCircleOutlinePoint = (d, isSource) => {
         // Total difference in x and y from source to target
@@ -28,7 +25,6 @@ export function useGeometry() {
         return { source:{x: (d.source.x + offsetSX), y: (d.source.y + offsetSY)},
          target: {x: (d.target.x - offsetX), y: (d.target.y - offsetY)} };
     }
-
 
     // for loop lines. Function not tested
     const getAnotherCircleOutlinePoint = (d, a) => {
@@ -96,8 +92,6 @@ export function useGeometry() {
             return {x: maxYx, y: maxY};
             }
         }
-
-
     }
 
     return{
@@ -106,10 +100,4 @@ export function useGeometry() {
         getRectOutlinePoint
 
     }
-    
-
-
-
-
-
 }

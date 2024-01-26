@@ -8,19 +8,15 @@ import axios from 'axios'
 // "export default () => {}" function below (which runs individually
 // for each client)
 const odinApi = axios.create({baseURL: process.env.API});
-const intentsApi = axios.create({baseURL: "http://localhost:5000/"}); // temporal
+const intentsApi = axios.create({baseURL: "http://localhost:5000/"});
 
 export default boot(({app}) => {
-  // for use inside Vue files (Options API) through this.$axios and this.$api
-
-  app.config.globalProperties.$axios = axios
+   app.config.globalProperties.$axios = axios
   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
 
   app.config.globalProperties.$odinApi = odinApi
   app.config.globalProperties.$intentsApi = intentsApi
-  // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
-  //       so you can easily perform requests against your app's API
 })
 
 export {odinApi, intentsApi}

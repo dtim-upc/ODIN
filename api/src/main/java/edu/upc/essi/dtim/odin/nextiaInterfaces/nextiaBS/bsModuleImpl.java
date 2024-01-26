@@ -14,6 +14,7 @@ public class bsModuleImpl implements bsModuleInterface {
             bootstrapODINInterface = BootstrapFactory.getInstance(dataset);
             return bootstrapODINInterface.bootstrapDataset(dataset);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InternalServerErrorException("Error converting dataset to graph", e.getMessage());
         }
     }

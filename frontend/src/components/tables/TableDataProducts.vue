@@ -1,8 +1,7 @@
 <template>
     <div class="q-pa-md">
-      <q-table :rows="rows" :columns="columns" :filter="search" row-key="id"
-               no-data-label="No queries created yet"
-               no-results-label="The filter didn't uncover any results" :visible-columns="visibleColumns">
+      <q-table :rows="dataProductsStore.dataProducts" :columns="columns" :filter="search" row-key="id"
+               no-results-label="The filter didn't uncover any results">
   
         <template v-slot:top-left="">
           <div class="q-table__title">
@@ -18,12 +17,7 @@
             </template>
           </q-input>
   
-          <q-btn flat round dense size="xl" :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-                 @click="props.toggleFullscreen">
-            <q-tooltip :disable="$q.platform.is.mobile" v-close-popup>
-              {{ props.inFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen" }}
-            </q-tooltip>
-          </q-btn>
+          <FullScreenToggle :props="props" @toggle="props.toggleFullscreen"/>
         </template>
   
         <template v-slot:body-cell-actions="props">
@@ -32,20 +26,17 @@
             <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
           </q-td>
         </template>
+
+        <template v-slot:no-data>
+          <div class="full-width row flex-center text-accent q-gutter-sm q-pa-xl" style="flex-direction: column">
+            <NoDataImage/>
+            <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">No data products.</span>
+          </div>
+        </template>
   
       </q-table>
-  
-      <q-dialog v-model="editDataProduct">
-        <q-card flat bordered class="my-card" style="min-width: 30vw;">
-          <q-card-section class="q-pt-none">
-            <EditDataProductForm
-              @submit-success="editDataProduct=false"
-              @cancel-form="editDataProduct=false"
-              :dataProductData="selectedDataProduct"
-            ></EditDataProductForm>
-          </q-card-section>
-        </q-card>
-      </q-dialog>
+
+      <EditDataProductForm v-model:show="showEditDataProduct" :dataProductData="selectedDataProduct" />
   
       <ConfirmDialog v-model:show="showConfirmDialog" title="Confirm deletion of a data product" 
                       body="Do you really want to delete the data product?"
@@ -54,46 +45,35 @@
   </template>
   
   <script setup>
-  import {computed, onMounted, ref} from "vue";
-  import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+  import { onMounted, ref} from "vue";
   import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
   import {useRoute} from "vue-router";
+  import NoDataImage from "src/assets/NoDataImage.vue";
   import ConfirmDialog from "src/components/ConfirmDialog.vue";
   import EditDataProductForm from "src/components/forms/EditDataProductForm.vue";
+  import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
   
+  const dataProductsStore = useDataProductsStore()
   const route = useRoute()
   
-  const storeDS = useDataSourceStore();
-  const dataProductsStore = useDataProductsStore()
+  const selectedDataProduct = ref(null)
   
-  onMounted(async() => {
-    storeDS.setProject()
-    await dataProductsStore.getDataProducts(route.params.id)
-  })
-  
-  const selectedDataProduct = ref(null);
   const search = ref("")
-  const visibleColumns = ["dataProductID", "dataProductName", "dataProductDescription", "expand", "actions"]; // Columns to be displayed
   
   const showConfirmDialog = ref(false)
-  const editDataProduct = ref(false)
-  
-  const rows = computed(() => {
-    return dataProductsStore.dataProducts.map((dp) => {
-      return {
-        ...dp,
-      };
-    });
-  });
-  
+  const showEditDataProduct = ref(false)
+
   const columns = [
     {name: "dataProductID", label: "ID", align: "center", field: "id", sortable: true},
     {name: "dataProductName", label: "Name", align: "center", field: "datasetName", sortable: true},
     {name: "dataProductDescription", label: "Description", align: "center", field: "datasetDescription", sortable: true},
     {name: "expand", label: "Query", align: "center", field: "expand", sortable: false},
     {name: 'actions', label: 'Actions', align: 'center', field: 'actions', sortable: false,},
-  ];
-  
+  ]
+
+  onMounted(async() => {
+    await dataProductsStore.getDataProducts(route.params.id)
+  })
   
   let confirmDelete = () => {}
   const deleteRow = (propsRow) => {
@@ -104,20 +84,8 @@
   }
   
   const editRow = (propsRow) => {
-    editDataProduct.value = true
+    showEditDataProduct.value = true
     selectedDataProduct.value = propsRow.row
   }
   </script>
-  
-  <style lang="css" scoped>
-  .centered-table {
-    display: flex;
-    justify-content: center; /* Centra horizontalmente el contenido de la tabla */
-    align-items: center; /* Centra verticalmente el contenido de la tabla */
-  }
-  
-  .centered-table table {
-    width: 100%; /* Asegura que la tabla ocupe todo el ancho disponible */
-  }
-  </style>
   

@@ -2,6 +2,8 @@ import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import intentsAPI from "src/api/intentsAPI.js";
 
+const notify = useNotify();
+
 export const useIntentsStore = defineStore('intents', {
 
   state: () => ({
@@ -15,378 +17,185 @@ export const useIntentsStore = defineStore('intents', {
     selectedPlans: [],
   }),
 
-  getters: {},
   actions: {
-    async init() {
 
-    },
-
-    async postIntent(projectID, data) {
-      const notify = useNotify();
-      console.log("Creating intent")
-
-      await intentsAPI.postIntent(projectID, data).then((response) => {
-        if (response.status === 200) {
-          notify.positive("Intent created")
-          console.log(response.data)
-          this.intentID = response.data
-        } else {
-          notify.negative("Intent could not be created")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong when creating an intent.")
-        }
-      });
-    },
-
-    deleteIntent(projectID, intentID) {
-      const notify = useNotify();
-      console.log("Deleting intent with ID ", intentID)
-
-      intentsAPI.deleteIntent(projectID, intentID).then((response) => {
-          if (response.status === 200) {
-            notify.positive(`Intent deleted successfully`)
-            this.getAllIntents(projectID) // Refresh the list of intents
-          } else {
-            notify.negative("Intent could not be deleted.")
-          }
-      }).catch((error) => {
-          console.log("error is: " + error)
-          if (error.response) {
-              notify.negative("Something went wrong in the server when deleting an intent.")
-          }
-      });
-    },
-
-    putIntent(intentID, projectID, data) {
-      const notify = useNotify();
-
-      intentsAPI.putIntent(intentID, projectID, data)
-        .then((response) => {
-          if (response.status === 200) {
-            notify.positive(`Intent successfully edited`);
-            successCallback()
-          } else {
-            notify.negative("Cannot edit data. Something went wrong on the server.");
-          }
-        })
-        .catch((error) => {
-          console.log("Error is: " + error);
-          if (error.response) {
-            notify.negative("Something went wrong on the server while editing the data.");
-          }
-        });
-    },
-
+    // ------------ CRUD operations
     async getAllIntents(projectID) {
-      intentsAPI.getAllIntents(projectID).then(response => {
-          console.log("Intents received")
-          if (response.data === "") {
-            this.intents = []
-          } else {
-            this.intents = response.data
-          }
-
-        }).catch(err => {
-        console.log("error retrieving intents")
-        console.log(err)
-      })
-    },
-
-    async annotateDataset(data) {
-      const notify = useNotify();
-      console.log("Annotating dataset")
-
-      await intentsAPI.annotateDataset(data).then((response) => {
-        console.log(response)
-        if (response.status === 200) {
-          notify.positive(`Dataset annotated`)
-          this.queryUri = Object.values(response.data)[0]
-        } else {
-          notify.negative("Dataset could not be annotated")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when annotating a dataset.")
-        }
-      });
-    },
-
-    getProblems() {
-      intentsAPI.getProblems()
-        .then(response => {
-          console.log("Intent problems received")
-
-          if (response.data === "") {
-            this.problems = []
-          } else {
-            this.problems = response.data
-          }
-
-        }).catch(err => {
-        console.log("error retrieving problems")
-        console.log(err)
-      })
-    },
-
-    async setAbstractPlans(data, successCallback) {
-      const notify = useNotify();
-      console.log("Running abstract planner")
-
-      await intentsAPI.setAbstractPlans(data).then((response) => {
-        if (response.status === 200) {
-          notify.positive(`Abstract plans created`)
-          this.abstractPlans = [] // Reset the list of abstract plans to avoid duplicates
-          // Formatting the plans to be displayed in the UI
-          for (let plan in response.data) {
-            const newObject = {
-              name: plan.split('#').at(-1),
-              id: plan,
-              selected: false,
-              plan: response.data[plan]
-            }
-            this.abstractPlans.push(newObject)
-          }
-          this.logicalPlans = []
-          this.selectedPlans = []
-          successCallback();
-        } else {
-          notify.negative("Abstract plans could not be created")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server for creating a project.")
-        }
-      });
-    },
-
-    /*
-    async getAbstractPlans() {
-      console.log("Getting abstract plans")
-      const notify = useNotify();
-
-      await intentsAPI.getAbstractPlans().then((response) => {
-        if (response.status === 200) {
-          if (response.data === "") {
-            this.abstractPlans = []
-          } else {
-            this.abstractPlans = response.data
-          }
-          notify.positive(`Abstract plans obtained`)
-        } else {
-          notify.negative("Error getting the abstract plans")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting the abstract plans")
-        }
-      });
-    },*/
-
-    async setLogicalPlans(data, successCallback) {
-      const notify = useNotify();
-      console.log("Running logical planner with data ", data)
-
-      await intentsAPI.setLogicalPlans(data).then((response) => {
-        console.log(response)
-        if (response.status === 200) {
-          notify.positive(`Logical plans created`)
-          // Formatting the plans to be displayed in the UI
-          const keys = Object.keys(response.data);
-          this.logicalPlans = [];
-        
-          for (let key of keys) {
-            let found = false
-            const plan = {
-              id: key,
-              selected: false,
-              plan: response.data[key]
-            }
-            this.logicalPlans.map(logPlan => {
-              if (logPlan.id === this.removeLastPart(key)) {
-                logPlan.plans.push(plan)
-                found = true
-              }
-            })
-            if (!found) {
-              this.logicalPlans.push({
-                id: this.removeLastPart(key),
-                selected: false,
-                plans: [plan]
-              })
-            }
-          }
-          this.selectedPlans = []
-          successCallback();
-        } else {
-          notify.negative("Logical plans could not be created")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when creating the logical plans.")
-        }
-      });
-    },
-
-    removeLastPart(inputString) {
-      const parts = inputString.split(' ');
-      if (parts.length > 1) {
-          parts.pop(); // Remove the last part
-          return parts.join(' ');
-      } else {
-          return inputString; // Return the original string if there's only one part
+      try {
+        const response = await intentsAPI.getAllIntents(projectID);
+        this.intents = response.data || [];
+      } catch (error) {
+        console.error("Error retrieving intents:", error);
+        console.error("Error:", error);
       }
     },
 
-    /*
-    async getLogicalPlans() {
-      console.log("Getting logical plans")
-      const notify = useNotify();
+    async postIntent(projectID, data) {
+      try {
+        const response = await intentsAPI.postIntent(projectID, data);
+        notify.positive("Intent created");
+        this.intentID = response.data;
+      } catch (error) {
+        notify.negative("Error creating an intent.");
+        console.error("Error:", error);
+      }
+    },
+    
+    async putIntent(intentID, projectID, data, successCallback) {
+      try {
+        await intentsAPI.putIntent(intentID, projectID, data);
+        notify.positive(`Intent successfully edited`);
+        this.getAllIntents(projectID);
+        successCallback();
+      } catch (error) {
+        notify.negative("Error editing an intent.");
+        console.error("Error:", error);
+      }
+    },
 
-      await intentsAPI.getLogicalPlans().then((response) => {
-        if (response.status === 200) {
-          if (response.data === "") {
-            this.logicalPlans = []
-          } else {
-            this.logicalPlans = response.data
-          }
-          notify.positive(`Logical plans obtained`)
-        } else {
-          notify.negative("Error getting the logical plans")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting the logical plans")
-        }
-      });
-    },*/
-
-    /*
-    setWorkflowPlans(data, successCallback) {
-      const notify = useNotify();
-      console.log("Running workflow planner with data ", data)
-
-      intentsAPI.setWorkflowPlans(data).then((response) => {
-        if (response.status === 204) {
-          notify.positive(`Workflow plans created`)
+    async deleteIntent(projectID, intentID) {
+      try {
+        response = await intentsAPI.deleteIntent(projectID, intentID);
+        notify.positive(`Intent deleted successfully`);
+        this.getAllIntents(projectID);
+      } catch (error) {
+        notify.negative("Error deleting an intent.");
+        console.error("Error:", error);
+      }
+    },
+    
+    // ------------ Plan generation operations
+    async getProblems() {
+      try {
+        const response = await intentsAPI.getProblems();
+        this.problems = response.data || [];
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+    
+    async annotateDataset(data) {
+      try {
+        const response = await intentsAPI.annotateDataset(data);
+        notify.positive(`Dataset annotated`);
+        this.queryUri = Object.values(response.data)[0];
+      } catch (error) {
+        notify.negative("Error in annotating the dataset.");
+        console.error("Error:", error);
+      }
+    },
+    
+    async setAbstractPlans(data, successCallback) {
+      try {
+        const response = await intentsAPI.setAbstractPlans(data);
+        notify.positive(`Abstract plans created`);
+          this.abstractPlans = Object.entries(response.data).map(([plan, value]) => ({
+            name: plan.split('#').at(-1),
+            id: plan,
+            selected: false,
+            plan: value
+          }));
+          this.logicalPlans = [];
+          this.selectedPlans = [];
           successCallback();
-        } else {
-          notify.negative("Workflow plans could not be created")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when creating the workflow plans.")
-        }
-      });
+      } catch (error) {
+        notify.negative("Error creating the abstract plans.");
+        console.error("Error:", error);
+      }
     },
-
-    async getWorkflowPlans() {
-      console.log("Getting workflow plans")
-      const notify = useNotify();
-
-      await intentsAPI.getWorkflowPlans().then((response) => {
-        if (response.status === 200) {
-          if (response.data === "") {
-            this.workflowPlans = []
-          } else {
-            this.workflowPlans = response.data
+    
+    async setLogicalPlans(data, successCallback) {
+      try {
+        const response = await intentsAPI.setLogicalPlans(data);
+        notify.positive(`Logical plans created`);
+        // Formatting the plans to be displayed in the UI
+        const keys = Object.keys(response.data);
+        this.logicalPlans = [];
+      
+        for (let key of keys) {
+          let found = false
+          const plan = {
+            id: key,
+            selected: false,
+            plan: response.data[key]
           }
-          notify.positive(`Workflow plans obtained`)
-        } else {
-          notify.negative("Error getting the workflow plans")
+          this.logicalPlans.map(logPlan => {
+            if (logPlan.id === this.removeLastPart(key)) {
+              logPlan.plans.push(plan)
+              found = true
+            }
+          })
+          if (!found) {
+            this.logicalPlans.push({
+              id: this.removeLastPart(key),
+              selected: false,
+              plans: [plan]
+            })
+          }
         }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting the workflow plans")
-        }
-      });
-    },*/    
+        this.selectedPlans = []
+        successCallback();
+      } catch (error) {
+        notify.negative("Error creating the logical plans.");
+        console.error("Error:", error);
+      }
+    },
+    
+    removeLastPart(inputString) {
+      const parts = inputString.split(' ');
+      if (parts.length > 1) {
+        parts.pop(); // Remove the last part
+        return parts.join(' ');
+      } else {
+        return inputString; // Return the original string if there's only one part
+      }
+    },
 
+    // ------------ Download operations
     async downloadRDF(planID) {
-      console.log("Downloading RDF file for plan " + planID)
-      const notify = useNotify();
-
-      await intentsAPI.downloadRDF(planID).then((response) => {
-        if (response.status === 200) {
-          this.createDownload(response.data, planID + ".ttl")
-          notify.positive(`File downloaded`)
-        } else {
-          notify.negative("Error getting the RDF file")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting the RDF file")
-        }
-      });
+      try {
+        const response = await intentsAPI.downloadRDF(planID);
+        this.createDownload(response.data, `${planID}.ttl`);
+        notify.positive(`RDF file downloaded`);
+      } catch (error) {
+        notify.negative("Error downloading the RDF file");
+        console.error("Error:", error);
+      }
     },
-
+    
     async downloadKNIME(planID) {
-      console.log("Downloading KNIME file for plan " + planID)
-      const notify = useNotify();
-
-      await intentsAPI.downloadKNIME(planID).then((response) => {
-        if (response.status === 200) {
-          this.createDownload(response.data, planID + ".knwf")
-          notify.positive(`File downloaded`)
-        } else {
-          notify.negative("Error getting the KNIME file")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting the KNIME file")
-        }
-      });
+      try {
+        const response = await intentsAPI.downloadKNIME(planID);
+        this.createDownload(response.data, `${planID}.knwf`);
+        notify.positive(`KNIME file downloaded`);
+      } catch (error) {
+        notify.negative("Error downloading the KNIME file");
+        console.error("Error:", error);
+      }
     },
-
+    
     async downloadAllRDF(selectedPlanIds) {
-      console.log("Downloading all RDF files")
-      const notify = useNotify();
-
-      await intentsAPI.downloadAllRDF(selectedPlanIds).then((response) => {
-        if (response.status === 200) {
-          this.createDownload(response.data, "rdf.zip")
-          notify.positive(`Files downloaded`)
-        } else {
-          notify.negative("Error getting all RDF files")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting all RDF files")
-        }
-      });
+      try {
+        const response = await intentsAPI.downloadAllRDF(selectedPlanIds);
+        this.createDownload(response.data, "rdf.zip");
+        notify.positive(`All RDF files downloaded`);
+      } catch (error) {
+        notify.negative("Error downloading all the RDF files");
+        console.error("Error:", error);
+      }
     },
-
+    
     async downloadAllKNIME(selectedPlanIds) {
-      console.log("Downloading All KNIME files")
-      const notify = useNotify();
-
-      await intentsAPI.downloadAllKNIME(selectedPlanIds).then((response) => {
-        if (response.status === 200) {
-          this.createDownload(response.data, "knime.zip")
-          notify.positive(`Files downloaded`)
-        } else {
-          notify.negative("Error getting all the KNIME files")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when getting all KNIME files")
-        }
-      });
+      try {
+        const response = await intentsAPI.downloadAllKNIME(selectedPlanIds);
+        this.createDownload(response.data, "knime.zip");
+        notify.positive(`All RDF files downloaded`);
+      } catch (error) {
+        notify.negative("Error downloading all the KNIMW files");
+        console.error("Error:", error);
+      }
     },
-
+    
     createDownload(data, name) {
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement('a');
@@ -395,22 +204,6 @@ export const useIntentsStore = defineStore('intents', {
       document.body.appendChild(link);
       link.click();
     },
-
-    async storeWorkflow(projectID, data) {
-      const notify = useNotify();
-
-      await intentsAPI.storeWorkflow(projectID, this.intentID, data).then((response) => {
-        if (response.status === 200) {
-          notify.positive(`Workflow stored`)
-        } else {
-          notify.negative("Error storing the workflow")
-        }
-      }).catch((error) => {
-        console.log("error is: " + error)
-        if (error.response) {
-          notify.negative("Something went wrong in the server when storing the workflow")
-        }
-      });
-    },
+    
   }
 })

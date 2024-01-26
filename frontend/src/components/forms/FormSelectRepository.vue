@@ -45,7 +45,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { useNotify } from 'src/use/useNotify.js'
-import { useDataSourceStore } from "../../stores/datasourcesStore";
+import { useDatasetsStore } from "../../stores/datasetsStore";
 import { useRepositoriesStore } from "src/stores/repositoriesStore";
 
 const props = defineProps({
@@ -64,11 +64,11 @@ const showS = computed({
 });
 
 onMounted(async () => {
-  repositoriesStore.selectedRepositoryId = null;
+  repositoriesStore.selectedRepository = {};
   onReset();
 });
 
-const storeDS = useDataSourceStore();
+const storeDS = useDatasetsStore();
 const repositoriesStore = useRepositoriesStore();
 
 const onRepositoryChange = () => {
@@ -92,10 +92,8 @@ const onSubmit = () => {
 const nextStep = () => {
   // Emitir un evento personalizado con los datos seleccionados
   const selectedRepositoryId = newDatasource.repositoryId;
-  console.log(selectedRepositoryId,"---------------------------- REPOOOOOOOOOOO IDDDD SEEEEND");
-  repositoriesStore.selectedRepositoryId = selectedRepositoryId;
 
-  repositoriesStore.setSelectedRepositoryId(selectedRepositoryId);
+  repositoriesStore.setSelectedRepository(selectedRepositoryId);
 
   emit("repository-selected", selectedRepositoryId);
 };

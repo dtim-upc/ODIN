@@ -67,13 +67,13 @@
 <script setup>
 import {ref} from 'vue'
 import {useIntentsStore} from 'stores/intentsStore.js'
-import {useWorkflowsStore} from 'stores/workflowStore.js'
+import {useWorkflowsStore} from 'stores/workflowsStore.js'
 import DialogWithVisualizedPlan from "../../components/intents/DialogWithVisualizedPlan.vue";
 import {useRoute} from "vue-router";
 
 const route = useRoute()
 const intentsStore = useIntentsStore()
-const workflowStore = useWorkflowsStore()
+const workflowsStore = useWorkflowsStore()
 
 const storeWorkflowDialogBoolean = ref(false)
 const dialog = ref(false)
@@ -120,7 +120,7 @@ const storeWorkflow = () => {
   const projectID = route.params.id
   const intentID = intentsStore.intentID
 
-  workflowStore.postWorkflow(projectID, intentID, data)
+  workflowsStore.postWorkflow(projectID, intentID, data)
 }
 
 </script>

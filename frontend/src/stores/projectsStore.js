@@ -7,15 +7,40 @@ const notify = useNotify();
 
 export const useProjectsStore = defineStore('projects', {
   state: () => ({
-    currentProject: {},
+    // We persist the current project in the local storage to not lose the data when refreshing the page
+    currentProject: JSON.parse(localStorage.getItem('currentProject')) || {},
     projects: [],
   }),
 
-  actions: {
-    async init() {
-      if (this.projects.length === 0) {
-        await this.getProjects();
+  getters: {
+    getGlobalSchema() {
+      if (this.currentProject.integratedGraph !== null) {
+        return this.currentProject.integratedGraph.globalGraph.graphicalSchema || "";
       }
+      else return null
+    },
+  },
+
+  actions: {
+
+    // ------------ CRUD operations
+
+    // i.e. get project
+    async setCurrentProject(project) { 
+      try {
+        const response = await projectAPI.getProject(project.projectId);
+        this.currentProject = response.data;
+        localStorage.setItem('currentProject', JSON.stringify(this.currentProject));
+        console.log("Current project:", this.currentProject)
+      } catch (error) {
+        notify.negative("Error retrieving the project");
+        console.error("Error:", error);
+      }
+    },
+
+    // i.e. get the same project from the server (with the latest data) and set it as the current project
+    updateCurrentProject() {
+      this.setCurrentProject(this.currentProject)
     },
 
     async getProjects() {
@@ -23,7 +48,7 @@ export const useProjectsStore = defineStore('projects', {
         const response = await projectAPI.getAllProjects();
         this.projects = response.data === "" ? [] : response.data;
       } catch (error) {
-        notify.negative("Could not retrieve projects");
+        notify.negative("Error retrieving the projects");
         console.error("Error:", error);
       }
     },
@@ -36,9 +61,21 @@ export const useProjectsStore = defineStore('projects', {
         this.projects.push(response.data);
         successCallback();
       } catch (error) {
-        notify.negative("Something went wrong in the server for creating a project.");
+        notify.negative("Error creating the project");
         console.error("Error:", error);
 
+      }
+    },
+
+    async putProject(project, successCallback) {
+      try {
+        await projectAPI.putProject(project.projectId, project);
+        notify.positive(`Project ${project.projectId} successfully edited`);
+        this.getProjects();
+        successCallback();
+      } catch (error) {
+        notify.negative("Error editing the project");
+        console.error("Error:", error);
       }
     },
 
@@ -48,22 +85,12 @@ export const useProjectsStore = defineStore('projects', {
         notify.positive(`Project deleted`);
         this.getProjects();
       } catch (error) {
-        notify.negative("Something went wrong on the server while deleting a project.");
+        notify.negative("Error deleting the project");
         console.error("Error:", error);
       }
     },
 
-    async putProject(project, successCallback) {
-      try {
-        await projectAPI.putProject(project.projectID, project);
-        notify.positive(`Project ${project.projectId} successfully edited`);
-        this.getProjects();
-        successCallback();
-      } catch (error) {
-        notify.negative("Something went wrong on the server while editing a project.");
-        console.error("Error:", error);
-      }
-    },
+    // ---------------- Other operations
 
     async cloneProject(id, successCallback) {
       try {
@@ -72,7 +99,7 @@ export const useProjectsStore = defineStore('projects', {
         this.getProjects();
         successCallback();
       } catch (error) {
-        notify.negative("Something went wrong on the server while cloning the project.");
+        notify.negative("Error cloning the project");
         console.error("Error:", error);
       }
     },
@@ -83,8 +110,9 @@ export const useProjectsStore = defineStore('projects', {
         const content = response.headers['content-type'];
         download(response.data, "source_graph.ttl", content);
       } catch (error) {
-        notify.negative("Something went wrong on the server while downloading the project schema.");
+        notify.negative("Error downloading the project schema");
+        console.error("Error:", error);
       }
-    }
+    },
   }
 });

@@ -1,22 +1,21 @@
 <template>
   <q-layout view="lHr LpR lFr">
-    <!-- v-model="drawer" @mouseenter="expandDrawer" @mouseleave="contractDrawer" -->
     <q-drawer show-if-above :mini="miniState" :width="200" :breakpoint="500" bordered>
       <q-scroll-area class="fit">
         <q-list padding>
 
           <q-item style="max-width: 200px; padding-top: 0px">
             <q-item-section avatar v-if="miniState">
-
               <ODIN_short class="logoODIN" style="width:38px"></ODIN_short>
-              <!-- <q-icon name="img:/assets/ODIN_short.svg" size="lg" color="primary"/>   -->
             </q-item-section>
+
             <q-item-section v-else>
               <q-img src="~assets/ODIN.svg" style="max-width: 180px; max-height: 35px; " fit="contain"/>
             </q-item-section>
           </q-item>
 
           <q-separator/>
+
           <q-item>
             <q-item-section avatar>
               <q-icon :name="miniState == true ? 'mdi-arrow-collapse-right' : 'mdi-arrow-collapse-left'"
@@ -25,351 +24,22 @@
           </q-item>
 
           <div class="top-buttons-wrapper">
-
-            <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="o_folder"
-                         :to="{name: 'projects'}"
-                         color="neutral500 ">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Projects</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Projects
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="o_folder"
-                         :to="{name: 'projects'}"
-                         color="neutral500 ">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Projects</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Projects
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-
-            <q-item exact manual-focus>
-              <q-item-section v-if="miniState" avatar>
-                <q-btn flat
-                       no-caps
-                       padding="xs"
-                       icon="o_cottage"
-                       :to="{name: 'home'}"
-                       :color="$route.name === 'home' ? 'primary600': 'neutral500' "
-                       :class="{ activebg: $route.name === 'home' }">
-                  <q-item-section>
-                    <div class="icon-label-wrapper">
-                      <span class="label-style">Home</span>
-                    </div>
-                  </q-item-section>
-                  <q-tooltip anchor="center right"
-                             self="center left"
-                             :offset="[10, 10]"
-                             transition-show="fade"
-                             transition-hide="fade">
-                    Home
-                  </q-tooltip>
-                </q-btn>
-              </q-item-section>
-              <q-item-section v-else>
-                <q-btn flat
-                       no-caps
-                       icon="o_cottage"
-                       :to="{ name: 'home' }"
-                       :color="$route.name === 'home' ? 'primary600': 'neutral500'"
-                       :class="{ activebg: $route.name === 'home' }">
-                  <q-item-section>
-                    <div class="icon-label-wrapper">
-                      <span class="label-style">Home</span>
-                    </div>
-                  </q-item-section>
-                  <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                    Home
-                  </q-tooltip>
-                </q-btn>
-              </q-item-section>
-            </q-item>
-
-            <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="mdi-database"
-                         :to="{name:'repositories'}"
-                         :color=" ['repositories'].includes($route.name) ? 'primary600': 'neutral500' "
-                         :class="{ activebg:  ['repositories'].includes($route.name) }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Repositories</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Repositories
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="mdi-database"
-                         :to="{name:'repositories'}"
-                         :color=" ['repositories'].includes($route.name) ? 'primary600': 'neutral500' "
-                         :class="{ activebg:  ['repositories'].includes($route.name) }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Repositories</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Repositories
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-
-            <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="o_layers"
-                         :to="{name:'datasources'}"
-                         :color=" ['datasources', 'dsIntegration'].includes($route.name) ? 'primary600': 'neutral500' "
-                         :class="{ activebg:  ['datasources', 'dsIntegration'].includes($route.name) }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Datasets</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Datasets
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="o_layers"
-                         :to="{name:'datasources'}"
-                         :color=" ['datasources', 'dsIntegration'].includes($route.name) ? 'primary600': 'neutral500' "
-                         :class="{ activebg:  ['datasources', 'dsIntegration'].includes($route.name) }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Datasets</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Datasets
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-
-            <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="o_hub"
-                         :to="{name: 'schema'}"
-                         :color="$route.name === 'schema' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'schema' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Schema</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Schema
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="o_hub"
-                         :to="{name: 'schema'}"
-                         :color="$route.name === 'schema' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'schema' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Schema</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Schema
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-  
-            <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="mdi-chat-question"
-                         :to="{name:'query'}"
-                         :color="$route.name === 'query' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'query' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Query</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Query
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="mdi-chat-question"
-                         :to="{name:'query'}"
-                         :color="$route.name === 'query' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'query' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Query</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Query
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-
-              <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="mdi-selection-search"
-                         :to="{name:'data-products'}"
-                         :color="$route.name === 'data-products' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'data-products' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Data products</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Data products
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="mdi-selection-search"
-                         :to="{name:'data-products'}"
-                         :color="$route.name === 'data-products' ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'data-products' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Data products</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Data products
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-
-              <q-item exact manual-focus>
-                <q-item-section v-if="miniState" avatar>
-                  <q-btn flat
-                         no-caps
-                         padding="xs"
-                         icon="mdi-thought-bubble"
-                         :to="{name:'intents-list'}"
-                         :color=" ['intents-list', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows'].includes($route.name) ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'intents-list' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Intents</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right"
-                               self="center left"
-                               :offset="[10, 10]"
-                               transition-show="fade"
-                               transition-hide="fade">
-                      Intents
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section v-else>
-                  <q-btn flat
-                         no-caps
-                         icon="mdi-thought-bubble"
-                         :to="{name:'intents-list'}"
-                         :color=" ['intents-list', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows'].includes($route.name) ? 'primary600': 'neutral500' "
-                         :class="{ activebg: $route.name === 'intents-list' }">
-                    <q-item-section>
-                      <div class="icon-label-wrapper">
-                        <span class="label-style">Intents</span>
-                      </div>
-                    </q-item-section>
-                    <q-tooltip anchor="center right" self="center left" :offset="[10, 10]" transition-show="fade" transition-hide="fade">
-                      Intents
-                    </q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-
+            <SideBarElement :icon="'o_folder'" :url="'projects'" :active-routes="['projects']" :label="'Projects'" :mini-state="miniState"/>
+            <SideBarElement :icon="'o_cottage'" :url="'home'" :active-routes="['home']" :label="'Home'" :mini-state="miniState"/>
+            <SideBarElement :icon="'mdi-database'" :url="'repositories'" :active-routes="['repositories']" :label="'Repositories'" :mini-state="miniState"/>
+            <SideBarElement :icon="'o_layers'" :url="'datasources'" :active-routes="['datasources', 'dsIntegration']" :label="'Datasets'" :mini-state="miniState"/>
+            <SideBarElement :icon="'o_hub'" :url="'schema'" :active-routes="['schema']" :label="'Schema'" :mini-state="miniState"/>
+            <SideBarElement :icon="'mdi-chat-question'" :url="'query'" :active-routes="['query']" :label="'Query'" :mini-state="miniState"/>
+            <SideBarElement :icon="'mdi-selection-search'" :url="'data-products'" :active-routes="['data-products']" :label="'Data products'" :mini-state="miniState"/>
+            <SideBarElement :icon="'mdi-thought-bubble'" :url="'intents-list'" :active-routes="['intents-list', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows']" :label="'Intents'" :mini-state="miniState"/>
           </div>
 
           <div class="fixed-bottom">
 
             <q-item manual-focus>
               <q-item-section avatar>
-                <q-btn class="q-mr-xs" flat round @click="authStore.setDark()"
-                       :icon="$q.dark.isActive ? 'nights_stay' : 'wb_sunny'"/>
+                <q-btn class="q-mr-xs" flat round @click="authStore.setDark()" :icon="$q.dark.isActive ? 'nights_stay' : 'wb_sunny'"/>
               </q-item-section>
-
             </q-item>
 
             <q-item manual-focus>
@@ -379,7 +49,6 @@
               </q-item-section>
             </q-item>
 
-
             <q-item manual-focus>
               <q-item-section avatar>
                 <q-btn round flat>
@@ -387,8 +56,7 @@
                     <img src="https://cdn.quasar.dev/img/boy-avatar.png"/>
                   </q-avatar>
 
-                  <q-menu auto-close transition-show="scale" transition-hide="scale" anchor="top end"
-                          self="bottom left">
+                  <q-menu auto-close transition-show="scale" transition-hide="scale" anchor="top end" self="bottom left">
                     <q-list style="min-width: 100px">
                       <q-item clickable @click="authStore.logout()">
                         <q-item-section>Log out</q-item-section>
@@ -416,24 +84,14 @@
 import {ref} from "vue";
 import ODIN_short from "components/icons/ODIN_short.vue";
 import {useAuthStore} from 'stores/authStore.js'
-// import {outlinedHub as hubi}  from "@quasar/extras/material-icons-outlined"
+import SideBarElement from "./SideBarElement.vue";
 const miniState = ref(false)
 const authStore = useAuthStore()
 
-function expandDrawer() {
-  if (miniState.value) {
-    miniState.value = false;
-  }
-}
-
-function contractDrawer() {
-  if (!miniState.value) {
-    miniState.value = true;
-  }
-}
 </script>
 
 <style lang="scss">
+
 .q-drawer--left.q-drawer--bordered {
   border-right: 1px solid rgb(234, 234, 239);
 }
@@ -445,46 +103,15 @@ function contractDrawer() {
 }
 
 .body--dark {
-
   .activebg {
     background-color: $neutral100d;
   }
-
 }
 
-/* a.router-link-exact-active{
-  background-color: #f0f0ff;
-} */
-/* .bg-color {
-   background-color: #f4f8fb;
-  background-color: #ffffff;
-} */
 .bg-white {
   background-color: #ffffff;
 }
 
-.bg-active {
-  /* color: #8f81bd; */
-  /* color:#5e429e; */
-  /* background: #f0edfd; */
-  /* background: #e7e2f3; */
-}
-
-/* .bg-active .q-btn {
-  background: #e7e2f3;
-} */
-/*@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");*/
-/*body {*/
-/*  background-color: #fff;*/
-/*  color: #171717;*/
-/*  transition: background-color 0.2s ease, color 0.2s ease;*/
-/*}*/
-/*body.dark-mode {*/
-/*  background-color: #242424;*/
-/*}*/
-/*body.dark-mode .flex h1 {*/
-/*  color: #fff;*/
-/*}*/
 .mode-toggle {
   position: relative;
   padding: 0;
@@ -556,8 +183,8 @@ body.dark-mode .mode-toggle .toggle #dark-mode:before {
 }
 
 .top-buttons-wrapper {
-  max-height: calc(100vh - 275px); /* Ajusta la altura máxima según tus necesidades */
-  overflow-y: auto; /* Agrega la barra de desplazamiento vertical cuando sea necesario */
+  max-height: calc(100vh - 275px);
+  overflow-y: auto
 }
 
 .btn-fixed-width {

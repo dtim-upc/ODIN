@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.nextiabs.bootstrap;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
 import edu.upc.essi.dtim.nextiabs.databaseConnection.PostgresSQLImpl;
@@ -20,9 +21,11 @@ public class BootstrapFactory {
         } else if (dataset instanceof APIDataset) {
             instance = new JSONBootstrap(dataset.getId(), dataset.getDatasetName(), ((APIDataset) dataset).getJsonPath());
         } else if (dataset instanceof SQLDataset) {
+            String url = ((RelationalJDBCRepository) dataset.getRepository()).getUrl();
+            String databaseName = url.substring(url.lastIndexOf("/") + 1);
             instance = new SQLBootstrap(dataset.getId(), dataset.getDatasetName(), ((SQLDataset) dataset).getTableName(), new PostgresSQLImpl(),
                     ((SQLDataset) dataset).getHostname(), ((SQLDataset) dataset).getPort(), ((SQLDataset) dataset).getUsername(),
-                    ((SQLDataset) dataset).getPassword(), dataset.getDatasetName());
+                    ((SQLDataset) dataset).getPassword(), databaseName);
         } else if (dataset instanceof XMLDataset) {
             instance = new XMLBootstrap(dataset.getId(), dataset.getDatasetName(), ((XMLDataset) dataset).getPath());
         } else if (dataset instanceof ParquetDataset) {

@@ -51,16 +51,16 @@
 import {ref, onBeforeMount} from "vue";
 import TableQueryResult from "components/tables/TableQueryResult.vue";
 import Graph from 'components/graph/Graph.vue'
-import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+import {useDatasetsStore} from 'src/stores/datasetsStore.js'
+import {useProjectsStore} from 'src/stores/projectsStore.js'
 import {useQueriesStore} from 'src/stores/queriesStore.js'
 import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
-import {useNotify} from 'src/use/useNotify.js'
 
-const storeDS = useDataSourceStore()
+const storeDS = useDatasetsStore()
 const queriesStore = useQueriesStore();
 const dataProductsStore = useDataProductsStore();
+const projectsStore = useProjectsStore();
 const alert = ref(false);
-const notify = useNotify();
 
 const persistData = ref(false);
 const dataProductColumns = ref([]);
@@ -119,8 +119,8 @@ const setSchema = datasource => {
 
 const setGlobalSchema = () => {
   selectedSchema.value = 'project'
-  graphical.value = storeDS.getGlobalSchema
-  graphID.value = storeDS.project.projectId
+  graphical.value = projectsStore.getGlobalSchema
+  graphID.value = projectsStore.currentProject.projectId
   graphType = "global"
 }
 
@@ -135,7 +135,7 @@ const queryGraph = (data) => {
     showResultQuery(responseData.columns, responseData.rows)
   }
 
-  queriesStore.queryGraph(storeDS.project.projectId, data, successCallback)
+  queriesStore.queryGraph(projectsStore.currentProject.projectId, data, successCallback)
 }
 
 const postDataProduct = () => {
@@ -146,12 +146,11 @@ const postDataProduct = () => {
   data.append("dataProductDescription", dataProductDescription.value);
   data.append("columns", dataProductColumns.value);
 
-  dataProductsStore.postDataProduct(storeDS.project.projectId, data)
+  dataProductsStore.postDataProduct(projectsStore.currentProject.projectId, data)
 
 }
 
 onBeforeMount(async () => {
-  await storeDS.setProject();
   setGlobalSchema();
   document.title = "Query";
 })

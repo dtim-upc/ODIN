@@ -1,11 +1,14 @@
 package edu.upc.essi.dtim.odin.intents;
 
+import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class IntentController {
@@ -15,6 +18,20 @@ public class IntentController {
 
 
     // ---------------- CRUD Operations
+
+    /**
+     * Retrieves all intents from a specific project.
+     *
+     * @param projectID The ID of the project to retrieve intents from.
+     * @return A ResponseEntity object containing the list of intents or an error message.
+     */
+    @GetMapping("/project/{projectID}/intents")
+    public ResponseEntity<Object> getIntentsOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all intents from project " + projectID);
+        List<Intent> intents = intentService.getIntentsOfProject(projectID);
+        return new ResponseEntity<>(intents, HttpStatus.OK);
+    }
+
     /**
      * Adds a new intent into the system
      *

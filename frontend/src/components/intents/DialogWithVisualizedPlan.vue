@@ -25,7 +25,7 @@
 
 <script setup>
 
-import { ref, defineProps, defineEmits, watch } from 'vue';
+import { ref, defineEmits, watch } from 'vue';
 import VisualizePlan from './VisualizePlan.vue';
 
 

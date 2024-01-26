@@ -39,7 +39,7 @@ export const useDataProductsStore = defineStore('dataProducts', {
         notify.positive(`Data product successfully edited`);
         this.getDataProducts(projectID);
       } catch (error) {
-        notify.negative("Something went wrong in the server while editing the data.");
+        notify.negative("Error editing the data product");
         console.error("Error:", error);
       }
     },
@@ -50,7 +50,7 @@ export const useDataProductsStore = defineStore('dataProducts', {
         notify.positive(`Data product deleted successfully`);
         this.getDataProducts(projectID);
       } catch (error) {
-        notify.negative("Something went wrong in the server when deleting a data product.");
+        notify.negative("Error deleting the data product.");
         console.error("Error:", error);
       }
     },

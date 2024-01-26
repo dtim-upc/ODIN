@@ -50,6 +50,17 @@ public class IntentService {
     }
 
     /**
+     * Retrieves the list of intents associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of Intent objects belonging to the project.
+     */
+    public List<Intent> getIntentsOfProject(String projectID) {
+        Project project = projectService.getProject(projectID);
+        return project.getIntents();
+    }
+
+    /**
      * Adds a new data intent into the system.
      *
      * @param projectID        ID of the project to which the new dataset will be added.

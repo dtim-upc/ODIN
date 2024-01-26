@@ -2,117 +2,96 @@ import { defineStore } from 'pinia';
 import {useNotify} from 'src/use/useNotify.js'
 import repositoryAPI from "src/api/repositoryAPI.js";
 
+const notify = useNotify();
+
 export const useRepositoriesStore = defineStore('repositories', {
-    state: () => ({
-        repositories: [],
-        selectedRepositoryId: null,
-        selectedRepositoryType: null,
-        selectedRepositoryName: null,
-    }),
+  state: () => ({
+    repositories: [],
+    selectedRepository: {},
+  }),
 
-    actions: {
-        async init() {
-
-        },
-
-        setSelectedRepositoryId(repositoryId) {
-          this.selectedRepositoryId = repositoryId;
-          this.setSelectedRepositoryName(repositoryId);
-          this.selectedRepositoryType = this.repositories.some(repository => repository.id === this.selectedRepositoryId) ? this.repositories.find(repository => repository.id === this.selectedRepositoryId).repositoryType : "ERROR 404 No type";
-        },
+  actions: {
     
-        setSelectedRepositoryName(repositoryId) {
-          this.selectedRepositoryName = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId).repositoryName : "ERROR 404 No name";
-        },
-
-        postRepository(projectID, data, success) {
-          const notify = useNotify()
-          console.log("adding data source...", data)
-          repositoryAPI.postRepository(projectID, data)
-            .then((response) => {
-              console.log("dataset created ", response)
-              if (response.status === 200) {
-                success(response.data)
-              } else {
-                notify.negative("Cannot create datasource. Something went wrong in the server.")
-              }
-            }).catch((error) => {
-            console.log("error addding ds: ", error)
-            notify.negative("Something went wrong in the server.")
-          });
-        },
-
-        async getAllRepositories(projectId) {
-            const notify = useNotify()
-            console.log("Getting repositories...")
-
-            await repositoryAPI.getAllRepositories(projectId).then(response => {
-              console.log("repos received", response.data)
-              if (response.data === "") { // when no datasources, api answer ""
-                this.repositories = []
-                notify.positive("There are no repositories yet. Add sources to see them.")
-              } else if (response.status === 204) {
-                this.repositories = []
-                notify.positive("There are no repositories yet. Add sources to see them.")
-              } else {
-                this.repositories = response.data
-              }
-            }).catch(err => {
-              console.log("error retrieving data sources")
-              console.log(err)
-              if (err.response && err.response.status === 401) {
-                // Handle unauthorized error
-                // Notify the user or perform any other necessary actions
-                notify.negative("Unauthorized access.")
-              } else if (err.response && err.response.status === 404) {
-                this.repositories = []
-                notify.negative("Repositories not found.")
-              } else {
-                notify.negative("Cannot connect to the server.")
-              }
-            });
-          },
-
-          putRepository(repositoryID, projectID, data, successCallback) {
-            const notify = useNotify();
-      
-            repositoryAPI.putRepository(repositoryID, projectID, data)
-              .then((response) => {
-                if (response.status === 200) {
-                  notify.positive(`Repository successfully edited`);
-                  successCallback()
-                } else {
-                  notify.negative("Cannot edit data. Something went wrong on the server.");
-                }
-              })
-              .catch((error) => {
-                console.log("Error is: " + error);
-                if (error.response) {
-                  notify.negative("Something went wrong on the server while editing the data.");
-                }
-              });
-          },
-
-        deleteRepository(projectID, repositoryID) {
-            const notify = useNotify();
-            console.log("Deleting repository with ID ", repositoryID)
-
-            repositoryAPI.deleteRepository(projectID, repositoryID).then((response) => {
-                if (response.status === 200) {
-                  notify.positive(`Repository deleted successfully`)
-                  var index = this.repositories.map(function(repo) { return repo.id; }).indexOf(repositoryID);
-                  if (index > -1) {
-                    this.repositories.splice(index, 1) // remove from local store
-                  }
-                } else {
-                  notify.negative("Repository could not be deleted.")
-                }
-            }).catch((error) => {
-                console.log("error is: " + error)
-                if (error.response) {
-                    notify.negative("Something went wrong in the server when deleting a repository.")
-                }
-            });
-        }
+    setSelectedRepository(repositoryId) {
+      this.selectedRepository = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId) : "ERROR 404 No repository";
     },
+
+    // ------------ CRUD operations
+    async getRepositories(projectId) {
+      try {
+        const response = await repositoryAPI.getRepositories(projectId);
+        if (response.data === "") {
+          this.repositories = [];
+        } else {
+          this.repositories = response.data;
+        }
+      } catch (error) {
+        notify.negative("Error getting the repositories");
+        console.error("Error:", error);
+      }
+    },
+    
+    async postRepository(projectID, data, successCallback) {
+      try {
+        await repositoryAPI.postRepository(projectID, data);
+        notify.positive(`Repository successfully created`);
+        this.getRepositories(projectID);
+        successCallback()
+      } catch (error) {
+        notify.negative("Error creating the repository");
+        console.error("Error:", error);
+      }
+    },
+
+    async putRepository(repositoryID, projectID, data, successCallback) {
+      try {
+        await repositoryAPI.putRepository(repositoryID, projectID, data);
+        notify.positive(`Repository successfully edited`);
+        this.getRepositories(projectID)
+        successCallback();
+      } catch (error) {
+        notify.negative("Error editing the repository");
+        console.error("Error:", error);
+      }
+    },
+
+    async deleteRepository(projectID, repositoryID) {
+      try {
+        await repositoryAPI.deleteRepository(projectID, repositoryID);
+        notify.positive(`Repository deleted successfully`);
+        this.getRepositories(projectID);
+      } catch (error) {
+        notify.negative("Error deleting the repository");
+        console.error("Error:", error);
+      }
+    },
+
+    // ------------ Operations related to JDBC repositories
+    async testConnection(data) {
+      try { 
+        const response = await repositoryAPI.testConnection(data);
+        if (response.data === true) {
+          notify.positive('Connection established successfully.');
+          return true;
+        } else {
+          notify.negative("Error connecting with the provided database.");
+          return false;
+        }
+      } catch (error) {
+        notify.error('Error while trying to connect with the database');
+        console.error("Error:", error);
+        return false;
+      }
+    },
+
+    async retrieveDBTables(projectID, repositoryID) {
+      try {
+        const response = await repositoryAPI.retrieveDBTables(projectID, repositoryID);
+        return response.data;
+      } catch (error) {
+        notify.error('Error awhile trying to get the tables of the database.');
+        console.error("Error:", error);
+      }
+    }
+  },
 });

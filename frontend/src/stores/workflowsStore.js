@@ -21,11 +21,12 @@ export const useWorkflowsStore = defineStore('store', {
       }
     },
 
-    async putWorkflow(intentID, projectID, workflowID, data) {
+    async putWorkflow(intentID, projectID, workflowID, data, successCallback) {
       try {
         await workflowAPI.putWorkflow(intentID, projectID, workflowID, data);
         notify.positive(`Workflow successfully edited`);
         useIntentsStore().getAllIntents(projectID); // Refresh the intents and, as such, the workflows
+        successCallback();
       } catch (error) {
         notify.negative("Error editing the workflow");
         console.error("Error:", error);
@@ -33,8 +34,6 @@ export const useWorkflowsStore = defineStore('store', {
     },
 
     async deleteWorkflow(projectID, intentID, workflowID) {
-      const notify = useNotify();
-
       try {
         await workflowAPI.deleteWorkflow(projectID, intentID, workflowID);
         notify.positive(`Workflow deleted successfully`);

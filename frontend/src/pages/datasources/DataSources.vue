@@ -1,12 +1,12 @@
 <template>
   <!-- class="flex flex-center" -->
   <q-page>
-    <TableDataSources/>
+    <TableDatasets/>
   </q-page>
 </template>
 
 <script setup>
-import TableDataSources from 'components/tables/TableDataSources.vue';
+import TableDatasets from 'components/tables/TableDatasets.vue';
 
 import { onBeforeMount } from "vue";
 

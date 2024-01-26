@@ -7,23 +7,14 @@
       <div class="paper"></div>
       <div class="folder__front" :style="folderFrontColor"></div>
       <div class="folder__front right" :style="folderFrontColor" @click="openFolder(props.row)">
-        <!-- q-mt-md -->
-        <!-- <div class="col"> -->
-        <div class="row no-wrap items-center  q-pa-sm rounded-borders">
+
+        <div class="row no-wrap items-center q-pa-sm rounded-borders">
           <span> {{ props.row.projectName }}</span>
           <q-space/>
-          <q-btn-dropdown @show="activeFolder = props.row.projectId" @before-hide="activeFolder = ''" color="primary"
+          <q-btn-dropdown @show.stop="activeFolder = props.row.projectId" @before-hide.stop="activeFolder = ''" color="primary"
                           flat dropdown-icon="more_horiz" no-icon-animation padding="none" menu-anchor="top right"
                           menu-self="top left" @click.stop.prevent>
             <q-list dense>
-              <q-item clickable v-close-popup @click="onItemClick">
-                <q-item-section avatar style="min-width: 30px;padding:0">
-                  <q-icon color="primary" name="settings"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Settings</q-item-label>
-                </q-item-section>
-              </q-item>
 
               <q-item clickable v-close-popup @click="openEditDialog(props.row)">
                 <q-item-section avatar style="min-width: 30px;padding:0">
@@ -34,38 +25,15 @@
                 </q-item-section>
               </q-item>
 
-              <q-item clickable v-close-popup @click="cloneProject(props.row.projectId)">
-                <q-item-section avatar style="min-width: 30px; padding:0">
-                  <q-icon color="primary" name="folder_copy"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Clone</q-item-label>
-                </q-item-section>
-              </q-item>
+              <FolderAction icon="edit" label="Edit" :onItemClick="() => openEditDialog(props.row)" />
+              <FolderAction icon="folder_copy" label="Clone" :onItemClick="() => projectsStore.cloneProject(props.row.projectId, success)" />
+              <FolderAction icon="delete" label="Delete" :onItemClick="() => projectsStore.deleteProject(props.row.projectId)" />
 
-              <q-item clickable v-close-popup @click="onItemClick">
-                <q-item-section avatar style="min-width: 30px;padding:0">
-                  <q-icon color="primary" name="join_full"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Integrate</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup @click="deleteItem(props.row.projectId)">
-                <q-item-section avatar style="min-width: 30px;padding:0">
-                  <q-icon color="primary" name="delete"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Delete</q-item-label>
-                </q-item-section>
-              </q-item>
             </q-list>
           </q-btn-dropdown>
         </div>
         <div style="position:absolute;bottom:0;width:100%">
           <div class="row no-wrap items-center q-mt-md q-pa-sm rounded-borders">
-            <!-- <span> {{ props.row.createdBy }}</span> -->
             <q-chip :style="folderBackColor" text-color="white">
               {{ props.row.repositories.reduce((total, repo) => total + repo.datasets.length, 0) }} files
             </q-chip>
@@ -79,27 +47,10 @@
       </div>
       <div class="folder__back_after" :style="folderBackColor">
       </div>
-
     </div>
-
   </div>
-
-  <q-dialog v-model="showEditDialog">
-    <q-card flat bordered class="my-card" style="min-width: 30vw;">
-      <q-card-section>
-        <div class="text-h6">Edit project</div>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <AddFolderForm
-          @submit-success="showEditDialog=false"
-          @cancel-form="showEditDialog=false"
-          :projectData="selectedProject"
-        ></AddFolderForm>
-      </q-card-section>
-    </q-card>
-  </q-dialog>
+  <AddFolderForm v-model:show="showEditDialog" :projectData="selectedProject"/>
 </template>
-
 
 <script setup>
 import {ref, computed} from "vue";
@@ -108,6 +59,7 @@ import {colors} from 'quasar'
 import {useProjectsStore} from "stores/projectsStore";
 import AddFolderForm from 'components/forms/AddFolderForm.vue';
 import {optionsPrivacy} from "./PrivacyOptions";
+import FolderAction from "./FolderAction.vue";
 
 const showEditDialog = ref(false);
 const selectedProject = ref(null);
@@ -129,37 +81,12 @@ const folderFrontColor = computed(() => 'background:' + props.row.projectColor +
 
 const openFolder = (project) => {
   router.push({name: 'home', params: {id: project.projectId}})
+  projectsStore.setCurrentProject(project)
 }
-const onItemClick = (project, event) => {
-  const option = event.currentTarget.innerText;
-  switch (option) {
-    case 'Edit':
-      openEditDialog(project);
-      break;
-    case 'Delete':
-      deleteItem(project.projectId);
-      break;
-    // Handle other options if needed
-    default:
-      break;
-  }
-};
-
-const token = 'your_token_value_here';
-
-const deleteItem = (id) => {
-  // Perform deletion logic here
-  projectsStore.deleteProject(id, token);
-};
 
 const openEditDialog = (project) => {
-  selectedProject.value = project; // Make a copy of the project data to avoid reactivity issues
+  selectedProject.value = project;
   showEditDialog.value = true;
-};
-
-const cloneProject = (id) => {
-  // Perform clone logic here
-  projectsStore.cloneProject(id, success);
 };
 
 const emit = defineEmits(["submitSuccess", "cancelForm"]);
@@ -169,11 +96,9 @@ const success = () => {
 };
 </script>
 
-
 <style lang="scss">
 $folderColor: #70a1ff;
 $paperColor: #ffffff;
-
 
 .folder {
   transition: all 0.2s ease-in;
@@ -188,7 +113,7 @@ $paperColor: #ffffff;
 
     .folder__back_after {
       position: absolute;
-      bottom: 98%; //if 100% you can see a little gap on Chrome
+      bottom: 98%; 
       left: 0;
       content: "";
       width: 35%;
@@ -206,8 +131,6 @@ $paperColor: #ffffff;
       background: darken($paperColor, 10%);
       border-radius: 5px;
       transition: all 0.3s ease-in-out;
-
-      //make paper bigger and bigger
 
       &:nth-child(2) {
         background: darken($paperColor, 5%);
@@ -242,17 +165,6 @@ $paperColor: #ffffff;
   &.active .paper {
     transform: translate(-50%, 0%);
   }
-
-  //there are 2 parts for the front of folder
-  //one goes left and another goes right
-
-  //   &:hover .folder__front {
-  //     transform: skew(15deg) scaleY(0.6);
-  //   }
-
-  //   &:hover .right {
-  //     transform: skew(-15deg) scaleY(0.6);
-  //   }
 
   &.active .folder__front {
     transform: skew(15deg) scaleY(0.6);

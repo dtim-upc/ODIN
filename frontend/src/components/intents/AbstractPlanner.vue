@@ -8,7 +8,7 @@
                 <q-input label="Intent name" outlined v-model="intentName" class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
 
-                <q-select label="Query" outlined v-model="selectedDataProdutName" :options="dataProductsStore.dataProducts.map(dp => dp.datasetName)" class="q-mb-sm"
+                <q-select label="Data product" outlined v-model="selectedDataProdutName" :options="dataProductsStore.dataProducts.map(dp => dp.datasetName)" class="q-mb-sm"
                     :rules="[ val => val && val.length > 0 || 'Select a dataset']"/>
                 
                 <q-select label="Problem" outlined v-model="problem" :options=Object.keys(intentsStore.problems) class="q-mb-sm"
@@ -31,7 +31,6 @@
 <script setup>
 import {ref, onMounted, computed} from 'vue'
 import {useIntentsStore} from 'stores/intentsStore.js'
-import {useQueriesStore} from 'stores/queriesStore.js'
 import {useDataProductsStore} from 'stores/dataProductsStore.js'
 import {useRoute, useRouter} from "vue-router";
 import { useQuasar } from 'quasar'
@@ -110,6 +109,10 @@ onMounted(async() => {
 </script>
 
 <style scoped>
+
+.reduced-height {
+  max-height: 500px;
+}
 
 
 </style>

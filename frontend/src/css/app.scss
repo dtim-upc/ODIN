@@ -1,6 +1,6 @@
 @import '@vue-flow/core/dist/style.css';
 
-/* import the default theme (optional) */
+// import the default theme
 @import '@vue-flow/core/dist/theme-default.css';
 
 @import '@vue-flow/controls/dist/style.css';
@@ -10,15 +10,8 @@
 
 // app global css in SCSS form
 .body--light {
-  /* background-color: #f4f8fb; */
-  /* background-color: #ffffff; */
-  // background-color: $neutral100;
   background-color: #ecebf3;
 }
-
-// .body--dark {
-//     background-color: $neutral100d;
-// }
 
 .q-btn--rectangle {
   border-radius: 4px;
@@ -29,15 +22,11 @@
 }
 
 .q-item--dark {
-
   color: $neutral400;
 }
 
-
 .bg-primary700 {
-
   background: $primary700;
-
 }
 
 
@@ -54,7 +43,6 @@
   .bg-white-color {
     background-color: #fff;
   }
-
 
 }
 
@@ -80,7 +68,6 @@
     color: $primary700d;
   }
 
-
   .text-neutral500 {
     color: $neutral400;
   }
@@ -88,10 +75,4 @@
   .bg-white-color {
     background-color: $dark;
   }
-
-  /* ... */
-
-  // aside.q-dark {
-  //     background: $neutral0d;
-  // }
 }

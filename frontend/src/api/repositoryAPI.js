@@ -4,7 +4,7 @@ export default {
   postRepository(projectID, data) {
     return odinApi.post('/project/' + projectID + '/repository', data)
   },
-  getAllRepositories(projectID) {
+  getRepositories(projectID) {
     return odinApi.get('/project/' + projectID + '/repositories')
   },
   putRepository(repositoryID, projectID, data) {
@@ -12,5 +12,11 @@ export default {
   },
   deleteRepository(projectID, repositoryID) {
     return odinApi.delete('/project/' + projectID + '/repository/' + repositoryID)
+  },
+  testConnection(data) {
+    return odinApi.post('/test-connection', data)
+  },
+  retrieveDBTables(projectID, repositoryId) {
+    return odinApi.get('/project/' + projectID + '/repository/' + repositoryId + '/get-tables')
   }
 }

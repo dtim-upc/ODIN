@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.datasets;
 
+import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,19 @@ public class DatasetController {
     private DatasetService datasetService;
 
     // ---------------- CRUD Operations
+    /**
+     * Retrieves all datasets from a specific project.
+     *
+     * @param projectId The ID of the project to retrieve datasets from.
+     * @return A ResponseEntity object containing the list of datasets or an error message.
+     */
+    @GetMapping("/project/{projectId}/datasets")
+    public ResponseEntity<Object> getDatasetsFromProject(@PathVariable String projectId) {
+        logger.info("Get all datasets from project " + projectId);
+        List<Dataset> datasets = datasetService.getDatasetsOfProject(projectId);
+        return new ResponseEntity<>(datasets, HttpStatus.OK);
+    }
+
     /**
      * Adds a new dataset into the system, which requires to create the dataset object, execute a bootstrap operation,
      * transform the data into a graph and store it to the databases (ODIN and data layer).
@@ -111,7 +125,7 @@ public class DatasetController {
      * @param url URL to get the file from.
      * @return If the task was successful return a ResponseEntity containing the files(s).
      */
-    @GetMapping("/download")
+    @GetMapping("/download-file")
     public ResponseEntity<ByteArrayResource> downloadFileFromURL(@RequestParam String url) {
         logger.info("Downloading file from URL: " + url);
         return datasetService.downloadFileFromURL(url);

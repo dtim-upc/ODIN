@@ -1,6 +1,5 @@
 import {route} from 'quasar/wrappers'
 import {createRouter, createMemoryHistory, createWebHistory, createWebHashHistory} from 'vue-router'
-import {useAuthStore} from 'src/stores/authStore.js'
 import routes from './routes'
 
 /*
@@ -12,7 +11,7 @@ import routes from './routes'
  * with the Router instance.
  */
 
-export default route(function (/* { store, ssrContext } */) {
+export default route(function () {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -20,37 +19,8 @@ export default route(function (/* { store, ssrContext } */) {
   const Router = createRouter({
     scrollBehavior: () => ({left: 0, top: 0}),
     routes,
-
-    // Leave this as is and make changes in quasar.conf.js instead!
-    // quasar.conf.js -> build -> vueRouterMode
-    // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
-
-
-  /*Router.beforeEach(async (to, from) => {
-    const authStore = useAuthStore()
-    authStore.init()
-
-
-      if(!authStore.user.accessToken && to.name !== 'auth') {
-        return { name: 'auth'}
-      }
-
-      // if(authStore.user.accessToken && from.name === 'auth') {
-      //   return {name: 'projects'}
-      // }
-
-      if(authStore.user.accessToken && to.name === 'auth') {
-        if(from.name === undefined)
-          return {name: 'projects'}
-        else
-          return false
-      }
-
-
-
-  })*/
 
   return Router
 })

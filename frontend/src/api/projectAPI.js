@@ -21,5 +21,5 @@ export default {
   },
   downloadProjectGraph(projectID) {
     return odinApi.get('/project/' + projectID + '/schema', {responseType: 'blob'})
-  }
+  },
 }

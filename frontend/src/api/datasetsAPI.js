@@ -13,10 +13,16 @@ export default {
   putDataset(projectID, datasetID, data) {
     return odinApi.put('/project/' + projectID + '/dataset/' + datasetID, data)
   },
-  downloadDatasetGraph(projectID, datasetID) {
+  downloadDatasetSchema(projectID, datasetID) {
     return odinApi.get('/project/' + projectID + '/dataset/' + datasetID + '/schema', {responseType: 'blob'})
   },
   setDatasetSchemaAsProjectSchema(projectID, datasetID) {
     return odinApi.post('/project/' + projectID + '/dataset/' + datasetID + '/set-project-schema')
   },
+  downloadFile(url) {
+    return odinApi.get('/download-file?url=' + encodeURIComponent(url), {responseType: 'arraybuffer'})
+  },
+  makeAPIRequest(url) {
+    return odinApi.get('/make-request?url=' + encodeURIComponent(url), {responseType: 'arraybuffer',})
+  }
 }

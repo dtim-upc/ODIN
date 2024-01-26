@@ -3,7 +3,6 @@ import * as d3 from "d3";
 
 export function useLazzo() {
 
-
     var poly;
     var points = [];
     var isEnabled = false;
@@ -100,8 +99,6 @@ export function useLazzo() {
         callback(clear);
       })
     }
-
-    
   
     // background is svg
     // width and height of svg...
@@ -125,8 +122,6 @@ export function useLazzo() {
 
         if(releaseFunct)
           releaseFunct(true)
-
-        console.log("up()...")
         state.started = false;
         points = [];
         poly.attr('points', to_str(points, 4, true));
@@ -136,13 +131,11 @@ export function useLazzo() {
       background.on('mouseup', up);
   
       background.on('mousemove', function(event) {
-        // console.log("moving...")
         if (!state.started) return;
         var pos = d3.pointer(event, background.select("g").node()); //background.select("g").node()
         // var pos= d3.mouse(background.select("g").node());
         var x = pos[0];
         var y = pos[1];
-        // console.log("x: "+x+" y: "+y)
         points.push([x, y])
         poly.attr('points', to_str(points, 4, true));
 
@@ -151,17 +144,11 @@ export function useLazzo() {
     }
 
     const removeEvents = (root ,background) => {
-
         background.on('mousedown',null)
         background.on('mouseup',null)
         background.on('mousemove',null)
         document.addEventListener('mouseup', null);
-
     }
-  
-
-
-
 
     return {
         enabled,
@@ -170,19 +157,6 @@ export function useLazzo() {
         initSelection,
         afterMarked,
         removeEvents
-
-
-    //   init: init,
-    //   marked: register,
-    //   contains: is_in,
-    //   state: state,
-    //   get_mouse_pos: get_mouse_pos,
-    //   points: points,
-    //   to_str: to_str,
-    //   set: function(points) {
-    //     points = points;
-    //     call(true);
-    //   }
     }
 
 

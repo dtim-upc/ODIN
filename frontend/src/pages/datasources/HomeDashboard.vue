@@ -25,7 +25,7 @@
 
             <q-list separator>
 
-              <q-item clickable style="padding:12px" v-ripple :active="active" @click="addDataSource = true">
+              <q-item clickable style="padding:12px" v-ripple :active="active" @click="postDataset = true">
 
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_file_upload" color="primary600 " class="activebg"></q-btn>
@@ -38,7 +38,7 @@
 
                 <q-item-section side>
 
-                  <q-btn v-if="integrationStore.getDatasourcesNumber==0 && storeDS.getDatasourcesNumber ==0"
+                  <q-btn v-if="storeDS.getDatasetsNumber == 0"
                          color="primary" label="Start" icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
@@ -60,7 +60,7 @@
 
                 <q-item-section side>
 
-                  <q-btn v-if="storeDS.getDatasourcesNumber==0" color="primary" label="Start"
+                  <q-btn v-if="storeDS.getDatasetsNumber==0" color="primary" label="Start"
                          icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
@@ -68,11 +68,10 @@
               </q-item>
 
 
-              <q-item clickable style="padding:12px" v-ripple :active="active" @click="addDataSource = true">
+              <q-item clickable style="padding:12px" v-ripple :active="active" @click="postDataset = true">
 
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_file_upload" color="primary600" class="activebg"/>
-                  <!-- <q-icon name="o_file_upload" :color="storeDS.getDatasourcesNumber > 1 || (integrationStore.getDatasourcesNumber>0 && storeDS.getDatasourcesNumber >0)? 'green':null"   /> -->
                 </q-item-section>
 
                 <q-item-section>
@@ -91,7 +90,6 @@
               <q-item clickable style="padding:12px" v-ripple :active="active" @click="showIntegrationView">
 
                 <q-item-section avatar>
-                  <!-- <q-icon :name="storeDS.getDatasourcesNumber > 1? 'check_circle':'o_merge'" :color="storeDS.getDatasourcesNumber > 1? 'green':null"  /> -->
                   <q-btn flat padding="xs" icon="o_merge" color="primary600" class="activebg"/>
                 </q-item-section>
 
@@ -103,7 +101,7 @@
                 </q-item-section>
 
                 <q-item-section side>
-                  <q-btn v-if="storeDS.getDatasourcesNumber < 2" color="primary" label="Start"
+                  <q-btn v-if="storeDS.getDatasetsNumber < 2" color="primary" label="Start"
                          icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
@@ -122,7 +120,6 @@
                 </q-item-section>
 
                 <q-item-section side>
-                  <!-- <q-icon name="o_navigate_next" color="green" /> -->
                   <q-btn color="primary" label="Start" icon-right="o_navigate_next" dense no-caps/>
                 </q-item-section>
 
@@ -139,7 +136,7 @@
     </div>
 
 
-    <FormNewDataSource v-model:show="addDataSource" :afterSubmitShowGraph="false"></FormNewDataSource>
+    <FormNewDataSource v-model:show="postDataset" :afterSubmitShowGraph="false"></FormNewDataSource>
 
   </q-page>
 </template>
@@ -148,39 +145,31 @@
 import {ref, onBeforeMount} from "vue";
 import {useRouter} from "vue-router";
 import FormNewDataSource from "components/forms/FormNewDataSource.vue";
-import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
+import {useDatasetsStore} from 'src/stores/datasetsStore.js'
 import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import home_pattern from "components/icons/home_pattern.vue";
 
-import {useAuthStore} from 'stores/authStore.js'
-
-const addDataSource = ref(false)
+const postDataset = ref(false)
 const active = ref(false)
 
 const router = useRouter()
 
-const authStore = useAuthStore()
 
-const storeDS = useDataSourceStore();
+const storeDS = useDatasetsStore();
 const integrationStore = useIntegrationStore()
 
 onBeforeMount(() => {
-  storeDS.setProject();
-  integrationStore.setProject();
   document.title = "Home"; // Título de la pestaña
 })
 
 const showIntegrationView = () => {
-  integrationStore.SelectOneDatasource();
   router.push({name: 'dsIntegration'})
 }
 
 const getStartedCompleteUpload2ndDS = () => {
 
 
-  if (storeDS.getDatasourcesNumber > 1) {
-    return true;
-  } else if (integrationStore.getDatasourcesNumber > 0 && storeDS.getDatasourcesNumber >= 1) {
+  if (storeDS.getDatasetsNumber > 1) {
     return true;
   }
   return false;
@@ -188,19 +177,8 @@ const getStartedCompleteUpload2ndDS = () => {
 }
 
 const progress = () => {
-
-  if (storeDS.getDatasourcesNumber >= 2) {
-    return 0.8
-  } else if (integrationStore.getDatasourcesNumber == 1 && storeDS.getDatasourcesNumber >= 1) {
-    return 0.6
-  } else if (integrationStore.getDatasourcesNumber == 1) {
-    return 0.2
-  } else if (storeDS.getDatasourcesNumber == 1) {
-    return 0.4
-  } else {
-    return 0
-  }
-
+  // todo: remake
+  return 0;
 }
 
 </script>

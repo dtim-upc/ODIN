@@ -28,15 +28,14 @@
 
           <q-card-section class="col">
             <div class="row bg-primary justify-center text-white q-pa-xs">
-              Project: {{ integrationStore.project.projectName }}
+              Project: {{ projectsStore.currentProject.projectName }}
             </div>
             <!-- <q-responsive :ratio="4/3" style="max-height: 53vh">
               <Webvowl :view="'bdi_manual_alignments'" :id="dsA.id" :minimal-i="dsA.type == 'INTEGRATED'? true: false"/>
             </q-responsive> -->
             <div class="row" style="min-height:50vh ;border: 1px #e4eaec;border-style: solid;">
               <div class="col">
-                <!-- integrationStore.selectedDS -->
-                <Graph :graphical="integrationStore.getGraphicalA" :alignment="alignment" :enableClickR="true"
+                <Graph :graphical="projectsStore.getGlobalSchema" :alignment="alignment" :enableClickR="true"
                        @elementClick="setAlignmentA"></Graph>
               </div>
               <!-- <div class="col-6">
@@ -106,6 +105,7 @@
 import {ref, reactive, onMounted} from "vue";
 import Graph from 'components/graph/Graph.vue'
 import {useIntegrationStore} from 'src/stores/integrationStore.js'
+import {useProjectsStore} from 'src/stores/projectsStore.js'
 
 const props = defineProps({
   dsA: {type: Object, default: {id: "", name: "", type: "", graphicalGraph: "", iri: "", path: ""}},
@@ -114,6 +114,7 @@ const props = defineProps({
 });
 
 const integrationStore = useIntegrationStore()
+const projectsStore = useProjectsStore()
 
 const alignment = reactive({
 
@@ -183,7 +184,7 @@ const resetRB = () => {
 
 
 const addAlignment = () => {
-  integrationStore.addAligment(alignment, true)
+  integrationStore.addAlignment(alignment, true)
   resetRA()
   resetRB()
 }

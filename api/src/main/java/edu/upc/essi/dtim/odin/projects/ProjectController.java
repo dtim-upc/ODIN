@@ -37,6 +37,18 @@ public class ProjectController {
     }
 
     /**
+     * Retrieves all projects of the system.
+     *
+     * @return A ResponseEntity containing a list of all projects and an OK HTTP code.
+     */
+    @GetMapping("/projects")
+    public ResponseEntity<List<Project>> getAllProjects() {
+        logger.info("GET request received for retrieving all projects");
+        List<Project> projects = projectService.getAllProjects();
+        return new ResponseEntity<>(projects, HttpStatus.OK);
+    }
+
+    /**
      * Creates a new project
      *
      * @param project The project to create.
@@ -47,18 +59,6 @@ public class ProjectController {
         logger.info("Post request received for creating project");
         Project newProject = projectService.saveProject(project);
         return new ResponseEntity<>(newProject, HttpStatus.CREATED);
-    }
-
-    /**
-     * Retrieves all projects of the system.
-     *
-     * @return A ResponseEntity containing a list of all projects and an OK HTTP code.
-     */
-    @GetMapping("/projects")
-    public ResponseEntity<List<Project>> getAllProjects() {
-        logger.info("GET request received for retrieving all projects");
-        List<Project> projects = projectService.getAllProjects();
-        return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
     /**
@@ -89,47 +89,6 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // ---------------- Operations to get data from the project's attributes
-
-    /**
-     * Get the repositories associated with a specific project.
-     *
-     * @param projectId The ID of the project.
-     * @return A ResponseEntity containing the list of repositories
-     */
-    @GetMapping("/project/{id}/repositories")
-    public ResponseEntity<List<DataRepository>> getRepositoriesOfProject(@PathVariable("id") String projectId) {
-        logger.info("GET request received for retrieving repositories of project " + projectId);
-        List<DataRepository> repositoriesOfProject = projectService.getRepositoriesOfProject(projectId);
-        return new ResponseEntity<>(repositoriesOfProject, HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves all datasets from a specific project.
-     *
-     * @param projectId The ID of the project to retrieve datasets from.
-     * @return A ResponseEntity object containing the list of datasets or an error message.
-     */
-    @GetMapping("/project/{projectId}/datasets")
-    public ResponseEntity<Object> getDatasetsFromProject(@PathVariable String projectId) {
-        logger.info("Get all datasets from project " + projectId);
-        List<Dataset> datasets = projectService.getDatasetsOfProject(projectId);
-        return new ResponseEntity<>(datasets, HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves all intents from a specific project.
-     *
-     * @param projectID The ID of the project to retrieve intents from.
-     * @return A ResponseEntity object containing the list of intents or an error message.
-     */
-    @GetMapping("/project/{projectID}/intents")
-    public ResponseEntity<Object> getIntentsOfProject(@PathVariable("projectID") String projectID) {
-        logger.info("Getting all intents from project " + projectID);
-        List<Intent> intents = projectService.getIntentsOfProject(projectID);
-        return new ResponseEntity<>(intents, HttpStatus.OK);
-    }
-
     // ---------------- Other operations
 
     /**
@@ -143,7 +102,6 @@ public class ProjectController {
         logger.info("Clone request received for cloning project with id: " +  projectId);
         Project projectClone = projectService.cloneProject(projectId);
         return new ResponseEntity<>(projectClone, HttpStatus.CREATED);
-
     }
 
     /**

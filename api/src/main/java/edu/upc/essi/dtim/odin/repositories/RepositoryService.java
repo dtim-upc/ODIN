@@ -256,4 +256,15 @@ public class RepositoryService {
 
         saveRepository(originalRepository);
     }
+
+    /**
+     * Retrieves the list of data repositories associated with a project.
+     *
+     * @param projectID The ID of the project.
+     * @return A list of DataRepository objects belonging to the project.
+     */
+    public List<DataRepository> getRepositoriesOfProject(String projectID) {
+        Project project = projectService.getProject(projectID);
+        return project.getRepositories();
+    }
 }

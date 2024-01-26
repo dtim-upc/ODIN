@@ -8,8 +8,8 @@
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
           <!-- Sección 1: Título form -->
           <div class="text-h4">Create new dataset</div>
-          <div class="text-h5">Parent Repository: {{ repositoriesStore.selectedRepositoryName }}</div>
-          <div class="text-h6">Repository Type: {{ repositoriesStore.selectedRepositoryType }}</div>
+          <div class="text-h5">Parent Repository: {{ repositoriesStore.selectedRepository.repositoryName }}</div>
+          <div class="text-h6">Repository Type: {{ repositoriesStore.selectedRepository.repositoryType }}</div>
 
           <!-- Sección 2: Información del Conjunto de Datos -->
           <q-card-section v-if="uploadedItems.length > 0">
@@ -22,9 +22,9 @@
                    @mouseover="showSpecialButton(index)" @mouseleave="hideSpecialButton(index)">
 
                 <div class="special-button special-button-hidden">
-                  <q-button @click="removeUploadedItem(index)" flat round>
+                  <q-btn @click="removeUploadedItem(index)" flat round>
                     <q-icon name="close" size="1.25em"/>
-                  </q-button>
+                  </q-btn>
                 </div>
 
                 <template
@@ -187,53 +187,27 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted, watch, computed, onBeforeMount} from "vue";
+import {ref, reactive, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integrationStore.js'
-import {useDataSourceStore} from "../../stores/datasourcesStore";
+import {useDatasetsStore} from "../../stores/datasetsStore";
 import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
 import {odinApi} from "../../boot/axios";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
-
 
 const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
 const apiDatasetName = ref(""); // 
 
 async function downloadFile() {
-  let url = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
-  try {
-    const response = await odinApi.get(`/download?url=${encodeURIComponent(url)}`, {
-      responseType: 'arraybuffer', // Cambia el tipo de respuesta a 'arraybuffer'
-    });
-
-    const contentDisposition = response.headers['content-disposition'];
-    let filename;
-
-    if (contentDisposition) {
-      // Si el encabezado content-disposition existe, obtén el nombre del archivo
-      filename = contentDisposition.split(';')[1].trim().split('=')[1];
-    } else {
-      // Si el encabezado no existe, intenta obtener el nombre del archivo de la URL
-      const urlParts = url.split('/');
-      filename = urlParts[urlParts.length - 1];
-    }
-
-    // Crea un nuevo objeto File a partir de la respuesta
-    const blob = new Blob([response.data], {type: 'application/octet-stream'});
-    const file = new File([blob], filename, {type: 'application/octet-stream'});
-
-    // Agrega el archivo a la lista uploadedItems
-    uploadedItems.value.push(file);
-  } catch (error) {
-    console.error('Error al descargar el archivo:', error);
-  }
+  let url = remoteFileUrl.value;
+  file = datasetsStore.downloadFile(url);
+  uploadedItems.value.push(file)
 }
 
 async function makeRequest() {
   let endpoint = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
 
-  let id_buscar = repositoriesStore.selectedRepositoryId; // Define el ID que deseas buscar
+  let id_buscar = repositoriesStore.selectedRepository.id; // Define el ID que deseas buscar
 
   let repositorio_encontrado = null; // Inicializa con null, no con None
 
@@ -248,37 +222,11 @@ async function makeRequest() {
   if (repositorio_encontrado) {
     notify.positive("REQUEST MADE: " + repositorio_encontrado.url + endpoint);
 
-    try {
-      const response = await odinApi.get(`/make-request?url=${encodeURIComponent(repositorio_encontrado.url + endpoint)}`, {
-        responseType: 'arraybuffer',
-      });
+    newDatasource.endpoint = endpoint;
+    newDatasource.apiDatasetName = apiDatasetName
 
-      newDatasource.endpoint = endpoint;
-      newDatasource.apiDatasetName = apiDatasetName
-
-      const contentDisposition = response.headers['content-disposition'];
-      let filename;
-
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match) {
-          filename = match[1];
-        }
-      } else {
-        // Si no se encuentra Content-Disposition, intenta obtener el nombre del archivo del URL
-        const urlParts = repositorio_encontrado.url.split('/');
-        filename = urlParts[urlParts.length - 1] + ".json";
-      }
-
-      // Crea un nuevo objeto File a partir de la respuesta
-      const blob = new Blob([response.data], {type: 'application/json'});
-      const file = new File([blob], filename, {type: 'application/json'});
-
-      uploadedItems.value.push(file);
-    } catch (error) {
-      console.error('Error al descargar el archivo:', error);
-    }
-
+    file = datasetsStore.makeAPIRequest(repositorio_encontrado.url + endpoint);
+    uploadedItems.value.push(file);
   } else {
     notify.negative("REPOSITORY NOT FOUND");
   }
@@ -306,7 +254,7 @@ const showS = computed({
   }
 })
 
-const storeDS = useDataSourceStore();
+const datasetsStore = useDatasetsStore();
 const repositoriesStore = useRepositoriesStore()
 
 // -------------------------------------------------------------
@@ -339,43 +287,16 @@ async function initializeComponent() {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await repositoriesStore.getAllRepositories(projectID.value);
-
-    console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-
-    //qué tipo de repositorio es?
-    //storeDS.repositories.some(repository => repository.id === storeDS.selectedRepositoryId) ? console.log(storeDS.repositories.find(repository => repository.id === storeDS.selectedRepositoryId)) : "NADA";
-
-    isLocalRepository.value = repositoriesStore.selectedRepositoryType === "LocalRepository";
-    isJDBCRepository.value = repositoriesStore.selectedRepositoryType === "RelationalJDBCRepository";
-    isAPIRepository.value = repositoriesStore.selectedRepositoryType === "APIRepository";
+    await repositoriesStore.getRepositories(projectID.value);
+    
+    isLocalRepository.value = repositoriesStore.selectedRepository.repositoryType === "LocalRepository";
+    isJDBCRepository.value = repositoriesStore.selectedRepository.repositoryType === "RelationalJDBCRepository";
+    isAPIRepository.value = repositoriesStore.selectedRepository.repositoryType === "APIRepository";
     console.log(isLocalRepository);
 
     if (isJDBCRepository.value) {
-      console.log("no es local repository");
-
-      //call backend end point for retrieving db information and adding the response to uploadedItems
-      try {
-        const repositoryId = repositoriesStore.selectedRepositoryId;
-
-        // Realiza la solicitud GET al punto final del backend con el repositoryId como parámetro
-        const response = await odinApi.get(`/` + repositoryId + `/tables`);
-
-        // Verifica si la solicitud se realizó con éxito
-        if (response.status === 200) {
-          const tablesData = response.data; // Esto debería contener la información de las tablas
-
-          for (const table of tablesData) {
-            uploadedItems.value.push(table); // Agregar cada objeto individual a uploadedItems
-          }
-        } else {
-          // Maneja el caso en el que la solicitud no se realizó con éxito (por ejemplo, un código de estado no 200)
-          console.error('Error en la solicitud al obtener información de tablas');
-        }
-      } catch (error) {
-        // Maneja cualquier error que pueda ocurrir durante la solicitud
-        console.error('Error al obtener información de tablas:', error);
-      }
+      uploadedItems.value = await repositoriesStore.retrieveDBTables(route.params.id, repositoriesStore.selectedRepository.id);
+      console.log("uploadedItems: " + uploadedItems.value);
     }
 
   }
@@ -412,8 +333,8 @@ const options = [
 ];
 
 const newDatasource = reactive({
-  repositoryId: repositoriesStore.selectedRepositoryId,
-  repositoryName: repositoriesStore.selectedRepositoryName,
+  repositoryId: repositoriesStore.selectedRepository.id,
+  repositoryName: repositoriesStore.selectedRepository.repositoryName,
   datasetDescription: '',
 });
 
@@ -421,7 +342,7 @@ const uploadedItems = ref([]);
 const DataSourceType = ref(options[0]);
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
   newDatasource.repositoryId = null;
-  repositoriesStore.selectedRepositoryId = null;
+  repositoriesStore.selectedRepository = {};
   newDatasource.repositoryName = '';
   newDatasource.datasetDescription = '';
   newDatasource.endpoint = '';
@@ -452,7 +373,7 @@ const onSubmit = () => {
 
   data.append("datasetDescription", newDatasource.datasetDescription);
   data.append("repositoryName", newDatasource.repositoryName);
-  data.append("repositoryId", repositoriesStore.selectedRepositoryId); // Set as empty string if repositoryId is null
+  data.append("repositoryId", repositoriesStore.selectedRepository.id); // Set as empty string if repositoryId is null
   console.log(newDatasource.repositoryId, "++++++++++++++++++++++++++");
 
   const attachTables = [];
@@ -485,7 +406,7 @@ const onSubmit = () => {
 
   console.log(data.get('repositoryId'))
 
-  integrationStore.addDataSource(route.params.id, data, successCallback);
+  datasetsStore.postDataset(route.params.id, data, successCallback);
 
   onReset();
 }
@@ -500,9 +421,8 @@ const successCallback = (datasource) => {
 
   showS.value = false;
 
-  integrationStore.addSelectedDatasource(datasource)
-  storeDS.getDatasources(route.params.id)
-  repositoriesStore.getAllRepositories(route.params.id)
+  datasetsStore.getDatasets(route.params.id)
+  repositoriesStore.getRepositories(route.params.id)
 }
 
 // Método para abrir el selector de archivos
@@ -708,7 +628,7 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
   cursor: pointer;
 }
 
-.special-button q-button:hover {
+.special-button q-btn:hover {
   color: red; /* Cambia el color al pasar el cursor */
   //text-decoration: none; /* Elimina el subrayado al pasar el cursor */
 }

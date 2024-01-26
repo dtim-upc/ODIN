@@ -1,60 +1,30 @@
 <template>
   <div class="q-pa-md">
-    <!-- :filter="search" -->
-    <q-table :rows="rows" :columns="columns"
-             row-key="name" no-data-label="No result."
-             no-results-label="The filter didn't uncover any results" :class="{ 'no-shadow': no_shadow }"
-    >
+    <q-table :rows="rows" :columns="columns" row-key="name"
+             no-results-label="The filter didn't uncover any results" :class="{ 'no-shadow': true }">
       <template v-slot:top-left="">
         <div class="q-table__title">
-          {{ title }}
+          Query result
         </div>
       </template>
 
       <template v-slot:top-right="props">
-
-        <!-- <q-input outlined dense debounce="400" color="primary" v-model="search">
-          <template v-slot:append>
-            <q-icon name="search"/>
-          </template>
-        </q-input> -->
-        <q-btn
-          color="primary"
-          icon-right="archive"
-          label="Export to csv"
-          no-caps
-          @click="exportTable"
-          v-if="enableExport"
-        />
-
-
-        <q-btn flat round dense :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-               @click="props.toggleFullscreen">
-          <q-tooltip :disable="$q.platform.is.mobile" v-close-popup>
-            {{ props.inFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen" }}
-          </q-tooltip>
-        </q-btn>
+        <q-btn color="primary" icon-right="archive" label="Export to csv" no-caps @click="exportTable"/>
+        <FullScreenToggle :props="props" @toggle="props.toggleFullscreen"/>
       </template>
 
     </q-table>
   </div>
 </template>
 
-
 <script setup>
-import {ref, onMounted} from "vue";
 import {exportFile} from 'quasar'
+import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
 
 const props = defineProps({
-  no_shadow: {type: Boolean, default: false},
-  view: {type: String, default: "datasources"},
   columns: {type: Array},
   rows: {type: Array},
-  enableExport: {type: Boolean, default: true}
 });
-
-const title = "Query result";
-
 
 const wrapCsvValue = (val, formatFn, row) => {
   let formatted = formatFn !== void 0
@@ -66,20 +36,10 @@ const wrapCsvValue = (val, formatFn, row) => {
     : String(formatted)
 
   formatted = formatted.split('"').join('""')
-  /**
-   * Excel accepts \n and \r in strings, but some other CSV parsers do not
-   * Uncomment the next two lines to escape new lines
-   */
-  // .split('\n').join('\\n')
-  // .split('\r').join('\\r')
-
   return `"${formatted}"`
 }
 
-onMounted(wrapCsvValue)
-
 const exportTable = () => {
-  // naive encoding to csv format
   const content = [props.columns.map(col => wrapCsvValue(col.label))].concat(
     props.rows.map(row => props.columns.map(col => wrapCsvValue(
       typeof col.field === 'function'
@@ -102,5 +62,3 @@ const exportTable = () => {
 }
 </script>
 
-<style lang="css" scoped>
-</style>

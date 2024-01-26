@@ -3,9 +3,7 @@
        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="0 0 152 144"
        style="enable-background:new 0 0 152 144;" xml:space="preserve" fill="currentColor">
-<!-- <style type="text/css">
-    .st0{fill:currentColor;}
-</style> -->
+
 <g id="Layer_1-2">
 	<path d="M10.2,89.7C8.7,84,8,78.1,8,72c0-19.9,8.1-37.9,21.1-50.9C42.1,8.1,60.1,0,80,0c39.8,0,72,32.2,72,72
 		c0,19.9-8.1,37.9-21.1,50.9c-13,13-31,21.1-50.9,21.1c-9.5,0-18.6-1.9-27-5.2c-1.7-0.7-3.4-1.5-5.1-2.3c-0.3-0.2-0.7-0.4-1-0.5

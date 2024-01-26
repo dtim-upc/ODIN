@@ -18,6 +18,20 @@ public class DataProductController {
     private DataProductService dataProductService;
 
     // ---------------- CRUD Operations
+
+    /**
+     * Retrieves all data products from a specific project.
+     *
+     * @param projectID The ID of the project to retrieve data products from.
+     * @return A ResponseEntity object containing the list of data products or an error message.
+     */
+    @GetMapping("/project/{projectID}/data-products")
+    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
+        logger.info("Getting all dataProducts from project " + projectID);
+        List<DataProduct> dataProducts = dataProductService.getDataProductsOfProject(projectID);
+        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
+    }
+
     /**
      * Adds a new data product into the system. That is, the result from a query executed over a graph (i.e. is
      * a subclass of a dataset, whose data comes from the merging and filtering of a bunch of datasets)
@@ -72,19 +86,6 @@ public class DataProductController {
         logger.info("Deleting data product " + dataProductID + " from project: " +  projectID);
         dataProductService.deleteDataProduct(projectID, dataProductID);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves all data products from a specific project.
-     *
-     * @param projectID The ID of the project to retrieve data products from.
-     * @return A ResponseEntity object containing the list of data products or an error message.
-     */
-    @GetMapping("/project/{projectID}/data-products")
-    public ResponseEntity<Object> getDataProductsOfProject(@PathVariable("projectID") String projectID) {
-        logger.info("Getting all dataProducts from project " + projectID);
-        List<DataProduct> dataProducts = dataProductService.getDataProductsOfProject(projectID);
-        return new ResponseEntity<>(dataProducts, HttpStatus.OK);
     }
 
     // ---------------- Other operations

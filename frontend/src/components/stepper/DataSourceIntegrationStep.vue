@@ -1,188 +1,83 @@
 <template>
   <q-stepper style="width:100%;margin-top:15px" v-model="step" ref="stepper" color="primary" animated
              class="no-padding-stepper">
-
-    <!-- v-if="integrationStore.project.numberOfDS == '0'" -->
-    <!-- <div> -->
-    <q-step :name="2" title="Preview dataset" icon="settings" :done="step > 1" style="min-height: 70vh;height: 1px"
-            id="previewSourceStep">
-      <!-- For each ad campaign that you create, you can control how much you're willing to -->
-      <!-- spend on clicks and conversions, which networks and geographical locations you want -->
-      <!-- your ads to show on, and more. -->
-
-
-      <div class="column items-center " style="height: 100%;">
-        <!-- <div class="col-6">
-          <div>
-           <json-viewer :value="jsonData"></json-viewer>
-          </div>
-
-        </div> -->
-        <div class="col-8" style="height: 100%;min-width: 75vw;">
+    <q-step v-for="(stepItem, index) in steps" :key="index" :name="stepItem.name" :title="stepItem.title" :icon="stepItem.icon" :done="step > stepItem.name" :style="stepItem.style" :id="stepItem.id">
+      <div v-if="stepItem.id === 'previewSourceStep' || stepItem.id === 'previewIntegration'" :class="stepItem.divClass" :style="stepItem.divStyle">
+        <div v-if="stepItem.id === 'previewSourceStep'" class="col-8" style="height: 100%; min-width: 75vw;">
           <Graph :graphical="integrationStore.getGraphicalB"></Graph>
         </div>
-      </div>
-
-
-      <!-- <CSVPreview></CSVPreview> -->
-    </q-step>
-    <!-- </div> -->
-
-
-    <q-step v-if="0!==datasetsNumber" :name="3" title="Integrate with project"
-            icon="mdi-graph-outline" :done="step > 2" style="min-height: 70vh">
-      <!-- <q-input outlined v-model="integratedName" label="Integrated datasource name" placeholder="Type a name for the integrated source" /> -->
-
-      <TableAligments :no_shadow="true"/>
-      <!-- :alignments.sync="alignments" -->
-    </q-step>
-
-    <q-step v-if="0!==datasetsNumber" :name="4" title="Review alignments"
-            icon="mdi-table-headers-eye" :done="step > 3" style="min-height: 70vh">
-
-      The following alignments cannot be integrated as their entity domains are not integrated. Delete them or indicate
-      the relationships of their entity domains to integrate them.
-      <TableJoinAlignments :no_shadow="true"></TableJoinAlignments>
-    </q-step>
-
-
-    <q-step v-if="0!==datasetsNumber" :name="5" title="Preview integration" icon="mdi-eye"
-            style="min-height: 70vh;height: 1px" id="previewIntegration">
-      <div class="row" style="height: 92%;">
-        <div class="col-12">
-          <!-- hola {{integrationStore.getGlobalSchema}} -->
+        <div v-else class="col-12">
           This is a preview of the global schema generated. Note that green elements are integrated resources. If you
           would like to see the schema integrated, use the toggle to visualize how source schemas are connected.
           <q-toggle :label="previewGS" false-value="Schema integrated" true-value="Global schema" v-model="previewGS"/>
-
-          <Graph
-            :graphical="previewGS === 'Global schema' ? integrationStore.getGlobalSchema: integrationStore.getGraphicalSchemaIntegration"></Graph>
+          <Graph :graphical="previewGS === 'Global schema' ? integrationStore.getTemporalGlobalSchema: 
+                  integrationStore.getTemporalGraphicalSchemaIntegration" />
         </div>
+      </div>
+      <TableAlignments v-if="stepItem.id === 'integrateWithProject'"/>
+      <div v-if="stepItem.id === 'reviewAlignments'">
+        The following alignments cannot be integrated as their entity domains are not integrated. Delete them or indicate
+        the relationships of their entity domains to integrate them.
+        <TableJoinAlignments :no_shadow="true"></TableJoinAlignments>
       </div>
     </q-step>
 
     <template v-slot:navigation>
       <q-stepper-navigation class="">
-        <!-- $refs.stepper.previous -->
-        <q-btn v-if="step > 1" flat color="primary" @click="previousStep()" :label="step === 4 ? 'Back' : 'Back'"
-               class="q-ml-sm"/>
-
+        <q-btn flat color="primary" @click="previousStep()" :label="step === 4 ? 'Back' : 'Back'" class="q-ml-sm"/>
         <q-btn class="q-ml-sm" @click="clickOk" :disable="disableStepBtn()" color="primary" :label="stepLabel()"/>
-        <!-- <q-btn @click="" color="primary" label="Delete"/> -->
       </q-stepper-navigation>
     </template>
   </q-stepper>
-
 </template>
 
 <script setup>
-import {ref, onMounted} from '@vue/runtime-core'
-import TableAligments from 'components/tables/TableAligments.vue';
+import {ref} from '@vue/runtime-core'
+import TableAlignments from 'components/tables/TableAlignments.vue';
 import TableJoinAlignments from 'components/tables/TableJoinAlignments.vue';
 import Graph from 'components/graph/Graph.vue'
-import {useDataSourceStore} from 'src/stores/datasourcesStore.js'
 import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import {useRouter} from "vue-router";
-import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
 
-
-
-// -------------------------------------------------------------
-//                         PROPS & EMITS
-// -------------------------------------------------------------
-
-// -------------------------------------------------------------
-//                         STORES & GLOBALS
-// -------------------------------------------------------------
-const dataSourceStore = useDataSourceStore();
 const integrationStore = useIntegrationStore();
-const repositoriesStore = useRepositoriesStore();
+const router = useRouter()
 
-const projectID = ref(null);
-const datasetsNumber = ref(0);
-
-onMounted(async () => {
-  await dataSourceStore.setProject()
-  await integrationStore.setProject()
-
-  const url = window.location.href; // Get the current URL
-  const regex = /project\/(\d+)\//;
-  const match = url.match(regex);
-  let projectId;
-  if (match) {
-    projectId = match[1];
-    console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
-    projectID.value = projectId;
-    await repositoriesStore.getAllRepositories(projectID.value)
-    // Count the datasets by summing the datasets in each repository
-    let totalDatasets = 0;
-    repositoriesStore.repositories.forEach((repository) => {
-      totalDatasets += repository.datasets.length;
-    });
-    datasetsNumber.value = totalDatasets;
-  }
-})
-
-
-const step = ref(2)
-if (integrationStore.selectedDS.length > 0) {
-  step.value = 2
-}
-// -------------------------------------------------------------
-//                         Others
-// -------------------------------------------------------------
+const step = ref(1)
 const previewGS = ref('Global schema')
 
-// import JsonViewer from 'vue-json-viewer'
-// const props = defineProps({
-//     step : { default:ref(1)}
-// });
-
-// const jsonData = {hola:"123", jsd:"23"}
-// const graphical = "{\"nodes\":[{\"id\":\"Class1\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks.title\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"title\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link1\"},{\"id\":\"Class2\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks.createdAt\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"createdAt\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link2\"},{\"id\":\"Class3\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#Class\",\"type\":\"class\",\"label\":\"ds1_museums\"},{\"id\":\"Class4\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks.idObject\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"idObject\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link3\"},{\"id\":\"Class5\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks.domain\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"domain\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link4\"},{\"id\":\"Class6\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.location\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"location\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link5\"},{\"id\":\"Class8\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#Class\",\"type\":\"class\",\"label\":\"artworks\"},{\"id\":\"Class9\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.ContainerMembershipProperty1\",\"iriType\":\"http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty\",\"type\":\"objectProperty\",\"label\":\"ContainerMembershipProperty1\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1\",\"range\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"linkId\":\"Link6\"},{\"id\":\"Class10\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.museum\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"museum\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link7\"},{\"id\":\"Class11\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.has_artworks\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"has_artworks\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums\",\"range\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1\",\"linkId\":\"Link8\"},{\"id\":\"Class12\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.category\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"category\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link9\"},{\"id\":\"Class13\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq\",\"type\":\"class\",\"label\":\"Seq1\"},{\"id\":\"Class14\",\"iri\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks.madeBy\",\"iriType\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"type\":\"objectProperty\",\"label\":\"madeBy\",\"domain\":\"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/598177e0e52c44299b9017f5f65604b8/ds1_museums.Seq1.artworks\",\"range\":\"http://www.w3.org/2001/XMLSchema#string\",\"linkId\":\"Link10\"},{\"id\":\"Datatype15\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype16\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype17\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype18\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype19\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype20\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype21\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"},{\"id\":\"Datatype22\",\"iri\":\"http://www.w3.org/2001/XMLSchema#string\",\"type\":\"xsdType\",\"label\":\"string\"}],\"links\":[{\"id\":\"Link1\",\"source\":\"Class8\",\"target\":\"Datatype15\",\"label\":\"title\"},{\"id\":\"Link2\",\"source\":\"Class8\",\"target\":\"Datatype16\",\"label\":\"createdAt\"},{\"id\":\"Link3\",\"source\":\"Class8\",\"target\":\"Datatype17\",\"label\":\"idObject\"},{\"id\":\"Link4\",\"source\":\"Class8\",\"target\":\"Datatype18\",\"label\":\"domain\"},{\"id\":\"Link5\",\"source\":\"Class3\",\"target\":\"Datatype19\",\"label\":\"location\"},{\"id\":\"Link6\",\"source\":\"Class13\",\"target\":\"Class8\",\"label\":\"ContainerMembershipProperty1\"},{\"id\":\"Link7\",\"source\":\"Class3\",\"target\":\"Datatype20\",\"label\":\"museum\"},{\"id\":\"Link8\",\"source\":\"Class3\",\"target\":\"Class13\",\"label\":\"has_artworks\"},{\"id\":\"Link9\",\"source\":\"Class3\",\"target\":\"Datatype21\",\"label\":\"category\"},{\"id\":\"Link10\",\"source\":\"Class8\",\"target\":\"Datatype22\",\"label\":\"madeBy\"}]}"
-
+const steps = [
+  { name: 1, title: "Preview dataset", icon: "settings", style: "min-height: 70vh;height: 1px", id: "previewSourceStep", divClass: "column items-center", divStyle: "height: 100%;" },
+  { name: 2, title: "Integrate with project", icon: "mdi-graph-outline", style: "min-height: 70vh", id: "integrateWithProject" },
+  { name: 3, title: "Review alignments", icon: "mdi-table-headers-eye", style: "min-height: 70vh", id: "reviewAlignments" },
+  { name: 4, title: "Preview integration", icon: "mdi-eye", style: "min-height: 70vh;height: 1px", id: "previewIntegration", divClass: "row", divStyle: "height: 92%;" }
+]
 
 const disableStepBtn = () => {
-  console.log("step val: ", step.value)
   switch (step.value) {
-    case 1: // list uploaded data sources
-      console.log("return true")
-      return integrationStore.selectedDS.length !== 1;
-    case 2: // preview bootstrapped graph
-      // return alignments.value.length == 0
-      break;
-    case 3: // selection of alignments
+    case 2:
       return integrationStore.alignments.length === 0;
-    case 4: // review of alignments
+    case 3:
       return !integrationStore.isJoinAlignmentsRelationshipsComplete;
-    default: //present final integration
+    default: 
       return false;
   }
 }
 
 const stepLabel = () => {
   switch (step.value) {
-    case 2:
-      if (datasetsNumber <= 1)
-        return "Finish"
-      return "Continue"
-    case 4:
+    case 3:
       return "Integrate"
-    case 5:
+    case 4:
       return "Finish"
     default:
       return "Continue"
   }
 }
 
-const router = useRouter();
-
 const previousStep = () => {
-
-  if (integrationStore.joinAlignments.length === 0 && step.value === 5) {
-    step.value = 3
-  } else if(step.value === 2) {
-    // Redirige a una página específica cuando step.value es 1
+  if (integrationStore.joinAlignments.length === 0 && step.value === 4) {
+    step.value = 2
+  } else if (step.value === 1) {
     router.push({ name: 'datasources' });
   } else {
     step.value--
@@ -195,47 +90,24 @@ const clickOk = () => {
       step.value++
       break;
     case 2:
-      console.log(datasetsNumber + " +++++++++++++++++++++++++++++++++ numero de datasets")
-      if (datasetsNumber.value === 1) {
-        // we persist data source
-        console.log("finish preview...")
-        dataSourceStore.finishPreview()
-
-      } else {
-        console.log("moving to integrate with project")
-        step.value++
-      }
-      break;
-    case 3:
-      console.log("integrate with project. Step value", step.value)
       integrationStore.integrate(function () {
         if (integrationStore.joinAlignments.length === 0) {
-          step.value = 5
+          step.value = 4
         } else {
           step.value++
         }
       })
-      // step.value++
-      //
-      // emit("finished")
-      // return false;
       break;
-
-    case 4:
-
-      console.log("step 4 review alignments")
+    case 3:
       integrationStore.reviewAlignments(function () {
         step.value++
       })
-
       break;
-    default:
-      //last step
-      console.log("step 4 save integration")
+    default: //last step
       integrationStore.persistIntegration()
+      router.push({ name: 'datasources' });
   }
 }
-
 
 </script>
 
@@ -243,7 +115,6 @@ const clickOk = () => {
 
 #previewIntegration > .q-stepper__step-content, #previewSourceStep > .q-stepper__step-content {
   height: 100%;
-
 
   .q-stepper__step-inner {
     height: 100%;

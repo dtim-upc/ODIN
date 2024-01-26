@@ -203,11 +203,11 @@ export default {
 </script>
 
 <script setup>
-import {ref, reactive, onMounted, watch, computed} from "vue";
+import {ref, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
 import {useRoute, useRouter} from "vue-router";
 import {useIntegrationStore} from 'src/stores/integrationStore.js'
-import {useDataSourceStore} from "../../stores/datasourcesStore";
+import {useDatasetsStore} from "../../stores/datasetsStore";
 import {useRepositoriesStore} from "stores/repositoriesStore.js";
 
 import {odinApi} from "../../boot/axios";
@@ -236,7 +236,6 @@ const showS = computed({
   }
 })
 
-const storeDS = useDataSourceStore();
 const repositoriesStore = useRepositoriesStore();
 
 // -------------------------------------------------------------
@@ -265,7 +264,7 @@ onMounted(async () => {
     projectId = match[1];
     console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
     projectID.value = projectId;
-    await repositoriesStore.getAllRepositories(projectID.value)
+    await repositoriesStore.getRepositories(projectID.value)
   }
 });
 
@@ -338,7 +337,7 @@ defineExpose({
 })
 
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
-  repositoriesStore.selectedRepositoryId = null;
+  repositoriesStore.selectedRepository = {};
 }
 
 function isJDBC(type) {
@@ -362,22 +361,7 @@ const testConnection = async () => {
     }
   }
 
-  try {
-    // Make a POST request to the backend endpoint
-    const response = await odinApi.post('/test-connection', data);
-
-    if (response.data === true) {
-      notify.positive('Connection established successfully.');
-      return true;
-    } else {
-      notify.negative("Error connecting with the provided database.");
-      return false;
-    }
-  } catch (error) {
-    console.error('Error al intentar establecer conexión con la base de datos:', error);
-    notify.negative('Error al intentar establecer conexión con la base de datos:', error);
-    return false;
-  }
+  return repositoriesStore.testConnection(data);
 }
 
 const onSubmit = async () => {
@@ -418,17 +402,10 @@ const onSubmit = async () => {
   }
 };
 
-const successCallback = (datasource) => {
-
-  console.log("success callback")
-
-  notify.positive(`Repository successfully created`)
+const successCallback = () => {
   onReset()
   form.value.resetValidation()
-
   showS.value = false;
-
-  repositoriesStore.getAllRepositories(route.params.id);
 }
 </script>
 

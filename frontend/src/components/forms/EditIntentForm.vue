@@ -1,45 +1,59 @@
 <template>
-    <q-card-section>
-      <div class="text-h6">Edit intent</div>
-    </q-card-section>
-    <q-card-section>
-      <q-form ref="form" @submit="onSubmit" class="q-gutter-md">
-        <q-input filled v-model="editedIntent.name" label="Intent name" lazy-rules :rules="nameRules" />
-        <div class="text-right">
-          <q-btn label="Update" type="submit" color="primary" v-close-popup />
-          <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup />
-        </div>
-      </q-form>
-    </q-card-section>
-  </template>
-  
-  <script setup>
-  import { defineProps, reactive } from "vue";
-  import { useIntentsStore } from "src/stores/intentsStore.js";
-  import { useRoute } from "vue-router";
-  
-  const intentsStore = useIntentsStore();
-  const route = useRoute();
-  
-  const props = defineProps({
-    intentData: { type: Object, default: null },
-  });
-  
-  const editedIntent = reactive({
-    id: props.intentData?.intentID || null,
-    name: props.intentData?.intentName || '',
-  });
-  
-  const nameRules = [(val) => (val && val.length > 0) || 'Please type a name'];
-  
-  const onSubmit = () => {
-    const data = new FormData();
-    data.append("intentID", editedIntent.id);
-    data.append("intentName", editedIntent.name);
-    intentsStore.putIntent(editedIntent.id, route.params.id, data, successCallback)
-  };
-  
-  const successCallback = () => {
-    intentsStore.getAllIntents(route.params.id); // get the repositories again to refresh the list of the store
-  };
-  </script>
+  <q-dialog v-model="showComponent" persistent>
+    <q-card flat bordered class="my-card" style="min-width: 30vw;">
+      <q-card-section class="q-pt-none">
+        <q-card-section>
+          <div class="text-h6">Edit intent</div>
+        </q-card-section>
+        <q-card-section>
+          <q-form ref="form" @submit="onSubmit" class="q-gutter-md">
+
+            <q-input filled v-model="editedIntent.name" label="Intent name" lazy-rules 
+                      :rules="[(val) => (val && val.length > 0) || 'Please type a name']" />
+            <div class="text-right">
+              <q-btn label="Update" type="submit" color="primary" v-close-popup />
+              <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup @click="emit('update:show', false)"/>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from "vue";
+import { useIntentsStore } from "src/stores/intentsStore.js";
+import { useRoute } from "vue-router";
+
+const props = defineProps({
+  show: {type: Boolean, default: false, required: true},
+  intentData: { type: Object, default: null },
+});
+
+const intentsStore = useIntentsStore();
+const route = useRoute();
+
+// Emits to associate the show prop with the parent component
+const emit = defineEmits(["update:show"])
+const showComponent = ref(props.show);
+watch(() => props.show, (newVal) => {
+  showComponent.value = newVal
+})
+
+// Data to be edited, we need to watch it, because the parent component can change it (initially we do not know which row is selected)
+const editedIntent = reactive({
+  id: props.intentData ? props.intentData.intentID : null,
+  name: props.intentData ? props.intentData.intentName : '',
+})
+watch(() => props.intentData, (newVal) => {
+  editedIntent.id = newVal ? newVal.intentID : null;
+  editedIntent.name = newVal ? newVal.intentName : '';
+}, { immediate: true });
+
+const onSubmit = () => {
+  const data = new FormData();
+  data.append("intentName", editedIntent.name);
+  intentsStore.putIntent(editedIntent.id, route.params.id, data, () => emit('update:show', false))
+}
+</script>

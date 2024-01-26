@@ -25,7 +25,6 @@
               </q-list>
             </q-menu>
 
-
           </q-btn>
         </div>
 
@@ -42,19 +41,10 @@
 <script setup>
 import {useAuthStore} from 'stores/authStore.js'
 
-
-// const notify = useNotify()
 const authStore = useAuthStore()
-
-const logout = () => {
-  authStore.logout()
-}
-
-
 </script>
 
 <style lang="scss">
-
 
 .body--light {
   .header_bg {
@@ -67,6 +57,5 @@ const logout = () => {
     background: $neutral500d !important;
   }
 }
-
 
 </style>

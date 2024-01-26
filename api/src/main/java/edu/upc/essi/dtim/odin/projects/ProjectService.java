@@ -160,46 +160,6 @@ public class ProjectService {
         ormProject.deleteOne(Project.class, id);
     }
 
-    // ---------------- Operations to get entities of a project
-
-    /**
-     * Retrieves the datasets associated with a project.
-     *
-     * @param projectID The ID of the project.
-     * @return A list of datasets belonging to the project.
-     */
-    public List<Dataset> getDatasetsOfProject(String projectID) {
-        Project project = getProject(projectID);
-        List<Dataset> datasets = new ArrayList<>();
-        // Iterate through the repositories in the project and collect their datasets
-        for (DataRepository repository : project.getRepositories()) {
-            datasets.addAll(repository.getDatasets());
-        }
-        return datasets;
-    }
-
-    /**
-     * Retrieves the list of data repositories associated with a project.
-     *
-     * @param projectID The ID of the project.
-     * @return A list of DataRepository objects belonging to the project.
-     */
-    public List<DataRepository> getRepositoriesOfProject(String projectID) {
-        Project project = getProject(projectID);
-        return project.getRepositories();
-    }
-
-    /**
-     * Retrieves the list of intents associated with a project.
-     *
-     * @param projectID The ID of the project.
-     * @return A list of Intent objects belonging to the project.
-     */
-    public List<Intent> getIntentsOfProject(String projectID) {
-        Project project = getProject(projectID);
-        return project.getIntents();
-    }
-
     // ---------------- Other operations
 
     /**
