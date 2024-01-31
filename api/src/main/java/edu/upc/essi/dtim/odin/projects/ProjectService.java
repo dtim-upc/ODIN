@@ -162,32 +162,8 @@ public class ProjectService {
 
     // ---------------- Other operations
 
+    // TODO: Remake this
     /**
-     * Downloads the project schema in Turtle (TTL) format.
-     *
-     * @param projectID The ID of the project for which the schema will be downloaded.
-     * @return A ResponseEntity containing the input stream resource and necessary headers for the download.
-     */
-    public ResponseEntity<InputStreamResource> downloadProjectSchema(String projectID) {
-        Project project = getProject(projectID);
-
-        Model model = project.getIntegratedGraph().getGraph();
-        StringWriter writer = new StringWriter();
-        model.write(writer, "TTL");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName() + ".ttl");
-
-        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("text/turtle"))
-                .body(resource);
-    }
-
-     // TODO: Remake this
-     /**
      * Clones a project, creating a new project with the same structure and data as the original project.
      *
      * @param originalProjectID Identification of the project to be cloned.
@@ -246,5 +222,39 @@ public class ProjectService {
 
         // Save the cloned project and return it
         return saveProject(projectToClone);
+    }
+
+
+    /**
+     * Downloads the project schema in Turtle (TTL) format.
+     *
+     * @param projectID The ID of the project for which the schema will be downloaded.
+     * @return A ResponseEntity containing the input stream resource and necessary headers for the download.
+     */
+    public ResponseEntity<InputStreamResource> downloadProjectSchema(String projectID) {
+        Project project = getProject(projectID);
+
+        Model model = project.getIntegratedGraph().getGraph();
+        StringWriter writer = new StringWriter();
+        model.write(writer, "TTL");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + project.getProjectName() + ".ttl");
+
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle"))
+                .body(resource);
+    }
+
+    public void resetProjectSchema(String projectID) {
+        Project project = getProject(projectID);
+
+        project.setIntegratedDatasets(new ArrayList<>());
+        project.setIntegratedGraph(null);
+
+        saveProject(project);
     }
 }

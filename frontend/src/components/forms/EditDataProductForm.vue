@@ -27,15 +27,15 @@
 <script setup>
 import { reactive, ref, watch } from "vue";
 import { useDataProductsStore } from "src/stores/dataProductsStore.js";
-import { useRoute } from "vue-router";
+import { useProjectsStore } from "src/stores/projectsStore.js";
 
 const props = defineProps({
   show: {type: Boolean, default: false, required: true},
   dataProductData:{type: Object, default: null},
 });
 
-const dataProductsStore = useDataProductsStore();
-const route = useRoute();
+const dataProductsStore = useDataProductsStore()
+const projectID = useProjectsStore().currentProject.projectId
 
 // Emits to associate the show prop with the parent component
 const emit = defineEmits(["update:show"])
@@ -59,6 +59,6 @@ const onSubmit = () => {
   const data = new FormData();
   data.append("dataProductName", editedDataProduct.name);
   data.append("dataProductDescription", editedDataProduct.description);
-  dataProductsStore.putDataProduct(editedDataProduct.id, route.params.id, data, () => emit('update:show', false))
+  dataProductsStore.putDataProduct(editedDataProduct.id, projectID, data, () => emit('update:show', false))
 };
 </script>

@@ -17,18 +17,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> handleElementNotFoundException(ElementNotFoundException e) {
         logger.info(e.getMessage());
+        e.printStackTrace();
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity<Object> handleFormatNotAccepted(FormatNotAcceptedException e) {
         logger.info(e.getMessage());
+        e.printStackTrace();
         return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler
     public ResponseEntity<Object> handleEmptyFileException(EmptyFileException e) {
         logger.info(e.getMessage());
+        e.printStackTrace();
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NO_CONTENT);
     }
 
@@ -36,12 +39,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> handleCustomIOException(CustomIOException e) {
         logger.info(e.getMessage());
+        e.printStackTrace();
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler
     public ResponseEntity<Object> handleInternalServerErrorException(InternalServerErrorException e) {
         logger.info(e.getMessage());
+        e.printStackTrace();
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

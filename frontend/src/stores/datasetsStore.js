@@ -34,6 +34,7 @@ export const useDatasetsStore = defineStore('datasets', {
     async postDataset(projectID, data, success) {
       try {
         const response = await datasetsAPI.postDataset(projectID, data)
+        this.getDatasets(projectID)
         success(response.data)
       } catch (error) {
         notify.negative("Error creating datasets")
@@ -45,7 +46,7 @@ export const useDatasetsStore = defineStore('datasets', {
       try {
         await datasetsAPI.putDataset(projectID, datasetID, data)
         notify.positive(`Dataset successfully edited`)
-        this.getDatasets(route.params.id)
+        this.getDatasets(projectID)
         successCallback()
       } catch (error) {
         notify.negative("Error when editing the dataset")
@@ -81,7 +82,8 @@ export const useDatasetsStore = defineStore('datasets', {
       try {
         const response = await datasetsAPI.downloadDatasetSchema(projectID, datasetID)
         const content = response.headers['content-type']
-        download(response.data, datasetID + ".ttl", content)
+        const datasetName = this.datasets.find(dataset => dataset.id === datasetID).datasetName
+        download(response.data, datasetName + ".ttl", content)
       } catch (error) {
         console.error("Error:", error)
         notify.negative("Error downloading the schema")

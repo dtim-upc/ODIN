@@ -78,7 +78,7 @@ const previousStep = () => {
   if (integrationStore.joinAlignments.length === 0 && step.value === 4) {
     step.value = 2
   } else if (step.value === 1) {
-    router.push({ name: 'datasources' });
+    router.push({ name: 'datasets' });
   } else {
     step.value--
   }
@@ -105,7 +105,7 @@ const clickOk = () => {
       break;
     default: //last step
       integrationStore.persistIntegration()
-      router.push({ name: 'datasources' });
+      router.push({ name: 'datasets' });
   }
 }
 

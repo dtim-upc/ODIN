@@ -24,7 +24,6 @@ export function useSelectionGraph() {
 
 
     const clearSelection = () => {
-        console.log("clear selection...")
         selected = {};
         links = [];
         linksNodes = [];
@@ -40,7 +39,6 @@ export function useSelectionGraph() {
         let data = [];
         let nodesID = [];
 
-        // console.log("preparingselecition", selected)
         Object.keys(selected).forEach( k => {
             let node = selected[k]
             let n  = new Object();
@@ -58,7 +56,6 @@ export function useSelectionGraph() {
 
         // var integrationProperties = [ Integration.IntegrationDProperty.iri, Integration.IntegrationOProperty.iri ]
         links.forEach( link => {
-            console.log("link", link)
             let n  = new Object();
             // n.domain =data[nodesId.indexOf(domain)].iri;
             // n.range =data[nodesId.indexOf(range)].iri  ;

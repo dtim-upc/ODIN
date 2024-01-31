@@ -27,6 +27,11 @@ public class DLSpark extends DataLayer {
     }
 
     @Override
+    public void uploadToTemporalFormattedZone(Dataset d, String tableName) throws SQLException {
+
+    }
+
+    @Override
     public void removeFromFormattedZone(String tableName) {
         deleteFilesFromDirectory(dataStorePath + "DeltaLake\\formattedZone\\" + tableName);
     }
@@ -53,7 +58,7 @@ public class DLSpark extends DataLayer {
     }
 
     @Override
-    public void copyToExploitationZone(String UUID) {
+    public void persistDataInTemporalExploitation(String UUID) {
 
     }
 
@@ -71,8 +76,4 @@ public class DLSpark extends DataLayer {
         return null;
     }
 
-    @Override
-    public void test() {
-
-    }
 }

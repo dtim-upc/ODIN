@@ -1,17 +1,20 @@
 package edu.upc.essi.dtim.odin.workflows;
 
-import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
+import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
+import edu.upc.essi.dtim.NextiaCore.graph.WorkflowGraph;
 import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.NextiaCore.queries.Workflow;
+import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.intents.IntentService;
-import edu.upc.essi.dtim.odin.projects.ProjectService;
+import edu.upc.essi.dtim.odin.workflows.pojo.WorkflowResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -20,6 +23,8 @@ public class WorkflowService {
     private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
     @Autowired
     private IntentService intentService;
+    @Autowired
+    private AppConfig appConfig;
 
     // ---------------- CRUD/ORM operations
 
@@ -29,7 +34,7 @@ public class WorkflowService {
      * @param workflow The DataProduct object to save.
      * @return The saved Workflow object.
      */
-    public Workflow saveDataProduct(Workflow workflow) {
+    public Workflow saveWorkflow(Workflow workflow) {
         return ormDataResource.save(workflow);
     }
 
@@ -51,10 +56,30 @@ public class WorkflowService {
      * Adds a new workflow into the system.
      *
      * @param intentID     ID of the intent to which the new workflow will be added to.
-     * @param workflow     The workflow to store
+     * @param workflowResponse  The workflow to store (the format needs to be adapted)
      */
-    public void postWorkflow(String intentID, Workflow workflow) {
+    public void postWorkflow(String intentID, WorkflowResponse workflowResponse) {
         Intent intent = intentService.getIntent(intentID);
+
+        Workflow workflow = new Workflow();
+        workflow.setWorkflowName(workflowResponse.getWorkflowName());
+
+        WorkflowGraph graph = CoreGraphFactory.createWorkflowGraph();
+        graph.setWorkflowRepresentation(workflowResponse.getVisualRepresentation());
+        workflow.setWorkflowGraph(graph);
+
+        workflow = saveWorkflow(workflow); // Give an id to the workflow graph
+
+        GraphStoreInterface graphStoreInterface;
+        try {
+            graphStoreInterface = GraphStoreFactory.getInstance(appConfig);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        graphStoreInterface.saveGraphFromStringRepresentation(workflow.getWorkflowGraph(), workflowResponse.getStringGraph());
+
+
         intent.addWorkflow(workflow);
         intentService.saveIntent(intent);
     }
@@ -96,6 +121,6 @@ public class WorkflowService {
 
         originalWorkflow.setWorkflowName(workflowName);
 
-        saveDataProduct(originalWorkflow);
+        saveWorkflow(originalWorkflow);
     }
 }

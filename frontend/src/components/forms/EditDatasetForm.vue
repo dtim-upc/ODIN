@@ -26,8 +26,8 @@
 
 <script setup>
 import { ref, reactive, watch } from "vue";
-import { useRoute } from "vue-router";
 import { useDatasetsStore } from "stores/datasetsStore";
+import { useProjectsStore } from "stores/projectsStore";
 
 const props = defineProps({
   show: {type: Boolean, default: false, required: true},
@@ -35,7 +35,7 @@ const props = defineProps({
 });
 
 const datasetsStore = useDatasetsStore();
-const route = useRoute()
+const projectID = useProjectsStore().currentProject.projectId
 
 // Emits to associate the show prop with the parent component
 const emit = defineEmits(["update:show"])
@@ -61,7 +61,7 @@ const onSubmit = () => {
   const data = new FormData();
   data.append("datasetName", editedDataset.name);
   data.append("datasetDescription", editedDataset.description);
-  datasetsStore.putDataset(route.params.id, editedDataset.id, data, () => emit('update:show', false))
+  datasetsStore.putDataset(projectID, editedDataset.id, data, () => emit('update:show', false))
   showComponent.value = false;
 }
 

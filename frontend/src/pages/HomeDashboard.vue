@@ -18,135 +18,102 @@
             <q-linear-progress :value="progress()" rounded color="green" class="q-mt-sm"/>
           </q-item-section>
 
-
         </template>
         <q-card style="width:100%">
           <q-card-section>
-
             <q-list separator>
-
               <q-item clickable style="padding:12px" v-ripple :active="active" @click="postDataset = true">
-
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_file_upload" color="primary600 " class="activebg"></q-btn>
                 </q-item-section>
-
                 <q-item-section>
                   <q-item-label>Upload a dataset</q-item-label>
                   <q-item-label caption>This will automatically define an schema</q-item-label>
                 </q-item-section>
-
                 <q-item-section side>
-
-                  <q-btn v-if="storeDS.getDatasetsNumber == 0"
+                  <q-btn v-if="datasourcesStore.getDatasetsNumber == 0"
                          color="primary" label="Start" icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
-
               </q-item>
 
-
               <q-item clickable style="padding:12px" v-ripple :active="active" @click="showIntegrationView">
-
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_archive" color="primary600 " class="activebg"></q-btn>
                 </q-item-section>
-
                 <q-item-section>
                   <q-item-label>Add the data source to this project</q-item-label>
                   <q-item-label caption>You will see the generated schema here</q-item-label>
                   <q-item-label caption>Upon confirmation, it will be saved into this project</q-item-label>
                 </q-item-section>
-
                 <q-item-section side>
-
-                  <q-btn v-if="storeDS.getDatasetsNumber==0" color="primary" label="Start"
+                  <q-btn v-if="datasourcesStore.getDatasetsNumber==0" color="primary" label="Start"
                          icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
-
               </q-item>
 
-
               <q-item clickable style="padding:12px" v-ripple :active="active" @click="postDataset = true">
-
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_file_upload" color="primary600" class="activebg"/>
                 </q-item-section>
-
                 <q-item-section>
                   <q-item-label>Upload a second dataset</q-item-label>
                   <q-item-label caption>This will automatically define an schema</q-item-label>
                 </q-item-section>
-
                 <q-item-section side>
                   <q-btn v-if="!getStartedCompleteUpload2ndDS()" color="primary" label="Start"
                          icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
-
               </q-item>
 
               <q-item clickable style="padding:12px" v-ripple :active="active" @click="showIntegrationView">
-
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_merge" color="primary600" class="activebg"/>
                 </q-item-section>
-
                 <q-item-section>
                   <q-item-label>Integrate second data source with the project</q-item-label>
                   <q-item-label caption>The project schema must be aligned with the second data source schema
                   </q-item-label>
                   <q-item-label caption>Upon confirmation, it will be saved into this project</q-item-label>
                 </q-item-section>
-
                 <q-item-section side>
-                  <q-btn v-if="storeDS.getDatasetsNumber < 2" color="primary" label="Start"
+                  <q-btn v-if="datasourcesStore.getDatasetsNumber < 2" color="primary" label="Start"
                          icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
-
               </q-item>
 
               <q-item clickable style="padding:12px" v-ripple :active="active">
-
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="mdi-selection-search" color="primary600" class="activebg"/>
                 </q-item-section>
-
                 <q-item-section>
                   <q-item-label>Explore the integrated data</q-item-label>
                   <q-item-label caption>Not available for this survey</q-item-label>
                 </q-item-section>
-
                 <q-item-section side>
                   <q-btn color="primary" label="Start" icon-right="o_navigate_next" dense no-caps/>
                 </q-item-section>
-
               </q-item>
 
-
             </q-list>
-
-
           </q-card-section>
         </q-card>
       </q-expansion-item>
-
     </div>
 
-
-    <FormNewDataSource v-model:show="postDataset" :afterSubmitShowGraph="false"></FormNewDataSource>
+    <CreateDatasetForm v-model:show="postDataset" :afterSubmitShowGraph="false" />
 
   </q-page>
 </template>
 
 <script setup>
-import {ref, onBeforeMount} from "vue";
+import {ref} from "vue";
 import {useRouter} from "vue-router";
-import FormNewDataSource from "components/forms/FormNewDataSource.vue";
+import CreateDatasetForm from "components/forms/CreateDatasetForm.vue";
 import {useDatasetsStore} from 'src/stores/datasetsStore.js'
-import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import home_pattern from "components/icons/home_pattern.vue";
 
 const postDataset = ref(false)
@@ -154,26 +121,17 @@ const active = ref(false)
 
 const router = useRouter()
 
-
-const storeDS = useDatasetsStore();
-const integrationStore = useIntegrationStore()
-
-onBeforeMount(() => {
-  document.title = "Home"; // Título de la pestaña
-})
+const datasourcesStore = useDatasetsStore();
 
 const showIntegrationView = () => {
   router.push({name: 'dsIntegration'})
 }
 
 const getStartedCompleteUpload2ndDS = () => {
-
-
-  if (storeDS.getDatasetsNumber > 1) {
+  if (datasourcesStore.getDatasetsNumber > 1) {
     return true;
   }
   return false;
-
 }
 
 const progress = () => {
@@ -182,6 +140,3 @@ const progress = () => {
 }
 
 </script>
-
-<style lang="scss">
-</style>

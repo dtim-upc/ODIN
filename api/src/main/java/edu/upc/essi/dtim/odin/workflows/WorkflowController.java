@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.odin.workflows;
 
 import edu.upc.essi.dtim.NextiaCore.queries.Workflow;
 import edu.upc.essi.dtim.odin.query.QueryController;
+import edu.upc.essi.dtim.odin.workflows.pojo.WorkflowResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,14 @@ public class WorkflowController {
     /**
      * Adds a new workflow into the system.
      *
-     * @param intentID     ID of the intent to which the new workflow will be added to.
-     * @param workflow     The workflow to store
+     * @param intentID          ID of the intent to which the new workflow will be added to.
+     * @param workflowResponse  The workflow to store (the format needs to be adapted)
      */
     @PostMapping("/project/{projectID}/intent/{intentID}/workflow")
     public ResponseEntity<Boolean> postWorkflow(@PathVariable("intentID") String intentID,
-                                                @RequestBody Workflow workflow) {
+                                                @RequestBody WorkflowResponse workflowResponse) {
         logger.info("Storing workflow");
-        workflowService.postWorkflow(intentID, workflow);
+        workflowService.postWorkflow(intentID, workflowResponse);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

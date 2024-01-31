@@ -28,7 +28,6 @@
 import { ref, defineEmits, watch } from 'vue';
 import VisualizePlan from './VisualizePlan.vue';
 
-
 const props = defineProps({
   dialog: {type: Boolean, required: true},
   visualizedPlan: {type: Object, required: true}
@@ -47,9 +46,4 @@ const close = () => {
   dialogVisible.value = false
   emits('update:dialog', false)
 }
-
 </script>
-
-<style >
-
-</style>

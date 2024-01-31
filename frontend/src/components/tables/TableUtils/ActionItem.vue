@@ -10,7 +10,7 @@
   </template>
   
   <script setup>
-  import { defineProps, defineEmits } from 'vue';
+  import { defineEmits } from 'vue';
   
   const props = defineProps({
     iconName: { type: String, required: true },

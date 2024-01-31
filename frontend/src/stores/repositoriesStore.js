@@ -13,7 +13,7 @@ export const useRepositoriesStore = defineStore('repositories', {
   actions: {
     
     setSelectedRepository(repositoryId) {
-      this.selectedRepository = this.repositories.some(repository => repository.id === repositoryId) ? this.repositories.find(repository => repository.id === repositoryId) : "ERROR 404 No repository";
+      this.selectedRepository = this.repositories.find(repository => repository.id === repositoryId);
     },
 
     // ------------ CRUD operations
@@ -89,7 +89,29 @@ export const useRepositoriesStore = defineStore('repositories', {
         const response = await repositoryAPI.retrieveDBTables(projectID, repositoryID);
         return response.data;
       } catch (error) {
-        notify.error('Error awhile trying to get the tables of the database.');
+        notify.error('Error while trying to get the tables of the database.');
+        console.error("Error:", error);
+      }
+    },
+
+    // ------------ Get the schemas when creating a new repository
+
+    async getRepositoryTypes() {
+      try {
+        const response = await repositoryAPI.getRepositoryTypes();
+        return response.data
+      } catch (error) {
+        notify.error('Error while getting the types of repositories.');
+        console.error("Error:", error);
+      }
+    },
+
+    async getRepositorySchema(repositoryType) {
+      try {
+        const response = await repositoryAPI.getRepositorySchema(repositoryType);
+        return response.data;
+      } catch (error) {
+        notify.error('Error while getting the repository schema');
         console.error("Error:", error);
       }
     }

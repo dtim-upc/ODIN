@@ -4,8 +4,6 @@ public class DataRepositoryTypeInfo {
     private String label;
     private String value;
 
-    public DataRepositoryTypeInfo() {}
-
     public DataRepositoryTypeInfo(String label, String value) {
         this.label = label;
         this.value = value;

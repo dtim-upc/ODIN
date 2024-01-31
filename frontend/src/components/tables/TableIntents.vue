@@ -27,6 +27,13 @@
         </q-td>
       </template>
 
+      <template v-slot:no-data>
+          <div class="full-width row flex-center text-accent q-gutter-sm q-pa-xl" style="flex-direction: column">
+            <NoDataImage/>
+            <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">No intents.</span>
+          </div>
+        </template>
+
       <template v-slot:body-cell-expand="props">
 
         <q-td :props="props">
@@ -46,7 +53,7 @@
                 <td>{{ workflow.workflowID }}</td>
                 <td>{{ workflow.workflowName }}</td>
                 <td>
-                  <q-btn @click="visualizeWorkflow(workflow.visualRepresentation)" color="primary" icon="visibility" size="sm"></q-btn>
+                  <q-btn @click="visualizeWorkflow(workflow.workflowGraph.workflowRepresentation)" color="primary" icon="visibility" size="sm"></q-btn>
                 </td>
                 <td>
                   <q-btn dense round flat color="grey" @click="editWorkflow(props.row, workflow)" icon="edit"></q-btn>
@@ -65,7 +72,7 @@
       </template>
 
     </q-table>
-
+    
     <!-- Additional dialogs that appear to fufill certain actions -->
     
     <DialogWithVisualizedPlan v-model:dialog="showVisualizePlan" :visualizedPlan="visualizedPlan"/>
@@ -88,16 +95,18 @@
 import {computed, onMounted, ref} from "vue";
 import {useIntentsStore} from "src/stores/intentsStore.js";
 import {useWorkflowsStore} from "src/stores/workflowsStore.js";
-import {useRoute, useRouter} from "vue-router";
-import ConfirmDialog from "src/components/ConfirmDialog.vue";
+import {useProjectsStore} from "src/stores/projectsStore.js";
+import {useRouter} from "vue-router";
+import ConfirmDialog from "src/components/utils/ConfirmDialog.vue";
+import NoDataImage from "src/assets/NoDataImage.vue";
 import EditIntentForm from "src/components/forms/EditIntentForm.vue";
 import EditWorkflowForm from "src/components/forms/EditWorkflowForm.vue";
-import DialogWithVisualizedPlan from "../../components/intents/DialogWithVisualizedPlan.vue";
+import DialogWithVisualizedPlan from "../../components/intents/visualize_plan/DialogWithVisualizedPlan.vue";
 import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
 
 const intentsStore = useIntentsStore()
 const workflowsStore = useWorkflowsStore()
-const route = useRoute()
+const projectID = useProjectsStore().currentProject.projectId
 const router = useRouter()
 
 const visualizedPlan = ref(null)
@@ -135,7 +144,7 @@ const columns = [
 ];
 
 onMounted(async() => {
-  await intentsStore.getAllIntents(route.params.id)
+  await intentsStore.getAllIntents(projectID)
 })
 
 const visualizeWorkflow = (visualRepresentation) => {
@@ -148,14 +157,14 @@ let confirmDelete = () => {}
 const deleteIntent = (propsRow) => {
   showDialogDeleteIntent.value = true
   confirmDelete = () => {
-    intentsStore.deleteIntent(route.params.id, propsRow.row.intentID)
+    intentsStore.deleteIntent(projectID, propsRow.row.intentID)
   }
 }
 
 const deleteWorkflow = (intent, workflow) => {
   showDialogDeleteWorkflow.value = true
   confirmDelete = () => {
-    workflowsStore.deleteWorkflow(route.params.id, intent.intentID, workflow.workflowID)
+    workflowsStore.deleteWorkflow(projectID, intent.intentID, workflow.workflowID)
   }
 }
 

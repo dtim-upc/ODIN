@@ -25,7 +25,7 @@
 <script setup>
 import { reactive, ref, watch } from "vue";
 import { useRepositoriesStore } from "src/stores/repositoriesStore";
-import { useRoute } from "vue-router";
+import { useProjectsStore } from "src/stores/projectsStore";
 
 const props = defineProps({
   show: {type: Boolean, default: false, required: true},
@@ -33,7 +33,7 @@ const props = defineProps({
 });
 
 const repositoriesStore = useRepositoriesStore();
-const route = useRoute()
+const projectID = useProjectsStore().currentProject.projectId
 
 // Emits to associate the show prop with the parent component
 const emit = defineEmits(["update:show"])
@@ -56,7 +56,7 @@ const onSubmit = () => {
   const data = new FormData();
   data.append("repositoryID", editedRepository.id);
   data.append("repositoryName", editedRepository.name);
-  repositoriesStore.putRepository(editedRepository.id, route.params.id, data, () => emit('update:show', false))
+  repositoriesStore.putRepository(editedRepository.id, projectID, data, () => emit('update:show', false))
 }
 
 </script>

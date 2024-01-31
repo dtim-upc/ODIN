@@ -24,6 +24,7 @@ public class jdModuleImpl implements jdModuleInterface {
         try {
             return discovery.getAlignments(dataset, dataset2);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InternalServerErrorException("There was an error when computing the alignments", e.getMessage());
         }
     }

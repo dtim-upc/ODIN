@@ -47,14 +47,14 @@
   <script setup>
   import { onMounted, ref} from "vue";
   import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
-  import {useRoute} from "vue-router";
+  import {useProjectsStore} from 'src/stores/projectsStore.js'
   import NoDataImage from "src/assets/NoDataImage.vue";
-  import ConfirmDialog from "src/components/ConfirmDialog.vue";
+  import ConfirmDialog from "src/components/utils/ConfirmDialog.vue";
   import EditDataProductForm from "src/components/forms/EditDataProductForm.vue";
   import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
   
   const dataProductsStore = useDataProductsStore()
-  const route = useRoute()
+  const projectID = useProjectsStore().currentProject.projectId
   
   const selectedDataProduct = ref(null)
   
@@ -72,14 +72,14 @@
   ]
 
   onMounted(async() => {
-    await dataProductsStore.getDataProducts(route.params.id)
+    await dataProductsStore.getDataProducts(projectID)
   })
   
   let confirmDelete = () => {}
   const deleteRow = (propsRow) => {
     showConfirmDialog.value = true
     confirmDelete = () => {
-        dataProductsStore.deleteDataProduct(route.params.id, propsRow.row.id)
+        dataProductsStore.deleteDataProduct(projectID, propsRow.row.id)
     }
   }
   

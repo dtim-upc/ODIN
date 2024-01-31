@@ -27,11 +27,11 @@
     </q-page>
 </template>
 
-
 <script setup>
 import {ref, onMounted, computed} from 'vue'
 import {useIntentsStore} from 'stores/intentsStore.js'
 import {useDataProductsStore} from 'stores/dataProductsStore.js'
+import {useProjectsStore} from 'stores/projectsStore.js'
 import {useRoute, useRouter} from "vue-router";
 import { useQuasar } from 'quasar'
 
@@ -41,6 +41,7 @@ const $q = useQuasar()
 
 const intentsStore = useIntentsStore()
 const dataProductsStore = useDataProductsStore()
+const projectID = useProjectsStore().currentProject.projectId
 
 const intentName = ref(null)
 const selectedDataProdutName = ref(null)
@@ -56,17 +57,16 @@ const handleSubmit = async() => {
   data.append("problem", intentsStore.problems[problem.value]);
   data.append("dataProductID", selectedDataProduct.id)
   
-  await intentsStore.postIntent(route.params.id, data)
+  await intentsStore.postIntent(projectID, data)
 
   $q.loading.show({message: 'Materializing data product...'}) // Then, create the csv file from the dataProduct
-  await dataProductsStore.materializeDataProduct(route.params.id, selectedDataProduct.id)
+  await dataProductsStore.materializeDataProduct(projectID, selectedDataProduct.id)
 
   $q.loading.show({message: 'Annotating query...'}) // Then, annotate the dataset and define the new ontology
   data = {
     'path': dataProductsStore.selectedDataProductPath,
     'label': target.value,
   }
-  console.log(data)
   await intentsStore.annotateDataset(data)
 
   $q.loading.show({message: 'Running abstract planner...'}) // Finally, run the planner
@@ -75,7 +75,6 @@ const handleSubmit = async() => {
     'dataset': intentsStore.queryUri,
     'problem': intentsStore.problems[problem.value],
   }
-  console.log(data)
 
   const successCallback = () => {
     router.push({ path: route.path.substring(0, route.path.lastIndexOf("/")) + "/logical-planner" })
@@ -93,7 +92,6 @@ const resetForm = () => {
 
 const getAttributes = computed(() => {
   const selectedDataProduct = dataProductsStore.dataProducts.find(dp => dp.datasetName === selectedDataProdutName.value);
-
   if (selectedDataProduct) {
     return selectedDataProduct.attributes.map(att => att.name)
   }
@@ -101,18 +99,8 @@ const getAttributes = computed(() => {
 })
 
 onMounted(async() => {
-  await dataProductsStore.getDataProducts(route.params.id)
+  await dataProductsStore.getDataProducts(projectID)
   intentsStore.getProblems()
 })
 
-
 </script>
-
-<style scoped>
-
-.reduced-height {
-  max-height: 500px;
-}
-
-
-</style>

@@ -15,6 +15,7 @@ export const useIntentsStore = defineStore('intents', {
     abstractPlans: [],
     logicalPlans: [],
     selectedPlans: [],
+    selectedRDFGraph: ""
   }),
 
   actions: {
@@ -148,6 +149,18 @@ export const useIntentsStore = defineStore('intents', {
         return parts.join(' ');
       } else {
         return inputString; // Return the original string if there's only one part
+      }
+    },
+
+    async getRDFGraph(planID) {
+      try {
+        // The API operation is the same as downloading the RDF file, but instead of downloading it, we store it in a variable
+        const response = await intentsAPI.downloadRDF(planID)
+        this.selectedRDFGraph = response.data;
+        notify.positive(`RDF file obtained`);
+      } catch (error) {
+        notify.negative("Error obtaining the RDF file");
+        console.error("Error:", error);
       }
     },
 

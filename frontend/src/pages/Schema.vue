@@ -25,19 +25,17 @@
                        :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
               </q-item>
 
-
             </q-list>
           </q-expansion-item>
 
           <q-expansion-item :label="'Local schemas (' + localSchemasLength + ' items)'" expand-icon="arrow_drop_down" :disable="localSchemasLength ===0">
             <q-list dense>
-              <q-item v-for="ds in storeDS.datasets" :key="ds.id">
+              <q-item v-for="ds in datasourcesStore.datasets" :key="ds.id">
                 <q-btn flat padding="xs" :label="ds.datasetName" class="full-width"
                        :class="selectedSchema === ds.id? 'activebg': ''" align="left" @click="setSchema(ds)"/>
               </q-item>
             </q-list>
           </q-expansion-item>
-
 
         </q-list>
       </q-scroll-area>
@@ -64,54 +62,34 @@ import Graph from 'components/graph/Graph.vue'
 import {useDatasetsStore} from 'src/stores/datasetsStore.js'
 import {useProjectsStore} from 'src/stores/projectsStore.js'
 
-import { onBeforeMount } from "vue";
-
-onBeforeMount(() => {
-  document.title = "Schema"; // Título de la pestaña
-});
-
-const storeDS = useDatasetsStore()
+const datasourcesStore = useDatasetsStore()
 const projectsStore = useProjectsStore()
+const projectID = useProjectsStore().currentProject.projectId
 
 const graphical = ref('');
 const selectedSchema = ref('');
 
-const setSchema = datasource => {
-  selectedSchema.value = datasource.id
-  graphical.value = datasource.localGraph.graphicalSchema
+const setSchema = dataset => {
+  selectedSchema.value = dataset.id
+  graphical.value = dataset.localGraph.graphicalSchema
 }
 
+const integratedSchemasLength = computed(() => projectsStore.currentProject.integratedDatasets ? projectsStore.currentProject.integratedDatasets.length : 0);
+const localSchemasLength = computed(() => datasourcesStore.datasets ? datasourcesStore.datasets.length : 0);
+
+onMounted(async () => {
+  await datasourcesStore.getDatasets(projectID);
+  if (datasourcesStore.datasets.length > 0) {
+    setGlobalSchema();
+  }
+});
+
 const setGlobalSchema = () => {
-  console.log("setting global schema view")
   selectedSchema.value = 'project'
   graphical.value = projectsStore.getGlobalSchema
 }
 
-onMounted(async () => {
-  try {
-    const url = window.location.href; // Get the current URL
-    const regex = /project\/(\d+)\//;
-    const match = url.match(regex);
-    let projectId;
-    if (match) {
-      projectId = match[1];
-      console.log(projectId);
-    }
-    await storeDS.getDatasets(projectId);
-
-    if (storeDS.datasets.length > 0) {
-      setGlobalSchema();
-    }
-
-  } catch (error) {
-    console.error("Error al cargar los datos de datasources desde la API:", error);
-  }
-});
-
-const integratedSchemasLength = computed(() => projectsStore.currentProject.integratedDatasets ? projectsStore.currentProject.integratedDatasets.length : 0);
-const localSchemasLength = computed(() => storeDS.datasets ? storeDS.datasets.length : 0);
 </script>
-
 
 <style lang="scss">
 .body--light {

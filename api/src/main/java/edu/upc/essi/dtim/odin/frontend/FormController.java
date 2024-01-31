@@ -19,17 +19,6 @@ public class FormController {
     private static final String repositoryFormsPath = "api\\src\\main\\resources\\frontend-schemas\\RepositoryForms\\";
 
     /**
-     * Retrieves the basic template of the repositories
-     *
-     * @return A String containing the template.
-     */
-    @GetMapping("/formSchema")
-    public String getFormSchema() {
-        logger.info("Formschema asked");
-        return formService.getRepositorySchema(repositoryFormsPath + "Template_Repository.json");
-    }
-
-    /**
      * Retrieves the template of a specific type of repository
      *
      * @param repositoryType Type of template to be retrieved.
@@ -46,7 +35,7 @@ public class FormController {
      *
      * @return A List of DataRepositoryTypeInfo, objects with two variables: repository name and repository file name.
      */
-    @GetMapping("/api/data-repository-types")
+    @GetMapping("/data-repository-types")
     public List<DataRepositoryTypeInfo> getDataRepositoryTypes() {
         return formService.getDataRepositoryTypes(repositoryFormsPath);
     }

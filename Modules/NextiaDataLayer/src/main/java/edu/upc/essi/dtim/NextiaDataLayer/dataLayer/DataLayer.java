@@ -30,6 +30,9 @@ public abstract class DataLayer {
         this.dataStorePath = dataStorePath;
     }
 
+    // ---------------- Interacting with the zones
+
+    // ---- Landing & Temporal Landing
     public void uploadToLandingZone(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
         df_bootstrap.repartition(1).write().format("parquet").save(dataStorePath + "landingZone\\" + d.getUUID());
@@ -65,6 +68,26 @@ public abstract class DataLayer {
         return spark.sql(d.getWrapper());
     }
 
+    // ---- Formatted
+
+    public abstract void uploadToFormattedZone(Dataset d, String tableName) throws SQLException;
+    public abstract void uploadToTemporalFormattedZone(Dataset d, String tableName) throws SQLException;
+    public abstract void removeFromFormattedZone(String tableName);
+
+    // ---- Exploitation & Temporal Exploitation
+
+    public abstract void uploadToTemporalExploitationZone(String sql, String UUID);
+    public abstract void removeFromExploitationZone(String tableName);
+    public abstract void persistDataInTemporalExploitation(String UUID);
+
+    // ---------------- Query execution
+
+    public abstract ResultSet executeQuery(String sql, Dataset[] datasets);
+    public abstract ResultSet executeQuery(String sql);
+    public abstract void execute(String sql);
+
+    // ---------------- Handling files
+
     public void deleteFilesFromDirectory(String directoryPath) {
         Path dir = Paths.get(directoryPath);
         try {
@@ -94,29 +117,16 @@ public abstract class DataLayer {
         return storeTemporalFile(dataStorePath + "tmp", inputFile, newFileDirectory);
     }
 
-    public abstract void uploadToFormattedZone(Dataset d, String tableName) throws SQLException;
+    public abstract String materialize(Dataset dataset, String zone, String format);
 
-    public abstract void removeFromFormattedZone(String tableName);
-
-    public abstract ResultSet executeQuery(String sql, Dataset[] datasets);
-    public abstract ResultSet executeQuery(String sql);
-    public abstract void execute(String sql);
+    // ---------------- Others
 
     public abstract void close();
-
     // Only for testing the data that is uploaded
+
     public void show(Dataset d) {
         String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
         org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(parquetPath);
         df.show();
     }
-
-    public abstract void copyToExploitationZone(String UUID);
-
-    public abstract void uploadToTemporalExploitationZone(String sql, String UUID);
-    public abstract void removeFromExploitationZone(String tableName);
-
-    public abstract String materialize(Dataset dataset, String zone, String format);
-
-    public abstract void test();
 }

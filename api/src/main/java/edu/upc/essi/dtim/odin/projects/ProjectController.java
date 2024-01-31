@@ -116,4 +116,17 @@ public class ProjectController {
         return projectService.downloadProjectSchema(projectID);
     }
 
+    /**
+     * Resets the project schema, removing the integrated graph generated so far
+     *
+     * @param projectID The ID of the project for which the schema will be downloaded.
+     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     */
+    @PostMapping("/project/{projectID}/reset-schema")
+    public ResponseEntity<Boolean> resetProjectSchema(@PathVariable("projectID") String projectID) {
+        logger.info("Resetting project schema for project: " +  projectID);
+        projectService.resetProjectSchema(projectID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

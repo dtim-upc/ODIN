@@ -1,8 +1,7 @@
 <template>
   <q-dialog v-model="showS" @hide="props.show=false" :key="showS">
-    <q-spinner-pie v-if="loading" color="light-blue" size="5em" align="center"/>
 
-    <q-card v-else style="width: 400px; max-width: 80vw">
+    <q-card  style="width: 400px; max-width: 80vw">
       <q-card-section>
         <!-- Resto del contenido con desplazamiento -->
         <div style="overflow-y: auto; max-height: calc(80vh - 140px);">
@@ -18,10 +17,8 @@
             <!-- Sección 3: Lista de archivos cargados -->
             <!-- List of Uploaded Files/Folders -->
             <div class="uploaded-items-list">
-              <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item"
-                   @mouseover="showSpecialButton(index)" @mouseleave="hideSpecialButton(index)">
-
-                <div class="special-button special-button-hidden">
+              <div v-for="(item, index) in uploadedItems" :key="index" class="uploaded-item">
+                <div class="special-button">
                   <q-btn @click="removeUploadedItem(index)" flat round>
                     <q-icon name="close" size="1.25em"/>
                   </q-btn>
@@ -144,6 +141,7 @@
               label="Make request"
               color="primary"
               @click="makeRequest"
+              class="q-mb-sm"
             />
             <q-input
               filled
@@ -158,7 +156,7 @@
           <q-card-section v-if="isLocalRepository">
             <!-- Tipo de origen de datos -->
             <q-select
-              v-model="DataSourceType"
+              v-model="DatasetType"
               :options="options"
               label="Type"
               class="q-mt-none"
@@ -168,7 +166,7 @@
           <!-- Descripción del conjunto de datos (opcional) -->
           <q-card-section>
             <!-- Descripción del conjunto de datos (opcional) -->
-            <q-input v-model="newDatasource.datasetDescription" filled autogrow label="Description (Optional)"/>
+            <q-input v-model="newDataset.datasetDescription" filled autogrow label="Description (Optional)"/>
           </q-card-section>
         </div>
       </q-card-section>
@@ -176,7 +174,7 @@
       <q-form ref="form" @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <!-- Botones del formulario -->
         <q-card-section>
-          <div v-if="showFormButtons">
+          <div>
             <q-btn label="Submit" type="submit" color="primary"/>
             <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" v-close-popup/>
           </div>
@@ -189,60 +187,33 @@
 <script setup>
 import {ref, reactive, onMounted, watch, computed} from "vue";
 import {useNotify} from 'src/use/useNotify.js'
-import {useRoute, useRouter} from "vue-router";
-import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import {useDatasetsStore} from "../../stores/datasetsStore";
 import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
-import {odinApi} from "../../boot/axios";
+import { useProjectsStore } from "src/stores/projectsStore";
+import { useQuasar } from "quasar";
 
-const remoteFileUrl = ref(""); // Variable para almacenar la URL del archivo remoto
-const apiDatasetName = ref(""); // 
+const datasetsStore = useDatasetsStore();
+const repositoriesStore = useRepositoriesStore()
+const projectID = useProjectsStore().currentProject.projectId
 
-async function downloadFile() {
-  let url = remoteFileUrl.value;
-  file = datasetsStore.downloadFile(url);
-  uploadedItems.value.push(file)
-}
+const remoteFileUrl = ref(""); 
+const apiDatasetName = ref(""); 
+const isLocalRepository = ref(false);
+const isJDBCRepository = ref(false);
+const isAPIRepository = ref(false);
 
-async function makeRequest() {
-  let endpoint = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
+const $q = useQuasar()
+const notify = useNotify()
 
-  let id_buscar = repositoriesStore.selectedRepository.id; // Define el ID que deseas buscar
+const form = ref(null)
+const options = ["Local file/s", "Remote file/s"];
 
-  let repositorio_encontrado = null; // Inicializa con null, no con None
-
-  // Supongamos que storeDS.repositories es una lista de objetos con propiedades "id" y "url"
-  for (const repo of repositoriesStore.repositories) {
-    if (repo.id === id_buscar) {
-      repositorio_encontrado = repo;
-      break;
-    }
-  }
-
-  if (repositorio_encontrado) {
-    notify.positive("REQUEST MADE: " + repositorio_encontrado.url + endpoint);
-
-    newDatasource.endpoint = endpoint;
-    newDatasource.apiDatasetName = apiDatasetName
-
-    file = datasetsStore.makeAPIRequest(repositorio_encontrado.url + endpoint);
-    uploadedItems.value.push(file);
-  } else {
-    notify.negative("REPOSITORY NOT FOUND");
-  }
-}
-
-// -------------------------------------------------------------
-//                         PROPS & EMITS
-// -------------------------------------------------------------
 const props = defineProps({
   show: {type: Boolean, default: false, required: true},
-  showFormButtons: {type: Boolean, default: true},
   afterSubmitShowGraph: {type: Boolean, default: true},
   repositoryId: String,
   repositoryName: String,
 });
-
 
 const emit = defineEmits(["update:show"])
 const showS = computed({
@@ -254,54 +225,36 @@ const showS = computed({
   }
 })
 
-const datasetsStore = useDatasetsStore();
-const repositoriesStore = useRepositoriesStore()
-
-// -------------------------------------------------------------
-//                         STORES & GLOBALS
-// -------------------------------------------------------------
-const showSpecialButton = (index) => {
-  const specialButton = document.querySelectorAll('.special-button')[index];
-  specialButton.classList.remove('special-button-hidden');
+async function downloadFile() {
+  let url = remoteFileUrl.value;
+  const file = await datasetsStore.downloadFile(url);
+  uploadedItems.value.push(file)
 }
 
-const hideSpecialButton = (index) => {
-  const specialButton = document.querySelectorAll('.special-button')[index];
-  specialButton.classList.add('special-button-hidden');
+async function makeRequest() {
+  let endpoint = remoteFileUrl.value; // Reemplaza con la URL que deseas descargar
+
+  newDataset.endpoint = endpoint;
+  newDataset.apiDatasetName = apiDatasetName
+
+  const file = await datasetsStore.makeAPIRequest(repositoriesStore.selectedRepository.url + endpoint)
+  uploadedItems.value.push(file)
+  apiDatasetName.value = file.name.substring(0, file.name.indexOf('.'))
 }
-
-
-const integrationStore = useIntegrationStore()
-
-const projectID = ref(null);
-const isLocalRepository = ref(false);
-const isJDBCRepository = ref(false);
-const isAPIRepository = ref(false);
 
 async function initializeComponent() {
-  const url = window.location.href; // Get the current URL
-  const regex = /project\/(\d+)\//;
-  const match = url.match(regex);
-  let projectId;
-  if (match) {
-    projectId = match[1];
-    console.log(projectId + "+++++++++++++++++++++++1 id del proyecto cogido"); // Output: 1
-    projectID.value = projectId;
-    await repositoriesStore.getRepositories(projectID.value);
+  await repositoriesStore.getRepositories(projectID)
     
-    isLocalRepository.value = repositoriesStore.selectedRepository.repositoryType === "LocalRepository";
-    isJDBCRepository.value = repositoriesStore.selectedRepository.repositoryType === "RelationalJDBCRepository";
-    isAPIRepository.value = repositoriesStore.selectedRepository.repositoryType === "APIRepository";
-    console.log(isLocalRepository);
+  isLocalRepository.value = repositoriesStore.selectedRepository.repositoryType === "LocalRepository";
+  isJDBCRepository.value = repositoriesStore.selectedRepository.repositoryType === "RelationalJDBCRepository";
+  isAPIRepository.value = repositoriesStore.selectedRepository.repositoryType === "APIRepository";
 
-    if (isJDBCRepository.value) {
-      uploadedItems.value = await repositoriesStore.retrieveDBTables(route.params.id, repositoriesStore.selectedRepository.id);
-      console.log("uploadedItems: " + uploadedItems.value);
-    }
-
+  if (isJDBCRepository.value) {
+    $q.loading.show({message: 'Retrieving tables...'})
+    uploadedItems.value = await repositoriesStore.retrieveDBTables(projectID, repositoriesStore.selectedRepository.id);
+    $q.loading.hide()
   }
 }
-
 
 watch(() => showS.value, (newValue) => {
   if (newValue) {
@@ -313,41 +266,26 @@ onMounted(() => {
   initializeComponent();
 });
 
-const route = useRoute()
-const router = useRouter()
-// -------------------------------------------------------------
-//                         Others
-// -------------------------------------------------------------
-
-const form = ref(null)
-const notify = useNotify()
-const loading = ref(false); // Variable para controlar la carga
-
 defineExpose({
   form
 })
 
-const options = [
-  "Local file/s",
-  "Remote file/s",
-];
-
-const newDatasource = reactive({
+const newDataset = reactive({
   repositoryId: repositoriesStore.selectedRepository.id,
   repositoryName: repositoriesStore.selectedRepository.repositoryName,
   datasetDescription: '',
 });
 
 const uploadedItems = ref([]);
-const DataSourceType = ref(options[0]);
+const DatasetType = ref(options[0]);
 const onReset = () => {// Restablece los valores de los campos a su estado inicial
-  newDatasource.repositoryId = null;
+  newDataset.repositoryId = null;
   repositoriesStore.selectedRepository = {};
-  newDatasource.repositoryName = '';
-  newDatasource.datasetDescription = '';
-  newDatasource.endpoint = '';
-  newDatasource.apiDatasetName = '';
-  DataSourceType.value = options[0];
+  newDataset.repositoryName = '';
+  newDataset.datasetDescription = '';
+  newDataset.endpoint = '';
+  newDataset.apiDatasetName = '';
+  DatasetType.value = options[0];
   databaseHost.value = '';
   databaseUser.value = '';
   databasePassword.value = '';
@@ -355,77 +293,59 @@ const onReset = () => {// Restablece los valores de los campos a su estado inici
 
   uploadedItems.value = []; // Vacía la lista de archivos cargados
 
-  DataSourceType.value = options[0];
+  DatasetType.value = options[0];
 }
 
-const onSubmit = () => {
-  loading.value = true; // Activa la carga
-
-  // Check if uploadedItems is empty
-  if (uploadedItems.value.length === 0) {
-    // Display a notification indicating that at least one file should be added
+const onSubmit = async() => {
+  if (uploadedItems.value.length === 0) { // If there are no files we ntify it as an error
     notify.negative('Please add at least one file before submitting.');
-    return; // Abort form submission
+    return;
   }
+  
+  $q.loading.show({message: 'Creating dataset...'})
+  const data = new FormData()
 
-  const data = new FormData();
-  console.log("Contenido de uploadedItems:", uploadedItems.value);
-
-  data.append("datasetDescription", newDatasource.datasetDescription);
-  data.append("repositoryName", newDatasource.repositoryName);
+  data.append("datasetDescription", newDataset.datasetDescription);
+  data.append("repositoryName", newDataset.repositoryName);
   data.append("repositoryId", repositoriesStore.selectedRepository.id); // Set as empty string if repositoryId is null
-  console.log(newDatasource.repositoryId, "++++++++++++++++++++++++++");
 
   const attachTables = [];
 
   // Append all files as an array under the key 'attach_files'
   uploadedItems.value.forEach((item) => {
-    console.log("Archivo que se va a agregar:", item);
-
-    if (item.files === undefined && isLocalRepository.value) {
-      data.append('attachFiles', item);
-    } else if (item.files !== undefined && isLocalRepository.value) {
-      item.files.forEach((file) => {
-        data.append('attachFiles', file);
-      });
-    } else if (item.files === undefined && !isLocalRepository.value && !isAPIRepository.value) {
-      //data.append('attachFiles', item);
-      attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
-    } else if (item.files === undefined && isAPIRepository.value) {
-      data.append('attachFiles', item);
-      data.append('endpoint', newDatasource.endpoint)
-      data.append('apiDatasetName', newDatasource.apiDatasetName)
-    } else {
-      console.log("attachTables: " + item.name);
-      attachTables.push(item.name.toString()); // Agregar el nombre al array attachTables
+    if (isLocalRepository.value) {
+      if (item.files === undefined) { // Only one file
+        data.append('attachFiles', item)
+      }
+      else { // Multiple files
+        item.files.forEach((file) => {
+          data.append('attachFiles', file)
+        })
+      }
     }
-    console.log(attachTables + " --------------");
-  });
+    else if (isJDBCRepository.value) {
+      attachTables.push(item.name.toString())
+    }
+    else if (isAPIRepository.value) {
+      data.append('attachFiles', item);
+      data.append('endpoint', newDataset.endpoint)
+      data.append('apiDatasetName', newDataset.apiDatasetName)
+    }
+  })
 
   data.append('attachTables', attachTables);
+  
+  const successCallback = () => {
+    onReset()
+    showS.value = false;
+  }
 
-  console.log(data.get('repositoryId'))
-
-  datasetsStore.postDataset(route.params.id, data, successCallback);
-
-  onReset();
+  await datasetsStore.postDataset(projectID, data, successCallback);
+  $q.loading.hide()
 }
 
-const successCallback = (datasource) => {
-  loading.value = false; // Desactiva la carga después de la operación
 
-  console.log("success callback")
-
-  notify.positive(`Dataset/s successfully uploaded`)
-  onReset()
-
-  showS.value = false;
-
-  datasetsStore.getDatasets(route.params.id)
-  repositoriesStore.getRepositories(route.params.id)
-}
-
-// Método para abrir el selector de archivos
+// Open file explorer
 const triggerFileUpload = () => {
   const fileUploadInput = document.createElement('input');
   fileUploadInput.type = 'file';
@@ -435,7 +355,7 @@ const triggerFileUpload = () => {
   fileUploadInput.click();
 };
 
-// Método para abrir el selector de carpetas
+// Open file explorer (only for directories)
 const triggerFolderUpload = () => {
   const folderUploadInput = document.createElement('input');
   folderUploadInput.type = 'file';
@@ -487,14 +407,14 @@ const removeUploadedItem = (index) => {
 
 const maxFilesValue = ref(undefined);
 
-// Watcher to update maxFilesValue whenever the DataSourceType changes
-watch(() => DataSourceType.value, () => {
-  if (DataSourceType.value === 'Single file') {
+// Watcher to update maxFilesValue whenever the DatasetType changes
+watch(() => DatasetType.value, () => {
+  if (DatasetType.value === 'Single file') {
     maxFilesValue.value = 1;
-  } else if (DataSourceType.value === 'Local file/s' || DataSourceType.value === 'Directory') {
+  } else if (DatasetType.value === 'Local file/s' || DatasetType.value === 'Directory') {
     maxFilesValue.value = undefined; // Allow selecting any number of files
   } else {
-    maxFilesValue.value = 1; // For other DataSourceType values, allow only one file to be uploaded
+    maxFilesValue.value = 1; // For other DatasetType values, allow only one file to be uploaded
   }
 });
 
@@ -503,65 +423,13 @@ const databaseUser = ref('');
 const databasePassword = ref('');
 
 // Computed property to determine if "Local file/s" is selected
-const isLocalFileOptionSelected = computed(() => DataSourceType.value === options[0]);
-
-const isRemoteFileOptionSelected = computed(() => DataSourceType.value === options[1]);
+const isLocalFileOptionSelected = computed(() => DatasetType.value === options[0]);
+const isRemoteFileOptionSelected = computed(() => DatasetType.value === options[1]);
 
 </script>
 
 
 <style lang="scss" scoped>
-.fileBoxLabel {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font: inherit;
-  vertical-align: baseline;
-}
-
-.fileBox {
-
-  .q-field__control {
-    height: 150px;
-  }
-
-  .q-field__control:before {
-    border: 1px dashed #A4A4A4;
-  }
-}
-
-.fileUploadBox {
-
-  position: absolute;
-  z-index: 1;
-  box-sizing: border-box;
-  display: table;
-  table-layout: fixed;
-  width: 100px;
-  height: 80px;
-  top: 86px;
-  left: 100px;
-  border: 1px dashed #A4A4A4;
-  border-radius: 3px;
-  text-align: center;
-  overflow: hidden;
-
-  .contentFile {
-    display: table-cell;
-    vertical-align: middle;
-  }
-
-  input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0;
-  }
-}
-
-/* Styles for the Upload Section */
 .uploader__empty-state {
   display: flex;
   align-items: center;
@@ -622,18 +490,9 @@ const isRemoteFileOptionSelected = computed(() => DataSourceType.value === optio
 
 .special-button {
   position: absolute;
-  top: 30%; /* Coloca el botón en el centro vertical */
-  left: 91%; /* Coloca el botón a la derecha del contenido */
-  color: blue;
+  top: 18%; /* Coloca el botón en el centro vertical */
+  left: 85%; /* Coloca el botón a la derecha del contenido */
+  color: red;
   cursor: pointer;
-}
-
-.special-button q-btn:hover {
-  color: red; /* Cambia el color al pasar el cursor */
-  //text-decoration: none; /* Elimina el subrayado al pasar el cursor */
-}
-
-.special-button-hidden {
-  display: none;
 }
 </style>

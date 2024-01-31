@@ -1,16 +1,9 @@
 <template>
 
-  <!-- Graph view -->
-  <!-- <div class="row items-stretch"> -->
-
   <div ref="graphParent" class="col" :class="$q.dark.isActive ? 'graph--dark': 'graph--light'"
        style="position:relative; height:100%">
     <div ref="graphDiv" id="graph" style="line-height: 0; width:100%; height:100%;">
     </div>
-
-
-    <!-- <div padding> -->
-
 
     <q-btn-group spread style="flex-direction: column;position:absolute;" class="fixed-bottom-right q-ma-md" @mouseenter="expandLabel" @mouseleave="contractLabel">
       <q-btn v-if="props.enableQuery" color="white" text-color="black" icon="o_search" @click="querySelection" :label="miniState? '':'SEND QUERY'"
@@ -23,10 +16,6 @@
       <q-btn color="white" text-color="black" icon="add" @click="zoomIn" style="padding: 4px 8px" :label="miniState ? '':'ZOOM IN'"/>
       <q-btn color="white" text-color="black" icon="remove" @click="zoomOut" style="padding: 4px 8px" :label="miniState ? '':'ZOOM OUT'"/>
     </q-btn-group>
-
-    <!-- </div> -->
-    <!--  -->
-
 
     <q-resize-observer @resize="onResize"/>
   </div>
@@ -62,7 +51,6 @@ const props = defineProps({
 
   alignment: {
     type: Object, default: {
-
       type: '', //both resource must be same type
       trueType: '',
       shortType: '',
@@ -80,6 +68,7 @@ const props = defineProps({
   }
 });
 const emit = defineEmits(["elementClick"])
+
 // ----------------------------------------------------------------------------
 //                  Data set up
 // ----------------------------------------------------------------------------
@@ -88,18 +77,13 @@ let graphicalNodes = json.nodes
 let graphicalLinks = json.links
 
 watch(() => props.graphical, n => {
-
   if (props.graphical || props.graphical == "") {
-    console.log("entra props actualizado")
-    // console.log(props.graphical)
     json = props.graphical == "" ? {"nodes": [], "links": []} : JSON.parse(props.graphical);
     graphicalNodes = json.nodes
     graphicalLinks = json.links
-    // console.log("update json")
     cleanVisualGraph()
     initVisualGraph()
   }
-
 })
 
 // ----------------------------------------------------------------------------
@@ -109,6 +93,7 @@ const graphDiv = ref(null);
 const graphParent = ref(null);
 let svg = ref(null);
 let root = ref(null);
+
 // ----------------------------------------------------------------------------
 //                  Graph set up variables
 // ----------------------------------------------------------------------------
@@ -120,45 +105,34 @@ let height = ref(null);
 let linkContainer = null;
 let nodeContainer = null;
 
-
 const notify = useNotify()
 // ----------------------------------------------------------------------------
-//
 //                  Buttons functionalities
-//
 // ----------------------------------------------------------------------------
 const $q = useQuasar()
 
 const toggleFullscreen = (e) => {
   $q.fullscreen.toggle(graphParent.value)
     .then(() => {
-      // success!
     })
     .catch((err) => {
       alert(err)
-      // uh, oh, error!!
-      // console.error(err)
     })
 }
 
 const enableSelection = () => {
-
-  // we disable zoom since overlap with the drag functionality of selection
-  disableZoom(true);
+  disableZoom(true); // we disable zoom since overlap with the drag functionality of selection
   resetSelection();
   // if(props.selectSubGraph)
-  console.log("width:", width.value)
   lazzo.initSelection(root.value, svg.value)
   lazzo.marked(selectMarked)
   lazzo.afterMarked(afterMarked)
 }
 
 const querySelection = () => {
-  console.log("query...", Object.keys(selectionG.getSelected()))
   if (Object.keys(selectionG.getSelected()).length == 0) {
     notify.negative("You must perform a selection over the graph before querying")
   } else {
-
     var data = selectionG.prepareSelectionObject();
     props.queryFunc(data)
   }
@@ -166,17 +140,13 @@ const querySelection = () => {
 }
 
 // ----------------------------------------------------------------------------
-//
 //                  OTHERS
-//
 // ----------------------------------------------------------------------------
 // const zoomDragEnable  = ref(true)
-
 
 let centerGraphView = props.centerGraphonLoad;
 
 const clickResource = (event, node) => {
-
   var clickElement = {}
   clickElement.iri = node.iri
   clickElement.id = node.id
@@ -189,24 +159,18 @@ const clickResource = (event, node) => {
   clickElement.label = node.label
   clickElement.event = event
 
-  // console.log("node....", node)
   emit('elementClick', clickElement)
 
 }
 const onResize = (size) => {
   // report.value = size
-  // console.log(size)
-
   if (width.value != size.width || height.value != size.height) {
-
     width.value = size.width
     height.value = size.height
     if (!centerGraphView) // to avoid centering when centering at graph view since it's done later
       center(0)
   }
-
 }
-
 
 const {
   getLabel,
@@ -217,6 +181,7 @@ const {
   drag,
   isGConvex
 } = useGraphUtils();
+
 const {zoomIn, zoomOut, center, initZoom, disableZoom} = useGraphZoom(svg, root, width, height);
 const lazzo = useLazzo();
 const geometry = useGeometry();
@@ -229,7 +194,6 @@ const cleanVisualGraph = () => {
 
   svg.value = d3.select(graphDiv.value).append('svg')
   // .attr("width", width.value).attr("height", height.value);
-
 }
 
 const resetSelection = () => {
@@ -239,29 +203,21 @@ const resetSelection = () => {
 }
 
 const afterMarked = () => {
-  console.log("after...")
   if (Object.keys(selectionG.getSelected()).length > 1 && !isGConvex(Object.keys(selectionG.getSelected()), selectionG.getLinks())) {
     notify.negative("The query graph must be convex")
-    // reset opacity
-    resetSelection()
+    resetSelection() // reset opacity
   }
   lazzo.removeEvents(root.value, svg.value)
   disableZoom(false);
 }
 
 const selectMarked = (node) => {
-  // console.log("selectedMarked...")
   // simulation.stop
   svg.value.selectAll(".class,.type").each(function (node) {
 
-
     if (!selectionG.contains(node)) {
       var point = [node.x, node.y];
-      // console.log("node point...", node)
-      // console.log("node inside...", node)
-      // console.log(node.getCTM())
       if (lazzo.contains(point)) {
-        // console.log("node inside...", node)
         selectionG.addNode(node);
 
         svg.value.select("#" + node.id).style("opacity", "1");
@@ -282,7 +238,6 @@ const selectMarked = (node) => {
               let linkN = svg.value.select("#" + link.nodeId)
               linkN.style("opacity", "1");
 
-              // console.log("dpks",linkN.data()[0])
               labs.push(link);
               selectionG.addLinkNode(linkN.data()[0])
             }
@@ -291,31 +246,23 @@ const selectMarked = (node) => {
         }
       }
     }
-
   })
-
 }
 
-
 const initVisualGraph = () => {
-
-  //set the repel force - may need to be tweaked for multiple data
-  //the lower the strength the more they will repel away from each other
-  //the larger the distance, the more apart they will be
+  // set the repel force - may need to be tweaked for multiple data
+  // the lower the strength the more they will repel away from each other
+  // the larger the distance, the more apart they will be
   var repelForce = d3.forceManyBody().strength(-500).distanceMax(600).distanceMin(120); //450
 
-
-// use if node disappear when draggin  -> https://stackoverflow.com/questions/45297356/d3-js-v4-force-layout-with-link-forces-causes-strange-movement-when-using-drag-b
-//  .force("collide", d3.forceCollide(20).radius(20).strength(0))
-
+  // use if node disappear when draggin  -> https://stackoverflow.com/questions/45297356/d3-js-v4-force-layout-with-link-forces-causes-strange-movement-when-using-drag-b
+  //  .force("collide", d3.forceCollide(20).radius(20).strength(0))
 
   simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody().strength(-500)) // push nodes apart to space them out
     // .force("charge", (d) => {
     //     var charge = -500;
-    //     console.log(d)
     //     if(d.type === 'class' ) {
-    //         console.log("entering....")
     //         charge = 10 * charge
     //     }
     //     return charge;
@@ -339,10 +286,8 @@ const initVisualGraph = () => {
     .force('centerX', d3.forceX(width.value / 2))
     .force('centerY', d3.forceY(height.value / 2))
 
-
   simulation.nodes(graphicalNodes)
   simulation.force("link").links(graphicalLinks)
-
 
   root.value = svg.value.append('g');
 
@@ -386,7 +331,6 @@ const initVisualGraph = () => {
     .style("fill", "none")
     .attr("marker-end", "url(#end-arrow)");
 
-
   let gnodes = nodeContainer.selectAll(".node")
     .data(simulation.nodes())
     .enter()
@@ -402,7 +346,6 @@ const initVisualGraph = () => {
     .classed('type', d => d.type === 'xsdType')
     .attr('id', (d) => d.id)
 
-
   let gclasses = nodeContainer.selectAll('.class')
   let gobjectProperties = nodeContainer.selectAll('.objectProperty')
   let gdatatypeProperties = nodeContainer.selectAll('.datatypeProperty')
@@ -415,9 +358,6 @@ const initVisualGraph = () => {
     let focusedElement = nodeContainer.selectAll('.focused')
     let d3element = d3.select(element)
 
-    console.log("***", props.alignment)
-    console.log("***", d)
-
     if (focusedElement.size() > 0 && !d3element.classed("focused")) {
       // there's another element selected. user needs to unselect it
     } else if (d3element.classed("focused")) {
@@ -425,30 +365,25 @@ const initVisualGraph = () => {
       d3element.classed("focused", false)
       clickResource('unfocused', d)
       // } else if (props.alignment.trueType == d.iriType || props.alignment.trueType == '') {
+      // when generating alignments, if another node is selected, we only allow to select nodes of the same type  
     } else if (props.alignment.type == d.type || props.alignment.type == '') {
       d3element.classed("focused", true)
       clickResource('focused', d)
+    } else {
+      notify.negative("You can only select nodes of the same type")
     }
-
-    // console.log("***",nodeContainer.selectAll('.focused').size() )
     //  d3element.classed('focused', true)
-
   }
 
-// TODO: fix unfouc...
+// TODO: fix unfocus
   const unfocusAll = () => {
-    console.log("unfocus all...")
     nodeContainer.selectAll('.focused').each(n => n.classed("focused", false))
   }
 
-
   watch(() => props.alignment, n => {
-
     if (props.alignment.type == '') {
-
       unfocusAll()
     }
-
   })
 
   gclasses.on("click", function (event, d) {
@@ -477,7 +412,6 @@ const initVisualGraph = () => {
       return d.radius
     })
 
-
 // TODO: change
   gtypes.append("rect")
     .attr('height', d => {
@@ -494,7 +428,6 @@ const initVisualGraph = () => {
 //    .attr('class', setClass)
 //    .attr('r', width.value * 0.03)
 
-
   gproperties.append("rect")
     .attr('height', d => {
       d.height = defaultPropertyHeight
@@ -508,29 +441,20 @@ const initVisualGraph = () => {
     .attr("y", d => -d.height / 2)
   // .style('fill', "#B8E1FF") ;
 
-
   gnodes.append("text")
     .attr("text-anchor", "middle")
     .text(d => getLabel(d.label))
     .attr("dy", ".35em") // this is only for properties
 
-
   simulation.on("tick", function (d) {
-
-// o.oo014
-
 
     var value = 1.0 - 10 * simulation.alpha();
     if (value > 0.009) {
       if (centerGraphView) {
-        // console.log("centering")
         centerGraphView = false;
         center();
       }
-
     }
-
-    // console.log(simulation.alpha())
 
     //        glinks.attr('d', function (d) {
     //        return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
@@ -538,11 +462,8 @@ const initVisualGraph = () => {
 
     //    });
 
-
     // glinks
     linkContainer.selectAll(".link").attr("d", function (d) {
-
-
       // Total difference in x and y from source to target
 //    var dx = d.target.x - d.source.x;
 //    var dy = d.target.y - d.source.y;
@@ -562,10 +483,9 @@ const initVisualGraph = () => {
         var point = geometry.getCircleOutlinePoint(d)
         // return "M" + d.source.x + "," + d.source.y + "L" + (d.target.x - offsetX) + "," + (d.target.y - offsetY);
         return "M" + point.source.x + "," + point.source.y + "L" + point.target.x + "," + point.target.y;
-        return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+        // return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
 
       } else if (d.target.width) {
-        // console.log("target is rect")
         var sourcePoint = geometry.getCircleOutlinePoint(d, true)
         var targetPoint = geometry.getRectOutlinePoint(d)
         return "M" + sourcePoint.x + "," + sourcePoint.y + "L" + targetPoint.x + "," + targetPoint.y;
@@ -580,37 +500,24 @@ const initVisualGraph = () => {
       // return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x  +"," + d.target.y ;
     });
 
-
     // gproperties
     nodeContainer.selectAll('.objectProperty, .datatypeProperty').attr("transform", (d, i) => {
-
-
       var pathLength = svg.value.select("#" + d.linkId).node().getTotalLength();
       d.point = svg.value.select("#" + d.linkId).node().getPointAtLength((pathLength) / 2);
       return ("translate(" + d.point.x + "," + d.point.y + ")");
-
-
     });
 
     //  glabels.attr("transform", (d,i) => {
-
     //      var pathLength = d3.select("#link" + i).node().getTotalLength();
     //      d.point = d3.select("#link" + i).node().getPointAtLength(pathLength / 2);
     //      return ("translate(" + d.point.x + "," + d.point.y + ")");
-
-
     //  });
 
 // gClassesAndTypes
-
     nodeContainer.selectAll('.class,.type').attr("transform", function (node) {
       return ("translate(" + node.x + "," + node.y + ")");
     });
-
-
   })
-
-
 }
 
 const miniState = ref(true)
@@ -627,10 +534,8 @@ function contractLabel() {
   }
 }
 
-
+// todo: update values when resize window and draw graph again
 onMounted(() => {
-
-  // todo: update values when resize window and draw graph again
   width.value = graphParent.value.clientWidth;
   height.value = graphParent.value.clientHeight;
 
@@ -640,63 +545,13 @@ onMounted(() => {
   //  .attr("preserveAspectRatio", "xMidYMid meet");
   // .attr("width", "100%").attr("height", "100%");
 
-  console.log("onmounted graph...")
-
-
   initVisualGraph()
-
-
-// simulation.alpha(1).restart()
-
-// simulation.alpha(0.1).restart()
-// console.log("alpha is...")
-// console.log(simulation.alpha())
-
-
-// const nodes = [
-//     {"id":"0", "type": "class", "label":"Country"},
-//      {"id":"1", "type":"class", "label":"lbl"},
-//      {"id":"2", "type":"class", "label":"health"},
-//       {"id":"7", "type":"class", "label":"super"},
-//      {"id":"3", "type":"xsdType", "label":"string"}, //xsdType
-
-//      {"id":"4", "type":"objectProperty", "label":"name", "linkId": "link1" },
-//      {"id":"5", "type":"objectProperty", "label":"another link", "linkId": "link2"}, //datatypeProperty
-//      {"id":"6", "type":"datatypeProperty", "label":"has_name", "linkId": "link3"}, //datatypeProperty
-//      {"id":"8", "type":"objectProperty", "label":"hams", "linkId": "link4" },
-//      ];
-// const links = [ {"id":"link1", "source":"0", "target":"1","label":"name"},
-//                 {"id":"link2","source":"1", "target":"2","label":"another link"},
-//                 {"id":"link3","source":"2", "target":"3","label":"has_name"},
-//                  {"id":"link4","source":"7", "target":"2","label":"has_name"}
-// ]
-
-// const nodes = [
-//     {"id":"Class1","iri":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk.created_by","type":"objectProperty","label":"created_by","domain":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk","range":"http://www.w3.org/2001/XMLSchema#string","linkId":"Link1"},
-// {"id":"Class2","iri":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk","type":"class","label":"msddk","domain":"null","range":"null","linkId":"null"},
-// {"id":"Class3","iri":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk.title","type":"objectProperty","label":"title","domain":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk","range":"http://www.w3.org/2001/XMLSchema#string","linkId":"Link2"},
-// {"id":"Class4","iri":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/fd749dcb27e24c64b1c36442ce4c0c1c","type":"class","label":"fd749dcb27e24c64b1c36442ce4c0c1c","domain":"null","range":"null","linkId":"null"},
-// {"id":"Class5","iri":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk.identifier","type":"objectProperty","label":"identifier","domain":"http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/fd749dcb27e24c64b1c36442ce4c0c1c/msddk","range":"http://www.w3.org/2001/XMLSchema#string","linkId":"Link3"},
-// {"id":"Datatype6","iri":"http://www.w3.org/2001/XMLSchema#string","type":"xsdType","label":"created_by","domain":"null","range":"null","linkId":"null"},
-// {"id":"Datatype7","iri":"http://www.w3.org/2001/XMLSchema#string","type":"xsdType","label":"title","domain":"null","range":"null","linkId":"null"},
-// {"id":"Datatype8","iri":"http://www.w3.org/2001/XMLSchema#string","type":"xsdType","label":"identifier","domain":"null","range":"null","linkId":"null"},
-// ]
-
-// const links = [
-//     {"id":"Link1","source":"Class2","target":"Datatype6","label":"created_by"},
-// {"id":"Link2","source":"Class2","target":"Datatype7","label":"title"},
-// {"id":"Link3","source":"Class2","target":"Datatype8","label":"identifier"},
-// ]
-
 });
 
 onUnmounted(() => {
-  console.log("unmounted")
   simulation.stop();
 })
-// before unmonunted?
 </script>
-
 
 <style lang="scss">
 
@@ -717,6 +572,7 @@ onUnmounted(() => {
 
 $bg-color: $neutral100;
 $dot-color: #212134;
+
 // Colors dark
 $bg-colord: hsl(256, 33, 10);
 $dot-colord: #fff;
@@ -731,9 +587,7 @@ g.focused rect {
 }
 
 .objectProperty > rect {
-
   fill: #B8E1FF
-
 }
 
 .datatypeProperty > rect {
@@ -742,17 +596,13 @@ g.focused rect {
 
 .type > rect {
   fill: #FACEB4;
-  // fill:peachpuff;
 }
 
 .integratedClass > circle {
-  // fill: #A5FFD6 !important;
   fill: #ADEDD0 !important;
 }
 
 .subclassof > rect {
-  // fill: #EAC386 !important;
-  // fill: #E4EBE7 !important;
   fill: #BBA58B !important
 }
 
@@ -764,27 +614,16 @@ g.focused rect {
   -moz-user-select: none; /* Old versions of Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none;
-  /* Non-prefixed version, currently
-                                   supported by Chrome, Edge, Opera and Firefox */
+  /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
 .graph--dark {
-
-
   #graph {
     background: linear-gradient(90deg, $bg-colord ($dot-space - $dot-size), transparent 1%) center,
     linear-gradient($bg-colord ($dot-space - $dot-size), transparent 1%) center,
     $dot-colord;
     background-size: $dot-space $dot-space;
   }
-
-
-  // .node{
-  //     fill: #ccc;
-  //     stroke: #fff;
-  //     stroke-width: 2px;
-
-  // }
 
   .class > circle {
     fill: #7B79FF;
@@ -807,12 +646,9 @@ g.focused rect {
   .link {
     stroke: #fff !important;
   }
-
-
 }
 
 .graph--light {
-
 
   #graph {
     background: linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
@@ -835,15 +671,11 @@ g.focused rect {
     fill: #A5FFD6;
   }
 
-
 }
 
-
-// pending of dark
 .link {
   stroke: #777;
   stroke-width: 2px;
 }
-
 
 </style>

@@ -69,7 +69,7 @@ public class DataLayerImpl implements DataLayerInterface {
     @Override
     public void copyToExploitationZone(String UUID) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        dl.copyToExploitationZone(UUID);
+        dl.persistDataInTemporalExploitation(UUID);
     }
 
     @Override

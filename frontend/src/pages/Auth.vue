@@ -162,7 +162,6 @@
 
           </div>
 
-
         </q-card>
       </div>
     </div>
@@ -173,8 +172,6 @@
 
 <script setup>
 import {ref, reactive, onMounted} from "vue";
-// import api from "src/api/dataSourcesAPI.js";
-// import {useNotify} from 'src/use/useNotify.js'
 import {useAuthStore} from 'stores/authStore.js'
 
 // import Particles from "vue3-particles";
@@ -215,27 +212,19 @@ const successSignUp = () => {
 }
 
 const signUp = () => {
-
-
   authStore.registerUser(user, successSignUp, userNameTaken)
-
-
 }
 
 const errorM = ref('')
 const errorUserName = ref(false)
 
 const userNameTaken = (message) => {
-
   errorM.value = message;
   errorUserName.value = true
-
 }
 
 onMounted(() => {
 //     authStore.init()
-
-
 })
 
 
@@ -258,7 +247,6 @@ onMounted(() => {
 .q-card {
   width: 360px;
 }
-
 
 .animated-bg {
   background: linear-gradient(253deg, #0cc898, #1797d2, #864fe1);

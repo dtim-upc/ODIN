@@ -65,7 +65,7 @@
 <script setup>
 import {ref, reactive, watch} from "vue";
 import {useProjectsStore} from 'stores/projectsStore.js';
-import {optionsPrivacy} from '../ui/PrivacyOptions';
+import {optionsPrivacy} from '../projects/PrivacyOptions';
 
 const props = defineProps({
   show: {type: Boolean, default: false, required: true},
@@ -92,16 +92,12 @@ const project = reactive({
   projectColor: props.projectData ? props.projectData.projectColor : optionsColor[0],
 });
 watch(() => props.projectData, (newVal) => {
-  project.id = newVal ? newVal.projectId : null;
-  project.name = newVal ? newVal.projectName : '';
-  project.description = newVal ? newVal.projectDescription : '';
-  project.privacy = newVal ? optionsPrivacy.find(option => option.value === newVal.projectPrivacy) : optionsPrivacy[0];
-  project.color = newVal ? newVal.projectColor : optionsColor[0];
+  project.projectId = newVal ? newVal.projectId : null;
+  project.projectName = newVal ? newVal.projectName : '';
+  project.projectDescription = newVal ? newVal.projectDescription : '';
+  project.projectPrivacy = newVal ? optionsPrivacy.find(option => option.value === newVal.projectPrivacy) : optionsPrivacy[0];
+  project.projectColor = newVal ? newVal.projectColor : optionsColor[0];
 }, { immediate: true });
-
-const success = () => {
-  emit('update:show', false)
-};
 
 const cancelForm = () => {
   emit('update:show', false)
@@ -110,9 +106,9 @@ const cancelForm = () => {
 const onSubmit = () => {
   project.projectPrivacy = project.projectPrivacy.value;
   if (props.projectData) {
-    projectsStore.putProject(project, success);
+    projectsStore.putProject(project, () => emit('update:show', false));
   } else {
-    projectsStore.postProject(project, success);
+    projectsStore.postProject(project, () => emit('update:show', false));
   }
 };
 

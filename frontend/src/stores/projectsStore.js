@@ -31,7 +31,6 @@ export const useProjectsStore = defineStore('projects', {
         const response = await projectAPI.getProject(project.projectId);
         this.currentProject = response.data;
         localStorage.setItem('currentProject', JSON.stringify(this.currentProject));
-        console.log("Current project:", this.currentProject)
       } catch (error) {
         notify.negative("Error retrieving the project");
         console.error("Error:", error);
@@ -58,7 +57,7 @@ export const useProjectsStore = defineStore('projects', {
       try {
         const response = await projectAPI.postProject(project);
         notify.positive(`Project ${project.projectName} successfully created`);
-        this.projects.push(response.data);
+        this.getProjects();
         successCallback();
       } catch (error) {
         notify.negative("Error creating the project");
@@ -111,6 +110,16 @@ export const useProjectsStore = defineStore('projects', {
         download(response.data, "source_graph.ttl", content);
       } catch (error) {
         notify.negative("Error downloading the project schema");
+        console.error("Error:", error);
+      }
+    },
+
+    async resetProjectSchema(projectID) {
+      try {
+        await projectAPI.resetProjectSchema(projectID);
+        this.updateCurrentProject();
+      } catch (error) {
+        notify.negative("Error reseting the project schema");
         console.error("Error:", error);
       }
     },

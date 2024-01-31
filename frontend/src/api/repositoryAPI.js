@@ -18,5 +18,11 @@ export default {
   },
   retrieveDBTables(projectID, repositoryId) {
     return odinApi.get('/project/' + projectID + '/repository/' + repositoryId + '/get-tables')
+  },
+  getRepositoryTypes() {
+    return odinApi.get("/data-repository-types")
+  },
+  getRepositorySchema(fileName) {
+    return odinApi.get(`/formSchema/` + fileName)
   }
 }

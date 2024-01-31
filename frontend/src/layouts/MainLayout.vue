@@ -27,11 +27,11 @@
             <SideBarElement :icon="'o_folder'" :url="'projects'" :active-routes="['projects']" :label="'Projects'" :mini-state="miniState"/>
             <SideBarElement :icon="'o_cottage'" :url="'home'" :active-routes="['home']" :label="'Home'" :mini-state="miniState"/>
             <SideBarElement :icon="'mdi-database'" :url="'repositories'" :active-routes="['repositories']" :label="'Repositories'" :mini-state="miniState"/>
-            <SideBarElement :icon="'o_layers'" :url="'datasources'" :active-routes="['datasources', 'dsIntegration']" :label="'Datasets'" :mini-state="miniState"/>
+            <SideBarElement :icon="'o_layers'" :url="'datasets'" :active-routes="['datasets', 'dsIntegration']" :label="'Datasets'" :mini-state="miniState"/>
             <SideBarElement :icon="'o_hub'" :url="'schema'" :active-routes="['schema']" :label="'Schema'" :mini-state="miniState"/>
             <SideBarElement :icon="'mdi-chat-question'" :url="'query'" :active-routes="['query']" :label="'Query'" :mini-state="miniState"/>
             <SideBarElement :icon="'mdi-selection-search'" :url="'data-products'" :active-routes="['data-products']" :label="'Data products'" :mini-state="miniState"/>
-            <SideBarElement :icon="'mdi-thought-bubble'" :url="'intents-list'" :active-routes="['intents-list', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows']" :label="'Intents'" :mini-state="miniState"/>
+            <SideBarElement :icon="'mdi-thought-bubble'" :url="'intents'" :active-routes="['intents', 'abstract-planner', 'logical-planner', 'workflow-planner', 'intent-workflows']" :label="'Intents'" :mini-state="miniState"/>
           </div>
 
           <div class="fixed-bottom">

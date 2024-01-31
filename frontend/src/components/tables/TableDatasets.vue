@@ -2,13 +2,12 @@
   <div class="q-pa-md">
     <div>
       <!-- Table for non-integrated datasets -->
-      <h5> New Datasets </h5>
       <q-table ref="tableRef" :rows="rows.filter(dataset => !isDatasetIntegrated(dataset))" 
               :columns="columns" :filter="search" row-key="id">
 
         <template v-slot:top-left="">
           <div class="q-table__title">
-            Datasets
+            Non-Integrated Datasets
             <q-btn unelevated padding="none" color="primary700" icon="add" @click="showSelectRepository = true"/>
           </div>
         </template>
@@ -53,7 +52,7 @@
 
                   <q-separator />
 
-                  <ActionItem iconName="download" actionLabel="Download schema"  @click="datasetsStore.downloadDatasetSchema(route.params.id, props.row.id)" />
+                  <ActionItem iconName="download" actionLabel="Download schema"  @click="datasetsStore.downloadDatasetSchema(projectID, props.row.id)" />
 
                 </q-list>
               </q-menu>
@@ -63,20 +62,26 @@
       </q-table>
     </div>
 
+    <br>
+    <q-separator size="10px"/>
+    <br>
+
     <div>
       <!-- Table for integrated datasets -->
-      <h5>Integrated Datasets</h5>
       <q-table ref="tableRef" :rows="rows.filter(dataset => isDatasetIntegrated(dataset))" 
                :columns="columns" :filter="search" row-key="id">
 
       <template v-slot:top-left="">
         <div class="q-table__title">
-          <q-btn label="Integrated schema" dense color="primary" icon="download" @click="projectsStore.downloadProjectSchema(route.params.id)"
-                 style="margin-right:10px"></q-btn>
+          Integrated Datasets
         </div>
       </template>
 
       <template v-slot:top-right="props">
+        <q-btn label="Reset" color="red" @click="resetProjectSchema"
+                 style="margin-right:10px"></q-btn>
+        <q-btn label="Integrated schema" dense color="primary" icon="download" @click="projectsStore.downloadProjectSchema(projectID)"
+                 style="margin-right:10px"></q-btn>
         <q-input outlined dense debounce="400" color="primary" v-model="search">
           <template v-slot:append>
             <q-icon name="search"/>
@@ -89,8 +94,8 @@
       <template v-slot:no-data>
         <div class="full-width row flex-center text-accent q-gutter-sm q-pa-xl" style="flex-direction: column">
           <NoDataImage/>
-          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">There are no datasets integrated yet.</span>
-          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate datasets, set one of them as the base schema of project, please add at least two sources.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">There are no integrated datasets yet.</span>
+          <span style="color: rgb(102, 102, 135);font-weight: 500;font-size: 1rem;line-height: 1.25;">To integrate datasets, first set one of them as the base schema of project.</span>
         </div>
       </template>
 
@@ -115,7 +120,7 @@
                   
                   <q-separator />
 
-                  <ActionItem iconName="download" actionLabel="Download schema"  @click="datasetsStore.downloadDatasetSchema(route.params.id, props.row.id)" />
+                  <ActionItem iconName="download" actionLabel="Download schema"  @click="datasetsStore.downloadDatasetSchema(projectID, props.row.id)" />
 
                 </q-list>
               </q-menu>
@@ -128,9 +133,9 @@
 
     <!-- Additional dialogs that appear to fufill certain actions -->
 
-    <FormSelectRepository v-model:show="showSelectRepository" @repository-selected="handleRepositorySelected"></FormSelectRepository>
+    <SelectRepositoryForm v-model:show="showSelectRepository" @repository-selected="handleRepositorySelected"></SelectRepositoryForm>
 
-    <FormNewDataSource v-model:show="showPostDataset"></FormNewDataSource>
+    <CreateDatasetForm v-model:show="showPostDataset" />
     <EditDatasetForm v-model:show="showEditDialog" :datasetData="selectedDataset" />
 
     <!-- Confirm dialog for deleting a dataset-->
@@ -143,21 +148,22 @@
                     :body="projectsStore.getGlobalSchema !== null ? 'Do you want to overwrite the existing project schema?' : 'Do you want to set the dataset schema as the base integration schema for the project?'"
                     :onConfirm="confirmSetProjectSchema"/>
 
+    <!-- Confirm dialog to confirm resetting a project schema -->
+    <ConfirmDialog v-model:show="showResetProjectSchema" title="Reset the project schema?" 
+                    body="This will delete the current integrated schema."
+                    :onConfirm="confirmResetProjectSchema"/>
+
     <!-- Dialog showcasing the graph schema -->
-    <q-dialog v-model="showGraphDialog">
-      <q-card style="max-width: 400px; margin: 20px auto;">
+    <q-dialog v-model="showGraphDialog" :maximized="true">
+      <q-card style="max-width: 1000px; max-height:41vw;">
         <q-card-section class="q-pt-md q-pb-md">
           <div class="text-h6">Graphical Data</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <div class="q-dialog__content">
+          <div class="q-dialog__content" style="height: 34vw">
             <Graph v-if="selectedGraphical" :graphical="selectedGraphical"></Graph>
           </div>
         </q-card-section>
-        <q-separator />
-        <q-card-actions align="center">
-          <q-btn label="Cerrar" color="primary" @click="showGraphDialog = false" />
-        </q-card-actions>
       </q-card>
     </q-dialog>
 
@@ -170,13 +176,13 @@ import {useDatasetsStore} from 'src/stores/datasetsStore.js';
 import {useIntegrationStore} from 'src/stores/integrationStore.js';
 import {useProjectsStore} from 'src/stores/projectsStore.js';
 import {useNotify} from 'src/use/useNotify.js';
-import FormNewDataSource from "components/forms/FormNewDataSource.vue";
-import {useRouter, useRoute} from "vue-router";
-import ConfirmDialog from "src/components/ConfirmDialog.vue";
+import CreateDatasetForm from "components/forms/CreateDatasetForm.vue";
+import {useRouter} from "vue-router";
+import ConfirmDialog from "src/components/utils/ConfirmDialog.vue";
 import EditDatasetForm from "components/forms/EditDatasetForm.vue";
 import Graph from "../graph/Graph.vue";
 import { QBtn, QMenu } from 'quasar';
-import FormSelectRepository from "../forms/FormSelectRepository.vue";
+import SelectRepositoryForm from "../forms/SelectRepositoryForm.vue";
 import NoDataImage from "src/assets/NoDataImage.vue";
 import ActionItem from "./TableUtils/ActionItem.vue";
 import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
@@ -186,7 +192,7 @@ const integrationStore = useIntegrationStore()
 const projectsStore = useProjectsStore()
 const notify = useNotify()
 const router = useRouter()
-const route = useRoute()
+const projectID = useProjectsStore().currentProject.projectId
 
 const selectedGraphical = ref(null)
 const selectedDataset = ref(false)
@@ -197,8 +203,9 @@ const showEditDialog = ref(false)
 const showDeleteDialog = ref(false)
 const showSetProjectSchema = ref(false)
 const showGraphDialog = ref(false)
-const showSelectRepository = ref(false);
-const showPostDataset = ref(false);
+const showSelectRepository = ref(false)
+const showPostDataset = ref(false)
+const showResetProjectSchema = ref(false)
 
 const rows = computed(() => {
   return datasetsStore.datasets.map((dataset) => {
@@ -218,7 +225,7 @@ const columns = [
 ]
 
 onMounted(() => {
-  datasetsStore.getDatasets(route.params.id);
+  datasetsStore.getDatasets(projectID);
 })
 
 const showGraph = (props) => {
@@ -230,7 +237,15 @@ let confirmSetProjectSchema = () => {}
 const setProjectSchema = (propsRow) => {
   showSetProjectSchema.value = true;
   confirmSetProjectSchema = () => {
-    datasetsStore.setDatasetSchemaAsProjectSchema(route.params.id, propsRow.row.id);
+    datasetsStore.setDatasetSchemaAsProjectSchema(projectID, propsRow.row.id);
+  }
+}
+
+let confirmResetProjectSchema = () => {}
+const resetProjectSchema = () => {
+  showResetProjectSchema.value = true;
+  confirmResetProjectSchema = () => {
+    projectsStore.resetProjectSchema(projectID);
   }
 }
 
@@ -254,7 +269,7 @@ let confirmDelete = () => {}
 const deleteRow = (propsRow) => {
   showDeleteDialog.value = true
   confirmDelete = () => {
-    datasetsStore.deleteDataset(route.params.id, propsRow.row.id)
+    datasetsStore.deleteDataset(projectID, propsRow.row.id)
   }
 }
 

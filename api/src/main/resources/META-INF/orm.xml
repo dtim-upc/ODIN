@@ -121,6 +121,11 @@
         </attributes>
     </entity>
 
+    <entity class="edu.upc.essi.dtim.NextiaCore.graph.jena.WorkflowGraphJenaImpl">
+        <table name="WORKFLOWGRAPH"/>
+        <attributes/>
+    </entity>
+
     <!--> MAPPING DATASET CLASS<-->
     <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
         <table name="DataRepository">
@@ -298,7 +303,11 @@
                 <generated-value strategy="AUTO"/>
             </id>
             <basic name="workflowName"/>
-            <basic name="visualRepresentation"/>
+            <one-to-one name="workflowGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.WorkflowGraphJenaImpl">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-one>
         </attributes>
     </entity>
 </entity-mappings>

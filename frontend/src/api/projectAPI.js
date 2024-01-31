@@ -22,4 +22,7 @@ export default {
   downloadProjectGraph(projectID) {
     return odinApi.get('/project/' + projectID + '/schema', {responseType: 'blob'})
   },
+  resetProjectSchema(projectID) {
+    return odinApi.post('/project/' + projectID + '/reset-schema')
+  },
 }

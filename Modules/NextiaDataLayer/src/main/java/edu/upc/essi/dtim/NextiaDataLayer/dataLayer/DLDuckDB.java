@@ -20,6 +20,8 @@ public class DLDuckDB extends DataLayer {
     Connection conn;
     Statement stmt;
 
+    // ---------------- DuckDB database management
+
     public DLDuckDB(String dataStorePath) {
         super(dataStorePath);
         this.conn = getConnection();
@@ -39,7 +41,6 @@ public class DLDuckDB extends DataLayer {
         // Create directory if it does not exist
         try {
             Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake"));
-            Files.createDirectories(Paths.get(dataStorePath + "DuckDBDataLake\\queries"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -49,6 +50,10 @@ public class DLDuckDB extends DataLayer {
             throw new RuntimeException(e);
         }
     }
+
+    // ---------------- Interacting with the zones
+
+    // ---- Formatted
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) {
@@ -62,6 +67,7 @@ public class DLDuckDB extends DataLayer {
         }
     }
 
+    @Override
     public void uploadToTemporalFormattedZone(Dataset d, String tableName) {
         String parquetPath = dataStorePath + "tmp\\" + d.getUUID();
         File directoryPath = new File(parquetPath);
@@ -93,6 +99,37 @@ public class DLDuckDB extends DataLayer {
         }
         return fileName;
     }
+
+    // ---- Exploitation & Temporal Exploitation
+
+    @Override
+    public void persistDataInTemporalExploitation(String UUID) {
+        try {
+            stmt.execute("CREATE TABLE exp_" + UUID + " AS SELECT * FROM tmp_exp_" + UUID);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void uploadToTemporalExploitationZone(String sql, String UUID) {
+        try {
+            stmt.execute("CREATE TEMP TABLE tmp_exp_" + UUID + " AS (" + sql + ")");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeFromExploitationZone(String tableName) {
+        try {
+            stmt.execute("DROP TABLE exp_" + tableName);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // ---------------- Query execution
 
     @Override
     public ResultSet executeQuery(String sql, Dataset[] datasets) {
@@ -133,7 +170,9 @@ public class DLDuckDB extends DataLayer {
                 try {
                     rs = stmt.executeQuery("SHOW TABLES");
                     while (rs.next()) {
-                        if (rs.getString(1).equals(dataset.getUUID())) {
+                        // We have to check if the data is the formatted zone
+                        // (if it is in the exp zone we don't have to materialize anything)
+                        if (rs.getString(1).equals("for_" + dataset.getUUID())) {
                             tableExists = true;
                         }
                     }
@@ -167,44 +206,7 @@ public class DLDuckDB extends DataLayer {
         return dc;
     }
 
-    @Override
-    public void close() {
-        try {
-            stmt.close();
-            conn.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        // Remove all the files in the temporal zone (/tmp)
-        deleteFilesFromDirectory(dataStorePath + "tmp");
-    }
-
-    @Override
-    public void copyToExploitationZone(String UUID) {
-        try {
-            stmt.execute("CREATE TABLE exp_" + UUID + " AS SELECT * FROM tmp_exp_" + UUID);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void uploadToTemporalExploitationZone(String sql, String UUID) {
-        try {
-            stmt.execute("CREATE TEMP TABLE tmp_exp_" + UUID + " AS (" + sql + ")");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void removeFromExploitationZone(String tableName) {
-        try {
-            stmt.execute("DROP TABLE exp_" + tableName);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    // ---------------- Handling files
 
     // TODO: extend this to different formats and zones
     @Override
@@ -214,7 +216,6 @@ public class DLDuckDB extends DataLayer {
         // String extension = "." + format;
         try {
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + zone + "_" + dataset.getUUID());
-
             try (FileWriter writer = new FileWriter(csvFilePath)) {
                 // Header
                 int columnCount = rs.getMetaData().getColumnCount();
@@ -245,16 +246,16 @@ public class DLDuckDB extends DataLayer {
         return System.getProperty("user.dir") + "\\" + csvFilePath; // Absolute path
     }
 
+    // ---------------- Others
+
     @Override
-    public void test() {
+    public void close() {
         try {
-            stmt.execute("CREATE TABLE test AS (SELECT Acronym FROM for_test2)");
-            ResultSet rs = stmt.executeQuery("SELECT * FROM test");
-            while (rs.next()) {
-                System.out.println(rs.getString(1));
-            }
+            stmt.close();
+            conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        deleteFilesFromDirectory(dataStorePath + "tmp"); // Remove all the files in the temporal zone (/tmp)
     }
 }

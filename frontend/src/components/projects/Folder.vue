@@ -16,15 +16,6 @@
                           menu-self="top left" @click.stop.prevent>
             <q-list dense>
 
-              <q-item clickable v-close-popup @click="openEditDialog(props.row)">
-                <q-item-section avatar style="min-width: 30px;padding:0">
-                  <q-icon color="primary" name="edit"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Edit</q-item-label>
-                </q-item-section>
-              </q-item>
-
               <FolderAction icon="edit" label="Edit" :onItemClick="() => openEditDialog(props.row)" />
               <FolderAction icon="folder_copy" label="Clone" :onItemClick="() => projectsStore.cloneProject(props.row.projectId, success)" />
               <FolderAction icon="delete" label="Delete" :onItemClick="() => projectsStore.deleteProject(props.row.projectId)" />
@@ -33,7 +24,7 @@
           </q-btn-dropdown>
         </div>
         <div style="position:absolute;bottom:0;width:100%">
-          <div class="row no-wrap items-center q-mt-md q-pa-sm rounded-borders">
+          <div class="row no-wrap items-ceqnter q-mt-md q-pa-sm rounded-borders">
             <q-chip :style="folderBackColor" text-color="white">
               {{ props.row.repositories.reduce((total, repo) => total + repo.datasets.length, 0) }} files
             </q-chip>
@@ -45,11 +36,10 @@
           </div>
         </div>
       </div>
-      <div class="folder__back_after" :style="folderBackColor">
-      </div>
+      <div class="folder__back_after" :style="folderBackColor"></div>
     </div>
   </div>
-  <AddFolderForm v-model:show="showEditDialog" :projectData="selectedProject"/>
+  <CreateFolderForm v-model:show="showEditDialog" :projectData="selectedProject"/>
 </template>
 
 <script setup>
@@ -57,21 +47,21 @@ import {ref, computed} from "vue";
 import {useRouter} from "vue-router";
 import {colors} from 'quasar'
 import {useProjectsStore} from "stores/projectsStore";
-import AddFolderForm from 'components/forms/AddFolderForm.vue';
+import CreateFolderForm from 'components/forms/CreateFolderForm.vue';
 import {optionsPrivacy} from "./PrivacyOptions";
 import FolderAction from "./FolderAction.vue";
 
+const projectsStore = useProjectsStore()
+const router = useRouter()
+
 const showEditDialog = ref(false);
 const selectedProject = ref(null);
+const activeFolder = ref("")
 
 const props = defineProps({
   row: {type: Object},
   folderColor: {type: String, default: "#3dbb94"}
 });
-const projectsStore = useProjectsStore()
-const router = useRouter()
-
-const activeFolder = ref("")
 
 const folderBackColor = computed(() => {
   return 'background:' + colors.lighten(props.row.projectColor, -10) + ';'

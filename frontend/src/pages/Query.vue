@@ -16,8 +16,7 @@
       <Graph :graphical="graphical" :enableSelection="true" :enableQuery="true" :queryFunc="queryGraph"></Graph>
     </div>
 
-
-    <q-dialog v-model="alert" full-width persistent>
+    <q-dialog v-model="showQueryResultDialog" full-width persistent>
       <q-card>
         <q-card-section>
           <TableQueryResult :columns="columns" :rows="rows" :no_shadow=true />
@@ -25,12 +24,12 @@
 
         <q-card-actions align="between">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn label="Persist data" color="primary" @click="persistData=true" />
+          <q-btn label="Persist data" color="primary" @click="showPersistDataDialog=true" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <q-dialog v-model="persistData">
+    <q-dialog v-model="showPersistDataDialog">
       <q-card style="width: 300px; height: 230px;">
         <q-card-section>
           <q-form @submit="postDataProduct" class="text-right">
@@ -46,33 +45,30 @@
   </q-page>
 </template>
 
-
 <script setup>
 import {ref, onBeforeMount} from "vue";
 import TableQueryResult from "components/tables/TableQueryResult.vue";
 import Graph from 'components/graph/Graph.vue'
-import {useDatasetsStore} from 'src/stores/datasetsStore.js'
 import {useProjectsStore} from 'src/stores/projectsStore.js'
 import {useQueriesStore} from 'src/stores/queriesStore.js'
 import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
 
-const storeDS = useDatasetsStore()
 const queriesStore = useQueriesStore();
 const dataProductsStore = useDataProductsStore();
 const projectsStore = useProjectsStore();
-const alert = ref(false);
 
-const persistData = ref(false);
+const showQueryResultDialog = ref(false);
+const showPersistDataDialog = ref(false);
+
 const dataProductColumns = ref([]);
 const dataProductName = ref("");
 const dataProductDescription = ref("");
-
 const dataProductUUID = ref('') 
+
 const graphical = ref('')
 const graphID = ref('')
 let graphType = ""
 const selectedSchema = ref('')
-
 
 const columns = ref([
   {name: "Name", required: true, label: "Name", align: "center", field: "name", sortable: true,},
@@ -87,12 +83,10 @@ const columns = ref([
 ]);
 const rows = ref([]);
 
-
 const showResultQuery = (columnsQ, rowsQ) => {
   const qcol = []
   for (const col in columnsQ) {
     var c = new Object();
-
     c.name = columnsQ[col];
     c.label = columnsQ[col];
     c.field = columnsQ[col];
@@ -107,14 +101,7 @@ const showResultQuery = (columnsQ, rowsQ) => {
     qrows.push(JSON.parse(rowsQ[col]))
   }
   rows.value = qrows;
-  alert.value = true;
-}
-
-const setSchema = datasource => {
-  selectedSchema.value = datasource.id
-  graphical.value = datasource.localGraph.graphicalSchema
-  graphID.value = datasource.id
-  graphType = "source"
+  showQueryResultDialog.value = true;
 }
 
 const setGlobalSchema = () => {
@@ -125,7 +112,6 @@ const setGlobalSchema = () => {
 }
 
 const queryGraph = (data) => {
-  console.log("query fn..")
   data.graphID = graphID.value
   data.graphType = graphType
 
@@ -139,7 +125,6 @@ const queryGraph = (data) => {
 }
 
 const postDataProduct = () => {
-  console.log("Storing data product")
   const data = new FormData();
   data.append("dataProductUUID", dataProductUUID.value);
   data.append("dataProductName", dataProductName.value);
@@ -147,12 +132,10 @@ const postDataProduct = () => {
   data.append("columns", dataProductColumns.value);
 
   dataProductsStore.postDataProduct(projectsStore.currentProject.projectId, data)
-
 }
 
 onBeforeMount(async () => {
   setGlobalSchema();
-  document.title = "Query";
 })
 
 </script>
@@ -171,6 +154,5 @@ onBeforeMount(async () => {
   }
 
 }
-
 
 </style>

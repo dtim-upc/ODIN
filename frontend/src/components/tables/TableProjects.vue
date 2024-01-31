@@ -32,15 +32,15 @@
     </template>
   </q-table>
 
-  <AddFolderForm v-model:show="showDialog"/>
+  <CreateFolderForm v-model:show="showDialog"/>
 
 </template>
 
 <script setup>
 import {ref, onMounted} from 'vue'
 import {useProjectsStore} from 'stores/projectsStore.js'
-import AddFolderForm from 'components/forms/AddFolderForm.vue';
-import Folder from 'components/ui/Folder.vue'
+import CreateFolderForm from 'components/forms/CreateFolderForm.vue';
+import Folder from 'components/projects/Folder.vue'
 import NoDataImage from 'src/assets/NoDataImage.vue';
 
 const projectsStore = useProjectsStore()

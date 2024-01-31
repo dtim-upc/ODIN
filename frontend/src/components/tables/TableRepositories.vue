@@ -10,9 +10,6 @@
       </template>
 
       <template v-slot:top-right="props">
-        <q-btn label="Integrated schema" dense color="primary" icon="download" style="margin-right:10px"
-                @click="projectsStore.downloadProjectSchema(route.params.id)" />
-
         <q-input outlined dense debounce="400" color="primary" v-model="search">
           <template v-slot:append>
             <q-icon name="search"/>
@@ -68,7 +65,7 @@
 
     <!-- Additional dialogs that appear to fufill certain actions -->
 
-    <FormNewRepository v-model:show="showAddDataRepository" />
+    <CreateRepositoryForm v-model:show="showAddDataRepository" />
 
     <EditRepositoryForm v-model:show="showEditRepository" :repositoryData="selectedRepository" />
 
@@ -82,17 +79,18 @@
 <script setup>
 import { onMounted, ref} from "vue";
 import {useProjectsStore} from 'src/stores/projectsStore.js'
-import FormNewRepository from "components/forms/FormNewRepository.vue";
+import CreateRepositoryForm from "components/forms/CreateRepositoryForm.vue";
 import {useRepositoriesStore} from "src/stores/repositoriesStore.js";
-import {useRoute} from "vue-router";
-import ConfirmDialog from "src/components/ConfirmDialog.vue";
+import ConfirmDialog from "src/components/utils/ConfirmDialog.vue";
 import EditRepositoryForm from "src/components/forms/EditRepositoryForm.vue";
 import NoDataImage from "src/assets/NoDataImage.vue";
 import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
+import { useNotify } from "src/use/useNotify";
 
 const repositoriesStore = useRepositoriesStore()
 const projectsStore = useProjectsStore()
-const route = useRoute()
+const projectID = useProjectsStore().currentProject.projectId
+const notify = useNotify()
 
 const selectedRepository = ref(null);
 
@@ -111,14 +109,29 @@ const columns = [
 ];
 
 onMounted(() => {
-  repositoriesStore.getRepositories(route.params.id,)
+  repositoriesStore.getRepositories(projectID)
 })
 
 let confirmDelete = () => {}
 const deleteRow = (propsRow) => {
-  showConfirmDialog.value = true
-  confirmDelete = () => {
-    repositoriesStore.deleteRepository(route.params.id, propsRow.row.id)
+  // Check if some of the datasets of the repository are integrated
+  let someDatasetIsIntegrated = false
+
+  selectedRepository.value = propsRow.row
+  propsRow.row.datasets.forEach(dataset => {
+    if (projectsStore.currentProject.integratedDatasets.some(integratedDataset => integratedDataset.id === dataset.id)) {
+      someDatasetIsIntegrated = true
+    }
+  })
+
+  if (someDatasetIsIntegrated) {
+    notify.negative("The repository can not be deleted because some of its datasets are integrated")
+  }
+  else {
+    showConfirmDialog.value = true
+    confirmDelete = () => {
+      repositoriesStore.deleteRepository(projectID, propsRow.row.id)
+    }
   }
 }
 
