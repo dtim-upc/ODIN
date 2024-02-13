@@ -1,11 +1,11 @@
 package edu.upc.essi.dtim.odin.workflows;
 
-import edu.upc.essi.dtim.NextiaCore.queries.Workflow;
 import edu.upc.essi.dtim.odin.query.QueryController;
-import edu.upc.essi.dtim.odin.workflows.pojo.WorkflowResponse;
+import edu.upc.essi.dtim.odin.workflows.pojos.WorkflowResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,5 +59,18 @@ public class WorkflowController {
         logger.info("Deleting workflow " + workflowID + " from intent: " +  intentID);
         workflowService.deleteWorkflow(intentID, workflowID);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // ---------------- Schema operations
+    /**
+     * Downloads the schema of a specific workflow as a Turtle (.ttl) file.
+     *
+     * @param workflowID The ID of the workflow to download the schema for.
+     * @return If the task was successful return a ResponseEntity containing the Turtle schema file.
+     */
+    @GetMapping("/project/{projectID}/intent/{intentID}/workflow/{workflowID}/schema")
+    public ResponseEntity<InputStreamResource> downloadWorkflowSchema(@PathVariable("workflowID") String workflowID) {
+        logger.info("Downloading schema for workflow: " +  workflowID);
+        return workflowService.downloadWorkflowSchema(workflowID);
     }
 }

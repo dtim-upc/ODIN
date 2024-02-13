@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.datasets;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

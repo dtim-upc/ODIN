@@ -10,4 +10,7 @@ export default {
   deleteWorkflow(projectID, intentID, workflowID) {
     return odinApi.delete('/project/' + projectID + '/intent/' + intentID + '/workflow/' + workflowID)
   },
+  downloadWorkflowSchema(projectID, intentID, workflowID) {
+    return odinApi.get('/project/' + projectID + '/intent/' + intentID + '/workflow/' + workflowID + '/schema', {responseType: 'blob'})
+  },
 }

@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataCollectors;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 
 public class DataCollectorSQL extends DataCollector {
     public DataCollectorSQL(String dataStorePath) {

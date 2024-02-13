@@ -2,9 +2,8 @@ package edu.upc.essi.dtim.odin.intents;
 
 import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaCore.queries.Intent;
-import edu.upc.essi.dtim.NextiaCore.queries.Workflow;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.dataProducts.DataProductService;
 import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.projects.ProjectService;

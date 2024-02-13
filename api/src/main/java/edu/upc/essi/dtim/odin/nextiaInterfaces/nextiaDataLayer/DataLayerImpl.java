@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.CustomIOException;

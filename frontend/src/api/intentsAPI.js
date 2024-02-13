@@ -26,21 +26,10 @@ export default {
   setLogicalPlans(data) {
     return intentsApi.post('/logical_planner', data)
   },
-  downloadRDF(planID) {
-    return intentsApi.get('/workflow_plans/rdf/' + planID)
+  downloadKNIME(data) {
+    return intentsApi.post('/workflow_plans/knime', data, {responseType: 'blob'})
   },
-  downloadKNIME(planID) {
-    return intentsApi.get('/workflow_plans/knime/' + planID)
-  },
-  downloadAllRDF(selectedPlanIds) {
-    const ids = selectedPlanIds.join(',');
-    return intentsApi.get(`/workflow_plans/rdf/all?ids=${ids}`, {responseType: 'blob'})
-  },
-  downloadAllKNIME(selectedPlanIds) {
-    const ids = selectedPlanIds.join(',');
-    return intentsApi.get(`/workflow_plans/knime/all?ids=${ids}`, {responseType: 'blob'})
-  },
-  storeWorkflow(projectID, intentID, data) {
-    return odinApi.post('/project/' + projectID + '/intent/' + intentID + '/workflow', data)
+  downloadAllKNIME(data) {
+    return intentsApi.post(`/workflow_plans/knime/all`, data, {responseType: 'blob'})
   },
 }

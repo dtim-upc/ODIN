@@ -40,7 +40,7 @@
       
       </div>
       <div class="col-12">
-        <h6>{{ selectedPlans }} selected plan(s)</h6>
+        <h6>{{ countSelectedPlans }} selected plan(s)</h6>
         <q-btn label="Select plans" color="primary" type="submit" size="17px"/>
       </div>
       <div class="col-12">
@@ -56,17 +56,15 @@ import {ref} from 'vue'
 import {useIntentsStore} from 'stores/intentsStore.js'
 import DialogWithVisualizedPlan from "../../components/intents/visualize_plan/DialogWithVisualizedPlan.vue";
 import {useRoute, useRouter} from "vue-router";
-import { useQuasar } from 'quasar'
 
 const router = useRouter()
 const route = useRoute()
-const $q = useQuasar()
 
 const intentsStore = useIntentsStore()
 
 const visualizedPlan = ref(null)
 const dialog = ref(false)
-const selectedPlans = ref(0)
+const countSelectedPlans = ref(intentsStore.countSelectedPlans)
 
 const openDialog = (plan) => {
   visualizedPlan.value = plan
@@ -74,17 +72,17 @@ const openDialog = (plan) => {
 }
 
 const checkboxIndividualPlan = (group, value) => {
-  if (value) selectedPlans.value++
-  else selectedPlans.value--
+  if (value) countSelectedPlans.value++
+  else countSelectedPlans.value--
 
-  let countSelectedPlans = 0
+  let countSelectedPlansOfGroup = 0
   group.plans.map(plan => {
-    if (plan.selected) countSelectedPlans++
+    if (plan.selected) countSelectedPlansOfGroup++
   })
-  if (countSelectedPlans === group.plans.length) {
+  if (countSelectedPlansOfGroup === group.plans.length) {
     group.selected = true
   }
-  else if (countSelectedPlans > 0) {
+  else if (countSelectedPlansOfGroup > 0) {
     group.selected = null // indeterminated state
   }
   else {
@@ -95,16 +93,14 @@ const checkboxIndividualPlan = (group, value) => {
 const checkboxGroup = (group, value) => {
   group.plans.map(plan => {
     if (plan.selected !== value) {
-      if (value) selectedPlans.value++
-      else selectedPlans.value--
+      if (value) countSelectedPlans.value++
+      else countSelectedPlans.value--
     }
     plan.selected = value
   })
 }
 
 const handleSubmit = () => {
-  $q.loading.show({message: 'Running workflow planner'})
-  
   intentsStore.selectedPlans = intentsStore.logicalPlans.map(group => {
     const filteredPlans = group.plans.filter(plan => plan.selected)
     return {
@@ -112,18 +108,18 @@ const handleSubmit = () => {
       plans: filteredPlans
     }
   }).filter(group => group.plans.length > 0) // get only the groups with at least one selected plan
+  intentsStore.countSelectedPlans = countSelectedPlans.value
 
   router.push({ path: route.path.substring(0, route.path.lastIndexOf("/")) + "/intent-workflows" })
-  $q.loading.hide()
 }
 
 const selectedPlansOfGroup = (group) => {
-  const totalNumberOfPlans = group.plans.length
-  let numberOfSelectedPlans = 0
+  const totalNumberOfPlansOfGroup = group.plans.length
+  let countSelectedPlansOfGroup = 0
   group.plans.map(plan => {
-    if (plan.selected) numberOfSelectedPlans++
+    if (plan.selected) countSelectedPlansOfGroup++
   })
-  return "(" + numberOfSelectedPlans + "/" + totalNumberOfPlans + ")"
+  return "(" + countSelectedPlansOfGroup + "/" + totalNumberOfPlansOfGroup + ")"
 }
 
 const selectAll = () => {

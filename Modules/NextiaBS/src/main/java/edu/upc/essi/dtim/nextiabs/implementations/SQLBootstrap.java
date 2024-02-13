@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.nextiabs.implementations;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataSourceVocabulary;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.Formats;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;

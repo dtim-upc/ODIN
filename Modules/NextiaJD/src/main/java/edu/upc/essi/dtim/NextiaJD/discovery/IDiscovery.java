@@ -1,7 +1,7 @@
 package edu.upc.essi.dtim.NextiaJD.discovery;
 
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import jakarta.xml.bind.JAXBException;
 import org.json.simple.JSONArray;

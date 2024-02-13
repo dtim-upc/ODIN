@@ -2,7 +2,7 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;

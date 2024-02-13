@@ -1,7 +1,6 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaDataLayer.utils.ResultSetSpark;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;

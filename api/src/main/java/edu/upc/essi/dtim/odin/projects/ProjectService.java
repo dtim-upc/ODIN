@@ -1,15 +1,13 @@
 package edu.upc.essi.dtim.odin.projects;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
-import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
-import edu.upc.essi.dtim.NextiaCore.queries.Intent;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;

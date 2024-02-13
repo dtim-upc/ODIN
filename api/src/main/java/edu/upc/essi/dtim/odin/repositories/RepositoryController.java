@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.odin.repositories;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.odin.repositories.POJOs.DataRepositorySchemaInfo;
 import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +104,32 @@ public class RepositoryController {
         logger.info("Get tables received from repository: " + repositoryID);
         List<TableInfo> tables = repositoryService.retrieveTablesInfo(repositoryID);
         return new ResponseEntity<>(tables, HttpStatus.OK);
+    }
+
+    // ------------ Repositories schema retrieval when creating a new repository
+
+    private static final String repositoryFormsPath = "api\\src\\main\\resources\\frontend-schemas\\RepositoryForms\\";
+
+    /**
+     * Retrieves the template of a specific type of repository
+     *
+     * @param repositoryType Type of template to be retrieved.
+     * @return A String containing the template.
+     */
+    @GetMapping("/form-schema/{repositoryType}")
+    public String getSpecificFormSchema(@PathVariable("repositoryType") String repositoryType) {
+        logger.info("Formschema asked: " + repositoryType);
+        return repositoryService.getRepositorySchema(repositoryFormsPath + repositoryType);
+    }
+
+    /**
+     * Returns a list will all the types of repositories available in the system
+     *
+     * @return A List of DataRepositoryTypeInfo, objects with two variables: repository name and repository file name.
+     */
+    @GetMapping("/data-repository-schemas")
+    public List<DataRepositorySchemaInfo> getDataRepositorySchemas() {
+        return repositoryService.getDataRepositorySchemas(repositoryFormsPath);
     }
 }
 

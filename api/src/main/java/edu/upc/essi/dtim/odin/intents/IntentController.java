@@ -81,6 +81,4 @@ public class IntentController {
         intentService.deleteIntent(projectID, intentID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
 }

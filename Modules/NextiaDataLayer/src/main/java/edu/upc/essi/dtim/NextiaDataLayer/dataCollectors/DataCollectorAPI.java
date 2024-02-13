@@ -1,8 +1,8 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataCollectors;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
+import edu.upc.essi.dtim.NextiaCore.repositories.APIRepository;
+import edu.upc.essi.dtim.NextiaCore.datasets.APIDataset;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

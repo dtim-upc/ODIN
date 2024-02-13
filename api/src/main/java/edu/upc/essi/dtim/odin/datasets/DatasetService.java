@@ -1,8 +1,8 @@
 package edu.upc.essi.dtim.odin.datasets;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.datasets.*;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.graph.*;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
@@ -14,10 +14,10 @@ import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
 import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS.bsModuleInterface;
@@ -62,7 +62,6 @@ public class DatasetService {
     private RestTemplate restTemplate;
     private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
 
-
     // ---------------- POST Operation
 
     /**
@@ -91,7 +90,7 @@ public class DatasetService {
             default: // Throw an exception for unsupported file formats
                 throw new FormatNotAcceptedException("Unsupported repository type: " + repository.getRepositoryType());
         }
-        //deleteTemporalFiles();
+//        deleteTemporalFiles();
     }
 
     /**
@@ -292,7 +291,7 @@ public class DatasetService {
             saveDataset(datasetWithGraph);
 
         } catch (Exception e) {
-            //deleteDatasetFromProject(projectID, dataset.getId());
+            deleteDatasetFromProject(projectID, dataset.getId());
             throw new InternalServerErrorException("Error when uploading the data to the data layer", e.getMessage());
         }
     }

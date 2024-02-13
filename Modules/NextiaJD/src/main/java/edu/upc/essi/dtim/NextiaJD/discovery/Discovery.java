@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.NextiaJD.discovery;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;

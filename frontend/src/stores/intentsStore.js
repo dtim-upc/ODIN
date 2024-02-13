@@ -1,21 +1,27 @@
 import {defineStore} from 'pinia'
 import {useNotify} from 'src/use/useNotify.js'
 import intentsAPI from "src/api/intentsAPI.js";
+import JSZip from 'jszip';
+import FileSaver from 'file-saver';
 
 const notify = useNotify();
 
 export const useIntentsStore = defineStore('intents', {
 
   state: () => ({
-    intents: [],
-    intentID: "",
-    queryUri: "",
-    problems: [],
-    selectedQuery: [],
-    abstractPlans: [],
-    logicalPlans: [],
-    selectedPlans: [],
-    selectedRDFGraph: ""
+    intents: [], // List of intents in the system (ODIN objects)
+    problems: [], // List of problems available for the user to select when creating an intent
+    intentID: "", // ID of the current intent (ODIN object), used to associate the workflows that are stored to it
+    
+    dataProductURI: "", // URI of the selected data product. This is required given that when working with graphs we need URIs
+    intent_graph: {}, // Graph definition of the current intent
+    ontology: "", // Ontology of the system (graph)
+    algorithmImplementations: [], // List of algorithms defined in the ontology
+    
+    abstractPlans: [], // List of abstract plans (displayed in Logical Planner)
+    logicalPlans: [], // List of logical plans (displayed in Workflow Planner)
+    selectedPlans: [], // List of selected plans by the user (Displayed in Workflows)
+    countSelectedPlans: 0 // Number of selected plans by the user
   }),
 
   actions: {
@@ -78,10 +84,11 @@ export const useIntentsStore = defineStore('intents', {
     async annotateDataset(data) {
       try {
         const response = await intentsAPI.annotateDataset(data);
-        notify.positive(`Dataset annotated`);
-        this.queryUri = Object.values(response.data)[0];
+        notify.positive(`Dataset annotated`)
+        this.ontology = response.data.ontology
+        this.dataProductURI = response.data.data_product_uri;
       } catch (error) {
-        notify.negative("Error in annotating the dataset.");
+        notify.negative("Error in annotating the dataset.")
         console.error("Error:", error);
       }
     },
@@ -89,16 +96,18 @@ export const useIntentsStore = defineStore('intents', {
     async setAbstractPlans(data, successCallback) {
       try {
         const response = await intentsAPI.setAbstractPlans(data);
-        notify.positive(`Abstract plans created`);
-          this.abstractPlans = Object.entries(response.data).map(([plan, value]) => ({
-            name: plan.split('#').at(-1),
-            id: plan,
-            selected: false,
-            plan: value
-          }));
-          this.logicalPlans = [];
-          this.selectedPlans = [];
-          successCallback();
+        notify.positive(`Abstract plans created`)
+        this.intent_graph = response.data.intent
+        this.algorithmImplementations = response.data.algorithm_implementations
+        this.abstractPlans = Object.entries(response.data.abstract_plans).map(([plan, value]) => ({
+          name: plan.split('#').at(-1),
+          id: plan,
+          selected: false,
+          plan: value
+        }));
+        this.logicalPlans = [];
+        this.selectedPlans = [];
+        successCallback();
       } catch (error) {
         notify.negative("Error creating the abstract plans.");
         console.error("Error:", error);
@@ -118,7 +127,8 @@ export const useIntentsStore = defineStore('intents', {
           const plan = {
             id: key,
             selected: false,
-            plan: response.data[key]
+            plan: response.data[key].logical_plan,
+            graph:  response.data[key].graph,
           }
           this.logicalPlans.map(logPlan => {
             if (logPlan.id === this.removeLastPart(key)) {
@@ -152,23 +162,10 @@ export const useIntentsStore = defineStore('intents', {
       }
     },
 
-    async getRDFGraph(planID) {
-      try {
-        // The API operation is the same as downloading the RDF file, but instead of downloading it, we store it in a variable
-        const response = await intentsAPI.downloadRDF(planID)
-        this.selectedRDFGraph = response.data;
-        notify.positive(`RDF file obtained`);
-      } catch (error) {
-        notify.negative("Error obtaining the RDF file");
-        console.error("Error:", error);
-      }
-    },
-
     // ------------ Download operations
-    async downloadRDF(planID) {
+    async downloadRDF(plan) {
       try {
-        const response = await intentsAPI.downloadRDF(planID);
-        this.createDownload(response.data, `${planID}.ttl`);
+        FileSaver.saveAs(new Blob([plan.graph]), `${plan.id}.ttl`);
         notify.positive(`RDF file downloaded`);
       } catch (error) {
         notify.negative("Error downloading the RDF file");
@@ -176,21 +173,38 @@ export const useIntentsStore = defineStore('intents', {
       }
     },
     
-    async downloadKNIME(planID) {
+    async downloadKNIME(plan) {
+      const data = {"graph": plan.graphs, "ontology": this.ontology}
       try {
-        const response = await intentsAPI.downloadKNIME(planID);
-        this.createDownload(response.data, `${planID}.knwf`);
+        const response = await intentsAPI.downloadKNIME(data);
+        FileSaver.saveAs(new Blob([response.data]), `${plan.id}.knwf`);
         notify.positive(`KNIME file downloaded`);
       } catch (error) {
         notify.negative("Error downloading the KNIME file");
         console.error("Error:", error);
       }
     },
+
+    getSelectedGraphs() {
+      const graphs = {}
+      for (const [key, value] of Object.entries(this.selectedPlans)) {
+        for (const plan of value.plans) {
+          const { graph, id } = plan
+          graphs[id] = graph
+        }
+      }
+      return graphs
+    },
     
-    async downloadAllRDF(selectedPlanIds) {
+    async downloadAllRDF() {
+      const zip = new JSZip();
       try {
-        const response = await intentsAPI.downloadAllRDF(selectedPlanIds);
-        this.createDownload(response.data, "rdf.zip");
+        for (const [key, value] of Object.entries(this.getSelectedGraphs())) {
+          zip.file(key + ".ttl", value);
+        }
+        zip.generateAsync({ type: 'blob' }).then(function (content) {
+          FileSaver.saveAs(content, 'rdf-files.zip');
+        });
         notify.positive(`All RDF files downloaded`);
       } catch (error) {
         notify.negative("Error downloading all the RDF files");
@@ -198,25 +212,17 @@ export const useIntentsStore = defineStore('intents', {
       }
     },
     
-    async downloadAllKNIME(selectedPlanIds) {
+    async downloadAllKNIME() {
+      const data = {"graphs": this.getSelectedGraphs(), "ontology": this.ontology}
       try {
-        const response = await intentsAPI.downloadAllKNIME(selectedPlanIds);
-        this.createDownload(response.data, "knime.zip");
+        const response = await intentsAPI.downloadAllKNIME(data);
+        FileSaver.saveAs(new Blob([response.data]), `knime.zip`);
         notify.positive(`All RDF files downloaded`);
       } catch (error) {
         notify.negative("Error downloading all the KNIMW files");
         console.error("Error:", error);
       }
     },
-    
-    createDownload(data, name) {
-      const url = window.URL.createObjectURL(new Blob([data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', name);
-      document.body.appendChild(link);
-      link.click();
-    },
-    
+  
   }
 })

@@ -65,9 +65,9 @@ public class DataProductController {
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
     @PutMapping("/project/{projectID}/data-product/{dataProductID}")
-    public ResponseEntity<Boolean> putIntent(@PathVariable("dataProductID") String dataProductID,
-                                             @RequestParam("dataProductName") String dataProductName,
-                                             @RequestParam("dataProductDescription") String dataProductDescription) {
+    public ResponseEntity<Boolean> putDataProduct(@PathVariable("dataProductID") String dataProductID,
+                                                  @RequestParam("dataProductName") String dataProductName,
+                                                  @RequestParam("dataProductDescription") String dataProductDescription) {
         logger.info("Putting data product " + dataProductID);
         dataProductService.putDataProduct(dataProductID, dataProductName, dataProductDescription);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -81,8 +81,8 @@ public class DataProductController {
      * @return If the task was successful return a ResponseEntity with an OK HTTP code.
      */
     @DeleteMapping("/project/{projectID}/data-product/{dataProductID}")
-    public ResponseEntity<Boolean> deleteIntent(@PathVariable("projectID") String projectID,
-                                                @PathVariable("dataProductID") String dataProductID) {
+    public ResponseEntity<Boolean> deleteDataProduct(@PathVariable("projectID") String projectID,
+                                                     @PathVariable("dataProductID") String dataProductID) {
         logger.info("Deleting data product " + dataProductID + " from project: " +  projectID);
         dataProductService.deleteDataProduct(projectID, dataProductID);
         return new ResponseEntity<>(HttpStatus.OK);

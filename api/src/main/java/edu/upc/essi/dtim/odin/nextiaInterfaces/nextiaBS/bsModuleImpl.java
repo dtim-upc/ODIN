@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaBS;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapFactory;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;

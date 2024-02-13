@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.integration.pojos;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 
 import java.util.List;

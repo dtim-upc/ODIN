@@ -1,25 +1,33 @@
 package edu.upc.essi.dtim.odin.repositories;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.NextiaCore.repositories.APIRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.LocalRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.exception.CustomIOException;
+import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
 import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterface;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
+import edu.upc.essi.dtim.odin.repositories.POJOs.DataRepositorySchemaInfo;
 import edu.upc.essi.dtim.odin.repositories.POJOs.TableInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -266,5 +274,57 @@ public class RepositoryService {
     public List<DataRepository> getRepositoriesOfProject(String projectID) {
         Project project = projectService.getProject(projectID);
         return project.getRepositories();
+    }
+
+    // ------------ Repositories schema retrieval when creating a new repository
+
+    /**
+     * Retrieves the template of a specific type of repository
+     *
+     * @param filePath Path of the template of the repository
+     * @return A String containing the template.
+     */
+    public String getRepositorySchema(String filePath) {
+        Resource resource = new FileSystemResource(filePath);
+
+        if (resource.exists()) {
+            byte[] bytes;
+            try {
+                bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
+            } catch (IOException e) {
+                throw new CustomIOException(e.getMessage());
+            }
+            return new String(bytes);
+        } else {
+            throw new ElementNotFoundException("Resource could not be found in " + filePath);
+        }
+    }
+
+    /**
+     * Returns a list will all the types of repositories available in the system
+     *
+     * @return A List of DataRepositoryTypeInfo, objects with two variables: repository name and repository file name.
+     */
+    public List<DataRepositorySchemaInfo> getDataRepositorySchemas(String repositoryFormsPath) {
+        List<DataRepositorySchemaInfo> dataRepositoryClasses = new ArrayList<>();
+        File directory = new File(repositoryFormsPath);
+
+        if (directory.isDirectory()) {
+            File[] jsonFiles = directory.listFiles((dir, name) -> name.endsWith(".json"));
+
+            if (jsonFiles != null) {
+                for (File jsonFile : jsonFiles) {
+                    String fileName = jsonFile.getName();
+                    String displayName = fileName.replace("_", " ").replace(".json", "");
+
+                    DataRepositorySchemaInfo dataRepositorySchemaInfo = new DataRepositorySchemaInfo(displayName, fileName);
+                    dataRepositoryClasses.add(dataRepositorySchemaInfo);
+                }
+            }
+        }
+        else {
+            throw new ElementNotFoundException("Directory does not exist: " + repositoryFormsPath);
+        }
+        return dataRepositoryClasses;
     }
 }

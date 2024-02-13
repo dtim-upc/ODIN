@@ -1,11 +1,10 @@
 package edu.upc.essi.dtim.odin.projects.pojo;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
 import edu.upc.essi.dtim.NextiaCore.queries.Intent;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
 
 import java.util.List;
 

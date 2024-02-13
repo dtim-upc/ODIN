@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.NextiaCore.queries;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 
 public class DataProduct extends Dataset {
 

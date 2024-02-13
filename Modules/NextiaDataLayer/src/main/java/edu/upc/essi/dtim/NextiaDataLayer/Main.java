@@ -1,10 +1,10 @@
 package edu.upc.essi.dtim.NextiaDataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.datasets.*;
+import edu.upc.essi.dtim.NextiaCore.repositories.APIRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.LocalRepository;
+import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DLDuckDB;
 
 import java.io.IOException;

@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin;
 
+import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.slf4j.Logger;
@@ -26,7 +27,8 @@ public class OdinApplication {
         SpringApplication.run(OdinApplication.class, args);
 
         // Initialize data layer
-        DataLayerSingleton.getInstance(appConfig);
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        // dl.initialize(); // Mock call to initialize the DataLayer systems. Uncomment in production.
 
         logger.info("Application started. Ready to receive API requests.");
     }

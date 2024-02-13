@@ -1,12 +1,10 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.queries.Query;
+import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollector;
 import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollectorAPI;
 import edu.upc.essi.dtim.NextiaDataLayer.dataCollectors.DataCollectorSQL;
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -82,7 +80,7 @@ public class DLDuckDB extends DataLayer {
     @Override
     public void removeFromFormattedZone(String tableName) {
         try {
-            stmt.execute("DROP TABLE for_" + tableName);
+            stmt.execute("DROP TABLE IF EXISTS for_" + tableName);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -123,7 +121,7 @@ public class DLDuckDB extends DataLayer {
     @Override
     public void removeFromExploitationZone(String tableName) {
         try {
-            stmt.execute("DROP TABLE exp_" + tableName);
+            stmt.execute("DROP TABLE IF EXISTS exp_" + tableName);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

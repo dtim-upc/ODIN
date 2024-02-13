@@ -27,7 +27,6 @@ public class PostgresSQLImpl implements IDatabaseSystem {
 
         try {
             Statement stmt = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            // TODO: check if this works
             // Get all tables
             ResultSet rs = stmt.executeQuery("SELECT table_name\n " +
                                                  "FROM information_schema.tables\n" + "';"

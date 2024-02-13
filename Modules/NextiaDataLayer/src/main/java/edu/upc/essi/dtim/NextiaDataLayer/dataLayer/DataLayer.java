@@ -1,7 +1,7 @@
 package edu.upc.essi.dtim.NextiaDataLayer.dataLayer;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
+import edu.upc.essi.dtim.NextiaCore.datasets.*;
+import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
@@ -122,11 +122,16 @@ public abstract class DataLayer {
     // ---------------- Others
 
     public abstract void close();
-    // Only for testing the data that is uploaded
 
+    // Only for testing the data that is uploaded
     public void show(Dataset d) {
         String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
         org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(parquetPath);
         df.show();
+    }
+
+    // Mock call to start Spark
+    public void initialize() {
+        spark.sql("SHOW TABLES");
     }
 }

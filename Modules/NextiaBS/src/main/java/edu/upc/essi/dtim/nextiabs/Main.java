@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.nextiabs;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.CSVDataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.CSVDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.implementations.*;
 import edu.upc.essi.dtim.nextiabs.utils.PrintGraph;

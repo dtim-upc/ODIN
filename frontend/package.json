@@ -20,6 +20,7 @@
     "d3": "^7.6.1",
     "downloadjs": "^1.4.7",
     "elkjs": "^0.8.2",
+    "file-saver": "^2.0.5",
     "flowchart-vue": "^0.32.0",
     "jszip": "^3.10.1",
     "pinia": "^2.0.11",

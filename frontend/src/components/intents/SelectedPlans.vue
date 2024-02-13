@@ -25,10 +25,10 @@
                             <q-btn color="primary" icon="mdi-database" size="10px" @click="storeWorkflowDialog(plan)" label="Store" style="font-size: 14px;"/>
                           </q-item-section>
                           <q-item-section avatar>
-                            <q-btn color="primary" icon="mdi-download" size="10px" @click="downloadRDF(plan)" label="RDF" style="font-size: 14px;"/>
+                            <q-btn color="primary" icon="mdi-download" size="10px" @click="intentsStore.downloadRDF(plan)" label="RDF" style="font-size: 14px;"/>
                           </q-item-section>
                           <q-item-section avatar>
-                            <q-btn color="primary" icon="mdi-download" size="10px" @click="downloadKNIME(plan)" label="KNIME" style="font-size: 14px;" />
+                            <q-btn color="primary" icon="mdi-download" size="10px" @click="intentsStore.downloadKNIME(plan)" label="KNIME" style="font-size: 14px;" />
                           </q-item-section>
                           </q-item>
                         </q-list>
@@ -39,8 +39,8 @@
                 
             </div>
             <div class="col-12">
-              <q-btn label="Download all RDF representations" @click="downloadAllRDF()"/>
-              <q-btn label="Download all KNIME representations" @click="downloadAllKNIME()" class="q-ml-sm"/>
+              <q-btn label="Download all RDF representations" @click="intentsStore.downloadAllRDF()"/>
+              <q-btn label="Download all KNIME representations" @click="intentsStore.downloadAllKNIME()" class="q-ml-sm"/>
             </div>
         </div>
     </q-page>
@@ -90,32 +90,11 @@ const storeWorkflowDialog = (plan) => {
   storeWorkflowDialogBoolean.value = true
 }
 
-const downloadRDF = (plan) => {
-  intentsStore.downloadRDF(plan.id)
-}
-
-const downloadKNIME = (plan) => {
-  intentsStore.downloadKNIME(plan.id)
-}
-
-const downloadAllRDF = () => {
-  const selectedPlanIds = intentsStore.selectedPlans.map(group => group.plans.map(plan => plan.id));
-  intentsStore.downloadAllRDF(selectedPlanIds)
-}
-
-const downloadAllKNIME = () => {
-  const selectedPlanIds = intentsStore.selectedPlans.map(group => group.plans.map(plan => plan.id));
-  intentsStore.downloadAllKNIME(selectedPlanIds)
-}
-
 const storeWorkflow = async () => {
-  $q.loading.show({message: 'Generating graphical representation'})
-  await intentsStore.getRDFGraph(selectedPlan.value.id) // get the RDF graph and store it in intentsStore.selectedRDFGraph
-  $q.loading.hide()
   const data = {
     workflowName: workflowName.value,
     visualRepresentation: selectedPlan.value.plan,
-    stringGraph: intentsStore.selectedRDFGraph,
+    stringGraph: selectedPlan.value.graph
   };
   const intentID = intentsStore.intentID
 

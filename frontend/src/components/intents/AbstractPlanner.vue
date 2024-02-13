@@ -72,8 +72,9 @@ const handleSubmit = async() => {
   $q.loading.show({message: 'Running abstract planner...'}) // Finally, run the planner
   data = {
     'intent_name': intentName.value,
-    'dataset': intentsStore.queryUri,
+    'dataset': intentsStore.dataProductURI,
     'problem': intentsStore.problems[problem.value],
+    'ontology': intentsStore.ontology,
   }
 
   const successCallback = () => {

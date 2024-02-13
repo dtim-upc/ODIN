@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { useNotify } from 'src/use/useNotify.js';
 import workflowAPI from "src/api/workflowAPI.js";
+import download from 'downloadjs'
 import { useIntentsStore } from "src/stores/intentsStore.js";
 
 const notify = useNotify();
@@ -41,6 +42,19 @@ export const useWorkflowsStore = defineStore('store', {
       } catch (error) {
         notify.negative("Error deleting the workflow.");
         console.error("Error:", error);
+      }
+    },
+
+    // ---------------- Graph related operations
+
+    async downloadWorkflowSchema(projectID, intentID, workflow) {
+      try {
+        const response = await workflowAPI.downloadWorkflowSchema(projectID, intentID, workflow.workflowID)
+        const content = response.headers['content-type']
+        download(response.data, workflow.workflowName + ".ttl", content)
+      } catch (error) {
+        console.error("Error:", error)
+        notify.negative("Error downloading the schema")
       }
     },
   }

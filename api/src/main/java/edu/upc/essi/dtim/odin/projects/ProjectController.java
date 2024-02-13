@@ -1,9 +1,5 @@
 package edu.upc.essi.dtim.odin.projects;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
-import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
-import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

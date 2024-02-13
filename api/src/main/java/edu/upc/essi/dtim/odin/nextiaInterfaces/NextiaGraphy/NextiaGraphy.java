@@ -156,7 +156,7 @@ public class NextiaGraphy {
             }
             l.setLabel(n.getLabel());
             if ((l.getSource() == null || l.getTarget() == null) && !n.getRange().equals("http://schema.org/identifier")) {
-                logger.error("ERROR " + l.getLabel() + "-------------------------------------");
+                logger.error("ERROR " + l.getLabel());
             }
             if (!n.getRange().equals("http://schema.org/identifier"))
                 links.add(l);
@@ -165,7 +165,6 @@ public class NextiaGraphy {
         Graphy gr = new Graphy();
         gr.setNodes(nodesReady);
         gr.setLinks(links);
-        System.out.println("----------------- " + new Gson().toJson(gr));
         return new Gson().toJson(gr);
     }
 

@@ -1,8 +1,7 @@
 package edu.upc.essi.dtim.nextiabs.bootstrap;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository;
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.*;
-import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
+import edu.upc.essi.dtim.NextiaCore.datasets.*;
+import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
 import edu.upc.essi.dtim.nextiabs.databaseConnection.PostgresSQLImpl;
 import edu.upc.essi.dtim.nextiabs.implementations.*;
 

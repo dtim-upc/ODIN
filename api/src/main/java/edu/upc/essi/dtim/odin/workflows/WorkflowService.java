@@ -1,37 +1,46 @@
 package edu.upc.essi.dtim.odin.workflows;
 
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
+import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.WorkflowGraph;
+import edu.upc.essi.dtim.NextiaCore.graph.jena.WorkflowGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.NextiaCore.queries.Workflow;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.RelationalStore.ORMStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.intents.IntentService;
-import edu.upc.essi.dtim.odin.workflows.pojo.WorkflowResponse;
+import edu.upc.essi.dtim.odin.workflows.pojos.WorkflowResponse;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 public class WorkflowService {
-    private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
     @Autowired
     private IntentService intentService;
     @Autowired
     private AppConfig appConfig;
+    private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
 
     // ---------------- CRUD/ORM operations
 
     /**
      * Saves a Workflow object into the ORM store
      *
-     * @param workflow The DataProduct object to save.
+     * @param workflow The Workflow object to save.
      * @return The saved Workflow object.
      */
     public Workflow saveWorkflow(Workflow workflow) {
@@ -49,6 +58,15 @@ public class WorkflowService {
         if (workflow == null) {
             throw new ElementNotFoundException("Workflow not found with ID: " + workflowID);
         }
+        // Retrieve the content of the graph associated with the workflow
+        GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+
+        Graph workflowGraph = graphStore.getGraph(workflow.getWorkflowGraph().getGraphName());
+        System.out.println(workflowGraph);
+
+        // Set the local graph of the workflow to the retrieved graph
+        workflow.setWorkflowGraph((WorkflowGraphJenaImpl) workflowGraph);
+
         return workflow;
     }
 
@@ -78,7 +96,6 @@ public class WorkflowService {
         }
 
         graphStoreInterface.saveGraphFromStringRepresentation(workflow.getWorkflowGraph(), workflowResponse.getStringGraph());
-
 
         intent.addWorkflow(workflow);
         intentService.saveIntent(intent);
@@ -122,5 +139,34 @@ public class WorkflowService {
         originalWorkflow.setWorkflowName(workflowName);
 
         saveWorkflow(originalWorkflow);
+    }
+
+    // ---------------- Schema operations
+
+    /**
+     * Downloads the schema of a workflow, in .ttl format.
+     *
+     * @param workflowID Identification of the workflow whose schema will be downloaded
+     * @return A ResponseEntity with the headers and the schema
+     */
+    public ResponseEntity<InputStreamResource> downloadWorkflowSchema(String workflowID) {
+        Workflow workflow = getWorkflow(workflowID);
+
+        Model model = workflow.getWorkflowGraph().getGraph(); // Get the RDF model (graph) from the workflow
+        StringWriter writer = new StringWriter();
+
+        model.write(writer, "TTL"); // Write the model (graph) to a StringWriter in Turtle format
+
+        HttpHeaders headers = new HttpHeaders();
+        // Set the HTTP headers to specify the content disposition as an attachment with the dataset name and .ttl extension
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + workflow.getWorkflowName() + ".ttl");
+
+        // Create an InputStreamResource from the StringWriter
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(writer.toString().getBytes()));
+        // Return a ResponseEntity with the Turtle schema file, content type, and headers
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("text/turtle"))
+                .body(resource);
     }
 }

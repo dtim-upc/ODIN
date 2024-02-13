@@ -58,12 +58,14 @@ const handleSubmit = async() => {
     router.push({ path: route.path.substring(0, route.path.lastIndexOf("/")) + "/workflow-planner" })
   }
 
-  let data = []
+  let plan_ids = []
   intentsStore.abstractPlans.map(absPlan => {
     if (absPlan.selected) {
-      data.push(absPlan.id)
+      plan_ids.push(absPlan.id)
     }
   })
+  const data = {"plan_ids": plan_ids, "intent_graph":intentsStore.intent_graph, 'ontology': intentsStore.ontology,
+                "algorithm_implementations": intentsStore.algorithmImplementations}
 
   await intentsStore.setLogicalPlans(data, successCallback)
   $q.loading.hide()

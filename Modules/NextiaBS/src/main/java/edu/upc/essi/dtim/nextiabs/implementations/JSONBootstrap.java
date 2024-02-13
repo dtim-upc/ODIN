@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.nextiabs.implementations;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataSourceVocabulary;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.Formats;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
@@ -66,7 +66,6 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
         //productionRules_JSON_to_RDFS();
 
         String SELECT = attributesSWJ.entrySet().stream().map( p -> {
-//            System.out.println(p.getKey() + " ----- " + p.getValue().getKey() + " ----- " + p.getValue().getPath());
             if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath() + " AS `" + p.getKey() + "`";
             return  p.getValue().getPath() + " AS `" + p.getValue().getLabel() + "`";
         }).collect(Collectors.joining(", "));
@@ -130,11 +129,8 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
         }
 
         G_source.addTriple(createIRI(D), RDF.type, DataFrame_MM.DataSource);
-//		try {
         Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
-//		} catch (ClassCastException e){
-//			Array(Json.createReader(fis).readValue().asJsonArray(), new JSON_Aux(D,"",""));
-//		}
+
     }
 
     private void DataType(JsonValue D, JSON_Aux p) {

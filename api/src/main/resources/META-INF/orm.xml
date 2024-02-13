@@ -41,19 +41,19 @@
             </basic>
 
             <one-to-many orphan-removal="true" name="repositories"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+                         target-entity="edu.upc.essi.dtim.NextiaCore.repositories.DataRepository">
                 <cascade>
                     <cascade-all/>
                 </cascade>
             </one-to-many>
 
             <one-to-many orphan-removal="false" name="integratedDatasets"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasets.Dataset">
                 <join-column name="PROJECTID"/>
             </one-to-many>
 
             <one-to-many orphan-removal="false" name="temporalIntegratedDatasets"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasets.Dataset">
                 <join-column name="PROJECTID"/>
             </one-to-many>
 
@@ -127,7 +127,7 @@
     </entity>
 
     <!--> MAPPING DATASET CLASS<-->
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+    <entity class="edu.upc.essi.dtim.NextiaCore.repositories.DataRepository">
         <table name="DataRepository">
             <unique-constraint>
                 <column-name>id</column-name>
@@ -141,7 +141,7 @@
             <basic name="repositoryName"/>
             <basic name="isVirtual"/>
             <one-to-many name="datasets" orphan-removal="true"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+                         target-entity="edu.upc.essi.dtim.NextiaCore.datasets.Dataset">
                 <cascade>
                     <cascade-all/>
                 </cascade>
@@ -149,7 +149,7 @@
         </attributes>
     </entity>
 
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.LocalRepository">
+    <entity class="edu.upc.essi.dtim.NextiaCore.repositories.LocalRepository">
         <table name="LocalRepository"/>
         <attributes>
             <basic name="path">
@@ -157,7 +157,7 @@
         </attributes>
     </entity>
 
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.APIRepository">
+    <entity class="edu.upc.essi.dtim.NextiaCore.repositories.APIRepository">
         <table name="ApiRepository"/>
         <attributes>
             <basic name="url">
@@ -165,7 +165,7 @@
         </attributes>
     </entity>
 
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.RelationalJDBCRepository">
+    <entity class="edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository">
         <table name="RelationalJDBCRepository"/>
         <attributes>
             <basic name="username">
@@ -192,7 +192,7 @@
         </attributes>
     </entity>
 
-    <entity class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset">
+    <entity class="edu.upc.essi.dtim.NextiaCore.datasets.Dataset">
         <table name="Dataset">
             <unique-constraint>
                 <column-name>id</column-name>
@@ -211,7 +211,7 @@
             <basic name="wrapper"/>
             <basic name="UUID"/>
             <many-to-one name="repository"
-                         target-entity="edu.upc.essi.dtim.NextiaCore.datasources.dataRepository.DataRepository">
+                         target-entity="edu.upc.essi.dtim.NextiaCore.repositories.DataRepository">
             </many-to-one>
             <one-to-many name="attributes" orphan-removal="true"
                          target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>
@@ -223,35 +223,35 @@
         </attributes>
     </entity>
 
-    <entity name="CSVDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.CSVDataset">
+    <entity name="CSVDataset" class="edu.upc.essi.dtim.NextiaCore.datasets.CSVDataset">
         <table name="CSVDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>
     </entity>
 
-    <entity name="JSONDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.JSONDataset">
+    <entity name="JSONDataset" class="edu.upc.essi.dtim.NextiaCore.datasets.JSONDataset">
         <table name="JSONDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>
     </entity>
 
-    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.XMLDataset">
+    <entity name="XmlDataset" class="edu.upc.essi.dtim.NextiaCore.datasets.XMLDataset">
         <table name="XmlDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>
     </entity>
 
-    <entity name="ParquetDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.ParquetDataset">
+    <entity name="ParquetDataset" class="edu.upc.essi.dtim.NextiaCore.datasets.ParquetDataset">
         <table name="ParquetDataset"/>
         <attributes>
             <basic name="path"/>
         </attributes>
     </entity>
 
-    <entity name="SQLDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.SQLDataset">
+    <entity name="SQLDataset" class="edu.upc.essi.dtim.NextiaCore.datasets.SQLDataset">
         <table name="SQLDataset"/>
         <attributes>
             <basic name="tableName"/>
@@ -262,7 +262,7 @@
         </attributes>
     </entity>
 
-    <entity name="APIDataset" class="edu.upc.essi.dtim.NextiaCore.datasources.dataset.APIDataset">
+    <entity name="APIDataset" class="edu.upc.essi.dtim.NextiaCore.datasets.APIDataset">
         <table name="APIDataset"/>
         <attributes>
             <basic name="endpoint"/>

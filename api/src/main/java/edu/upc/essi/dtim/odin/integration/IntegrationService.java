@@ -1,6 +1,6 @@
 package edu.upc.essi.dtim.odin.integration;
 
-import edu.upc.essi.dtim.NextiaCore.datasources.dataset.Dataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
@@ -11,8 +11,8 @@ import edu.upc.essi.dtim.odin.exception.EmptyFileException;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationTemporalResponse;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreFactory;
-import edu.upc.essi.dtim.odin.NextiaStore.GraphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.datasets.DatasetService;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.integration.pojos.IntegrationData;
