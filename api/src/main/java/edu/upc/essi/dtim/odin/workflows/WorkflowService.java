@@ -62,7 +62,6 @@ public class WorkflowService {
         GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
 
         Graph workflowGraph = graphStore.getGraph(workflow.getWorkflowGraph().getGraphName());
-        System.out.println(workflowGraph);
 
         // Set the local graph of the workflow to the retrieved graph
         workflow.setWorkflowGraph((WorkflowGraphJenaImpl) workflowGraph);

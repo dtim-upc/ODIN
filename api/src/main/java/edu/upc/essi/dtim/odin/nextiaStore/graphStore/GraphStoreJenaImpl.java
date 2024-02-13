@@ -67,6 +67,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
             // Load data from the string into the model
             RDFDataMgr.read(model, stringReader, null, Lang.TURTLE);
         }
+        graph.setGraph(model);
         saveGraph(graph);
     }
 
