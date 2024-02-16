@@ -120,7 +120,7 @@ public class RepositoryController {
     @GetMapping("/form-schema/{repositoryType}")
     public String getSpecificFormSchema(@PathVariable("repositoryType") String repositoryType) {
         logger.info("Formschema asked: " + repositoryType);
-        return repositoryService.getRepositorySchema(repositoryFormsPath + repositoryType);
+        return repositoryService.getRepositorySchema(Paths.get(repositoryFormsPath,repositoryType).toString());
     }
 
     /**
