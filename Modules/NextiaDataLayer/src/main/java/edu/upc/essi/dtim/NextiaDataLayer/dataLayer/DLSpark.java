@@ -7,6 +7,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import java.nio.file.Paths;
 import java.sql.*;
 
 public class DLSpark extends DataLayer {
@@ -19,10 +20,10 @@ public class DLSpark extends DataLayer {
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) {
-        String path = dataStorePath + "landingZone\\" + d.getUUID();
+        String path = Paths.get(dataStorePath, "landingZone",  d.getUUID()).toString();
 
         org.apache.spark.sql.Dataset<Row> df = spark.read().parquet(path);
-        df.write().format("delta").save(dataStorePath + "DeltaLake\\formattedZone\\" + tableName);
+        df.write().format("delta").save(Paths.get(dataStorePath,"DeltaLake","formattedZone",tableName).toString());
     }
 
     @Override
@@ -32,7 +33,7 @@ public class DLSpark extends DataLayer {
 
     @Override
     public void removeFromFormattedZone(String tableName) {
-        deleteFilesFromDirectory(dataStorePath + "DeltaLake\\formattedZone\\" + tableName);
+        deleteFilesFromDirectory(Paths.get(dataStorePath,"DeltaLake","formattedZone", tableName).toString());
     }
 
     @Override

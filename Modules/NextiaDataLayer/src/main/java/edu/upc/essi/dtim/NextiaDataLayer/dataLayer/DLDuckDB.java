@@ -43,7 +43,7 @@ public class DLDuckDB extends DataLayer {
             throw new RuntimeException(e);
         }
         try {
-            return DriverManager.getConnection("jdbc:duckdb:" + dataStorePath + "DuckDBDataLake\\database");
+            return DriverManager.getConnection("jdbc:duckdb:" + Paths.get(dataStorePath, "DuckDBDataLake","database").toString());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -55,11 +55,11 @@ public class DLDuckDB extends DataLayer {
 
     @Override
     public void uploadToFormattedZone(Dataset d, String tableName) {
-        String parquetPath = dataStorePath + "landingZone\\" + d.getUUID();
+        String parquetPath = Paths.get(dataStorePath, "landingZone", d.getUUID()).toString();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         try {
-            stmt.execute("CREATE TABLE for_" + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+            stmt.execute("CREATE TABLE for_" + tableName + " AS SELECT * FROM read_parquet('" + Paths.get(directoryPath.toString(),fileName) + "')");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -67,11 +67,11 @@ public class DLDuckDB extends DataLayer {
 
     @Override
     public void uploadToTemporalFormattedZone(Dataset d, String tableName) {
-        String parquetPath = dataStorePath + "tmp\\" + d.getUUID();
+        String parquetPath = Paths.get(dataStorePath, "tmp", d.getUUID()).toString();
         File directoryPath = new File(parquetPath);
         String fileName = getParquetFile(directoryPath);
         try {
-            stmt.execute("CREATE TEMP TABLE for_" + tableName + " AS SELECT * FROM read_parquet('" + directoryPath + "\\" +  fileName + "')");
+            stmt.execute("CREATE TEMP TABLE for_" + tableName + " AS SELECT * FROM read_parquet('" + Paths.get(directoryPath.toString(), fileName) + "')");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -209,7 +209,7 @@ public class DLDuckDB extends DataLayer {
     // TODO: extend this to different formats and zones
     @Override
     public String materialize(Dataset dataset, String zone, String format) {
-        String csvFilePath = dataStorePath + "tmp\\" + dataset.getUUID() + ".csv";
+        String csvFilePath = Paths.get(dataStorePath, "tmp", dataset.getUUID() + ".csv").toString();
         // As of now, we assume that it is always a csv
         // String extension = "." + format;
         try {
@@ -241,7 +241,7 @@ public class DLDuckDB extends DataLayer {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return System.getProperty("user.dir") + "\\" + csvFilePath; // Absolute path
+        return Paths.get(System.getProperty("user.dir"), csvFilePath).toString(); // Absolute path
     }
 
     // ---------------- Others
