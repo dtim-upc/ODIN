@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +109,7 @@ public class RepositoryController {
 
     // ------------ Repositories schema retrieval when creating a new repository
 
-    private static final String repositoryFormsPath = "api\\src\\main\\resources\\frontend-schemas\\RepositoryForms\\";
+    private static final String repositoryFormsPath = Paths.get("api","src","main","resources","frontend-schemas","RepositoryForms").toString();
 
     /**
      * Retrieves the template of a specific type of repository
