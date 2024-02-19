@@ -1,3 +1,3 @@
 package edu.upc.essi.dtim.NextiaCore.graph;
 
-public interface IntegratedGraph { }
+public interface IntegratedGraph extends Graph { }

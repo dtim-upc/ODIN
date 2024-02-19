@@ -1,11 +1,14 @@
 package edu.upc.essi.dtim.odin.projects;
 
+import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
+import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
+import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreJenaImpl;
 import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
@@ -104,6 +107,12 @@ public class ProjectService {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        //Populate the graph instance of the project's datasets
+        for (Dataset d : project.getIntegratedDatasets()) {
+            LocalGraph lg = (LocalGraph) GraphStoreFactory.getInstance(appConfig).getGraph(d.getLocalGraph().getGraphName());
+            d.setLocalGraph(lg);
         }
 
         return project;

@@ -3,8 +3,11 @@ package edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaQR;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
+import edu.upc.essi.dtim.NextiaCore.graph.IntegratedGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
+import edu.upc.essi.dtim.NextiaQR.rewriting.IQueryRewriting;
+import edu.upc.essi.dtim.NextiaQR.rewriting.QueryRewriting;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import edu.upc.essi.dtim.odin.query.pojos.QueryDataSelection;
@@ -22,8 +25,13 @@ public class qrModuleImpl implements qrModuleInterface {
     @Autowired
     private static AppConfig appConfig;
     @Override
-    public QueryResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<Dataset> integratedDatasets, QueryDataSelection body) {
+    public QueryResult makeQuery(IntegratedGraph integratedGraph, List<Dataset> integratedDatasets, QueryDataSelection body) {
         String UUID = generateUUID();
+        // -- Query rewriting algorithm --
+        // 1) From an integrated graph we automatically compute the data structures that are required for the
+        //    rewriting algorithm (i.e., global graph --already computed--, source graphs, and mappings graph --implicit--)
+        IQueryRewriting qrAlgorithm = new QueryRewriting(DataLayerSingleton.getInstance(appConfig));
+        qrAlgorithm.generateQueryingStructures(integratedGraph,integratedDatasets);
 
         // This is a mock of the NextiaQR call: create a new dataset in the formatted zone (the dataset should already be created by ODIN)
         // and call the uploadToTemporalExploitationZone with the necessary sql (this is what nextiaQR does). This is

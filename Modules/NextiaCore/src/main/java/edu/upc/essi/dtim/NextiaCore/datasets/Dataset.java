@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.NextiaCore.datasets;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
 import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
@@ -18,7 +19,7 @@ public class Dataset {
 	private String wrapper;
 	@JsonIgnoreProperties({"datasets"})
 	private DataRepository repository;
-	private LocalGraphJenaImpl localGraph;
+	private LocalGraph localGraph;
 	private String UUID;
 
 	public Dataset() {}
@@ -67,10 +68,10 @@ public class Dataset {
 		this.wrapper = wrapper;
 	}
 
-	public LocalGraphJenaImpl getLocalGraph() {
+	public LocalGraph getLocalGraph() {
 		return localGraph;
 	}
-	public void setLocalGraph(LocalGraphJenaImpl localGraph) {
+	public void setLocalGraph(LocalGraph localGraph) {
 		this.localGraph = localGraph;
 	}
 
