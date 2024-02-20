@@ -38,7 +38,7 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 
 	@Override
 	public Graph bootstrapSchema(Boolean generateMetadata) {
-		G_target = CoreGraphFactory.createGraphInstance("local");
+		G_target = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
 //		setPrefixes();
 
 		BufferedReader br;

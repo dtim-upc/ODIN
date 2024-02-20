@@ -33,6 +33,7 @@ dependencies {
     implementation project(':Modules:NextiaBS')
     implementation project(':Modules:NextiaDI')
     implementation project(':Modules:NextiaJD')
+    implementation project(':Modules:NextiaQR')
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'

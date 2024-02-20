@@ -9,6 +9,11 @@ import java.util.List;
  * A POJO (Plain Old Java Object) class representing integration data.
  */
 public class IntegrationData {
+
+    public IntegrationData() {
+        super();
+    }
+
     private Dataset dsA; // The first dataset to be integrated
     private Dataset dsB; // The second dataset to be integrated.
     private String integratedName; // Name of the integrated data

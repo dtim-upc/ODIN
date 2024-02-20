@@ -3,6 +3,7 @@ package edu.upc.essi.dtim.nextiabs.implementations;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDF;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.RDFS;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
@@ -37,7 +38,7 @@ public class ParquetBootstrap extends DataSource implements IBootstrap<Graph>, B
 
 	@Override
 	public Graph bootstrapSchema(Boolean generateMetadata) {
-		G_target = CoreGraphFactory.createGraphInstance("local");
+		G_target = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
 //		setPrefixes();
 
 		G_target.addTriple(createIRI(name), RDF.type, DataFrame_MM.DataFrame);

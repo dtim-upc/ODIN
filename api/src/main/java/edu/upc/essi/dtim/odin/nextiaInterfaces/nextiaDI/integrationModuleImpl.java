@@ -15,7 +15,7 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class integrationModuleImpl implements integrationModuleInterface {
+public class    integrationModuleImpl implements integrationModuleInterface {
     @Override
     public Graph integrate(Graph graphA, Graph graphB, List<Alignment> alignments) {
         Graph integratedGraph = CoreGraphFactory.createGraphInstance("normal");

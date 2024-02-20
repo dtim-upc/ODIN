@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class DF_MMtoRDFS {
 
-    public static Graph productionRulesDataframe_to_RDFS(Graph G_source){
-        Graph G_target = CoreGraphFactory.createGraphInstance("local");
+    public static LocalGraph productionRulesDataframe_to_RDFS(LocalGraph G_source){
+        LocalGraph G_target = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
         List<Map<String, Object>> result;
 
         // Rule 1. Instances of J:Object(dataframe) are translated to instances of rdfs:Class .

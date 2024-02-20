@@ -9,5 +9,5 @@ import edu.upc.essi.dtim.odin.query.pojos.QueryResult;
 import java.util.List;
 
 public interface qrModuleInterface {
-    QueryResult makeQuery(IntegratedGraph integratedGraph, List<Dataset> integratedDatasets, QueryDataSelection body);
+    QueryResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<Dataset> integratedDatasets, QueryDataSelection body);
 }

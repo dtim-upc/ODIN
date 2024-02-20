@@ -38,7 +38,7 @@ public class SQLBootstrap extends DataSource implements IBootstrap<Graph>, Boots
         super();
         this.id = id;
         this.name = schemaName;
-        G_target = CoreGraphFactory.createGraphInstance("local");
+        G_target = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
         this.Database = DBType;
         this.hostname = hostname;
         this.port = port;

@@ -1,14 +1,15 @@
 package edu.upc.essi.dtim.nextiabs.bootstrap;
 
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
+import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
 
 public class BootstrapResult {
-    Graph graph;
+    LocalGraph graph;
     String wrapper;
 
     public BootstrapResult() {}
 
-    public BootstrapResult(Graph graph) {
+    public BootstrapResult(LocalGraph graph) {
         this.graph = graph;
     }
 
@@ -16,15 +17,15 @@ public class BootstrapResult {
         this.wrapper = wrapper;
     }
 
-    public BootstrapResult(Graph graph, String wrapper) {
+    public BootstrapResult(LocalGraph graph, String wrapper) {
         this.graph = graph;
         this.wrapper = wrapper;
     }
 
-    public Graph getGraph() {
+    public LocalGraph getGraph() {
         return graph;
     }
-    public void setGraph(Graph graph) {
+    public void setGraph(LocalGraph graph) {
         this.graph = graph;
     }
 

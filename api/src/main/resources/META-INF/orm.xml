@@ -215,7 +215,9 @@
             </many-to-one>
             <one-to-many name="attributes" orphan-removal="true"
                          target-entity="edu.upc.essi.dtim.NextiaCore.discovery.Attribute"/>
-            <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl">
+            <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl">
+            <!-- Updated Sergi -->
+            <!-- <one-to-one name="localGraph" target-entity="edu.upc.essi.dtim.NextiaCore.graph.jena.GraphJenaImpl"> -->
                 <cascade>
                     <cascade-all/>
                 </cascade>

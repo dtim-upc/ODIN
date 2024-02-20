@@ -8,7 +8,7 @@ import java.util.Map;
 
 public abstract class DataSource implements IDataSource {
     // Used for the RDFS graph
-    public Graph G_target;
+    public LocalGraph G_target;
     public String wrapper;
 
     public String id;
@@ -17,7 +17,7 @@ public abstract class DataSource implements IDataSource {
     public Map<String, String> prefixes;
 
     public DataSource(){
-        this.G_target = CoreGraphFactory.createGraphInstance("normal");
+        this.G_target = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
         this.id = "";
         this.prefixes = new HashMap<>();
 //        setPrefixes();

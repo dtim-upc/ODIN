@@ -267,7 +267,7 @@ public class DatasetService {
         try {
             // Execute bootstrap: transform datasource into graph and generate the wrapper
             BootstrapResult bsResult = bootstrapDataset(dataset);
-            Graph graph = bsResult.getGraph();
+            LocalGraph graph = bsResult.getGraph();
             String wrapper = bsResult.getWrapper();
 
             // Generating visual schema for frontend

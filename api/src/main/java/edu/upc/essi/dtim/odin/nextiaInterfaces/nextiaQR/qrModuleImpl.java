@@ -25,7 +25,7 @@ public class qrModuleImpl implements qrModuleInterface {
     @Autowired
     private static AppConfig appConfig;
     @Override
-    public QueryResult makeQuery(IntegratedGraph integratedGraph, List<Dataset> integratedDatasets, QueryDataSelection body) {
+    public QueryResult makeQuery(IntegratedGraphJenaImpl integratedGraph, List<Dataset> integratedDatasets, QueryDataSelection body) {
         String UUID = generateUUID();
         // -- Query rewriting algorithm --
         // 1) From an integrated graph we automatically compute the data structures that are required for the

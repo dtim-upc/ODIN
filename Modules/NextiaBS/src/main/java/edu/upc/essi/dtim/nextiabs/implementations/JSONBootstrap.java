@@ -30,7 +30,7 @@ import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDatafr
 
 public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
     // Using DataFrame_MM and without Jena
-    protected Graph G_source; //used for the graph in the source metamodel
+    protected LocalGraph G_source; //used for the graph in the source metamodel
 
     public String path;
 
@@ -47,7 +47,7 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
         this.id = id;
         this.name = name;
         this.path = path;
-        this.G_source = CoreGraphFactory.createGraphInstance("local");
+        this.G_source = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
         ObjectCounter = 0;
         ArrayCounter = 0;
 
