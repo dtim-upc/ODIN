@@ -30,8 +30,6 @@ findProject(':Modules:NextiaJD')?.name = 'NextiaJD'
 include 'Modules:NextiaQR'
 findProject(':Modules:NextiaQR')?.name = 'NextiaQR'
 include 'Modules:NextiaCore'
-findProject(':Modules:IntentSpecification2WorkflowGenerator')?.name = 'IntentSpecification2WorkflowGenerator'
-include 'Modules:IntentSpecification2WorkflowGenerator'
 include 'api'
 include 'frontend'
 
