@@ -104,6 +104,10 @@ def download_knime():
     plan_graph = Graph().parse(data=request.json.get("graph", ""), format='turtle')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
 
+    plan_graph.print()
+    print("--------------")
+    # ontology.print()
+
     file_path = os.path.join(files_folder, f'{uuid.uuid4()}.ttl')
     plan_graph.serialize(file_path, format='turtle')
 

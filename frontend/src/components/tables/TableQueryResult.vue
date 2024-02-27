@@ -9,7 +9,6 @@
       </template>
 
       <template v-slot:top-right="props">
-        <q-btn color="primary" icon-right="archive" label="Export to csv" no-caps @click="exportTable"/>
         <FullScreenToggle :props="props" @toggle="props.toggleFullscreen"/>
       </template>
 
@@ -18,7 +17,6 @@
 </template>
 
 <script setup>
-import {exportFile} from 'quasar'
 import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
 
 const props = defineProps({
@@ -26,39 +24,5 @@ const props = defineProps({
   rows: {type: Array},
 });
 
-const wrapCsvValue = (val, formatFn, row) => {
-  let formatted = formatFn !== void 0
-    ? formatFn(val, row)
-    : val
-
-  formatted = formatted === void 0 || formatted === null
-    ? ''
-    : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-  return `"${formatted}"`
-}
-
-const exportTable = () => {
-  const content = [props.columns.map(col => wrapCsvValue(col.label))].concat(
-    props.rows.map(row => props.columns.map(col => wrapCsvValue(
-      typeof col.field === 'function'
-        ? col.field(row)
-        : row[col.field === void 0 ? col.name : col.field],
-      col.format,
-      row
-    )).join(','))
-  ).join('\r\n')
-
-  const status = exportFile(
-    'table-export.csv',
-    content,
-    'text/csv'
-  )
-
-  if (status !== true) {
-    notify.negative("Browser denied file download.")
-  }
-}
 </script>
 

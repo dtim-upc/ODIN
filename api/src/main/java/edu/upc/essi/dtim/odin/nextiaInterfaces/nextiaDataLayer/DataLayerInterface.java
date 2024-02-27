@@ -40,5 +40,5 @@ public interface DataLayerInterface {
 
     void copyToExploitationZone(String UUID);
 
-    String materialize(Dataset dataset, String zone, String format);
+    String materialize(String UUID, String zone, String format);
 }

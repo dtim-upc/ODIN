@@ -174,7 +174,7 @@ export const useIntentsStore = defineStore('intents', {
     },
     
     async downloadKNIME(plan) {
-      const data = {"graph": plan.graphs, "ontology": this.ontology}
+      const data = {"graph": plan.graph, "ontology": this.ontology}
       try {
         const response = await intentsAPI.downloadKNIME(data);
         FileSaver.saveAs(new Blob([response.data]), `${plan.id}.knwf`);

@@ -208,19 +208,19 @@ public class DLDuckDB extends DataLayer {
 
     // TODO: extend this to different formats and zones
     @Override
-    public String materialize(Dataset dataset, String zone, String format) {
-        String csvFilePath = Paths.get(dataStorePath, "tmp", dataset.getUUID() + ".csv").toString();
+    public String materialize(String UUID, String zone, String format) {
+        String csvFilePath = Paths.get(dataStorePath, "tmp", UUID + ".csv").toString();
         // As of now, we assume that it is always a csv
         // String extension = "." + format;
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM " + zone + "_" + dataset.getUUID());
+            ResultSet rs = stmt.executeQuery("SELECT * FROM " + zone + "_" + UUID);
             try (FileWriter writer = new FileWriter(csvFilePath)) {
                 // Header
                 int columnCount = rs.getMetaData().getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
                     writer.append(rs.getMetaData().getColumnName(i));
                     if (i < columnCount) {
-                        writer.append(",");
+                        writer.append(";");
                     }
                 }
                 writer.append("\n");
@@ -230,7 +230,7 @@ public class DLDuckDB extends DataLayer {
                         Object value = rs.getObject(i);
                         writer.append(value != null ? value.toString() : "null");
                         if (i < columnCount) {
-                            writer.append(",");
+                            writer.append(";");
                         }
                     }
                     writer.append("\n");

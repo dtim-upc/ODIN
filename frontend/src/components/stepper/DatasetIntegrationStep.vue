@@ -88,6 +88,7 @@ const clickOk = () => {
   switch (step.value) {
     case 1:
       step.value++
+      integrationStore.alignments = [] // reset the alignments left from other integrations
       break;
     case 2:
       integrationStore.integrate(function () {

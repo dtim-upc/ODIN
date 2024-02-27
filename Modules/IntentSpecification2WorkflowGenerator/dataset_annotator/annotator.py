@@ -10,7 +10,7 @@ from common import *
 def add_dataset_info(dataset_path, graph, label):
     dataset_node = ab.term(path.basename(dataset_path))
     graph.add((dataset_node, RDF.type, dmop.TabularDataset))
-    dataset = pd.read_csv(dataset_path)
+    dataset = pd.read_csv(dataset_path, encoding='latin', delimiter=";")
     add_csv_info(dataset_path, dataset, dataset_node, graph)
     add_column_info(dataset_path, dataset, dataset_node, graph, label)
 

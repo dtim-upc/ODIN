@@ -14,10 +14,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.*;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import javax.json.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -27,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+import static edu.upc.essi.dtim.nextiabs.utils.Utils.reformatName;
 
 public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
     // Using DataFrame_MM and without Jena
@@ -67,7 +65,7 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
 
         String SELECT = attributesSWJ.entrySet().stream().map( p -> {
             if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath() + " AS `" + p.getKey() + "`";
-            return  p.getValue().getPath() + " AS `" + p.getValue().getLabel() + "`";
+            return  p.getValue().getPath() + " AS " + reformatName(p.getValue().getLabel());
         }).collect(Collectors.joining(", "));
 
 
@@ -76,8 +74,8 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
 //            System.out.println(s.getLeft() + " ---- " + s.getRight());
 //        }
 
-        String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode(" + p.getLeft() + ") AS " + p.getRight()).collect(Collectors.joining("\n"));
-        wrapper = "SELECT " + SELECT + " FROM " + name + " " + LATERAL;
+        String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode(" + p.getLeft() + ") AS " + reformatName(p.getRight())).collect(Collectors.joining("\n"));
+        wrapper = "SELECT " + SELECT + " FROM `" + name + "` " + LATERAL;
 
         //generateMetadata();
 
@@ -128,9 +126,21 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
             throw new RuntimeException("File not found");
         }
 
-        G_source.addTriple(createIRI(D), RDF.type, DataFrame_MM.DataSource);
-        Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
+        // Step 1: Read data from fis and store it in a JSON array
+        JsonReader reader = Json.createReader(fis);
+        JsonArray jsonArray = reader.readArray();
+        reader.close();
 
+        // Step 2: Extract the JSON object from the JSON array
+        if (jsonArray.size() > 0) {
+            JsonObject jsonObject = jsonArray.getJsonObject(0); // Assuming jsonArray contains only one object
+            System.out.println(jsonObject);
+
+            // Step 3: Call the object method with the JSON object
+            Object(jsonObject, new JSON_Aux(D, "", ""));
+        } else {
+            throw new RuntimeException("Empty JSON array");
+        }
     }
 
     private void DataType(JsonValue D, JSON_Aux p) {

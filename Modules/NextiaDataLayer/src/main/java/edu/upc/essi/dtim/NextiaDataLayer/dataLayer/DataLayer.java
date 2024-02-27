@@ -64,7 +64,7 @@ public abstract class DataLayer {
         }
         // we use the name because the wrapper is expecting the sql table to have the name of the dataset
         assert df != null;
-        df.createOrReplaceTempView(d.getDatasetName());
+        df.createOrReplaceTempView("`" + d.getDatasetName() + "`");
         return spark.sql(d.getWrapper());
     }
 
@@ -117,7 +117,7 @@ public abstract class DataLayer {
         return storeTemporalFile(dataStorePath + "tmp", inputFile, newFileDirectory);
     }
 
-    public abstract String materialize(Dataset dataset, String zone, String format);
+    public abstract String materialize(String UUID, String zone, String format);
 
     // ---------------- Others
 

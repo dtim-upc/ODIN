@@ -16,4 +16,10 @@ export default {
   putDataProduct(projectID, dataProductID, data) {
     return odinApi.put('/project/' + projectID + '/data-product/' +  dataProductID, data)
   },
+  downloadTemporalDataProduct(projectID, dataProductUUID) {
+    return odinApi.post('/project/' + projectID + '/download-temporal-data-product/' +  dataProductUUID)
+  },
+  downloadDataProduct(projectID, dataProductID) {
+    return odinApi.post('/project/' + projectID + '/data-product/' +  dataProductID + '/download')
+  },
 }

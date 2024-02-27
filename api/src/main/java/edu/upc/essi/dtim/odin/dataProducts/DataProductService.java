@@ -11,8 +11,13 @@ import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerInterfac
 import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -136,18 +141,62 @@ public class DataProductService {
         return project.getDataProducts();
     }
 
-    // ---------------- Other operations
+    // ------------ Download/materialize operations
 
     /**
-     * Materializes a data product into a CSV file, mainly to be ingested by the intent generation pipeline.
+     * Materializes a data product into a CSV file.
      *
-     * @param dataProductID   The ID of the data product to be materialized
-     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     * @param dataProductID The ID of the data product to be materialized
+     * @return If the task was successful returns a path were the materialized file resides
      */
     public String materializeDataProduct(String dataProductID) {
-        // Own function to get the data product
         DataProduct dp = ormDataResource.findById(DataProduct.class, dataProductID);
         DataLayerInterface dataLayerInterFace = new DataLayerImpl(appConfig);
-        return dataLayerInterFace.materialize(dp, "exp", "csv");
+        return dataLayerInterFace.materialize(dp.getUUID(), "exp", "csv");
+    }
+
+    /**
+     * Downloads a temporal data product. That is, just after executing a query over the data and before the data product
+     * has been stored in ODIN.
+     *
+     * @param dataProductUUID The UUID of the data product to be downloaded
+     * @return If the task was successful returns a ResponseEntity with the file to download
+     */
+    public ResponseEntity<FileSystemResource> downloadTemporalDataProduct(String dataProductUUID) {
+        DataLayerInterface dataLayerInterFace = new DataLayerImpl(appConfig);
+        String pathOfMaterializedDataProduct = dataLayerInterFace.materialize(dataProductUUID, "tmp_exp", "csv");
+        return downloadCSVFile(pathOfMaterializedDataProduct);
+    }
+
+    /**
+     * Downloads a data product.
+     *
+     * @param dataProductID The ID of the data product to be downloaded
+     * @return If the task was successful returns a ResponseEntity with the file to download
+     */
+    public ResponseEntity<FileSystemResource> downloadDataProduct(String dataProductID) {
+        String pathOfMaterializedDataProduct = materializeDataProduct(dataProductID);
+        return downloadCSVFile(pathOfMaterializedDataProduct);
+    }
+
+    /**
+     * Downloads a CSV file generated from a data product
+     *
+     * @param pathOfMaterializedDataProduct Path of the data product (in CSV format) to download
+     * @return If the task was successful returns a ResponseEntity with the file to download
+     */
+    public ResponseEntity<FileSystemResource> downloadCSVFile(String pathOfMaterializedDataProduct) {
+        // Create a FileSystemResource to represent the CSV file
+        FileSystemResource file = new FileSystemResource(new File(pathOfMaterializedDataProduct));
+
+        // Set headers to trigger file download
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=file.csv");
+
+        // Set the content type
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+
+        // Return ResponseEntity with the file content and headers
+        return ResponseEntity.ok().headers(headers).body(file);
     }
 }

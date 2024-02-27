@@ -72,7 +72,7 @@ public class DLSpark extends DataLayer {
     }
 
     @Override
-    public String materialize(Dataset dataset, String zone, String format) {
+    public String materialize(String UUID, String zone, String format) {
         return null;
     }
 

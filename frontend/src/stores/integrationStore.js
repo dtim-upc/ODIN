@@ -53,17 +53,28 @@ export const useIntegrationStore = defineStore('integration', {
     },
     
     addAlignment(alignment, refactor) {
-      const a = refactor ? {
-        iriA: alignment.resourceA.iri,
-        labelA: alignment.resourceA.label,
-        iriB: alignment.resourceB.iri,
-        labelB: alignment.resourceB.label,
-        l: alignment.integratedLabel,
-        type: alignment.type,
-        similarity: alignment.similarity
-      } : alignment;
-    
-      this.alignments.push(a);
+      let newAlignment = true
+      console.log(this.alignments)
+      this.alignments.map(schemaAlignment => {
+        if (schemaAlignment.iriA ===  alignment.resourceA.iri && schemaAlignment.iriB ===  alignment.resourceB.iri) {
+          newAlignment = false
+          notify.negative("Alignment already defined");
+        }
+      })
+      if (newAlignment) {
+        const a = refactor ? {
+          iriA: alignment.resourceA.iri,
+          labelA: alignment.resourceA.label,
+          iriB: alignment.resourceB.iri,
+          labelB: alignment.resourceB.label,
+          l: alignment.integratedLabel,
+          type: alignment.type,
+          similarity: alignment.similarity
+        } : alignment;
+      
+        this.alignments.push(a);
+        notify.positive("Alignment added")
+      }
     },
 
     deleteAlignment(alignment) {
@@ -122,6 +133,8 @@ export const useIntegrationStore = defineStore('integration', {
         await integrationAPI.persistIntegration(projectsStore.currentProject.projectId);
         notify.positive("Integration saved successfully");
         projectsStore.updateCurrentProject();
+        this.alignments = []
+        this.joinAlignments = []
       } catch (error) {
         console.error("Error:", error);
         notify.negative("Something went wrong when persisting the integration " + error);

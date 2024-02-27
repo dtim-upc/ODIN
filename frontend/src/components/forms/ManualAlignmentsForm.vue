@@ -82,11 +82,9 @@ import {ref, reactive} from "vue";
 import Graph from 'components/graph/Graph.vue'
 import {useIntegrationStore} from 'src/stores/integrationStore.js'
 import {useProjectsStore} from 'src/stores/projectsStore.js'
-import { useNotify } from "src/use/useNotify";
 
 const integrationStore = useIntegrationStore()
 const projectsStore = useProjectsStore()
-const notify = useNotify()
 
 const props = defineProps({
   dsA: {type: Object, default: {id: "", name: "", type: "", graphicalGraph: "", iri: "", path: ""}},
@@ -152,7 +150,6 @@ const addAlignment = () => {
   integrationStore.addAlignment(alignment, true)
   resetRA()
   resetRB()
-  notify.positive("Alignment added")
 }
 
 const setAlignmentA = (resource) => {

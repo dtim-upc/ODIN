@@ -28,6 +28,8 @@ import edu.upc.essi.dtim.odin.projects.pojo.Project;
 
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
@@ -49,6 +51,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static edu.upc.essi.dtim.odin.utils.Utils.generateUUID;
+import static edu.upc.essi.dtim.odin.utils.Utils.reformatName;
 
 @Service
 public class DatasetService {
@@ -125,6 +128,7 @@ public class DatasetService {
             // Get only the file name to add it to the dataset instance (we need it to execute the bootstrap)
             int slashIndex = fullFileName.lastIndexOf("/");
             String datasetName = fullFileName.substring(slashIndex >= 0 ? slashIndex + 1 : 0, dotIndex);
+            datasetName = reformatName(datasetName);
 
             String newFileName = UUID + "." + format; // New file name using the UUID
 
@@ -161,6 +165,8 @@ public class DatasetService {
             // Reconstruct file from the Multipart file (i.e. store the file in the temporal zone to be accessed later)
             String filePath = storeTemporalFile(attachFile, newFileName);
 
+            apiDatasetName = reformatName(apiDatasetName);
+
             // Generate dataset, set UUID parameter and save it (to assign an id)
             Dataset dataset = generateDataset(filePath, apiDatasetName, datasetDescription, repositoryID, endpoint, "api");
             dataset.setUUID(UUID);
@@ -182,6 +188,7 @@ public class DatasetService {
         for (String tableName : attachTables) {
             // Extract data from datasource file, set UUID parameter and save it (to assign an id)
             String UUID = generateUUID(); // Unique universal identifier (UUID) of the dataset
+            tableName = reformatName(tableName);
             Dataset dataset = generateDataset(null, tableName, datasetDescription, repositoryID, null, "sql");
             dataset.setUUID(UUID);
             dataset = saveDataset(dataset);
@@ -292,6 +299,7 @@ public class DatasetService {
 
         } catch (Exception e) {
             deleteDatasetFromProject(projectID, dataset.getId());
+            e.printStackTrace();
             throw new InternalServerErrorException("Error when uploading the data to the data layer", e.getMessage());
         }
     }
@@ -305,11 +313,19 @@ public class DatasetService {
      */
     public List<Attribute> getAttributesFromWrapper(String wrapper) {
         List<Attribute> attributes = new ArrayList<>();
-        int backtickIndex = wrapper.indexOf("`");
-        while (backtickIndex != -1) {
-            int nextBacktickIndex = wrapper.indexOf("`", backtickIndex + 1);
-            attributes.add(generateAttribute(wrapper.substring(backtickIndex + 1, nextBacktickIndex)));
-            backtickIndex = wrapper.indexOf("`", nextBacktickIndex + 1);
+        int startIndex = wrapper.indexOf(" AS ");
+
+        while (startIndex != -1) {
+            startIndex += 4; // Move to the character after " AS "
+            int endIndex = wrapper.indexOf(',', startIndex);
+
+            if (endIndex != -1) {
+                String extractedString = wrapper.substring(startIndex, endIndex).trim();
+                attributes.add(generateAttribute(extractedString));
+                startIndex = wrapper.indexOf(" AS ", endIndex); // Move to the next " AS "
+            } else {
+                break; // If no comma found, exit loop
+            }
         }
         return attributes;
     }
@@ -441,8 +457,15 @@ public class DatasetService {
     public void putDataset(String datasetID, String datasetName, String datasetDescription) {
         Dataset originalDataset = getDataset(datasetID);
 
+        // Not working (it should replace the name in the schema)
+        GraphStoreInterface graphStore = GraphStoreFactory.getInstance(appConfig);
+        graphStore.changeGraphName(originalDataset.getLocalGraph().getGraphName(), originalDataset.getDatasetName(), datasetName);
+
+        originalDataset = getDataset(datasetID);
+
         originalDataset.setDatasetName(datasetName);
         originalDataset.setDatasetDescription(datasetDescription);
+
 
         saveDataset(originalDataset);
     }

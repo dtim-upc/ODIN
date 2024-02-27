@@ -192,7 +192,7 @@ public class RepositoryService {
                 while (resultSet.next()) {
                     // For each table, get the number of rows of the table
                     String tableName = resultSet.getString("table_name");
-                    String rowCountQuery = "SELECT COUNT(*) FROM " + tableName + ";";
+                    String rowCountQuery = "SELECT COUNT(*) FROM \"" + tableName + "\";";
 
                     try (ResultSet rowCountResultSet = statementLines.executeQuery(rowCountQuery)) {
                         if (rowCountResultSet.next()) {
@@ -201,7 +201,7 @@ public class RepositoryService {
                             rowCountResultSet.close();
 
                             // Size of the table
-                            String tableSizeQuery = "SELECT pg_size_pretty(pg_total_relation_size('" + tableName + "')) AS total_size;";
+                            String tableSizeQuery = "SELECT pg_size_pretty(pg_total_relation_size('\"" + tableName + "\"')) AS total_size;";
                             try (ResultSet sizeResultSet = statementSize.executeQuery(tableSizeQuery)) {
                                 if (sizeResultSet.next()) {
                                     String tableSize = sizeResultSet.getString("total_size");

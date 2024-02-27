@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { useNotify } from 'src/use/useNotify.js';
 import dataProductAPI from "src/api/dataProductsAPI";
+import download from 'downloadjs';
 
 const notify = useNotify();
 
@@ -55,13 +56,35 @@ export const useDataProductsStore = defineStore('dataProducts', {
       }
     },
 
-    // ------------ Other operations
-    async materializeDataProduct(projectID, dataProductID) {
+    // ------------ Download/materialize operations
+    async materializeDataProduct(projectID, dataProductID) { // To be ingested by the intent API
       try {
         const response = await dataProductAPI.materializeDataProduct(projectID, dataProductID);
         this.selectedDataProductPath = response.data;
       } catch (error) {
         notify.negative("Error materializing the data");
+        console.error("Error:", error);
+      }
+    },
+
+    async downloadTemporalDataProduct(projectID, dataProductUUID) { // The user downloads it from the frontend
+      try {
+        const response = await dataProductAPI.downloadTemporalDataProduct(projectID, dataProductUUID);
+        const content = response.headers['content-type'];
+        download(response.data, "result.csv", content);
+      } catch (error) {
+        notify.negative("Error downloading the data");
+        console.error("Error:", error);
+      }
+    },
+
+    async downloadDataProduct(projectID, dataProduct) { // The user downloads it from the frontend
+      try {
+        const response = await dataProductAPI.downloadDataProduct(projectID, dataProduct.id);
+        const content = response.headers['content-type'];
+        download(response.data, dataProduct.datasetName + ".csv", content);
+      } catch (error) {
+        notify.negative("Error downloading the data");
         console.error("Error:", error);
       }
     }

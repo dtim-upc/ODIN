@@ -5,10 +5,14 @@ import edu.upc.essi.dtim.odin.intents.IntentController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.List;
 
 @RestController
@@ -101,4 +105,29 @@ public class DataProductController {
         String pathOfMaterializedDataProduct = dataProductService.materializeDataProduct(dataProductID);
         return new ResponseEntity<>(pathOfMaterializedDataProduct, HttpStatus.OK);
     }
+
+    /**
+     * Downloads a (temporal) DataProduct content's as a CSV file.
+     *
+     * @param dataProductUUID The UUID of the data product to be materialized
+     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     */
+    @PostMapping("/project/{projectID}/download-temporal-data-product/{dataProductUUID}")
+    public ResponseEntity<FileSystemResource> downloadTemporalDataProduct(@PathVariable("dataProductUUID") String dataProductUUID) {
+        logger.info("Downloading data product");
+        return dataProductService.downloadTemporalDataProduct(dataProductUUID);
+    }
+
+    /**
+     * Downloads a DataProduct content's as a CSV file.
+     *
+     * @param dataProductID The UUID of the data product to be materialized
+     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     */
+    @PostMapping("/project/{projectID}/data-product/{dataProductID}/download")
+    public ResponseEntity<FileSystemResource> downloadDataProduct(@PathVariable("dataProductID") String dataProductID) {
+        logger.info("Downloading data product");
+        return dataProductService.downloadDataProduct(dataProductID);
+    }
+
 }

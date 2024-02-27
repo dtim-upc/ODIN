@@ -35,4 +35,12 @@ public interface GraphStoreInterface {
      * @return The retrieved graph.
      */
     Graph getGraph(String name);
+
+    /**
+     * Replaces strings of a graph
+     *
+     * @param name The URI of the graph to retrieve.
+     * @return The retrieved graph.
+     */
+    Graph changeGraphName(String graphName, String oldName, String newName);
 }

@@ -8,7 +8,7 @@ public class CalculateQuality {
     public CalculateQuality(Double l, double s) {this.l = l; this.s = s;}
 
     public double calculateQualityDiscrete(double c, double k){
-        if (c == 1 && k == 1) return 1.0;
+//        if (c == 1 && k == 1) return 1.0;
         for (double i = 0; i<l; ++i) {
             if ((c >= 1-(i/l)) && (k >= Math.pow(0.5, i))) {
                 return (l-i+1)/l;

@@ -37,10 +37,13 @@ public class qrModuleImpl implements qrModuleInterface {
         // and call the uploadToTemporalExploitationZone with the necessary sql (this is what nextiaQR does). This is
         // done as so to prevent having to handle a result set, and instead directly storing the result of the query.
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        // Demo
+        // dl.execute("CREATE TABLE IF NOT EXISTS for_countries AS SELECT * FROM read_csv_auto('C:\\Work\\Files\\countries.csv')");
+        // dl.uploadToTemporalExploitationZone("SELECT * FROM for_countries", UUID);
         dl.execute("CREATE TABLE IF NOT EXISTS for_titanic AS SELECT * FROM read_csv_auto('C:\\Work\\Files\\titanic1.csv')");
-        dl.uploadToTemporalExploitationZone("SELECT PassengerId, Survived, Name FROM for_titanic", UUID);
+        dl.uploadToTemporalExploitationZone("SELECT * FROM for_titanic", UUID);
         // End of the mock
-        // The result of the query is now im the temporal exploitation zone, ready to be persisted if the user wants.
+        // The result of the query is now in the temporal exploitation zone, ready to be persisted if the user wants.
         // First, however, we sent a sample to the frontend
         ResultSet rs = dl.executeQuery("SELECT * FROM tmp_exp_" + UUID);
         QueryResult res = new QueryResult();

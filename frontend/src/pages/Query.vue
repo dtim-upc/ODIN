@@ -22,8 +22,9 @@
           <TableQueryResult :columns="columns" :rows="rows" :no_shadow=true />
         </q-card-section>
 
-        <q-card-actions align="between">
+        <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn color="primary" icon-right="archive" label="Export to csv" @click="downloadTemporalDataProduct"/>
           <q-btn label="Persist data" color="primary" @click="showPersistDataDialog=true" />
         </q-card-actions>
       </q-card>
@@ -52,6 +53,9 @@ import Graph from 'components/graph/Graph.vue'
 import {useProjectsStore} from 'src/stores/projectsStore.js'
 import {useQueriesStore} from 'src/stores/queriesStore.js'
 import {useDataProductsStore} from 'src/stores/dataProductsStore.js'
+import { useQuasar } from "quasar";
+
+const $q = useQuasar()
 
 const queriesStore = useQueriesStore();
 const dataProductsStore = useDataProductsStore();
@@ -112,6 +116,7 @@ const setGlobalSchema = () => {
 }
 
 const queryGraph = (data) => {
+  $q.loading.show({message: 'Executing query...'})
   data.graphID = graphID.value
   data.graphType = graphType
 
@@ -122,6 +127,7 @@ const queryGraph = (data) => {
   }
 
   queriesStore.queryGraph(projectsStore.currentProject.projectId, data, successCallback)
+  $q.loading.hide()
 }
 
 const postDataProduct = () => {
@@ -134,6 +140,10 @@ const postDataProduct = () => {
   dataProductsStore.postDataProduct(projectsStore.currentProject.projectId, data)
 }
 
+const downloadTemporalDataProduct = () => {
+  dataProductsStore.downloadTemporalDataProduct(projectsStore.currentProject.projectId, dataProductUUID.value)
+}
+
 onBeforeMount(async () => {
   setGlobalSchema();
 })
@@ -142,7 +152,6 @@ onBeforeMount(async () => {
 
 <style lang="scss">
 .body--light {
-
   .columnHeader {
     background: white;
   }
@@ -152,7 +161,5 @@ onBeforeMount(async () => {
   .columnHeader {
     background: #202024;
   }
-
 }
-
 </style>

@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+import static edu.upc.essi.dtim.nextiabs.utils.Utils.reformatName;
 
 /**
  * Generates an instance of a DataFrame_Metamodel representation of a postgresSQL database
@@ -58,10 +59,10 @@ public class SQLBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 
         List<String> columns = new LinkedList<>();
         for (Pair<String, String> col: tableData.getColumns()) {
-            columns.add(col.getLeft() + " AS `" + col.getLeft() + "`");
+            columns.add(col.getLeft() + " AS " + reformatName(col.getLeft()));
         }
         String columnNames = String.join(", ", columns);
-        wrapper = "SELECT " + columnNames + " FROM " + tableName;
+        wrapper = "SELECT " + columnNames + " FROM `" + tableName + "`";
 
         if (generateMetadata) {
             generateMetadata();

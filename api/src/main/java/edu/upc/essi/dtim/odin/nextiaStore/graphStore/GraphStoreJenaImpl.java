@@ -18,12 +18,15 @@ import org.apache.jena.rdf.model.*;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.tdb.TDBFactory;
+import org.apache.jena.update.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.jena.query.*;
 
@@ -120,6 +123,7 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
         return graph;
     }
 
+
     /**
      * Deletes the graph from the graph database
      *
@@ -132,6 +136,61 @@ public class GraphStoreJenaImpl implements GraphStoreInterface {
             dataset.removeNamedModel(graph.getGraphName());
         }
         dataset.commit();
+    }
+
+    @Override
+    public Graph changeGraphName(String graphName, String oldString, String newString) {
+//        Model model = dataset.getNamedModel(graphName);
+//        dataset.begin(ReadWrite.WRITE);
+//
+//        String namedGraphURI = "http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + graphName;
+//
+//        DatasetGraph dsg = dataset.asDatasetGraph();
+//
+//        // SPARQL Update query
+//        String sparqlUpdate = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+//                                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+//                                "DELETE {?s ?p ?o} " +
+//                                "INSERT {?s ?p ?oNew} " +
+//                                "WHERE {?s ?p ?o . BIND(REPLACE(str(?o), '" + oldString + "', '" + newString + "', 'i') AS ?oNew)}";
+//
+//        // Execute the update inside a transaction
+//        try {
+//            dataset.begin(ReadWrite.WRITE);
+//            UpdateProcessor processor = UpdateExecutionFactory.create(sparqlUpdate, dataset);
+//            processor.execute();
+//            dataset.commit();
+//        } finally {
+//            dataset.end();
+//        }
+
+
+
+
+//        try {
+//            // Define the update query
+//            String updateQuery =
+//                    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+//                            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
+//                            "PREFIX yourGraphURI: <Your_Graph_URI> " +
+//                            "DELETE {?s ?p ?o} " +
+//                            "INSERT {?s ?p ?oNew} " +
+//                            "WHERE {?s ?p ?o . BIND(REPLACE(str(?o), '" + oldString + "', '" + newString + "', 'i') AS ?oNew)}";
+//
+//            // Execute the update query
+//            UpdateFactory.create(updateQuery).execute(dataset);
+//
+//            // Commit the changes
+//            dataset.commit();
+//        } finally {
+//            dataset.end();
+//        }
+
+        // Close the dataset when done
+//        dataset.commit();
+//        dataset.end();
+
+        return null;
     }
 
 }

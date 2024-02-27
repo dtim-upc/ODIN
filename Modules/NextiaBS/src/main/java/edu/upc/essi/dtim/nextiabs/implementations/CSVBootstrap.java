@@ -17,9 +17,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
+import static edu.upc.essi.dtim.nextiabs.utils.Utils.reformatName;
 
 /**
  * Generates an RDFS-compliant representation of a CSV file schema
@@ -58,15 +61,15 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 		G_target.addTriple(createIRI(name), RDF.type, DataFrame_MM.DataFrame);
 		G_target.addTripleLiteral(createIRI(name), RDFS.label, name);
 		parser.getHeaderNames().forEach(h -> {
-			String h2 = h.replace("\"", "").trim();
+			String h2 = reformatName(h);
 			G_target.addTriple(createIRI(h2),RDF.type,DataFrame_MM.Data);
 			G_target.addTripleLiteral(createIRI(h2), RDFS.label,h2 );
 			G_target.addTriple(createIRI(name),DataFrame_MM.hasData,createIRI(h2));
 			G_target.addTriple(createIRI(h2),DataFrame_MM.hasDataType,DataFrame_MM.String);
 		});
 
-		String select =  parser.getHeaderNames().stream().map(a ->  a + " AS `" + a.replace(".","_") + "`").collect(Collectors.joining(", "));
-		wrapper = "SELECT " + select  + " FROM " + name;
+		String select =  parser.getHeaderNames().stream().map(a ->  a + " AS " + reformatName(a)).collect(Collectors.joining(", "));
+		wrapper = "SELECT " + select  + " FROM `" + name + "`";
 
 		//TODO: implement metadata
 //		if(generateMetadata)

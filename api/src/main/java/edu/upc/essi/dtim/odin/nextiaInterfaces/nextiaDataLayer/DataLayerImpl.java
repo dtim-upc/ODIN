@@ -25,6 +25,7 @@ public class DataLayerImpl implements DataLayerInterface {
             dl.uploadToFormattedZone(dataset, dataset.getUUID());
         }
         catch (Exception e) {
+            e.printStackTrace();
             throw new InternalServerErrorException("Error when uploading the data to the data layer", e.getMessage());
         }
     }
@@ -73,8 +74,8 @@ public class DataLayerImpl implements DataLayerInterface {
     }
 
     @Override
-    public String materialize(Dataset dataset, String zone, String format) {
+    public String materialize(String UUID, String zone, String format) {
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
-        return dl.materialize(dataset, zone, format);
+        return dl.materialize(UUID, zone, format);
     }
 }
