@@ -102,7 +102,7 @@ public class ORMStoreJpaImpl implements ORMStoreInterface {
     @Override
     public <T> boolean deleteOne(Class<T> entityClass, String id) {
         EntityManager em = emf.createEntityManager();
-        boolean success = false;
+        boolean success;
         try {
             em.getTransaction().begin();
 

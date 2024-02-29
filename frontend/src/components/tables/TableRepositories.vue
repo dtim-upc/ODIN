@@ -87,6 +87,10 @@ import NoDataImage from "src/assets/NoDataImage.vue";
 import FullScreenToggle from "./TableUtils/FullScreenToggle.vue";
 import { useNotify } from "src/use/useNotify";
 
+const props = defineProps({
+  showAddDataRepositoryProp: {type: Boolean, default: false}
+});
+
 const repositoriesStore = useRepositoriesStore()
 const projectsStore = useProjectsStore()
 const projectID = useProjectsStore().currentProject.projectId
@@ -96,7 +100,7 @@ const selectedRepository = ref(null);
 
 const search = ref("")
 
-const showAddDataRepository = ref(false)
+const showAddDataRepository = ref(props.showAddDataRepositoryProp)
 const showConfirmDialog = ref(false)
 const showEditRepository = ref(false)
 

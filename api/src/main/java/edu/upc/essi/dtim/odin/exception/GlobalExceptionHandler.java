@@ -50,6 +50,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<Object> IntegrityConstraintViolation(IntegrityConstraintViolation e) {
+        logger.info(e.getMessage());
+        e.printStackTrace();
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 
 

@@ -20,6 +20,7 @@ public class Dataset {
 	@JsonIgnoreProperties({"datasets"})
 	private DataRepository repository;
 	private LocalGraph localGraph;
+	// This is used as the name of the dataset in files and in the data layers, as it is more robust than a "normal" ID.
 	private String UUID;
 
 	public Dataset() {}

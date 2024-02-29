@@ -201,7 +201,7 @@
         <inheritance strategy="JOINED"/>
         <attributes>
             <id name="id">
-                <generated-value strategy="AUTO"/>
+                <generated-value strategy=""/>
             </id>
             <basic name="datasetName"/>
             <basic name="datasetDescription"/>

@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.nextiabs;
 
 import edu.upc.essi.dtim.NextiaCore.datasets.CSVDataset;
+import edu.upc.essi.dtim.NextiaCore.datasets.JSONDataset;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.nextiabs.implementations.*;
 import edu.upc.essi.dtim.nextiabs.utils.PrintGraph;
@@ -10,13 +11,13 @@ import edu.upc.essi.dtim.nextiabs.databaseConnection.PostgresSQLImpl;
 public class Main {
 
     public static void main(String[] args) {
-        CSVDataset d1 = new CSVDataset("id", "titanic", "description", "C:\\Work\\Files\\test_datasets\\hooke.csv");
-        CSVBootstrap cbs = new CSVBootstrap(d1.getId(), d1.getDatasetName(), d1.getPath());
+//        CSVDataset d1 = new CSVDataset("id", "titanic", "description", "C:\\Work\\Files\\test_datasets\\hooke.csv");
+//        CSVBootstrap cbs = new CSVBootstrap(d1.getId(), d1.getDatasetName(), d1.getPath());
 
-//        JSONBootstrap_with_DataFrame_MM_without_Jena jbs = new JSONBootstrap_with_DataFrame_MM_without_Jena();
-//        JsonDataset d2 = new JsonDataset("cats", "cats", "description", "C:\\Work\\Files\\test.json");
+        JSONDataset d2 = new JSONDataset("cats", "cats", "description", "C:\\Work\\Files\\test.json");
+        JSONBootstrap jbs = new JSONBootstrap("test", "test", "C:\\Work\\Files\\tests_json\\sub_object_with_arrays_literals.json");
 
-        BootstrapResult bsr = cbs.bootstrapDataset(d1);
+        BootstrapResult bsr = jbs.bootstrapDataset(d2);
         System.out.println(bsr.getWrapper());
     }
 

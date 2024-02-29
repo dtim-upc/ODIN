@@ -2,6 +2,7 @@ package edu.upc.essi.dtim.odin.dataProducts;
 
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaCore.queries.DataProduct;
+import edu.upc.essi.dtim.NextiaCore.queries.Intent;
 import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
 import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreInterface;
 import edu.upc.essi.dtim.odin.config.AppConfig;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 public class DataProductService {
@@ -109,12 +111,20 @@ public class DataProductService {
     public void deleteDataProduct(String projectID, String dataProductID) {
         Project project = projectService.getProject(projectID);
         List<DataProduct> dpOfProject = project.getDataProducts();
-        boolean intentFound = false;
+
+        List<Intent> intents = project.getIntents();
+        for (Intent intent: intents) {
+            if (Objects.equals(intent.getDataProduct().getId(), dataProductID)) {
+
+            }
+        }
+
+        boolean dataProductFound = false;
         // Iterate through the data repositories
         for (DataProduct dpInProject : dpOfProject) {
             if (dpInProject.getId().equals(dataProductID)) {
                 // Remove the data product from the ORM project
-                intentFound = true;
+                dataProductFound = true;
                 dpOfProject.remove(dpInProject);
                 // Remove from Data layer
                 DataLayerInterface dlInterface = new DataLayerImpl(appConfig);
@@ -124,7 +134,7 @@ public class DataProductService {
         }
         project.setDataProducts(dpOfProject); // Save and set the updated list of data repositories
         // Throw an exception if the repository was not found
-        if (!intentFound) {
+        if (!dataProductFound) {
             throw new NoSuchElementException("Intent not found with id: " + dataProductID);
         }
         projectService.saveProject(project); // Save the updated project without the repository

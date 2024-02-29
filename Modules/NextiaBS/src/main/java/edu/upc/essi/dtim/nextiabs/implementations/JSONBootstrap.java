@@ -15,6 +15,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.json.*;
+import javax.json.stream.JsonParser;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -63,16 +64,22 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
 
         //productionRules_JSON_to_RDFS();
 
+        // TODO: Check if it is correct
         String SELECT = attributesSWJ.entrySet().stream().map( p -> {
-            if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath() + " AS `" + p.getKey() + "`";
-            return  p.getValue().getPath() + " AS " + reformatName(p.getValue().getLabel());
+            if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath() + " AS " + reformatName(p.getKey());
+            else {
+                String originalPath = p.getValue().getPath();
+                int lastIndex = originalPath.lastIndexOf(".");
+                String viewName = originalPath.substring(lastIndex + 1);
+                return viewName + " AS " + reformatName(p.getValue().getLabel());
+            }
         }).collect(Collectors.joining(", "));
 
-
-//        System.out.println(" -------------------- ");
-//        for (Pair<String, String> s: lateralViews) {
-//            System.out.println(s.getLeft() + " ---- " + s.getRight());
-//        }
+        // Old approach
+//        String SELECT = attributesSWJ.entrySet().stream().map( p -> {
+//            if (p.getKey().equals(p.getValue().getKey())) return p.getValue().getPath() + " AS " + reformatName(p.getKey());
+//            return p.getValue().getPath() + " AS " + reformatName(p.getValue().getLabel());
+//        }).collect(Collectors.joining(", "));
 
         String LATERAL = lateralViews.stream().map(p -> "LATERAL VIEW explode(" + p.getLeft() + ") AS " + reformatName(p.getRight())).collect(Collectors.joining("\n"));
         wrapper = "SELECT " + SELECT + " FROM `" + name + "` " + LATERAL;
@@ -119,27 +126,29 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
 
 
     private void Document(String path, String D) {
-        InputStream fis;
         try {
-            fis = new FileInputStream(path);
+            InputStream fis = new FileInputStream(path);
+            JsonParser parser = Json.createParser(fis);
+
+            G_source.addTriple(createIRI(D), RDF.type, DataFrame_MM.DataSource);
+
+            JsonParser.Event event = parser.next(); // Get the first JSON token
+            // Check if the JSON is an array or an object through the first token ( obj -> "{" , array -> "[" )
+            if (event == JsonParser.Event.START_OBJECT) {
+                fis = new FileInputStream(path);
+                Object(Json.createReader(fis).readValue().asJsonObject(),new JSON_Aux(D,"",""));
+            }
+            else if (event == JsonParser.Event.START_ARRAY) {
+                event = parser.next();
+                if (event == JsonParser.Event.VALUE_NULL) {
+                    throw new RuntimeException("Empty JSON Array");
+                } else { // We get the first element and generate the wrapper over it:
+                    JsonObject value = (JsonObject) parser.getValue();
+                    Object(value, new JSON_Aux(D,"",""));
+                }
+            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException("File not found");
-        }
-
-        // Step 1: Read data from fis and store it in a JSON array
-        JsonReader reader = Json.createReader(fis);
-        JsonArray jsonArray = reader.readArray();
-        reader.close();
-
-        // Step 2: Extract the JSON object from the JSON array
-        if (jsonArray.size() > 0) {
-            JsonObject jsonObject = jsonArray.getJsonObject(0); // Assuming jsonArray contains only one object
-            System.out.println(jsonObject);
-
-            // Step 3: Call the object method with the JSON object
-            Object(jsonObject, new JSON_Aux(D, "", ""));
-        } else {
-            throw new RuntimeException("Empty JSON array");
         }
     }
 
@@ -198,7 +207,9 @@ public class JSONBootstrap extends DataSource implements IBootstrap<Graph>, Boot
             // TODO: some ds have empty array, check below example images array
             G_source.addTriple(createIRI(p.getKey()),DataFrame_MM.hasDataType,DataFrame_MM.String);
         }
-        lateralViews.add(Pair.of(p.getKey(), p.getKey()+"_view"));
+
+//        lateralViews.add(Pair.of(p.getKey(), p.getKey()+"_view")); // Old approach
+        lateralViews.add(Pair.of(p.getPath(), p.getKey()+"_view")); // TODO: Check if correct
         G_source.addTriple(createIRI(p.getKey()),DataFrame_MM.hasDataType,iri_u_prime);
 //		G_source.add(createIRI(u_prime),JSON_MM.hasMember,createIRI(p));
     }

@@ -56,7 +56,8 @@
                   <q-btn @click="visualizeWorkflow(workflow.workflowGraph.workflowRepresentation)" color="primary" icon="visibility" size="sm"></q-btn>
                 </td>
                 <td>
-                  <q-btn dense round flat color="grey" @click="workflowsStore.downloadWorkflowSchema(projectID, props.row.intentID, workflow)" icon="download"></q-btn>
+                  <q-btn dense round flat color="grey" @click="workflowsStore.downloadWorkflowSchema(projectID, props.row.intentID, workflow)" icon="download" label="RDF"></q-btn>
+                  <!--<q-btn dense round flat color="grey" @click="intentsStore.downloadKNIME(plan)" icon="download" label="KNIME"/>-->
                   <q-btn dense round flat color="grey" @click="editWorkflow(props.row, workflow)" icon="edit"></q-btn>
                   <q-btn dense round flat color="grey" @click="deleteWorkflow(props.row, workflow)" icon="delete"></q-btn>
                 </td>

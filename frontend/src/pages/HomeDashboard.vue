@@ -22,16 +22,32 @@
         <q-card style="width:100%">
           <q-card-section>
             <q-list separator>
+
+              <q-item clickable style="padding:12px" v-ripple :active="active" @click="router.push({ name: 'repositories'})">
+                <q-item-section avatar>
+                  <q-btn flat padding="xs" icon="mdi-database" color="primary600 " class="activebg"></q-btn>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Create a repository</q-item-label>
+                  <q-item-label caption>Needed to start uploading data</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn v-if="datasourcesStore.datasets.length == 0"
+                         color="primary" label="Start" icon-right="o_navigate_next" dense no-caps/>
+                  <q-icon v-else name="check_circle" color="green"/>
+                </q-item-section>
+              </q-item>
+
               <q-item clickable style="padding:12px" v-ripple :active="active" @click="postDataset = true">
                 <q-item-section avatar>
                   <q-btn flat padding="xs" icon="o_file_upload" color="primary600 " class="activebg"></q-btn>
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Upload a dataset</q-item-label>
-                  <q-item-label caption>This will automatically define an schema</q-item-label>
+                  <q-item-label caption>This will automatically define a schema</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-btn v-if="datasourcesStore.getDatasetsNumber == 0"
+                  <q-btn v-if="datasourcesStore.datasets.length == 0"
                          color="primary" label="Start" icon-right="o_navigate_next" dense no-caps/>
                   <q-icon v-else name="check_circle" color="green"/>
                 </q-item-section>
@@ -42,7 +58,7 @@
                   <q-btn flat padding="xs" icon="o_archive" color="primary600 " class="activebg"></q-btn>
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Add the data source to this project</q-item-label>
+                  <q-item-label>Add the dataset to this project</q-item-label>
                   <q-item-label caption>You will see the generated schema here</q-item-label>
                   <q-item-label caption>Upon confirmation, it will be saved into this project</q-item-label>
                 </q-item-section>
@@ -73,8 +89,8 @@
                   <q-btn flat padding="xs" icon="o_merge" color="primary600" class="activebg"/>
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Integrate second data source with the project</q-item-label>
-                  <q-item-label caption>The project schema must be aligned with the second data source schema
+                  <q-item-label>Integrate second dataset with the project</q-item-label>
+                  <q-item-label caption>The project schema must be aligned with the second dataset schema
                   </q-item-label>
                   <q-item-label caption>Upon confirmation, it will be saved into this project</q-item-label>
                 </q-item-section>
@@ -115,11 +131,13 @@ import {useRouter} from "vue-router";
 import CreateDatasetForm from "components/forms/CreateDatasetForm.vue";
 import {useDatasetsStore} from 'src/stores/datasetsStore.js'
 import home_pattern from "components/icons/home_pattern.vue";
+import { useRoute } from "vue-router";
 
 const postDataset = ref(false)
 const active = ref(false)
 
 const router = useRouter()
+const route = useRoute()
 
 const datasourcesStore = useDatasetsStore();
 

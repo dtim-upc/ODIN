@@ -51,6 +51,9 @@ export const useWorkflowsStore = defineStore('store', {
       try {
         const response = await workflowAPI.downloadWorkflowSchema(projectID, intentID, workflow.workflowID)
         const content = response.headers['content-type']
+        /*response.data.text().then(textContent => {
+          console.log(textContent)
+        })*/
         download(response.data, workflow.workflowName + ".ttl", content)
       } catch (error) {
         console.error("Error:", error)
