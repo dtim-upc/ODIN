@@ -47,7 +47,9 @@ Before you begin, ensure that you have the following prerequisites installed:
 - [Quasar](https://quasar.dev/) (CLI >= 2.0) You can install it using `npm install -g @quasar/cli`
 - [Gradle](https://gradle.org/) (version >=6.8)
 - [Java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html) (version 11)
-- [Spark](https://spark.apache.org/downloads.html)
+- [Spark](https://spark.apache.org/downloads.html): When installing Spark is it required to do a series of extra steps to make it work. We attach links to
+    do generate a correct installation for [Windows](https://www.knowledgehut.com/blog/big-data/how-to-install-apache-spark-on-windows) 
+    and [Linux (Ubuntu)](https://www.virtono.com/community/tutorial-how-to/how-to-install-apache-spark-on-ubuntu-22-04-and-centos/) systems.
 
 Then, clone the repository:
 
@@ -58,7 +60,7 @@ Then, clone the repository:
    
 ### Configuration <a name="configuration"></a>
 
-After following the previous steps [Prerequisites](#prerequisites) and [Installation](#installation). Lets ensemble everything to be able to compile and make ODIN run.
+Lets ensemble everything to be able to compile and make ODIN run.
 
 #### Backend <a name="backend-configuration"></a>
 
@@ -70,6 +72,15 @@ After following the previous steps [Prerequisites](#prerequisites) and [Installa
     This will compile all the different modules and run their respective tests.
 
 2. As of now, the best way to launch the application is to open the project in a Java IDE (e.g. IntelliJ) and execute the class OdinApplication.java.
+
+##### Intent module
+The Intents module is built with Python and, as such, can not be natively executed by ODIN. Instead, it offers an API
+to which ODIN connects to and sends requests. To initialize this API go to `ODIN/Modules/IntentSpecification2WorkflowGenerator`
+and execute the following command:
+
+```bash
+   flask --app api\api_main.py run    
+   ```
 
 #### Frontend <a name="frontend-configuration"></a>
 
