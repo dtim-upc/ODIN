@@ -70,10 +70,6 @@ dependencies {
             strictly '3.0.16'
         }
     }
-
-
-
-
 }
 
 jacocoTestReport {
@@ -106,6 +102,14 @@ tasks['sonarqube'].dependsOn test
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+}
+
+bootJar  {
+    manifest {
+        attributes (
+                'Main-Class': 'edu.upc.essi.dtim.odin.OdinApplication'
+        )
+    }
 }
 
 test {

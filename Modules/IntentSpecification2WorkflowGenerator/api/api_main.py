@@ -1,4 +1,5 @@
 import shutil
+import proactive
 
 from flask import Flask, request, send_file
 from flask_cors import CORS
@@ -104,10 +105,6 @@ def download_knime():
     plan_graph = Graph().parse(data=request.json.get("graph", ""), format='turtle')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
 
-    plan_graph.print()
-    print("--------------")
-    # ontology.print()
-
     file_path = os.path.join(files_folder, f'{uuid.uuid4()}.ttl')
     plan_graph.serialize(file_path, format='turtle')
 
@@ -130,3 +127,98 @@ def annotate_dataset_from_frontend():
     datasets = {n.fragment: n for n in custom_ontology.subjects(RDF.type, dmop.TabularDataset)}
     return {"ontology": custom_ontology.serialize(format="turtle"),
             "data_product_uri": datasets[data_product_name + ".csv"]}
+
+
+# TODO: Make the actual translation from the original RDF graph to the Proactive definition
+@app.post('/workflow_plans/proactive')
+def download_proactive():
+    graph = Graph().parse(data=request.json.get("graph", ""), format='turtle')
+    ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
+
+    # Connect to Proactive
+    gateway = proactive.ProActiveGateway(base_url="https://try.activeeon.com:8443", debug=False, javaopts=[], log4j_props_file=None,
+                                         log4py_props_file=None)
+    gateway.connect("pa75332", "MinatMinao99")
+
+    try:
+        # Create one of the example workflows and send it (just to show that the SDK works)
+        proactive_job = gateway.createJob()
+        proactive_job.setJobName("extremexp_example_workflow")
+        bucket = gateway.getBucket("ai-machine-learning")
+
+        load_iris_dataset_task = bucket.create_Load_Iris_Dataset_task()
+        proactive_job.addTask(load_iris_dataset_task)
+
+        split_data_task = bucket.create_Split_Data_task()
+        split_data_task.addDependency(load_iris_dataset_task)
+        proactive_job.addTask(split_data_task)
+
+        logistic_regression_task = bucket.create_Logistic_Regression_task()
+        proactive_job.addTask(logistic_regression_task)
+
+        train_model_task = bucket.create_Train_Model_task()
+        train_model_task.addDependency(split_data_task)
+        train_model_task.addDependency(logistic_regression_task)
+        proactive_job.addTask(train_model_task)
+
+        download_model_task = bucket.create_Download_Model_task()
+        download_model_task.addDependency(train_model_task)
+        proactive_job.addTask(download_model_task)
+
+        predict_model_task = bucket.create_Predict_Model_task()
+        predict_model_task.addDependency(split_data_task)
+        predict_model_task.addDependency(train_model_task)
+        proactive_job.addTask(predict_model_task)
+
+        preview_results_task = bucket.create_Preview_Results_task()
+        preview_results_task.addDependency(predict_model_task)
+        proactive_job.addTask(preview_results_task)
+
+        # gateway.submitJob(proactive_job, debug=False)
+
+        # Create another workflow and download it. This mimics the behavior that we will have to implement, as there is
+        # no way (I think) to upload our own data inside a workflow. It has to be done before the execution of the workflow.
+        # Hence, the idea is to generate the workflow, download it, upload the data, import the workflow and execute it.
+
+        proactive_job = gateway.createJob()
+        proactive_job.setJobName("extremexp_test_workflow")
+        bucket = gateway.getBucket("ai-machine-learning")
+
+        load_dataset_task = bucket.create_Import_Data_task(import_from="PA:USER_FILE", file_path="countries.csv", file_delimiter=",", label_column="IncomeGroup")
+        proactive_job.addTask(load_dataset_task)
+
+        split_data_task = bucket.create_Split_Data_task()
+        split_data_task.addDependency(load_dataset_task)
+        proactive_job.addTask(split_data_task)
+
+        random_forest_task = bucket.create_Random_Forest_task()
+        proactive_job.addTask(random_forest_task)
+
+        train_model_task = bucket.create_Train_Model_task()
+        train_model_task.addDependency(split_data_task)
+        train_model_task.addDependency(random_forest_task)
+        proactive_job.addTask(train_model_task)
+
+        download_model_task = bucket.create_Download_Model_task()
+        download_model_task.addDependency(train_model_task)
+        proactive_job.addTask(download_model_task)
+
+        predict_model_task = bucket.create_Predict_Model_task()
+        predict_model_task.addDependency(split_data_task)
+        predict_model_task.addDependency(train_model_task)
+        proactive_job.addTask(predict_model_task)
+
+        preview_results_task = bucket.create_Preview_Results_task()
+        preview_results_task.addDependency(predict_model_task)
+        proactive_job.addTask(preview_results_task)
+
+        gateway.saveJob2XML(proactive_job, os.path.abspath(r'api/temp_files/extremexp_test_workflow.xml'))
+
+    finally:
+        print("Disconnecting")
+        gateway.disconnect()
+        print("Disconnected")
+        gateway.terminate()
+        print("Finished")
+
+    return send_file(os.path.abspath(r'api/temp_files/extremexp_test_workflow.xml'), as_attachment=True)

@@ -30,6 +30,9 @@
                           <q-item-section avatar>
                             <q-btn color="primary" icon="mdi-download" size="10px" @click="intentsStore.downloadKNIME(plan)" label="KNIME" style="font-size: 14px;" />
                           </q-item-section>
+                          <q-item-section avatar>
+                            <q-btn color="primary" icon="mdi-download" size="10px" @click="intentsStore.downloadProactive(plan)" label="Proactive" style="font-size: 14px;" />
+                          </q-item-section>
                           </q-item>
                         </q-list>
                       </q-expansion-item>

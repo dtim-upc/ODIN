@@ -32,4 +32,7 @@ export default {
   downloadAllKNIME(data) {
     return intentsApi.post(`/workflow_plans/knime/all`, data, {responseType: 'blob'})
   },
+  downloadProactive(data) {
+    return intentsApi.post('/workflow_plans/proactive', data, {responseType: 'blob'})
+  },
 }

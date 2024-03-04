@@ -185,6 +185,18 @@ export const useIntentsStore = defineStore('intents', {
       }
     },
 
+    async downloadProactive(plan) {
+      const data = {"graph": plan.graph, "ontology": this.ontology, "layout": this.plan}
+      try {
+        const response = await intentsAPI.downloadProactive(data);
+        FileSaver.saveAs(new Blob([response.data]), `${plan.id}.xml`);
+        notify.positive(`Proactive file downloaded`);
+      } catch (error) {
+        notify.negative("Error downloading the KNIME file");
+        console.error("Error:", error);
+      }
+    },
+
     getSelectedGraphs() {
       const graphs = {}
       for (const [key, value] of Object.entries(this.selectedPlans)) {
