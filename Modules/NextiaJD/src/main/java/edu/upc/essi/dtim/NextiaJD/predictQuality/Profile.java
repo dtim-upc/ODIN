@@ -33,7 +33,7 @@ public class Profile {
     public JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, IOException {
         // Create table from file and preprocess the data
         Statement stmt = conn.createStatement();
-        stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + path + "', header=True, all_varchar=True, ignore_errors=True)");
+        stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + path + "', header=True, all_varchar=True)");
         preprocessing(conn, tableName);
 
         // Generate the profile of the table: for each column, its profile is generated and added to the features variable
@@ -180,12 +180,8 @@ public class Profile {
         int counter = 1;
         for (String file: listOfFiles) {
             System.out.println("File " + counter + " out of " + listOfFiles.size());
-            if (counter > 225) { // This if is to place conditions to isolate some of the files
-                Profile p = new Profile(conn);
-                if (!file.equals(".DS_Store")) {
-                    JSONArray profile1 = p.createProfile(path + "/" + file, pathToStore, "");
-                }
-            }
+            Profile p = new Profile(conn);
+            p.createProfile(path + "\\" + file, pathToStore, "");
             counter++;
         }
     }

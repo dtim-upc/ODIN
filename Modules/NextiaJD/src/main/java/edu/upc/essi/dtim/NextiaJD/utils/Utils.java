@@ -25,7 +25,7 @@ public class Utils {
     // Trim (remove spaces at either side of the string) and lowercase (transform all characters to lowercase)
     public static void preprocessing(Connection conn, String tableName) throws SQLException {
         Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS");
+        ResultSet rs = stmt.executeQuery("DESCRIBE  \"" + tableName + "\"");
         while (rs.next()) {
             if (rs.getString(2).equals(tableName)) {
                 stmt.execute(

@@ -11,8 +11,6 @@ import java.io.*;
 import java.sql.Connection;
 import java.util.*;
 
-import static edu.upc.essi.dtim.NextiaJD.utils.Utils.writeJSON;
-
 public class PredictQuality {
 
     Connection conn;
@@ -33,7 +31,7 @@ public class PredictQuality {
             Map.entry("PctNonAlphanumeric", 0), Map.entry("PctDateTime", 0), Map.entry("PctPhones", 0),
             Map.entry("PctEmail", 0), Map.entry("PctURL", 0), Map.entry("PctIP", 0),
             Map.entry("PctGeneral", 0), Map.entry("PctTime", 0), Map.entry("PctDate", 0),
-            Map.entry("PctUnknown", 0), Map.entry("PctDatetime", 0), // with lowercase t for the specific type
+            Map.entry("PctUnknown", 0), Map.entry("PctDateTimeSpecific", 0), // with lowercase t for the specific type
             Map.entry("PctUsername", 0), Map.entry("PctPhrases", 0), Map.entry("PctOthers", 0),
             Map.entry("datatype", 2), Map.entry("specificType", 2), Map.entry("len_max_word", 0),
             Map.entry("len_min_word", 0), Map.entry("len_avg_word", 0), Map.entry("wordsCntMax", 0),
@@ -67,17 +65,18 @@ public class PredictQuality {
         }
 
         distances.putAll(calculateDistances(profile1, profile2));
-        writeDistances(distances);
+        writeDistances("", distances);
 
         return predictQualityThroughModel(distances);
     }
 
-    private void writeDistances(Map<String, Object> distances) throws IOException {
+    private void writeDistances(String s, Map<String, Object> distances) throws IOException {
         List<Map<String, Object>> listOfMap = new LinkedList<>();
         listOfMap.add(distances);
 
-        File file = new File("distances.csv"); // NextiaJD2/distances.csv
+        File file = new File(s + "distances.csv"); // NextiaJD2/distances.csv
         Writer writer = new FileWriter(file, true);
+        System.out.println(distances);
 //        CsvSchema schema = null;
 //        CsvSchema.Builder schemaBuilder = CsvSchema.builder();
 //        if (listOfMap != null && !listOfMap.isEmpty()) {
@@ -88,6 +87,11 @@ public class PredictQuality {
 //        }
 //        CsvMapper mapper = new CsvMapper();
 //        mapper.writer(schema).writeValues(writer).writeAll(listOfMap);
+        for (String key: distances.keySet()) {
+            System.out.println(key);
+            writer.write(key);
+            writer.write(",");
+        }
         for (String key: distances.keySet()) {
             writer.write(String.valueOf(distances.get(key)));
             writer.write(",");
@@ -226,7 +230,7 @@ public class PredictQuality {
                 }
             }
         }
-        writeJSON(profile, "", "/home/marc/Escritorio/Files/Profiles", "normalized_profile");
+        //writeJSON(profile, "", "/home/marc/Escritorio/Files/Profiles", "normalized_profile");
         return profile;
     }
 
@@ -247,5 +251,55 @@ public class PredictQuality {
         }
 
         return profile;
+    }
+
+    public void calculateDistancesForAllProfilesInAFolder(String path) {
+        File[] files = (new File (path)).listFiles();
+        LinkedList<Map<String,Object>> allDistances = new LinkedList<>();
+
+        assert files != null;
+        for (int i = 0; i < files.length; ++i) {
+            for (int j = 0; j< files.length; ++j) {
+                if (j > i) {
+                    LinkedList<Map<String, Object>> profiles1;
+                    LinkedList<Map<String, Object>> profiles2;
+                    try {
+                        profiles1 = readJSONFile(String.valueOf(files[i]));
+                        profiles2 = readJSONFile(String.valueOf(files[j]));
+                    } catch (IOException | ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // Remove null rows
+                    profiles1.removeAll(Collections.singleton(null));
+                    profiles2.removeAll(Collections.singleton(null));
+
+                    try {
+                        normalizeProfile(profiles1);
+                        normalizeProfile(profiles2);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    for (Map<String, Object> profile1: profiles1) {
+                        for (Map<String, Object> profile2: profiles2) {
+                            Map<String, Object> distances = new HashMap<>();
+                            double cardinality1 = Double.parseDouble(String.valueOf(profile1.get("cardinality")));
+                            double cardinality2 = Double.parseDouble(String.valueOf(profile2.get("cardinality")));
+                            distances.put("K", Math.min(cardinality1, cardinality2)/Math.max(cardinality1, cardinality2));
+                            distances.put("cardinalityRaw", cardinality1);
+                            distances.put("cardinalityRaw_2", cardinality2);
+                            distances.putAll(calculateDistances(profile1, profile2));
+                            allDistances.add(distances);
+                            try {
+                                writeDistances(i + "_" + j + "_", distances);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }
