@@ -1,25 +1,20 @@
 package edu.upc.essi.dtim.NextiaJD.predictQuality;
 
 import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
-import org.apache.commons.io.FilenameUtils;
-import org.json.JSONObject;
 import org.json.simple.JSONArray;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static edu.upc.essi.dtim.NextiaJD.predictQuality.FeatureGeneration.*;
-import static edu.upc.essi.dtim.NextiaJD.utils.Utils.getNumberOfValues;
-import static edu.upc.essi.dtim.NextiaJD.utils.Utils.preprocessing;
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
 
 public class Profile {
 
@@ -30,61 +25,43 @@ public class Profile {
         this.conn = conn;
     }
 
-    public JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, IOException {
-        // Create table from file and preprocess the data
-        Statement stmt = conn.createStatement();
-        stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + path + "', header=True, all_varchar=True)");
-        preprocessing(conn, tableName);
+    public JSONArray createProfile(String dataPath, String pathToStoreProfile) {
+        try {
+            // Create table from file and preprocess the data (trim and lowercase)
+            Statement stmt = conn.createStatement();
+            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, all_varchar=True)");
+            preprocessing(conn, tableName);
 
-        // Generate the profile of the table: for each column, its profile is generated and added to the features variable
-        LinkedList<Map<String,Object>> features = new LinkedList<>();
-        ResultSet rs = stmt.executeQuery("SELECT COLUMN_NAME, TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS");
-        while (rs.next()) {
-            if (rs.getString(2).equals(tableName)) {
+            // Generate the profile of the table: for each column, its profile is generated and added to the features variable
+            LinkedList<Map<String,Object>> features = new LinkedList<>();
+            ResultSet rs = stmt.executeQuery("DESCRIBE \"" + tableName + "\"");
+            while (rs.next()) {
                 // We only generate the profile if the column has some value (i.e. if it is only null values, we do not create the profile)
                 if (getNumberOfValues(conn, tableName, rs.getString(1)) != 0.0) {
                     features.add(createProfileOfColumn(rs.getString(1)));
                 }
             }
-        }
 
-        // Add name of the dataset to each column
-        for (Map<String,Object> map: features) {
-            map.put("ds_name", Paths.get(path).getFileName().toString());
-        }
-
-        // Write the profile in a JSON file (if needed)
-        if (!pathToStoreProfile.isEmpty()) {
-            writeJSON(features, path, pathToStoreProfile, resultingProfileName);
-        }
-
-        // Return the JSON profile to the process that invokes the function
-        JSONArray json = new JSONArray();
-        json.addAll(features);
-        stmt.execute("DROP TABLE \"" + tableName + "\"");
-        return json;
-    }
-
-    public void writeJSON(LinkedList<Map<String, Object>> features, String path, String pathToStoreProfile, String resultingProfileName) throws IOException {
-        String profileFileName = pathToStoreProfile + "\\" + resultingProfileName + ".json";
-        if (resultingProfileName.isEmpty()) {
-            String fileName = Paths.get(path).getFileName().toString();
-            String fileNameWithOutExt = FilenameUtils.removeExtension(fileName);
-            profileFileName = pathToStoreProfile + "\\" + fileNameWithOutExt + ".json";
-        }
-        FileWriter file = new FileWriter(profileFileName);
-        file.write("[\n");
-        int count = 1;
-        for (Map<String,Object> map: features) {
-            JSONObject json = new JSONObject(map);
-            if (count < features.size()) {
-                file.write(json + ",\n");
-                ++count;
+            // Add name of the dataset to each column (that is, the name of the CSV file)
+            for (Map<String,Object> map: features) {
+                map.put("dataset_name", Paths.get(dataPath).getFileName().toString());
             }
-            else file.write(json + "\n");
+
+            // Write the profile in a CSV/JSON file
+            if (!pathToStoreProfile.isEmpty()) {
+                writeCSV(features, dataPath, pathToStoreProfile);
+//                writeJSON(features, dataPath, pathToStoreProfile);
+            }
+
+            // Return the JSON profile to the process that invokes the function
+            JSONArray json = new JSONArray();
+            json.addAll(features);
+            stmt.execute("DROP TABLE \"" + tableName + "\"");
+            return json;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        file.write("]");
-        file.close();
     }
 
     public Map<String,Object> createProfileOfColumn(String column) throws SQLException {
@@ -93,7 +70,7 @@ public class Profile {
         addValueDistributionFeatures(column, columnFeatures);
         addSyntacticFeatures(column, columnFeatures);
         addOtherFeatures(column, columnFeatures);
-        columnFeatures.put("att_name", column); // Add name of the column
+        columnFeatures.put("attribute_name", column); // Add name of the column
         return columnFeatures;
     }
 
@@ -113,15 +90,15 @@ public class Profile {
         columnFeatures.put("frequency_min", newFeatures.get("frequency_min"));
         columnFeatures.put("frequency_max", newFeatures.get("frequency_max"));
         columnFeatures.put("frequency_sd", newFeatures.get("frequency_sd"));
-        columnFeatures.put("frequency_IQR", newFeatures.get("frequency_IQR"));
+        columnFeatures.put("frequency_iqr", newFeatures.get("frequency_iqr"));
         columnFeatures.put("val_pct_min", newFeatures.get("val_pct_min"));
         columnFeatures.put("val_pct_max", newFeatures.get("val_pct_max"));
         columnFeatures.put("val_pct_std", newFeatures.get("val_pct_std"));
         columnFeatures.put("constancy", newFeatures.get("constancy"));
 
         newFeatures = generateFrequentWordContainment(conn, tableName, column);
-        columnFeatures.put("freqWordContainment", newFeatures.get("freqWordContainment"));
-        columnFeatures.put("freqWordSoundexContainment", newFeatures.get("freqWordSoundexContainment"));
+        columnFeatures.put("freq_word_containment", newFeatures.get("freq_word_containment"));
+        columnFeatures.put("freq_word_soundex_containment", newFeatures.get("freq_word_soundex_containment"));
 
         newFeatures = generateOctiles(conn, tableName, column);
         columnFeatures.put("frequency_1qo", newFeatures.get("frequency_1qo"));
@@ -136,11 +113,11 @@ public class Profile {
     public void addSyntacticFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
         Map<String, Object> newFeatures = generateDatatypes(conn, tableName, column);
         columnFeatures.put("datatype", newFeatures.get("datatype"));
-        columnFeatures.put("specificType", newFeatures.get("specificType"));
+        columnFeatures.put("specific_type", newFeatures.get("specific_type"));
 
-        String[] datatypeLabels = {"PctNumeric", "PctAlphanumeric", "PctAlphabetic", "PctNonAlphanumeric", "PctDateTime", "PctUnknown"};
-        String[] specificDatatypeLabels = {"PctPhones", "PctEmail", "PctURL", "PctIP", "PctUsername", "PctPhrases", "PctGeneral",
-                "PctDate", "PctTime", "PctDateTimeSpecific", "PctOthers"};
+        String[] datatypeLabels = {"pct_numeric", "pct_alphanumeric", "pct_alphabetic", "pct_non_alphanumeric", "pct_date_time", "pct_unknown"};
+        String[] specificDatatypeLabels = {"pct_phones", "pct_email", "pct_url", "pct_ip", "pct_username", "pct_phrases", "pct_general",
+                "pct_date", "pct_time", "pct_date_time_specific", "pct_others"}; // Other = not determined
 
         for (String datatypeLabel : datatypeLabels) columnFeatures.put(datatypeLabel, newFeatures.get(datatypeLabel));
         for (String specificDatatypeLabel : specificDatatypeLabels) columnFeatures.put(specificDatatypeLabel, newFeatures.get(specificDatatypeLabel));
@@ -151,39 +128,39 @@ public class Profile {
         columnFeatures.put("len_avg_word", newFeatures.get("len_avg_word"));
 
         newFeatures = generateWordCount(conn, tableName, column);
-        columnFeatures.put("wordsCntMax", newFeatures.get("wordsCntMax"));
-        columnFeatures.put("wordsCntMin", newFeatures.get("wordsCntMin"));
-        columnFeatures.put("wordsCntAvg", newFeatures.get("wordsCntAvg"));
-        columnFeatures.put("numberWords", newFeatures.get("numberWords"));
-        columnFeatures.put("wordsCntSd", newFeatures.get("wordsCntSd"));
+        columnFeatures.put("words_cnt_max", newFeatures.get("words_cnt_max"));
+        columnFeatures.put("words_cnt_min", newFeatures.get("words_cnt_min"));
+        columnFeatures.put("words_cnt_avg", newFeatures.get("words_cnt_avg"));
+        columnFeatures.put("number_words", newFeatures.get("number_words"));
+        columnFeatures.put("words_cnt_sd", newFeatures.get("words_cnt_sd"));
     }
 
     public void addOtherFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
         Map<String, Object> newFeatures = generateFirstAndLastWord(conn, tableName, column);
-        columnFeatures.put("firstWord", newFeatures.get("firstWord"));
-        columnFeatures.put("lastWord", newFeatures.get("lastWord"));
+        columnFeatures.put("first_word", newFeatures.get("first_word"));
+        columnFeatures.put("last_word", newFeatures.get("last_word"));
 
         newFeatures = generateIsBinary(conn, column);
-        columnFeatures.put("binary", newFeatures.get("binary"));
+        columnFeatures.put("is_binary", newFeatures.get("is_binary"));
 
         newFeatures = generateIsEmpty(conn, tableName, column);
-        columnFeatures.put("isEmpty", newFeatures.get("isEmpty"));
+        columnFeatures.put("is_empty", newFeatures.get("is_empty"));
     }
 
     public static void generateAllProfilesOfAllDataInAFolder(String path, String pathToStore) throws Exception {
         Connection conn = DuckDB.getConnection();
-        // Path of the folder that contains the files to obtain profiles from
-        Set<String> listOfFiles = Stream.of(Objects.requireNonNull(new File(path).listFiles()))
-                .filter(file -> !file.isDirectory())
-                .map(File::getName)
-                .collect(Collectors.toSet());
+        Files.createDirectories(Path.of(pathToStore));
+
+        // Path of the folder that contains the files to obtain profiles from (we get only the files)
+        File[] files = (new File (path)).listFiles(File::isFile);
+        assert files != null;
+
         int counter = 1;
-        for (String file: listOfFiles) {
-            System.out.println("File " + counter + " out of " + listOfFiles.size());
+        for (File file: files) {
+            System.out.println("File " + counter + " out of " + files.length + ": " + file);
             Profile p = new Profile(conn);
-            p.createProfile(path + "\\" + file, pathToStore, "");
+            p.createProfile(String.valueOf(file), pathToStore);
             counter++;
         }
     }
-
 }

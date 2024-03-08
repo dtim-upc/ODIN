@@ -67,10 +67,10 @@ public class Discovery implements IDiscovery {
     }
 
     @Override
-    public JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, IOException {
+    public JSONArray createProfile(String path, String pathToStoreProfile) throws SQLException, IOException {
         Connection conn = DuckDB.getConnection();
         Profile p = new Profile(conn);
-        return p.createProfile(path, pathToStoreProfile, resultingProfileName);
+        return p.createProfile(path, pathToStoreProfile);
     }
 
     @Override

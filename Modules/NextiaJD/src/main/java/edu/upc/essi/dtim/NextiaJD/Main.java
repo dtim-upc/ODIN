@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.NextiaJD;
 
 import edu.upc.essi.dtim.NextiaJD.predictQuality.PredictQuality;
+import edu.upc.essi.dtim.NextiaJD.predictQuality.Profile;
 import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
 
 import java.sql.Connection;
@@ -25,10 +26,17 @@ public class Main {
 //        pq.predictQuality("D:\\Projects\\Files\\eo4_profile.json", "D:\\Projects\\Files\\eo_xx_2_profile.json", "NAME", "NAME");
 
         try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\datasets", "C:\\Work\\NextiaJD\\datasets\\profiles");
+//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\datasets", "C:\\Work\\NextiaJD\\datasets\\profilesCSV");
             Connection conn = DuckDB.getConnection();
+            Profile p = new Profile(conn);
             PredictQuality pq = new PredictQuality(conn);
-            pq.calculateDistancesForAllProfilesInAFolder("C:\\Work\\NextiaJD\\test");
+
+//            p.createProfile("C:\\Work\\NextiaJD\\datasets\\us_companies_copy.csv", "C:\\Work\\NextiaJD");
+
+            pq.calculateDistancesForAllProfilesInAFolder("C:\\Work\\NextiaJD\\datasets\\profilesCSV", "C:\\Work\\NextiaJD");
+
+//            pq.predictQuality("C:\\Work\\NextiaJD\\datasets\\profilesCSV\\acquisitions_profile.csv", "C:\\Work\\NextiaJD\\datasets\\profilesCSV\\acquisitions_profile.csv",
+//                    "AcquisitionID", "AcquisitionID");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

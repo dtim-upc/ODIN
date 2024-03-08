@@ -174,7 +174,7 @@ def download_proactive():
         preview_results_task.addDependency(predict_model_task)
         proactive_job.addTask(preview_results_task)
 
-        # gateway.submitJob(proactive_job, debug=False)
+        gateway.submitJob(proactive_job, debug=False)
 
         # Create another workflow and download it. This mimics the behavior that we will have to implement, as there is
         # no way (I think) to upload our own data inside a workflow. It has to be done before the execution of the workflow.

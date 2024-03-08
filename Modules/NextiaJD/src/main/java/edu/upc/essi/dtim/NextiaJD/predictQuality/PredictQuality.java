@@ -1,96 +1,89 @@
 package edu.upc.essi.dtim.NextiaJD.predictQuality;
 
-import jakarta.xml.bind.JAXBException;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.xml.sax.SAXException;
 
 import java.io.*;
 import java.sql.Connection;
 import java.util.*;
+
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.readCSVFile;
+import static edu.upc.essi.dtim.NextiaJD.utils.Utils.readJSONFile;
 
 public class PredictQuality {
 
     Connection conn;
     LinkedList<String> metricsToNormalize = new LinkedList<>(Arrays.asList(
             "cardinality", "entropy", "frequency_avg", "frequency_min", "frequency_max", "frequency_sd",
-            "len_max_word", "len_min_word", "len_avg_word", "wordsCntMax", "wordsCntMin", "wordsCntAvg",
-            "numberWords", "wordsCntSd"
+            "len_max_word", "len_min_word", "len_avg_word", "words_cnt_max", "words_cnt_min", "words_cnt_avg",
+            "number_words", "words_cnt_sd"
     ));
     Map<String, Integer> distancePattern = Map.<String, Integer>ofEntries(
             Map.entry("cardinality", 0), Map.entry("uniqueness", 0), Map.entry("entropy", 0),
             Map.entry("incompleteness", 0), Map.entry("frequency_avg", 0), Map.entry("frequency_min", 0),
             Map.entry("frequency_max", 0), Map.entry("frequency_sd", 0), Map.entry("val_pct_min", 0),
             Map.entry("val_pct_max", 0), Map.entry("val_pct_std", 0), Map.entry("constancy", 0),
-            Map.entry("freqWordContainment", 1), Map.entry("freqWordSoundexContainment", 1), Map.entry("frequency_1qo", 0),
+            Map.entry("freq_word_containment", 1), Map.entry("freq_word_soundex_containment", 1), Map.entry("frequency_1qo", 0),
             Map.entry("frequency_2qo", 0), Map.entry("frequency_3qo", 0), Map.entry("frequency_4qo", 0),
             Map.entry("frequency_5qo", 0), Map.entry("frequency_6qo", 0), Map.entry("frequency_7qo", 0),
-            Map.entry("PctNumeric", 0), Map.entry("PctAlphanumeric", 0), Map.entry("PctAlphabetic", 0),
-            Map.entry("PctNonAlphanumeric", 0), Map.entry("PctDateTime", 0), Map.entry("PctPhones", 0),
-            Map.entry("PctEmail", 0), Map.entry("PctURL", 0), Map.entry("PctIP", 0),
-            Map.entry("PctGeneral", 0), Map.entry("PctTime", 0), Map.entry("PctDate", 0),
-            Map.entry("PctUnknown", 0), Map.entry("PctDateTimeSpecific", 0), // with lowercase t for the specific type
-            Map.entry("PctUsername", 0), Map.entry("PctPhrases", 0), Map.entry("PctOthers", 0),
-            Map.entry("datatype", 2), Map.entry("specificType", 2), Map.entry("len_max_word", 0),
-            Map.entry("len_min_word", 0), Map.entry("len_avg_word", 0), Map.entry("wordsCntMax", 0),
-            Map.entry("wordsCntMin", 0), Map.entry("wordsCntAvg", 0), Map.entry("numberWords", 0),
-            Map.entry("wordsCntSd", 0), Map.entry("ds_name", 2), Map.entry("att_name", 2),
-            Map.entry("isEmpty", 2), Map.entry("binary", 0), Map.entry("frequency_IQR", 0),
-            Map.entry("firstWord", 3), Map.entry("lastWord", 3)
+            Map.entry("pct_numeric", 0), Map.entry("pct_alphanumeric", 0), Map.entry("pct_alphabetic", 0),
+            Map.entry("pct_non_alphanumeric", 0), Map.entry("pct_date_time", 0), Map.entry("pct_phones", 0),
+            Map.entry("pct_email", 0), Map.entry("pct_url", 0), Map.entry("pct_ip", 0),
+            Map.entry("pct_general", 0), Map.entry("pct_time", 0), Map.entry("pct_date", 0),
+            Map.entry("pct_unknown", 0), Map.entry("pct_date_time_specific", 0), // with lowercase t for the specific type
+            Map.entry("pct_username", 0), Map.entry("pct_phrases", 0), Map.entry("pct_others", 0),
+            Map.entry("datatype", 2), Map.entry("specific_type", 2), Map.entry("len_max_word", 0),
+            Map.entry("len_min_word", 0), Map.entry("len_avg_word", 0), Map.entry("words_cnt_max", 0),
+            Map.entry("words_cnt_min", 0), Map.entry("words_cnt_avg", 0), Map.entry("number_words", 0),
+            Map.entry("words_cnt_sd", 0), Map.entry("dataset_name", 2), Map.entry("attribute_name", 2),
+            Map.entry("is_empty", 2), Map.entry("is_binary", 0), Map.entry("frequency_iqr", 0),
+            Map.entry("first_word", 3), Map.entry("last_word", 3)
     );
 
     public PredictQuality(Connection conn) {this.conn = conn;}
 
-    public double predictQuality(String path1, String path2, String att1, String att2) throws IOException, ParseException, JAXBException, SAXException {
-        LinkedList<Map<String, Object>> profiles1 = readJSONFile(path1);
-        LinkedList<Map<String, Object>> profiles2 = readJSONFile(path2);
-        // Remove null rows
+    public double predictQuality(String path1, String path2, String att1, String att2) {
+//        LinkedList<Map<String, Object>> profiles1 = readJSONFile(path1);
+//        LinkedList<Map<String, Object>> profiles2 = readJSONFile(path2);
+        LinkedList<Map<String, Object>> profiles1 = readCSVFile(path1);
+        LinkedList<Map<String, Object>> profiles2 = readCSVFile(path2);
+
+        // Remove null rows and normalize the profiles
         profiles1.removeAll(Collections.singleton(null));
         profiles2.removeAll(Collections.singleton(null));
+        normalizeProfile(profiles1);
+        normalizeProfile(profiles2);
 
-        Map<String, Object> distances = getCardinalityProportion(profiles1, att1, profiles2, att2);
+        // Initialize the distances map with the cardinalities
+//        Map<String, Object> distances = getCardinalityProportion(profiles1, att1, profiles2, att2);
+        Map<String, Object> distances = new HashMap<>();
 
-        profiles1 = normalizeProfile(profiles1);
-        profiles2 = normalizeProfile(profiles2);
-
+        // Get the profiles that we need (that is, get only the two profiles corresponding to the two attributes to compare)
         Map<String, Object> profile1 = new HashMap<>();
         Map<String, Object> profile2 = new HashMap<>();
         for (Map<String, Object> profile: profiles1) {
-            if (profile.get("att_name").equals(att1)) profile1 = profile;
+            if (profile.get("attribute_name").equals(att1)) profile1 = profile;
         }
         for (Map<String, Object> profile: profiles2) {
-            if (profile.get("att_name").equals(att2)) profile2 = profile;
+            if (profile.get("attribute_name").equals(att2)) profile2 = profile;
         }
 
+        // Calculate the distances
         distances.putAll(calculateDistances(profile1, profile2));
-        writeDistances("", distances);
+//        writeDistances("C:\\Projects\\ODIN", distances, true);
 
         return predictQualityThroughModel(distances);
     }
 
-    private void writeDistances(String s, Map<String, Object> distances) throws IOException {
-        List<Map<String, Object>> listOfMap = new LinkedList<>();
-        listOfMap.add(distances);
-
-        File file = new File(s + "distances.csv"); // NextiaJD2/distances.csv
+    private void writeDistances(String distancesFilePath, Map<String, Object> distances, Boolean writeHeader) throws IOException {
+        File file = new File(distancesFilePath + "\\distances.csv");
         Writer writer = new FileWriter(file, true);
-        System.out.println(distances);
-//        CsvSchema schema = null;
-//        CsvSchema.Builder schemaBuilder = CsvSchema.builder();
-//        if (listOfMap != null && !listOfMap.isEmpty()) {
-//            for (String col : listOfMap.get(0).keySet()) {
-//                schemaBuilder.addColumn(col);
-//            }
-//            schema = schemaBuilder.build().withLineSeparator(System.lineSeparator()).withHeader();
-//        }
-//        CsvMapper mapper = new CsvMapper();
-//        mapper.writer(schema).writeValues(writer).writeAll(listOfMap);
-        for (String key: distances.keySet()) {
-            System.out.println(key);
-            writer.write(key);
-            writer.write(",");
+
+        if (writeHeader) {
+            for (String key: distances.keySet()) {
+                writer.write(key);
+                writer.write(",");
+            }
+            writer.write("\n");
         }
         for (String key: distances.keySet()) {
             writer.write(String.valueOf(distances.get(key)));
@@ -100,56 +93,24 @@ public class PredictQuality {
         writer.flush();
     }
 
-    private Map<String, Object> getCardinalityProportion(LinkedList<Map<String, Object>> profiles1, String att1, LinkedList<Map<String, Object>> profiles2, String att2) {
-        Map<String, Object> distances = new HashMap<>();
-
-        double cardinality1 = 0.0;
-        double cardinality2 = 0.0;
-        for (Map<String, Object> profile: profiles1) {
-            if (profile.get("att_name").equals(att1)) cardinality1 = Double.parseDouble(String.valueOf(profile.get("cardinality")));
-        }
-        for (Map<String, Object> profile: profiles2) {
-            if (profile.get("att_name").equals(att2)) cardinality2 = Double.parseDouble(String.valueOf(profile.get("cardinality")));
-        }
-        distances.put("K", Math.min(cardinality1, cardinality2)/Math.max(cardinality1, cardinality2));
-        distances.put("cardinalityRaw", cardinality1);
-        distances.put("cardinalityRaw_2", cardinality2);
-
-        return distances;
-    }
-
-    private double predictQualityThroughModel(Map<String, Object> distances) throws IOException, JAXBException, SAXException {
-//        String filePath = new File("").getAbsolutePath();
-//        filePath = filePath.concat("\\src\\main\\resources\\model\\ML_Best_model.pmml");
-//        Path modelPath = Paths.get("C:\\Projects\\NextiaJD2\\src\\main\\resources\\model\\ML_Best_model.pmml");
-//        System.out.println(distances);
+//    private Map<String, Object> getCardinalityProportion(LinkedList<Map<String, Object>> profiles1, String att1, LinkedList<Map<String, Object>> profiles2, String att2) {
+//        Map<String, Object> distances = new HashMap<>();
 //
-//        Evaluator evaluator = new LoadingModgetNumberOfValueselEvaluatorBuilder().load(modelPath.toFile()).build();
-//        evaluator.verify();
-//
-//        FieldName targetName = evaluator.getTargetFields().get(0).getName();
-//        List<InputField> inputFields = evaluator.getInputFields();
-//
-//        // PctSpaces, freqWordCLEANContainment (the other containments are okay)
-//        distances.put("freqWordCleanContainment", 0.5);
-//        distances.put("PctSpaces", 0.0);
-//
-//        Map<FieldName, FieldValue> arguments = new LinkedHashMap<>();
-//        for (InputField inputField : inputFields) {
-//            FieldName inputName = inputField.getName();
-//            Object value = distances.get(inputName.toString());
-//            FieldValue inputValue = inputField.prepare(value);
-//            arguments.put(inputName, inputValue);
+//        double cardinality1 = 0.0;
+//        double cardinality2 = 0.0;
+//        for (Map<String, Object> profile: profiles1) {
+//            if (profile.get("attribute_name").equals(att1)) cardinality1 = Double.parseDouble(String.valueOf(profile.get("cardinality")));
 //        }
+//        for (Map<String, Object> profile: profiles2) {
+//            if (profile.get("attribute_name").equals(att2)) cardinality2 = Double.parseDouble(String.valueOf(profile.get("cardinality")));
+//        }
+//        distances.put("original_cardinality", cardinality1);
+//        distances.put("original_cardinality_2", cardinality2);
 //
-//        // Evaluating the model with known-good arguments
-//        Map<FieldName, ?> results = evaluator.evaluate(arguments);
-//
-//        // Extracting prediction
-//        Map<String, ?> resultRecord = EvaluatorUtil.decodeAll(results);
-//        Double yPred = (Double) resultRecord.get(targetName.toString());
-//        System.out.println("Prediction is " + yPred);
+//        return distances;
+//    }
 
+    private double predictQualityThroughModel(Map<String, Object> distances) {
         return 0.0;
     }
 
@@ -161,8 +122,10 @@ public class PredictQuality {
                 distances.put(feature, value);
             }
             else if (distancePattern.get(feature) == 1) { // containment for arrays, such as the most common words
-                LinkedList<String> listValues1 = new LinkedList((Collection) profile1.get(feature));
-                LinkedList<String> listValues2 = new LinkedList((Collection) profile2.get(feature));
+                List<String> elementsList1 = Arrays.asList(((String) profile1.get(feature)).replaceAll("\\[|\\]|\\s", "").split(","));
+                List<String> elementsList2 = Arrays.asList(((String) profile2.get(feature)).replaceAll("\\[|\\]|\\s", "").split(","));
+                LinkedList<String> listValues1 = new LinkedList<>(elementsList1);
+                LinkedList<String> listValues2 = new LinkedList<>(elementsList2);
 
                 double numberOfContainedValues = 0.0;
                 for (String value: listValues1) {
@@ -188,13 +151,13 @@ public class PredictQuality {
     private Map<String,Object> calculateBinaryFeatures(Map<String, Object> profile1, Map<String, Object> profile2) {
         Map<String, Object> binaryFeatures = new HashMap<>();
         Double levDistance = Double.valueOf(LevenshteinDistance.getDefaultInstance()
-                .apply((CharSequence) profile1.get("att_name"), (CharSequence) profile2.get("att_name")));
+                .apply((CharSequence) profile1.get("attribute_name"), (CharSequence) profile2.get("attribute_name")));
         binaryFeatures.put("name_dist", levDistance);
 
         return binaryFeatures;
     }
 
-    private LinkedList<Map<String, Object>> normalizeProfile(LinkedList<Map<String, Object>> profile) throws IOException {
+    private void normalizeProfile(LinkedList<Map<String, Object>> profile) {
         double numberOfColumns = profile.size();
         Set<String> keySet = profile.get(0).keySet();
         // z-score
@@ -231,55 +194,32 @@ public class PredictQuality {
             }
         }
         //writeJSON(profile, "", "/home/marc/Escritorio/Files/Profiles", "normalized_profile");
-        return profile;
     }
 
     private double objectToDouble(Object o) {
         return Double.parseDouble(String.valueOf(o));
     }
 
-    private LinkedList<Map<String, Object>> readJSONFile(String path) throws IOException, ParseException {
-        JSONParser jsonParser  = new JSONParser();
-        FileReader reader = new FileReader(path);
-        Object obj = jsonParser.parse(reader);
-        JSONArray profileJSON = (JSONArray) obj;
-        LinkedList<Map<String,Object>> profile = new LinkedList<>();
-
-        for (Object featureJSON : profileJSON) {
-            Map<String, Object> features = (Map<String, Object>) featureJSON;
-            profile.add(features);
-        }
-
-        return profile;
-    }
-
-    public void calculateDistancesForAllProfilesInAFolder(String path) {
-        File[] files = (new File (path)).listFiles();
-        LinkedList<Map<String,Object>> allDistances = new LinkedList<>();
+    public void calculateDistancesForAllProfilesInAFolder(String path, String distancesPath) {
+        File[] files = (new File (path)).listFiles(File::isFile);
+        boolean writeHeader = true;
 
         assert files != null;
         for (int i = 0; i < files.length; ++i) {
             for (int j = 0; j< files.length; ++j) {
                 if (j > i) {
-                    LinkedList<Map<String, Object>> profiles1;
-                    LinkedList<Map<String, Object>> profiles2;
-                    try {
-                        profiles1 = readJSONFile(String.valueOf(files[i]));
-                        profiles2 = readJSONFile(String.valueOf(files[j]));
-                    } catch (IOException | ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // Remove null rows
+                    System.out.println("Dataset 1: " + (i+1) + "/" + (files.length - 1) + " " +  files[i] + " || Dataset 2: " + (j-i) + "/" + (files.length - i - 1) + " " + files[j]);
+                    LinkedList<Map<String, Object>> profiles1 = readCSVFile(String.valueOf(files[i]));
+                    LinkedList<Map<String, Object>> profiles2 = readCSVFile(String.valueOf(files[j]));
+
+                    // Remove null rows and normalize the profiles
                     profiles1.removeAll(Collections.singleton(null));
                     profiles2.removeAll(Collections.singleton(null));
+                    normalizeProfile(profiles1);
+                    normalizeProfile(profiles2);
 
-                    try {
-                        normalizeProfile(profiles1);
-                        normalizeProfile(profiles2);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
+                    // For every attribute of every dataset in combination of every other attribute of every other dataset,
+                    // we get the profiles of both attributes and calculate the distances.
                     for (Map<String, Object> profile1: profiles1) {
                         for (Map<String, Object> profile2: profiles2) {
                             Map<String, Object> distances = new HashMap<>();
@@ -289,9 +229,9 @@ public class PredictQuality {
                             distances.put("cardinalityRaw", cardinality1);
                             distances.put("cardinalityRaw_2", cardinality2);
                             distances.putAll(calculateDistances(profile1, profile2));
-                            allDistances.add(distances);
                             try {
-                                writeDistances(i + "_" + j + "_", distances);
+                                writeDistances(distancesPath, distances, writeHeader);
+                                writeHeader = false;
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }

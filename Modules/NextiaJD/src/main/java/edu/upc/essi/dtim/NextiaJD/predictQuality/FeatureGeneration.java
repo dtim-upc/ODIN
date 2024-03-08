@@ -67,7 +67,7 @@ public class FeatureGeneration {
             features.put("frequency_min", rs.getDouble(2));
             features.put("frequency_max", rs.getDouble(3));
             features.put("frequency_sd", rs.getDouble(4));
-            features.put("frequency_IQR", rs.getDouble(5)/numberOfRows);
+            features.put("frequency_iqr", rs.getDouble(5)/numberOfRows);
             features.put("val_pct_min", rs.getDouble(2)/numberOfRows);
             features.put("val_pct_max", rs.getDouble(3)/numberOfRows);
             features.put("val_pct_std", rs.getDouble(4)/numberOfRows);
@@ -102,8 +102,8 @@ public class FeatureGeneration {
             if (soundex.isEmpty()) frequentWordsSoundex.add(rs.getString(1));
             else frequentWordsSoundex.add(soundex);
         }
-        features.put("freqWordContainment", frequentWords);
-        features.put("freqWordSoundexContainment", frequentWordsSoundex);
+        features.put("freq_word_containment", frequentWords);
+        features.put("freq_word_soundex_containment", frequentWordsSoundex);
 
         return features;
     }
@@ -141,10 +141,10 @@ public class FeatureGeneration {
         double numberOfRows = getNumberOfRows(conn, tableName);
 
         String datatype = null;
-        String[] datatypeLabels = {"PctNumeric", "PctAlphanumeric", "PctAlphabetic", "PctNonAlphanumeric", "PctDateTime", "PctUnknown"};
+        String[] datatypeLabels = {"pct_numeric", "pct_alphanumeric", "pct_alphabetic", "pct_non_alphanumeric", "pct_date_time", "pct_unknown"};
         String specificDatatype = null;
-        String[] specificDatatypeLabels = {"PctPhones", "PctEmail", "PctURL", "PctIP", "PctUsername", "PctPhrases", "PctGeneral",
-                "PctDate", "PctTime", "PctDateTimeSpecific", "PctOthers"}; // Other = no-determined
+        String[] specificDatatypeLabels = {"pct_phones", "pct_email", "pct_url", "pct_ip", "pct_username", "pct_phrases", "pct_general",
+                "pct_date", "pct_time", "pct_date_time_specific", "pct_others"}; // Other = no-determined
         double[] datatypes = new double[6];
         double[] specificDatatypes = new double[11];
 
@@ -205,7 +205,7 @@ public class FeatureGeneration {
 
         features.put("datatype", datatype);
         for (int i=0; i<datatypes.length; ++i) features.put(datatypeLabels[i], datatypes[i]/numberOfRows);
-        features.put("specificType", specificDatatype);
+        features.put("specific_type", specificDatatype);
         for (int i=0; i<specificDatatypes.length; ++i) features.put(specificDatatypeLabels[i], specificDatatypes[i]/numberOfRows);
 
         return features;
@@ -241,11 +241,11 @@ public class FeatureGeneration {
                         "FROM \"" + tableName + "\" " +
                         "WHERE \"" + column + "\" IS NOT NULL)");
         while (rs.next()) {
-            features.put("wordsCntMax", rs.getDouble(1));
-            features.put("wordsCntMin", rs.getDouble(2));
-            features.put("wordsCntAvg", rs.getDouble(3));
-            features.put("numberWords", rs.getDouble(4));
-            features.put("wordsCntSd", rs.getDouble(5));
+            features.put("words_cnt_max", rs.getDouble(1));
+            features.put("words_cnt_min", rs.getDouble(2));
+            features.put("words_cnt_avg", rs.getDouble(3));
+            features.put("number_words", rs.getDouble(4));
+            features.put("words_cnt_sd", rs.getDouble(5));
         }
         return features;
     }
@@ -261,8 +261,8 @@ public class FeatureGeneration {
                         "WHERE \"" + column + "\" IS NOT NULL " +
                         "ORDER BY (\"" + column + "\") ASC)");
         rs.next();
-        features.put("firstWord", rs.getString(1));
-        features.put("lastWord", rs.getString(2));
+        features.put("first_word", rs.getString(1));
+        features.put("last_word", rs.getString(2));
 
         return features;
     }
@@ -275,8 +275,8 @@ public class FeatureGeneration {
         // WHERE COLUMN_NAME = \"" + column +  "\" does not work inside the sql query, so we filter outside of it
         while (rs.next()) {
             if (rs.getString(2).equals(column)) {
-                if (rs.getString(1).equals("BOOLEAN")) features.put("binary", 1);
-                else features.put("binary", 0);
+                if (rs.getString(1).equals("BOOLEAN")) features.put("is_binary", 1);
+                else features.put("is_binary", 0);
             }
         }
 
@@ -289,8 +289,8 @@ public class FeatureGeneration {
 
         ResultSet rs = stmt.executeQuery("SELECT COUNT(\"" + column + "\") FROM \"" + tableName + "\" WHERE \"" + column + "\" IS NOT NULL" );
         rs.next();
-        if (rs.getInt(1) == 0) features.put("isEmpty", 1);
-        else features.put("isEmpty", 0);
+        if (rs.getInt(1) == 0) features.put("is_empty", 1);
+        else features.put("is_empty", 0);
 
         return features;
     }

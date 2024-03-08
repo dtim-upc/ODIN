@@ -22,7 +22,7 @@ public interface IDiscovery {
 
     LinkedList<Map<String, Object>> calculateQualitiesFromDatasets(String CSVPath1, String CSVPath2, String qualityType);
 
-    JSONArray createProfile(String path, String pathToStoreProfile, String resultingProfileName) throws SQLException, ClassNotFoundException, IOException;
+    JSONArray createProfile(String path, String pathToStoreProfile) throws SQLException, ClassNotFoundException, IOException;
 
     double predictJoinQuality(String path1, String path2, String att1, String att2) throws SQLException, ClassNotFoundException, IOException, ParseException, SAXException, JAXBException;
 
