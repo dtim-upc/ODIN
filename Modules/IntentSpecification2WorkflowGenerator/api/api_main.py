@@ -138,7 +138,7 @@ def download_proactive():
     # Connect to Proactive
     gateway = proactive.ProActiveGateway(base_url="https://try.activeeon.com:8443", debug=False, javaopts=[], log4j_props_file=None,
                                          log4py_props_file=None)
-    gateway.connect("pa75332", "MinatMinao99")
+    gateway.connect("pa75332", "testpwd")
 
     try:
         # Create one of the example workflows and send it (just to show that the SDK works)
@@ -174,7 +174,7 @@ def download_proactive():
         preview_results_task.addDependency(predict_model_task)
         proactive_job.addTask(preview_results_task)
 
-        gateway.submitJob(proactive_job, debug=False)
+        # gateway.submitJob(proactive_job, debug=False)
 
         # Create another workflow and download it. This mimics the behavior that we will have to implement, as there is
         # no way (I think) to upload our own data inside a workflow. It has to be done before the execution of the workflow.
@@ -184,6 +184,7 @@ def download_proactive():
         proactive_job.setJobName("extremexp_test_workflow")
         bucket = gateway.getBucket("ai-machine-learning")
 
+        ################## Change file path (name) and label name (send both as parameters)
         load_dataset_task = bucket.create_Import_Data_task(import_from="PA:USER_FILE", file_path="countries.csv", file_delimiter=",", label_column="IncomeGroup")
         proactive_job.addTask(load_dataset_task)
 
@@ -193,6 +194,8 @@ def download_proactive():
 
         random_forest_task = bucket.create_Random_Forest_task()
         proactive_job.addTask(random_forest_task)
+
+        bucket.create_Support_Vector_Machines_task()
 
         train_model_task = bucket.create_Train_Model_task()
         train_model_task.addDependency(split_data_task)
