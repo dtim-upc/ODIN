@@ -17,6 +17,7 @@ export const useIntentsStore = defineStore('intents', {
     intent_graph: {}, // Graph definition of the current intent
     ontology: "", // Ontology of the system (graph)
     algorithmImplementations: [], // List of algorithms defined in the ontology
+    labelColumn: "", // Column over which a classification model will operate. ONLY FOR INTEGRATION WITH PROACTIVE. SHOULD BE REMOVED WHEN INTEGRATION DEPENDS ON THE GRAPH
     
     abstractPlans: [], // List of abstract plans (displayed in Logical Planner)
     logicalPlans: [], // List of logical plans (displayed in Workflow Planner)
@@ -82,6 +83,7 @@ export const useIntentsStore = defineStore('intents', {
     },
     
     async annotateDataset(data) {
+      this.labelColumn = data["label"] // SHOULD BE REMOVED EVENTUALLY
       try {
         const response = await intentsAPI.annotateDataset(data);
         notify.positive(`Dataset annotated`)
@@ -186,7 +188,10 @@ export const useIntentsStore = defineStore('intents', {
     },
 
     async downloadProactive(plan) {
-      const data = {"graph": plan.graph, "ontology": this.ontology, "layout": this.plan}
+      const currentIntent = this.intents.find(intent => intent.intentID === String(this.intentID)) // SHOULD BE REMOVED EVENTUALLY
+      const dataProductName = currentIntent.dataProduct.datasetName // SHOULD BE REMOVED EVENTUALLY
+      // At some point, the translation to the Proactive ontology should be done, and the API should only require the graph to make it
+      const data = {"graph": plan.graph, "ontology": this.ontology, "layout": plan.plan, "label_column": this.labelColumn, "data_product_name": dataProductName}
       try {
         const response = await intentsAPI.downloadProactive(data);
         FileSaver.saveAs(new Blob([response.data]), `${plan.id}.xml`);

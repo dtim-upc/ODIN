@@ -134,6 +134,9 @@ def annotate_dataset_from_frontend():
 def download_proactive():
     graph = Graph().parse(data=request.json.get("graph", ""), format='turtle')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
+    layout = request.json.get('layout', '')
+    label_column = request.json.get('label_column', '')
+    data_product_name = request.json.get('data_product_name', '')
 
     # Connect to Proactive
     gateway = proactive.ProActiveGateway(base_url="https://try.activeeon.com:8443", debug=False, javaopts=[], log4j_props_file=None,
@@ -185,21 +188,26 @@ def download_proactive():
         bucket = gateway.getBucket("ai-machine-learning")
 
         ################## Change file path (name) and label name (send both as parameters)
-        load_dataset_task = bucket.create_Import_Data_task(import_from="PA:USER_FILE", file_path="countries.csv", file_delimiter=",", label_column="IncomeGroup")
+        load_dataset_task = bucket.create_Import_Data_task(import_from="PA:USER_FILE", file_path=data_product_name + ".csv", file_delimiter=";", label_column=label_column)
         proactive_job.addTask(load_dataset_task)
 
         split_data_task = bucket.create_Split_Data_task()
         split_data_task.addDependency(load_dataset_task)
         proactive_job.addTask(split_data_task)
 
+        # Model depends on the layout, the rest is the same
+        scale_task = bucket.create_Scale_Data_task()
+        model_task = bucket.create_Support_Vector_Machines_task()
+        for key in layout:
+            if "decision_tree_predictor" in key:
+                model_task = bucket.create_Random_Forest_task()
+                break
         random_forest_task = bucket.create_Random_Forest_task()
         proactive_job.addTask(random_forest_task)
 
-        bucket.create_Support_Vector_Machines_task()
-
         train_model_task = bucket.create_Train_Model_task()
         train_model_task.addDependency(split_data_task)
-        train_model_task.addDependency(random_forest_task)
+        train_model_task.addDependency(model_task)
         proactive_job.addTask(train_model_task)
 
         download_model_task = bucket.create_Download_Model_task()

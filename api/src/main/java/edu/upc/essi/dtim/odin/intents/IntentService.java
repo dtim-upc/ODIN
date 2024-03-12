@@ -74,7 +74,20 @@ public class IntentService {
         newIntent = saveIntent(newIntent);
 
         Project project = projectService.getProject(projectID);
-        project.addIntent(newIntent);
+        List<Intent> intentsOfProject = project.getIntents();
+
+        // Before adding the new intent, we remove all those that have no workflows. This is because we first create the
+        // intent and then the workflows, but an intent with no workflows (which can happen if user cancels the process)
+        // is of no use.
+        for (Intent intentInProject : project.getIntents()) {
+            if (intentInProject.getWorkflows().isEmpty()) {
+                intentsOfProject.remove(intentInProject);
+                break;
+            }
+        }
+
+        intentsOfProject.add(newIntent);
+        project.setIntents(intentsOfProject);
         projectService.saveProject(project);
 
         return newIntent.getIntentID();

@@ -58,6 +58,7 @@ const handleSubmit = async() => {
   data.append("dataProductID", selectedDataProduct.id)
   
   await intentsStore.postIntent(projectID, data)
+  await intentsStore.getAllIntents(projectID, data) // Refresh the list of intents
 
   $q.loading.show({message: 'Materializing data product...'}) // Then, create the csv file from the dataProduct
   await dataProductsStore.materializeDataProduct(projectID, selectedDataProduct.id)
