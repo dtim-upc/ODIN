@@ -22,6 +22,7 @@ dependencies {
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     implementation group: 'org.jpmml', name: 'pmml-evaluator', version: '1.6.4'
     implementation group: 'commons-io', name: 'commons-io', version: '2.15.0'
+    implementation group: 'com.opencsv', name: 'opencsv', version: '5.9'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'

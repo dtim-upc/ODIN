@@ -12,13 +12,9 @@ import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapODIN;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
+import java.io.*;
 import java.util.stream.Collectors;
 
 import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
@@ -44,17 +40,13 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 		G_target = (LocalGraph) CoreGraphFactory.createGraphInstance("local");
 //		setPrefixes();
 
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader(path));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-
 		CSVParser parser;
 		try {
-			parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+			char delimiter = detectDelimiter(path); // Detect the delimiter of the file
+			BufferedReader br = new BufferedReader(new FileReader(path));
+			parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(delimiter));
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 
@@ -68,7 +60,7 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 			G_target.addTriple(createIRI(h2),DataFrame_MM.hasDataType,DataFrame_MM.String);
 		});
 
-		String select =  parser.getHeaderNames().stream().map(a ->  a + " AS " + reformatName(a)).collect(Collectors.joining(", "));
+		String select =  parser.getHeaderNames().stream().map(a ->  "\"" + a + "\" AS " + reformatName(a)).collect(Collectors.joining(", "));
 		wrapper = "SELECT " + select  + " FROM `" + name + "`";
 
 		//TODO: implement metadata
@@ -93,6 +85,30 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 
 		G_target.addTripleLiteral(ds, DataSourceVocabulary.HAS_FORMAT.getURI(), Formats.CSV.val());
 		G_target.addTripleLiteral(ds, DataSourceVocabulary.HAS_WRAPPER.getURI(), wrapper);
+	}
+
+	private char detectDelimiter(String path) throws IOException {
+		char[] delimiters = {';', ',', '\t'};
+		BufferedReader br = new BufferedReader(new FileReader(path));
+
+		for (char delimiter : delimiters) {
+			// Parsing the CSV file with current delimiter
+			CSVFormat csvFormat = CSVFormat.DEFAULT.withDelimiter(delimiter);
+			CSVParser csvParser = new CSVParser(br, csvFormat);
+
+			Iterable<CSVRecord> records = csvParser.getRecords(); // Get the first record
+			if (records.iterator().hasNext()) {
+				CSVRecord firstRecord = records.iterator().next();
+				// If the record contains more than 1 column, we assume it's the correct delimiter
+				if (firstRecord.size() > 1) {
+					csvParser.close();
+					return delimiter;
+				}
+			}
+			csvParser.close(); // Close the parser
+			br = new BufferedReader(new FileReader(path)); // Reset the reader to start from the beginning of the file
+		}
+		return ','; // Return null if no delimiter is detected
 	}
 
 	@Override

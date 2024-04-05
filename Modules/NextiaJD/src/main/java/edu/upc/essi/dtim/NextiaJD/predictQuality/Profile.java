@@ -7,11 +7,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static edu.upc.essi.dtim.NextiaJD.predictQuality.FeatureGeneration.*;
 import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
@@ -19,25 +18,33 @@ import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
 public class Profile {
 
     Connection conn;
-    String tableName = "temptTable";
+    String tableName;
 
     public Profile(Connection conn) {
         this.conn = conn;
+        this.tableName = "temptTable";
+    }
+
+    public Profile(Connection conn, String tableName) {
+        this.conn = conn;
+        this.tableName = tableName;
     }
 
     public JSONArray createProfile(String dataPath, String pathToStoreProfile) {
         try {
             // Create table from file and preprocess the data (trim and lowercase)
             Statement stmt = conn.createStatement();
-            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, all_varchar=True)");
+            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=-1, ignore_errors=True)");
             preprocessing(conn, tableName);
 
             // Generate the profile of the table: for each column, its profile is generated and added to the features variable
             LinkedList<Map<String,Object>> features = new LinkedList<>();
             ResultSet rs = stmt.executeQuery("DESCRIBE \"" + tableName + "\"");
             while (rs.next()) {
-                // We only generate the profile if the column has some value (i.e. if it is only null values, we do not create the profile)
-                if (getNumberOfValues(conn, tableName, rs.getString(1)) != 0.0) {
+                ResultSet rs2 = conn.createStatement().executeQuery("SELECT \"" + rs.getString(1) + "\" FROM \"" + tableName + "\" LIMIT 0");
+                ResultSetMetaData rsmd = rs2.getMetaData();
+                // We only generate the profile if the column is VARCHAR and has some value (i.e. if it is only null values, we do not create the profile)
+                if (rsmd.getColumnTypeName(1).equals("VARCHAR") && getNumberOfValues(conn, tableName, rs.getString(1)) != 0.0) {
                     features.add(createProfileOfColumn(rs.getString(1)));
                 }
             }
@@ -48,7 +55,7 @@ public class Profile {
             }
 
             // Write the profile in a CSV/JSON file
-            if (!pathToStoreProfile.isEmpty()) {
+            if (!pathToStoreProfile.isEmpty() && !features.isEmpty()) {
                 writeCSV(features, dataPath, pathToStoreProfile);
 //                writeJSON(features, dataPath, pathToStoreProfile);
             }
@@ -60,8 +67,16 @@ public class Profile {
             return json;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("SKIPPED");
+            // We have to remove the table if it has been created. Otherwise, the remaining profiles will not be generated
+            try {
+                Statement stmt = conn.createStatement();
+                stmt.execute("DROP TABLE IF EXISTS \"" + tableName + "\"");
+            }  catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
+        return null;
     }
 
     public Map<String,Object> createProfileOfColumn(String column) throws SQLException {
@@ -70,7 +85,7 @@ public class Profile {
         addValueDistributionFeatures(column, columnFeatures);
         addSyntacticFeatures(column, columnFeatures);
         addOtherFeatures(column, columnFeatures);
-        columnFeatures.put("attribute_name", column); // Add name of the column
+        columnFeatures.put("attribute_name", "\"" + column + "\""); // Add name of the column
         return columnFeatures;
     }
 
@@ -148,7 +163,6 @@ public class Profile {
     }
 
     public static void generateAllProfilesOfAllDataInAFolder(String path, String pathToStore) throws Exception {
-        Connection conn = DuckDB.getConnection();
         Files.createDirectories(Path.of(pathToStore));
 
         // Path of the folder that contains the files to obtain profiles from (we get only the files)
@@ -156,11 +170,26 @@ public class Profile {
         assert files != null;
 
         int counter = 1;
+
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         for (File file: files) {
-            System.out.println("File " + counter + " out of " + files.length + ": " + file);
-            Profile p = new Profile(conn);
-            p.createProfile(String.valueOf(file), pathToStore);
+//            System.out.println("File " + counter + " out of " + files.length + ": " + file);
+            final int counterIteration = counter;
+            executor.submit(() -> {
+                Connection conn = null;
+                try {
+                    conn = DuckDB.getConnection();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                Profile p = new Profile(conn, "table" + counterIteration);
+                p.createProfile(String.valueOf(file), pathToStore);
+                System.out.println("Finsihed " + counterIteration);
+            });
             counter++;
         }
+
+        executor.shutdown();
     }
 }

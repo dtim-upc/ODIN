@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.util.*;
 
 import static edu.upc.essi.dtim.NextiaJD.utils.Utils.readCSVFile;
-import static edu.upc.essi.dtim.NextiaJD.utils.Utils.readJSONFile;
 
 public class PredictQuality {
 
@@ -53,10 +52,6 @@ public class PredictQuality {
         normalizeProfile(profiles1);
         normalizeProfile(profiles2);
 
-        // Initialize the distances map with the cardinalities
-//        Map<String, Object> distances = getCardinalityProportion(profiles1, att1, profiles2, att2);
-        Map<String, Object> distances = new HashMap<>();
-
         // Get the profiles that we need (that is, get only the two profiles corresponding to the two attributes to compare)
         Map<String, Object> profile1 = new HashMap<>();
         Map<String, Object> profile2 = new HashMap<>();
@@ -68,14 +63,17 @@ public class PredictQuality {
         }
 
         // Calculate the distances
-        distances.putAll(calculateDistances(profile1, profile2));
+        Map<String, Object> distances = calculateDistances(profile1, profile2);
+        if (distances.isEmpty()) {
+            throw new RuntimeException();
+        }
 //        writeDistances("C:\\Projects\\ODIN", distances, true);
 
         return predictQualityThroughModel(distances);
     }
 
     private void writeDistances(String distancesFilePath, Map<String, Object> distances, Boolean writeHeader) throws IOException {
-        File file = new File(distancesFilePath + "\\distances.csv");
+        File file = new File(distancesFilePath.replace("/", "_"));
         Writer writer = new FileWriter(file, true);
 
         if (writeHeader) {
@@ -116,34 +114,40 @@ public class PredictQuality {
 
     private Map<String, Object> calculateDistances(Map<String, Object> profile1, Map<String, Object> profile2) {
         Map<String, Object> distances = new HashMap<>();
-        for (String feature: profile1.keySet()) {
-            if (distancePattern.get(feature) == 0) { // subtraction for most numeric values, such as cardinality
-                double value = objectToDouble(profile1.get(feature)) - objectToDouble(profile2.get(feature));
-                distances.put(feature, value);
-            }
-            else if (distancePattern.get(feature) == 1) { // containment for arrays, such as the most common words
-                List<String> elementsList1 = Arrays.asList(((String) profile1.get(feature)).replaceAll("\\[|\\]|\\s", "").split(","));
-                List<String> elementsList2 = Arrays.asList(((String) profile2.get(feature)).replaceAll("\\[|\\]|\\s", "").split(","));
-                LinkedList<String> listValues1 = new LinkedList<>(elementsList1);
-                LinkedList<String> listValues2 = new LinkedList<>(elementsList2);
-
-                double numberOfContainedValues = 0.0;
-                for (String value: listValues1) {
-                    if (listValues2.contains(value)) numberOfContainedValues += 1;
+        try {
+            for (String feature: profile1.keySet()) {
+                if (distancePattern.get(feature) == 0) { // subtraction for most numeric values, such as cardinality
+                    double value = objectToDouble(profile1.get(feature)) - objectToDouble(profile2.get(feature));
+                    distances.put(feature, value);
                 }
-                distances.put(feature, numberOfContainedValues/listValues1.size());
-            }
-            else if (distancePattern.get(feature) == 2) { // add both values, such as the two datasets names
-                distances.put(feature, profile1.get(feature));
-                distances.put(feature + "_2", profile2.get(feature));
-            }
-            else if (distancePattern.get(feature) == 3) { // levenshtein distance, such as for the first words
-                distances.put(feature,  Double.valueOf(LevenshteinDistance.getDefaultInstance()
-                        .apply((CharSequence) profile1.get(feature), (CharSequence) profile2.get(feature))));
-            }
-        }
+                else if (distancePattern.get(feature) == 1) { // containment for arrays, such as the most common words
+                    List<String> elementsList1 = Arrays.asList(((String) profile1.get(feature)).replaceAll("\\[|\\]|\\s", "").split(","));
+                    List<String> elementsList2 = Arrays.asList(((String) profile2.get(feature)).replaceAll("\\[|\\]|\\s", "").split(","));
+                    LinkedList<String> listValues1 = new LinkedList<>(elementsList1);
+                    LinkedList<String> listValues2 = new LinkedList<>(elementsList2);
 
-        distances.putAll(calculateBinaryFeatures(profile1,profile2));
+                    double numberOfContainedValues = 0.0;
+                    for (String value: listValues1) {
+                        if (listValues2.contains(value)) numberOfContainedValues += 1;
+                    }
+                    distances.put(feature, numberOfContainedValues/listValues1.size());
+                }
+                else if (distancePattern.get(feature) == 2) { // add both values, such as the two datasets names
+                    distances.put(feature, profile1.get(feature));
+                    distances.put(feature + "_2", profile2.get(feature));
+                }
+                else if (distancePattern.get(feature) == 3) { // levenshtein distance, such as for the first words
+                    distances.put(feature,  Double.valueOf(LevenshteinDistance.getDefaultInstance()
+                            .apply((CharSequence) profile1.get(feature), (CharSequence) profile2.get(feature))));
+                }
+            }
+            distances.putAll(calculateBinaryFeatures(profile1,profile2));
+        } catch (Exception e) {
+
+        }
+        if (distances.size() != 61) {
+            distances = new HashMap<>();
+        }
 
         return distances;
     }
@@ -222,18 +226,14 @@ public class PredictQuality {
                     // we get the profiles of both attributes and calculate the distances.
                     for (Map<String, Object> profile1: profiles1) {
                         for (Map<String, Object> profile2: profiles2) {
-                            Map<String, Object> distances = new HashMap<>();
-                            double cardinality1 = Double.parseDouble(String.valueOf(profile1.get("cardinality")));
-                            double cardinality2 = Double.parseDouble(String.valueOf(profile2.get("cardinality")));
-                            distances.put("K", Math.min(cardinality1, cardinality2)/Math.max(cardinality1, cardinality2));
-                            distances.put("cardinalityRaw", cardinality1);
-                            distances.put("cardinalityRaw_2", cardinality2);
-                            distances.putAll(calculateDistances(profile1, profile2));
-                            try {
-                                writeDistances(distancesPath, distances, writeHeader);
-                                writeHeader = false;
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
+                            Map<String, Object> distances = calculateDistances(profile1, profile2);
+                            if (!distances.isEmpty()) {
+                                try {
+                                    writeDistances(distancesPath + "\\distances.csv", distances, writeHeader);
+                                    writeHeader = false;
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                         }
                     }
@@ -241,5 +241,48 @@ public class PredictQuality {
                 }
             }
         }
+    }
+
+    public void calculateDistancesAttVsFolder(String attribute, String dataset, String path) {
+        File[] files = (new File (path)).listFiles(File::isFile);
+        boolean writeHeader = true;
+
+        LinkedList<Map<String, Object>> profilesDataset = readCSVFile(path + "\\" + dataset);
+        profilesDataset.removeAll(Collections.singleton(null));
+        normalizeProfile(profilesDataset);
+        Map<String, Object> queryProfile = null;
+        for (Map<String, Object> prof: profilesDataset) {
+            if (prof.get("attribute_name").equals("\"" + attribute + "\"")) {
+                queryProfile = prof;
+                break;
+            }
+        }
+        assert queryProfile != null;
+        assert files != null;
+
+        for (int i = 0; i < files.length; ++i) {
+            System.out.println(i + 1 + " out of " + files.length + ": " + files[i]);
+            String fileDatasetName = String.valueOf(files[i]).substring(String.valueOf(files[i]).lastIndexOf("\\") + 1);
+            // Filter out the same dataset
+//            if (!fileDatasetName.equals(dataset)) {
+                LinkedList<Map<String, Object>> dataLakeProfiles = readCSVFile(String.valueOf(files[i]));
+                for (Map<String, Object> dataLakeProfile: dataLakeProfiles) {
+                    Map<String, Object> distances = calculateDistances(queryProfile, dataLakeProfile);
+                    if (!distances.isEmpty()) {
+                        try {
+                            File folder = new File(path + "\\distances"); // Create folder
+                            folder.mkdirs();
+
+                            String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
+                            writeDistances(distancesPath, distances, writeHeader);
+                            writeHeader = false;
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+//                }
+            }
+        }
+        
     }
 }
