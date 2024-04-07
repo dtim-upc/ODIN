@@ -44,14 +44,18 @@ public class Main {
 //        pq.predictQuality("C:\\Work\\NextiaJD\\datasets\\profilesCSV\\acquisitions_profile.csv", "C:\\Work\\NextiaJD\\datasets\\profilesCSV\\acquisitions_profile.csv",
 //                    "AcquisitionID", "AcquisitionID");
 
-
 //        santos();
 //        tus();
-        santosBig();
-//        p.createProfile("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\datalake\\gp-prescribing---september-2018.csv",
-//                    "C:\\Work");
+//        santosBig();
+//        p.createProfile("D:\\real_data_lake_benchmark\\datalake\\HMRC_WMI_headcount_and_payroll_data_June_2015.csv", "D:\\");
+
+
+
+        p.createProfile(args[0], args[1]);
 
     }
+
+    // java -jar NextiaJD-all.jar %%F "C:\Projects\real_data_lake_benchmark\profiles"
     public static void santos() {
         try {
 //            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\datalake", "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\profiles");
@@ -115,7 +119,7 @@ public class Main {
 
     public static void santosBig() {
         try {
-            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\datalake", "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\profiles");
+            generateAllProfilesOfAllDataInAFolder("C:\\Projects\\real_data_lake_benchmark\\datalake", "C:\\Projects\\real_data_lake_benchmark\\profiles");
 //            Connection conn = DuckDB.getConnection();
 //            Profile p = new Profile(conn);
 //            PredictQuality pq = new PredictQuality(conn);
