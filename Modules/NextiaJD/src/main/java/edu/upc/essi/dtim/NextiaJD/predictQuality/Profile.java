@@ -34,7 +34,7 @@ public class Profile {
         try {
             // Create table from file and preprocess the data (trim and lowercase)
             Statement stmt = conn.createStatement();
-            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=-1, ignore_errors=True)");
+            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=1000, ignore_errors=True)");
             preprocessing(conn, tableName);
 
             // Generate the profile of the table: for each column, its profile is generated and added to the features variable
@@ -64,10 +64,12 @@ public class Profile {
             JSONArray json = new JSONArray();
             json.addAll(features);
             stmt.execute("DROP TABLE \"" + tableName + "\"");
+
             return json;
 
         } catch (SQLException e) {
-            System.out.println("SKIPPED");
+            System.out.println("SKIPPED " + dataPath);
+            System.out.println(e);
             // We have to remove the table if it has been created. Otherwise, the remaining profiles will not be generated
             try {
                 Statement stmt = conn.createStatement();
@@ -166,30 +168,32 @@ public class Profile {
         Files.createDirectories(Path.of(pathToStore));
 
         // Path of the folder that contains the files to obtain profiles from (we get only the files)
-        File[] files = (new File (path)).listFiles(File::isFile);
+        File[] files = (new File(path)).listFiles(File::isFile);
         assert files != null;
 
         int counter = 1;
 
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        // Creating a fixed-size thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(8);
 
-        for (File file: files) {
-//            System.out.println("File " + counter + " out of " + files.length + ": " + file);
-            final int counterIteration = counter;
+        for (File file : files) {
+            final int counterIter = counter;
             executor.submit(() -> {
-                Connection conn = null;
                 try {
-                    conn = DuckDB.getConnection();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("File " + counterIter + " out of " + files.length + ": " + file + " || " + "Processor: " + Thread.currentThread().getName());
+                    if (counterIter > 10000 && counterIter <= 11000) {
+                        Connection conn = DuckDB.getConnection();
+                        Profile p = new Profile(conn, "table" + counterIter);
+                        p.createProfile(String.valueOf(file), pathToStore);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                Profile p = new Profile(conn, "table" + counterIteration);
-                p.createProfile(String.valueOf(file), pathToStore);
-                System.out.println("Finsihed " + counterIteration);
             });
             counter++;
         }
 
+        // Shutdown the executor after all tasks are submitted
         executor.shutdown();
     }
 }
