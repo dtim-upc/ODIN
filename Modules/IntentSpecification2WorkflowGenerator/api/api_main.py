@@ -212,18 +212,10 @@ def download_proactive():
         train_model_task.addDependency(model_task)
         proactive_job.addTask(train_model_task)
 
-        download_model_task = bucket.create_Download_Model_task()
-        download_model_task.addDependency(train_model_task)
-        proactive_job.addTask(download_model_task)
-
         predict_model_task = bucket.create_Predict_Model_task()
         predict_model_task.addDependency(split_data_task)
         predict_model_task.addDependency(train_model_task)
         proactive_job.addTask(predict_model_task)
-
-        preview_results_task = bucket.create_Preview_Results_task()
-        preview_results_task.addDependency(predict_model_task)
-        proactive_job.addTask(preview_results_task)
 
         gateway.saveJob2XML(proactive_job, os.path.abspath(r'api/temp_files/extremexp_test_workflow.xml'))
 
