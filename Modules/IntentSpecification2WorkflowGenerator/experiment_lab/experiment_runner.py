@@ -113,7 +113,7 @@ def generate_intent(file: str) -> Graph:
 def run_experiment(file: str, destination_folder: str) -> Tuple[float, int]:
     cbox = Graph()
     cbox.parse(file, format='turtle')
-    cbox.parse('../dataset_annotator/penguins_annotated.ttl', format='turtle')
+    cbox.parse('../dataset_annotator/annotated_datasets/penguins_annotated.ttl', format='turtle')
 
     intent_graph = generate_intent(os.path.basename(file))
 

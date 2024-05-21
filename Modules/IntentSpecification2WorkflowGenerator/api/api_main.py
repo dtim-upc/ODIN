@@ -4,6 +4,10 @@ import proactive
 from flask import Flask, request, send_file
 from flask_cors import CORS
 
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from api.functions import *
 from pipeline_translator.pipeline_translator import translate_graph_folder, translate_graph
 from dataset_annotator.annotator import annotate_dataset
@@ -37,6 +41,11 @@ def run_abstract_planner():
 
     intent = intent_graph
     abstract_plans, algorithm_implementations = abstract_planner(ontology, intent)
+    print("INTENT NAME:", intent_name)
+    print("DATASET:", dataset)
+    print("INTENT GRAPH:", intent)
+    print("ABSTRACT PLANS:", abstract_plans)
+    print("ALGORITHM IMPLEMENTATIONS", algorithm_implementations)
     return {"abstract_plans": abstract_plans, "intent": intent.serialize(format="turtle"),
             "algorithm_implementations": algorithm_implementations}
 
@@ -112,19 +121,22 @@ def download_knime():
     translate_graph(ontology, file_path, knime_file_path)
 
     return send_file(knime_file_path, as_attachment=True)
-
+abstract_planner
 
 @app.post('/annotate_dataset')
 def annotate_dataset_from_frontend():
     path = request.json.get('path', '')
     label = request.json.get('label', '')
-    data_product_name = path[path.rfind("\\") + 1:-4]
+    # data_product_name = path[path.rfind("\\") + 1:-4]
+    data_product_path = path[path.rfind("\\") + 1:-4]
+    data_product_name = os.path.splitext(os.path.basename(path))[0].split(".")[0]
 
-    new_path = path[0:path.rfind("\\") + 1] + data_product_name + "_annotated.ttl"
+    new_path = path[0:path.rfind("\\") + 1] + data_product_path + "_annotated.ttl"
     annotate_dataset(path, new_path, label)
 
     custom_ontology = get_custom_ontology(new_path)
     datasets = {n.fragment: n for n in custom_ontology.subjects(RDF.type, dmop.TabularDataset)}
+    
     return {"ontology": custom_ontology.serialize(format="turtle"),
             "data_product_uri": datasets[data_product_name + ".csv"]}
 

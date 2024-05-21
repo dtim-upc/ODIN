@@ -5,6 +5,7 @@ from .decision_tree import *
 from .svm import *
 from .missing_values import *
 from .csv_io import *
+from .pie_chart import *
 
 implementations = [
     partitioning_implementation,
@@ -18,6 +19,7 @@ implementations = [
     missing_value_applier_implementation,
     csv_reader_implementation,
     csv_writer_implementation,
+    piechart_visualizer_implementation,
 ]
 
 components = [
@@ -40,4 +42,5 @@ components = [
     missing_value_applier_component,
     csv_reader_local_component,
     csv_writer_local_component,
+    piechart_visualizer_component,
 ]
