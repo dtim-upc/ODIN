@@ -13,11 +13,7 @@ from common import *
 def add_dataset_info(dataset_path, graph, label):
     dataset_node = ab.term(path.basename(dataset_path))
     graph.add((dataset_node, RDF.type, dmop.TabularDataset))
-<<<<<<< HEAD
     dataset = pd.read_csv(dataset_path, encoding='latin', delimiter=";")
-=======
-    dataset = pd.read_csv(dataset_path, on_bad_lines='skip')
->>>>>>> 218cd58 (Updating the ontology along with creating the new pipeline generation algorithm)
     add_csv_info(dataset_path, dataset, dataset_node, graph)
     add_column_info(dataset_path, dataset, dataset_node, graph, label)
 
