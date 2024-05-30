@@ -40,8 +40,8 @@ public class qrModuleImpl implements qrModuleInterface {
         // Demo
         // dl.execute("CREATE TABLE IF NOT EXISTS for_countries AS SELECT * FROM read_csv_auto('C:\\Work\\Files\\countries.csv')");
         // dl.uploadToTemporalExploitationZone("SELECT * FROM for_countries", UUID);
-        dl.execute("DROP TABLE for_countries");
-        dl.execute("CREATE TABLE IF NOT EXISTS for_countries AS SELECT * FROM read_csv_auto('C:\\Work\\anomalies.csv')");
+        dl.execute("DROP TABLE IF EXISTS for_countries");
+        dl.execute("CREATE TABLE IF NOT EXISTS for_countries AS SELECT * FROM read_csv_auto('C:\\Work\\ODIN files\\demos\\demo_countries\\countries.csv')");
         dl.uploadToTemporalExploitationZone("SELECT * FROM for_countries", UUID);
         // End of the mock
         // The result of the query is now in the temporal exploitation zone, ready to be persisted if the user wants.

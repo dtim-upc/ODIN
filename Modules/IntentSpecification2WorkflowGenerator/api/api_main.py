@@ -54,6 +54,7 @@ def convert_strings_to_uris(obj):
 @app.post('/logical_planner')
 def run_logical_planner():
     plan_ids = request.json.get('plan_ids', '')
+    print(plan_ids)
     intent_json = request.json.get('intent_graph', '')
     algorithm_implementations = request.json.get('algorithm_implementations', '')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
@@ -62,14 +63,15 @@ def run_logical_planner():
     algorithm_implementations_uris = convert_strings_to_uris(algorithm_implementations)
 
     intent = Graph().parse(data=intent_json, format='turtle')
-    intent.print()
 
     impls = [impl
              for alg, impls in algorithm_implementations_uris.items() if str(alg) in plan_ids
              for impl in impls]
 
     workflow_plans = workflow_planner(ontology, impls, intent)
+    workflow_plans[0].serialize(destination='C:\\Users\\marc.maynou\\Desktop\\NextiaJD\\wplan.rdf', format='xml')
     logical_plans = logical_planner(ontology, workflow_plans)
+    workflow_plans[0].serialize(destination='C:\\Users\\marc.maynou\\Desktop\\NextiaJD\\lplan.rdf', format='xml')
 
     return logical_plans
 

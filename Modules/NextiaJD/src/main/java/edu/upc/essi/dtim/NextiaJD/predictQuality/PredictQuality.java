@@ -3,14 +3,14 @@ package edu.upc.essi.dtim.NextiaJD.predictQuality;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.io.*;
-import java.sql.Connection;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static edu.upc.essi.dtim.NextiaJD.utils.Utils.readCSVFile;
 
 public class PredictQuality {
-
-    Connection conn;
     LinkedList<String> metricsToNormalize = new LinkedList<>(Arrays.asList(
             "cardinality", "entropy", "frequency_avg", "frequency_min", "frequency_max", "frequency_sd",
             "len_max_word", "len_min_word", "len_avg_word", "words_cnt_max", "words_cnt_min", "words_cnt_avg",
@@ -38,7 +38,7 @@ public class PredictQuality {
             Map.entry("first_word", 3), Map.entry("last_word", 3)
     );
 
-    public PredictQuality(Connection conn) {this.conn = conn;}
+    public PredictQuality() {}
 
     public double predictQuality(String path1, String path2, String att1, String att2) {
 //        LinkedList<Map<String, Object>> profiles1 = readJSONFile(path1);
@@ -73,16 +73,18 @@ public class PredictQuality {
     }
 
     private void writeDistances(String distancesFilePath, Map<String, Object> distances, Boolean writeHeader) throws IOException {
-        File file = new File(distancesFilePath.replace("/", "_"));
+        File file = new File(distancesFilePath.replace("/", "_").replace(": ","_"));
+        boolean fileExists = file.exists();
         Writer writer = new FileWriter(file, true);
 
-        if (writeHeader) {
+        if (!fileExists) {
             for (String key: distances.keySet()) {
                 writer.write(key);
                 writer.write(",");
             }
             writer.write("\n");
         }
+
         for (String key: distances.keySet()) {
             writer.write(String.valueOf(distances.get(key)));
             writer.write(",");
@@ -91,22 +93,17 @@ public class PredictQuality {
         writer.flush();
     }
 
-//    private Map<String, Object> getCardinalityProportion(LinkedList<Map<String, Object>> profiles1, String att1, LinkedList<Map<String, Object>> profiles2, String att2) {
-//        Map<String, Object> distances = new HashMap<>();
-//
-//        double cardinality1 = 0.0;
-//        double cardinality2 = 0.0;
-//        for (Map<String, Object> profile: profiles1) {
-//            if (profile.get("attribute_name").equals(att1)) cardinality1 = Double.parseDouble(String.valueOf(profile.get("cardinality")));
-//        }
-//        for (Map<String, Object> profile: profiles2) {
-//            if (profile.get("attribute_name").equals(att2)) cardinality2 = Double.parseDouble(String.valueOf(profile.get("cardinality")));
-//        }
-//        distances.put("original_cardinality", cardinality1);
-//        distances.put("original_cardinality_2", cardinality2);
-//
-//        return distances;
-//    }
+    private void writeHeader(String distancesFilePath, Map<String, Object> distances) throws IOException {
+        File file = new File(distancesFilePath.replace("/", "_"));
+        Writer writer = new FileWriter(file, true);
+
+        for (String key: distances.keySet()) {
+            writer.write(key);
+            writer.write(",");
+        }
+        writer.write("\n");
+        writer.flush();
+    }
 
     private double predictQualityThroughModel(Map<String, Object> distances) {
         return 0.0;
@@ -143,9 +140,9 @@ public class PredictQuality {
             }
             distances.putAll(calculateBinaryFeatures(profile1,profile2));
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         }
-        if (distances.size() != 61) {
+        if (distances.size() != 40 && distances.size() != 61) { // 61 for full
             distances = new HashMap<>();
         }
 
@@ -197,11 +194,14 @@ public class PredictQuality {
                 }
             }
         }
-        //writeJSON(profile, "", "/home/marc/Escritorio/Files/Profiles", "normalized_profile");
     }
 
     private double objectToDouble(Object o) {
-        return Double.parseDouble(String.valueOf(o));
+        try {
+            return Double.parseDouble(String.valueOf(o));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public void calculateDistancesForAllProfilesInAFolder(String path, String distancesPath) {
@@ -210,9 +210,9 @@ public class PredictQuality {
 
         assert files != null;
         for (int i = 0; i < files.length; ++i) {
+            System.out.println("Started iteration " + i);
             for (int j = 0; j< files.length; ++j) {
                 if (j > i) {
-                    System.out.println("Dataset 1: " + (i+1) + "/" + (files.length - 1) + " " +  files[i] + " || Dataset 2: " + (j-i) + "/" + (files.length - i - 1) + " " + files[j]);
                     LinkedList<Map<String, Object>> profiles1 = readCSVFile(String.valueOf(files[i]));
                     LinkedList<Map<String, Object>> profiles2 = readCSVFile(String.valueOf(files[j]));
 
@@ -245,44 +245,69 @@ public class PredictQuality {
 
     public void calculateDistancesAttVsFolder(String attribute, String dataset, String path) {
         File[] files = (new File (path)).listFiles(File::isFile);
-        boolean writeHeader = true;
 
         LinkedList<Map<String, Object>> profilesDataset = readCSVFile(path + "\\" + dataset);
         profilesDataset.removeAll(Collections.singleton(null));
         normalizeProfile(profilesDataset);
-        Map<String, Object> queryProfile = null;
-        for (Map<String, Object> prof: profilesDataset) {
-            if (prof.get("attribute_name").equals("\"" + attribute + "\"")) {
-                queryProfile = prof;
-                break;
-            }
-        }
+        profilesDataset.forEach(prof -> System.out.println(prof.get("attribute_name")));
+        Map<String, Object> queryProfile = profilesDataset.stream().filter(prof -> prof.get("attribute_name").equals("\"" + attribute.trim() + "\"")).findFirst().orElse(null);
         assert queryProfile != null;
         assert files != null;
 
-        for (int i = 0; i < files.length; ++i) {
-            System.out.println(i + 1 + " out of " + files.length + ": " + files[i]);
-            String fileDatasetName = String.valueOf(files[i]).substring(String.valueOf(files[i]).lastIndexOf("\\") + 1);
-            // Filter out the same dataset
-//            if (!fileDatasetName.equals(dataset)) {
-                LinkedList<Map<String, Object>> dataLakeProfiles = readCSVFile(String.valueOf(files[i]));
-                for (Map<String, Object> dataLakeProfile: dataLakeProfiles) {
-                    Map<String, Object> distances = calculateDistances(queryProfile, dataLakeProfile);
-                    if (!distances.isEmpty()) {
-                        try {
-                            File folder = new File(path + "\\distances"); // Create folder
-                            folder.mkdirs();
+        ExecutorService executor = Executors.newFixedThreadPool(8);
 
-                            String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
-                            writeDistances(distancesPath, distances, writeHeader);
-                            writeHeader = false;
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+        for (int i = 0; i < files.length; ++i) {
+            int finalI = i;
+            String fileDatasetName = String.valueOf(files[finalI]).substring(String.valueOf(files[finalI]).lastIndexOf("\\") + 1);
+            if (i == 0) {
+                // Filter out the same dataset
+                if (!fileDatasetName.equals(dataset)) {
+                    LinkedList<Map<String, Object>> dataLakeProfiles = readCSVFile(String.valueOf(files[finalI]));
+                    for (Map<String, Object> dataLakeProfile : dataLakeProfiles) {
+                        Map<String, Object> distances = calculateDistances(queryProfile, dataLakeProfile);
+                        if (!distances.isEmpty()) {
+                            try {
+                                File folder = new File(path + "\\distances"); // Create folder
+                                folder.mkdirs();
+
+                                String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
+                                writeDistances(distancesPath, distances, false);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
-//                }
+                }
+            }
+            else {
+                executor.submit(() -> {
+                    // Filter out the same dataset
+//                    if (!fileDatasetName.equals(dataset)) {
+                        LinkedList<Map<String, Object>> dataLakeProfiles = readCSVFile(String.valueOf(files[finalI]));
+                        for (Map<String, Object> dataLakeProfile : dataLakeProfiles) {
+                            Map<String, Object> distances = calculateDistances(queryProfile, dataLakeProfile);
+                            if (!distances.isEmpty()) {
+                                try {
+                                    File folder = new File(path + "\\distances"); // Create folder
+                                    folder.mkdirs();
+
+                                    String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
+                                    writeDistances(distancesPath, distances, false);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+//                    }
+                });
             }
         }
-        
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

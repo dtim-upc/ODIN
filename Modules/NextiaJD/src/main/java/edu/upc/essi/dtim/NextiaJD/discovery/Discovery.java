@@ -76,7 +76,7 @@ public class Discovery implements IDiscovery {
     @Override
     public double predictJoinQuality(String path1, String path2, String att1, String att2) throws SQLException, IOException, ParseException, SAXException, JAXBException {
         Connection conn = DuckDB.getConnection();
-        PredictQuality pq = new PredictQuality(conn);
+        PredictQuality pq = new PredictQuality();
         return pq.predictQuality(path1, path2, att1, att2);
     }
 

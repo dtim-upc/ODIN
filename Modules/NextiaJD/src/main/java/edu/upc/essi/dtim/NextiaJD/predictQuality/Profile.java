@@ -3,6 +3,7 @@ package edu.upc.essi.dtim.NextiaJD.predictQuality;
 import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
 import org.json.simple.JSONArray;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,10 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.nio.charset.*;
+import java.io.IOException;
+import java.util.List;
 
 import static edu.upc.essi.dtim.NextiaJD.predictQuality.FeatureGeneration.*;
 import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
@@ -34,7 +39,32 @@ public class Profile {
         try {
             // Create table from file and preprocess the data (trim and lowercase)
             Statement stmt = conn.createStatement();
-            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=1000, ignore_errors=True)");
+            try {
+                stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
+            } catch (SQLException e) {
+                if (e.toString().contains("Invalid unicode (byte sequence mismatch) detected in CSV file")) {
+                    try {
+                        // Read all lines from the file with Latin-1 encoding
+                        List<String> lines = Files.readAllLines(Paths.get(dataPath), StandardCharsets.ISO_8859_1);
+
+                        // Write all lines back to the same file with UTF-8 encoding
+                        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(dataPath), StandardCharsets.UTF_8)) {
+                            for (String line : lines) {
+                                writer.write(line);
+                                writer.newLine();
+                            }
+                        }
+                        stmt = conn.createStatement();
+                        stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                if (e.toString().contains("CSV File not supported for multithreading")) {
+                    stmt = conn.createStatement();
+                    stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=True, parallel=false)");
+                }
+            }
             preprocessing(conn, tableName);
 
             // Generate the profile of the table: for each column, its profile is generated and added to the features variable
@@ -64,6 +94,8 @@ public class Profile {
             JSONArray json = new JSONArray();
             json.addAll(features);
             stmt.execute("DROP TABLE \"" + tableName + "\"");
+            stmt.close();
+            conn.close();
 
             return json;
 
@@ -128,18 +160,18 @@ public class Profile {
     }
 
     public void addSyntacticFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
-        Map<String, Object> newFeatures = generateDatatypes(conn, tableName, column);
-        columnFeatures.put("datatype", newFeatures.get("datatype"));
-        columnFeatures.put("specific_type", newFeatures.get("specific_type"));
+//        Map<String, Object> newFeatures = generateDatatypes(conn, tableName, column);
+//        columnFeatures.put("datatype", newFeatures.get("datatype"));
+//        columnFeatures.put("specific_type", newFeatures.get("specific_type"));
+//
+//        String[] datatypeLabels = {"pct_numeric", "pct_alphanumeric", "pct_alphabetic", "pct_non_alphanumeric", "pct_date_time", "pct_unknown"};
+//        String[] specificDatatypeLabels = {"pct_phones", "pct_email", "pct_url", "pct_ip", "pct_username", "pct_phrases", "pct_general",
+//                "pct_date", "pct_time", "pct_date_time_specific", "pct_others"}; // Other = not determined
+//
+//        for (String datatypeLabel : datatypeLabels) columnFeatures.put(datatypeLabel, newFeatures.get(datatypeLabel));
+//        for (String specificDatatypeLabel : specificDatatypeLabels) columnFeatures.put(specificDatatypeLabel, newFeatures.get(specificDatatypeLabel));
 
-        String[] datatypeLabels = {"pct_numeric", "pct_alphanumeric", "pct_alphabetic", "pct_non_alphanumeric", "pct_date_time", "pct_unknown"};
-        String[] specificDatatypeLabels = {"pct_phones", "pct_email", "pct_url", "pct_ip", "pct_username", "pct_phrases", "pct_general",
-                "pct_date", "pct_time", "pct_date_time_specific", "pct_others"}; // Other = not determined
-
-        for (String datatypeLabel : datatypeLabels) columnFeatures.put(datatypeLabel, newFeatures.get(datatypeLabel));
-        for (String specificDatatypeLabel : specificDatatypeLabels) columnFeatures.put(specificDatatypeLabel, newFeatures.get(specificDatatypeLabel));
-
-        newFeatures = generateLengths(conn, tableName, column);
+        Map<String, Object> newFeatures = generateLengths(conn, tableName, column);
         columnFeatures.put("len_max_word", newFeatures.get("len_max_word"));
         columnFeatures.put("len_min_word", newFeatures.get("len_min_word"));
         columnFeatures.put("len_avg_word", newFeatures.get("len_avg_word"));
@@ -173,19 +205,18 @@ public class Profile {
 
         int counter = 1;
 
-        // Creating a fixed-size thread pool
-        ExecutorService executor = Executors.newFixedThreadPool(8);
+        // Define the thread pool
+        int parallelism = 4; // Number of available processors
+        ExecutorService executor = Executors.newFixedThreadPool(parallelism);
 
         for (File file : files) {
-            final int counterIter = counter;
+            int fileNumber = counter;
             executor.submit(() -> {
                 try {
-                    System.out.println("File " + counterIter + " out of " + files.length + ": " + file + " || " + "Processor: " + Thread.currentThread().getName());
-                    if (counterIter > 10000 && counterIter <= 11000) {
-                        Connection conn = DuckDB.getConnection();
-                        Profile p = new Profile(conn, "table" + counterIter);
-                        p.createProfile(String.valueOf(file), pathToStore);
-                    }
+                    Connection conn = DuckDB.getConnection();
+                    Profile p = new Profile(conn, "table" + fileNumber);
+                    p.createProfile(String.valueOf(file), pathToStore);
+                    System.out.println("File " + fileNumber + " out of " + files.length + ": " + file);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -193,7 +224,7 @@ public class Profile {
             counter++;
         }
 
-        // Shutdown the executor after all tasks are submitted
+        // Shutdown the executor when all tasks are completed
         executor.shutdown();
     }
 }
