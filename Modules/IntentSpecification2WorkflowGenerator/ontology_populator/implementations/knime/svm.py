@@ -31,14 +31,14 @@ polynomial_svm_learner_component = Component(
     name='Polynomial SVM Learner',
     implementation=svm_learner_implementation,
     overriden_parameters=[
-        ('Kernel type', 'Polynomial'),
+        ParameterSpecification(list(svm_learner_implementation.parameters.keys())[8], 'Polynomial'),
     ],
     exposed_parameters=[
-        'Class column',
-        'Overlapping Penalty',
-        'Bias',
-        'Power',
-        'Gamma',
+        list(svm_learner_implementation.parameters.keys())[0],
+        list(svm_learner_implementation.parameters.keys())[1],
+        list(svm_learner_implementation.parameters.keys())[2],
+        list(svm_learner_implementation.parameters.keys())[3],
+        list(svm_learner_implementation.parameters.keys())[4],
     ],
     transformations=[
         Transformation(
@@ -60,13 +60,13 @@ hypertangent_svm_learner_component = Component(
     name='HyperTangent SVM Learner',
     implementation=svm_learner_implementation,
     overriden_parameters=[
-        ('Kernel type', 'HyperTangent'),
+        ParameterSpecification(list(svm_learner_implementation.parameters.keys())[8], 'HyperTangent'),
     ],
     exposed_parameters=[
-        'Class column',
-        'Overlapping Penalty',
-        'Kappa',
-        'Delta',
+        list(svm_learner_implementation.parameters.keys())[0],
+        list(svm_learner_implementation.parameters.keys())[1],
+        list(svm_learner_implementation.parameters.keys())[5],
+        list(svm_learner_implementation.parameters.keys())[6],
     ],
     transformations=[
         Transformation(
@@ -83,12 +83,12 @@ rbf_svm_learner_component = Component(
     name='RBF SVM Learner',
     implementation=svm_learner_implementation,
     overriden_parameters=[
-        ('Kernel type', 'RBF'),
+        ParameterSpecification(list(svm_learner_implementation.parameters.keys())[8], 'RBF'),
     ],
     exposed_parameters=[
-        'Class column',
-        'Overlapping Penalty',
-        'Sigma',
+        list(svm_learner_implementation.parameters.keys())[0],
+        list(svm_learner_implementation.parameters.keys())[1],
+        list(svm_learner_implementation.parameters.keys())[7],
     ],
     transformations=[
         Transformation(

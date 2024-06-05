@@ -1,9 +1,12 @@
 import sys
+import os
 
 from rdflib.collection import Collection
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from common import *
-from implementations.knime import implementations, components
+from ontology_populator.implementations.knime import implementations, components
 
 
 def init_cbox() -> Graph:
@@ -22,6 +25,7 @@ def add_problems(cbox):
         cb.Prediction,
         cb.DataCleaning,
         cb.DataManagement,
+        cb.DataVisualization,
 
         cb.Classification,
         cb.Clustering,
@@ -37,11 +41,11 @@ def add_problems(cbox):
     ]
 
     for p in problems:
-        cbox.add((p, RDF.type, tb.Problem))
+        cbox.add((p, RDF.type, tb.Task))
 
     for p, sps in subproblems:
         for sp in sps:
-            cbox.add((sp, tb.subProblemOf, p))
+            cbox.add((sp, tb.subtaskOf, p))
 
 
 def add_algorithms(cbox):
@@ -81,6 +85,17 @@ def add_algorithms(cbox):
         # Data Management
         (cb.TrainTestSplit, cb.DataManagement),
         (cb.LabelExtraction, cb.DataManagement),
+
+        # Data Visualization
+        (cb.PieChart, cb.DataVisualization),
+        (cb.BarChart, cb.DataVisualization),
+        (cb.ScatterPlot, cb.DataVisualization),
+        (cb.LinePlot, cb.DataVisualization),
+        # (cb.DensityPlot, cb.DataVisualization),
+        (cb.Histogram, cb.DataVisualization),
+        (cb.HeatMap, cb.DataVisualization),
+        
+        
     ]
 
     for algorithm, problem in algorithms:
@@ -112,13 +127,77 @@ def add_models(cbox):
         'MissingValueModel',
     ]
 
-    cbox.add((cb.Model, RDFS.subClassOf, tb.Data))
+    cbox.add((cb.Model, RDFS.subClassOf, tb.Data)) ### ask and change accordingly
     for model in models:
         cbox.add((cb.term(model), RDFS.subClassOf, cb.Model))
 
         cbox.add((cb.term(model + 'Shape'), RDF.type, SH.NodeShape))
-        cbox.add((cb.term(model + 'Shape'), RDF.type, tb.DataTag))
+        cbox.add((cb.term(model + 'Shape'), RDF.type, tb.DataSpec))
         cbox.add((cb.term(model + 'Shape'), SH.targetClass, cb.term(model)))
+
+
+def add_visualizations(cbox):
+    visualizations = [
+        'PieChartVisualization',
+        'BarChartVisualization',
+        'ScatterPlotVisualization',
+        'LinePlotVisualization',
+        # 'DensityPlotVisualization'
+        'HistogramVisualization',
+        'HeatMapVisualization',
+        
+    ]
+
+    cbox.add((cb.Visualization, RDFS.subClassOf, tb.Data))
+    for visual in visualizations:
+        cbox.add((cb.term(visual), RDFS.subClassOf, cb.Visualization))
+
+        cbox.add((cb.term(visual + 'Shape'), RDF.type, SH.NodeShape))
+        cbox.add((cb.term(visual + 'Shape'), RDF.type, tb.DataSpec))
+        cbox.add((cb.term(visual + 'Shape'), SH.targetClass, cb.term(visual)))
+
+
+# def add_datasets(cbox):
+#     cbox.add((dmop.TabularDataset, RDFS.subClassOf, tb.Data))
+
+#     cbox.add((cb.term('TabularDatasetShape'), RDF.type, SH.NodeShape))
+#     cbox.add((cb.term('TabularDatasetShape'), RDF.type, tb.DataSpec))
+#     cbox.add((cb.term('TabularDatasetShape'), SH.targetClass, dmop.TabularDataset))
+
+
+def add_subproperties(cbox):
+    subproperties = [
+        # Column
+        (dmop.hasColumnName, dmop.ColumnInfoProperty),
+        (dmop.hasDataPrimitiveTypeColumn, dmop.ColumnInfoProperty),
+        (dmop.hasPosition, dmop.ColumnInfoProperty),
+        (dmop.isCategorical, dmop.ColumnInfoProperty),
+        (dmop.isFeature, dmop.ColumnInfoProperty),
+        (dmop.isLabel, dmop.ColumnInfoProperty),
+        (dmop.isUnique, dmop.ColumnInfoProperty),
+        (dmop.containsNulls, dmop.ColumnValueInfoProperty),
+        (dmop.hasMeanValue, dmop.ColumnValueInfoProperty),
+        (dmop.hasStandardDeviation, dmop.ColumnValueInfoProperty),
+        (dmop.hasMaxValue, dmop.ColumnValueInfoProperty),
+        (dmop.hasMinValue, dmop.ColumnValueInfoProperty),
+
+        # Dataset
+        (dmop.delimiter, dmop.DatasetPhysicalProperty),
+        (dmop.doubleQuote, dmop.DatasetPhysicalProperty),
+        (dmop.encoding, dmop.DatasetPhysicalProperty),
+        (dmop.fileFormat, dmop.DatasetPhysicalProperty),
+        (dmop.hasHeader, dmop.DatasetPhysicalProperty),
+        (dmop.isNormalized, dmop.DatasetValueInfoProperty),
+        (dmop.lineDelimiter, dmop.DatasetPhysicalProperty),
+        (dmop.numberOfColumns, dmop.DatasetInfoProperty),
+        (dmop.numberOfRows, dmop.DatasetInfoProperty),
+        (dmop.path, dmop.DatasetPhysicalProperty),
+        (dmop.quoteChar, dmop.DatasetPhysicalProperty),
+        (dmop.skipInitialSpace, dmop.DatasetPhysicalProperty),
+    ]
+
+    for s, o in subproperties:
+        cbox.add((s, RDFS.subPropertyOf, o))
 
 
 def add_shapes(cbox):
@@ -237,12 +316,15 @@ def add_shapes(cbox):
     cbox.add((cb.NormalizedTabularDatasetShape, SH.targetClass, dmop.TabularDataset))
 
 
-def main(dest='../ontologies/cbox.ttl'):
+def main(dest='../modified-ontologies/cbox.ttl'):
     cbox = init_cbox()
     add_problems(cbox)
     add_algorithms(cbox)
     add_implementations(cbox)
     add_models(cbox)
+    add_visualizations(cbox)
+    # add_datasets(cbox)
+    add_subproperties(cbox)
     add_shapes(cbox)
 
     cbox.serialize(dest, format='turtle')

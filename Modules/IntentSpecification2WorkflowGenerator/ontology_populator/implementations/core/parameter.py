@@ -1,5 +1,9 @@
 from typing import Union
 
+import os 
+import sys
+from .parameter_specification import ParameterSpecification
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from common import *
 
 LiteralValue = Union[str, bool, int, float, None]

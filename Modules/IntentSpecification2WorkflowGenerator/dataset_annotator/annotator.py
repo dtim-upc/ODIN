@@ -1,8 +1,11 @@
 import csv
 import os
+import sys
 from os import path
 
 import pandas as pd
+
+sys.path.append(os.path.abspath('..'))
 
 from common import *
 

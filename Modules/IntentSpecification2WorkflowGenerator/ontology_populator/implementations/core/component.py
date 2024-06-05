@@ -2,9 +2,13 @@ from typing import List, Union, Tuple, Any
 
 from rdflib.collection import Collection
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from common import *
 from .implementation import Implementation
 from .transformation import Transformation
+from .parameter_specification import ParameterSpecification
 
 LiteralValue = Union[str, bool, int, float, None]
 
@@ -13,7 +17,7 @@ class Component:
 
     def __init__(self, name: str, implementation: Implementation, transformations: List[Transformation],
                  exposed_parameters: List[str] = None,
-                 overriden_parameters: List[Tuple[str, Any]] = None,
+                 overriden_parameters: List[ParameterSpecification] = None,
                  counterpart: Union['Component', List['Component']] = None,
                  namespace: Namespace = cb) -> None:
         super().__init__()
@@ -28,11 +32,13 @@ class Component:
         self.component_type = {
             tb.LearnerImplementation: tb.LearnerComponent,
             tb.ApplierImplementation: tb.ApplierComponent,
+            tb.VisualizerImplementation: tb.VisualizerComponent,
             tb.Implementation: tb.Component,
         }[self.implementation.implementation_type]
         self.counterpart = counterpart
         if self.counterpart is not None:
-            assert self.component_type in {tb.LearnerComponent, tb.ApplierComponent}
+            # if self.component_type is not None:
+            assert self.component_type in {tb.LearnerComponent, tb.ApplierComponent, tb.VisualizerComponent}
             if isinstance(self.counterpart, list):
                 for c in self.counterpart:
                     if c.counterpart is None:
@@ -59,18 +65,24 @@ class Component:
         g.add((self.uri_ref, tb.hasTransformation, Collection(g, uri=BNode(), seq=transformation_nodes).uri))
 
         # Overriden parameters triples
-        for parameter, value in self.overriden_parameters:
-            parameter_value = BNode()
-            g.add((parameter_value, RDF.type, tb.ParameterValue))
-            g.add((parameter_value, tb.forParameter, self.implementation.parameters[parameter].uri_ref))
-            g.add((parameter_value, tb.has_value, Literal(value)))
-            g.add((self.uri_ref, tb.overridesParameter, parameter_value))
+        # for parameter, value in self.overriden_parameters:
+            # parameter_value = BNode()
+            # g.add((parameter_value, RDF.type, tb.ParameterValue))
+            # g.add((parameter_value, tb.forParameter, self.implementation.parameters[parameter].uri_ref))
+            # g.add((parameter_value, tb.has_value, Literal(value)))
+            # g.add((self.uri_ref, tb.overridesParameter, parameter_value))
+        for para_spec in self.overriden_parameters:
+            g.add((self.uri_ref, tb.overrideParameter, para_spec.uri_ref))
 
         # Exposed parameters triples
         for parameter in self.exposed_parameters:
             g.add((self.uri_ref, tb.exposesParameter, self.implementation.parameters[parameter].uri_ref))
 
         return self.uri_ref
+
+        # Specification of Input and Output Types
+        # g.add(self.uri_ref, tb.specifiesInput, self.input_type)
+        # g.add(self.uri_ref, tb.specifiesOutput, self.output_type)
 
     def add_counterpart_relationship(self, g: Graph):
         if self.counterpart is None:

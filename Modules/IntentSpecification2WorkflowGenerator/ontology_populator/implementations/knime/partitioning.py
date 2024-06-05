@@ -28,12 +28,14 @@ random_relative_train_test_split_component = Component(
     name='Random Relative Train-Test Split',
     implementation=partitioning_implementation,
     overriden_parameters=[
-        ("Size of First Partition", "Relative"),
-        ("Sampling Method", "Random"),
+        # ("Size of First Partition", "Relative"),
+        # ("Sampling Method", "Random"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[0], list(partitioning_implementation.parameters.values())[0].default_value),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[1], list(partitioning_implementation.parameters.values())[1].default_value)
     ],
     exposed_parameters=[
-        "Fraction (Relative size)",
-        "Random seed",
+        list(partitioning_implementation.parameters.keys())[2],
+        list(partitioning_implementation.parameters.keys())[4],
     ],
     transformations=[
         CopyTransformation(1, 1),
@@ -62,12 +64,12 @@ random_absolute_train_test_split_component = Component(
     name='Random Absolute Train-Test Split',
     implementation=partitioning_implementation,
     overriden_parameters=[
-        ("Size of First Partition", "Absolute"),
-        ("Sampling Method", "Random"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[0], "Absolute"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[1], "Random")
     ],
     exposed_parameters=[
-        "Count (Absolute size)",
-        "Random seed",
+        list(partitioning_implementation.parameters.keys())[3],
+        list(partitioning_implementation.parameters.keys())[4],
     ],
     transformations=[
         CopyTransformation(1, 1),
@@ -96,11 +98,11 @@ top_relative_train_test_split_component = Component(
     name='Top K Relative Train-Test Split',
     implementation=partitioning_implementation,
     overriden_parameters=[
-        ("Size of First Partition", "Relative"),
-        ("Sampling Method", "First"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[0], "Relative"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[1], "First"),
     ],
     exposed_parameters=[
-        "Fraction (Relative size)",
+        list(partitioning_implementation.parameters.keys())[2],
     ],
     transformations=[
         CopyTransformation(1, 1),
@@ -129,11 +131,11 @@ top_absolute_train_test_split_component = Component(
     name='Top K Absolute Train-Test Split',
     implementation=partitioning_implementation,
     overriden_parameters=[
-        ("Size of First Partition", "Absolute"),
-        ("Sampling Method", "First"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[0], "Absolute"),
+        ParameterSpecification(list(partitioning_implementation.parameters.values())[1], "First"),
     ],
     exposed_parameters=[
-        "Count (Absolute size)",
+        list(partitioning_implementation.parameters.keys())[3],
     ],
     transformations=[
         CopyTransformation(1, 1),

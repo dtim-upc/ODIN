@@ -171,7 +171,7 @@ def generate_fake_abox(num_components: int, num_requirements_per_component: int,
 
 
 def generate_experiment_suite(folder: str):
-    num_components = [5, 10, 100, 200]
+    num_components = [5, 10]#, 100, 200]
     num_requirements_per_component = [1, 2, 3, 4, 5]
     num_components_per_requirement = [1, 2, 3, 4, 5]
     overlap = 0

@@ -42,9 +42,12 @@ mean_imputation_component = Component(
     name='Mean Imputation',
     implementation=missing_value_implementation,
     overriden_parameters=[
-        ('Integer', 'org.knime.base.node.preproc.pmml.missingval.handlers.DoubleMeanMissingCellHandlerFactory'),
-        ('Float', 'org.knime.base.node.preproc.pmml.missingval.handlers.DoubleMeanMissingCellHandlerFactory'),
-        ('String', 'org.knime.base.node.preproc.pmml.missingval.handlers.MostFrequentValueMissingCellHandlerFactory'),
+        ParameterSpecification(list(missing_value_implementation.parameters.values())[0],
+                               'org.knime.base.node.preproc.pmml.missingval.handlers.DoubleMeanMissingCellHandlerFactory'),
+        ParameterSpecification(list(missing_value_implementation.parameters.values())[2],
+                               'org.knime.base.node.preproc.pmml.missingval.handlers.DoubleMeanMissingCellHandlerFactory'),
+        ParameterSpecification(list(missing_value_implementation.parameters.values())[1],
+                               'org.knime.base.node.preproc.pmml.missingval.handlers.MostFrequentValueMissingCellHandlerFactory'),
     ],
     exposed_parameters=[],
     transformations=[
@@ -66,9 +69,12 @@ drop_rows_component = Component(
     name='Drop Rows with Missing Values',
     implementation=missing_value_implementation,
     overriden_parameters=[
-        ('Integer', 'org.knime.base.node.preproc.pmml.missingval.pmml.RemoveRowMissingCellHandlerFactory'),
-        ('Float', 'org.knime.base.node.preproc.pmml.missingval.pmml.RemoveRowMissingCellHandlerFactory'),
-        ('String', 'org.knime.base.node.preproc.pmml.missingval.pmml.RemoveRowMissingCellHandlerFactory'),
+        ParameterSpecification(list(missing_value_implementation.parameters.values())[0],
+                               'org.knime.base.node.preproc.pmml.missingval.pmml.RemoveRowMissingCellHandlerFactory'),
+        ParameterSpecification(list(missing_value_implementation.parameters.values())[2],
+                               'org.knime.base.node.preproc.pmml.missingval.pmml.RemoveRowMissingCellHandlerFactory'),
+        ParameterSpecification(list(missing_value_implementation.parameters.values())[1],
+                               'org.knime.base.node.preproc.pmml.missingval.pmml.RemoveRowMissingCellHandlerFactory'),
     ],
     exposed_parameters=[],
     transformations=[

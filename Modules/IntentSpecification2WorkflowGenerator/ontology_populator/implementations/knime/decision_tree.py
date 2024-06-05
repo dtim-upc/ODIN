@@ -40,24 +40,27 @@ decision_tree_learner_component = Component(
     implementation=decision_tree_learner_implementation,
     transformations=[
     ],
+    # overriden_parameters=[
+    #     ParameterSpecification(parameter, parameter.default_value) for parameter in decision_tree_learner_implementation.parameters
+    # ],
     exposed_parameters=[
-        'Class column',
-        'Number of records to store for view',
-        'Min number records per node',
-        'Pruning method',
-        'Reduced error pruning',
-        'Quality Measure',
-        'Average split point',
-        'Number of threads',
-        'Max number of nominal values',
-        'Binary nominal splits',
-        'Filter invalid',
-        'Skip nominal columns without domain information',
-        'No true child strategy',
-        'Missing value strategy',
-        'Force root split columns',
-        'Root split column',
-    ],
+    list(decision_tree_learner_implementation.parameters.keys())[0],
+    list(decision_tree_learner_implementation.parameters.keys())[1],
+    list(decision_tree_learner_implementation.parameters.keys())[2],
+    list(decision_tree_learner_implementation.parameters.keys())[3],
+    list(decision_tree_learner_implementation.parameters.keys())[4],
+    list(decision_tree_learner_implementation.parameters.keys())[5],
+    list(decision_tree_learner_implementation.parameters.keys())[6],
+    list(decision_tree_learner_implementation.parameters.keys())[7],
+    list(decision_tree_learner_implementation.parameters.keys())[8],
+    list(decision_tree_learner_implementation.parameters.keys())[9],
+    list(decision_tree_learner_implementation.parameters.keys())[10],
+    list(decision_tree_learner_implementation.parameters.keys())[11],
+    list(decision_tree_learner_implementation.parameters.keys())[12],
+    list(decision_tree_learner_implementation.parameters.keys())[13],
+    list(decision_tree_learner_implementation.parameters.keys())[14],
+    list(decision_tree_learner_implementation.parameters.keys())[15],
+    ]
 )
 
 decision_tree_predictor_implementation = KnimeImplementation(

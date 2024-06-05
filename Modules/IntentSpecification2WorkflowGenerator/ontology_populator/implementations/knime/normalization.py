@@ -27,11 +27,11 @@ min_max_scaling_component = Component(
     name='Min-Max Scaling',
     implementation=normalizer_implementation,
     overriden_parameters=[
-        ('Normalization mode', 1),
+        ParameterSpecification(list(normalizer_implementation.parameters.keys())[0], 1),
     ],
     exposed_parameters=[
-        'New minimum',
-        'New maximum',
+        list(normalizer_implementation.parameters.keys())[1],
+        list(normalizer_implementation.parameters.keys())[2],
     ],
     transformations=[
         CopyTransformation(1, 1),
@@ -77,7 +77,7 @@ z_score_scaling_component = Component(
     name='Z-Score Scaling',
     implementation=normalizer_implementation,
     overriden_parameters=[
-        ('Normalization mode', 2),
+        ParameterSpecification(list(normalizer_implementation.parameters.keys())[0], 2),
     ],
     transformations=[
         CopyTransformation(1, 1),
@@ -121,7 +121,7 @@ decimal_scaling_component = Component(
     name='Decimal Scaling',
     implementation=normalizer_implementation,
     overriden_parameters=[
-        ('Normalization mode', 3),
+        ParameterSpecification(list(normalizer_implementation.parameters.keys())[0], 3),
     ],
     transformations=[
         CopyTransformation(1, 1),

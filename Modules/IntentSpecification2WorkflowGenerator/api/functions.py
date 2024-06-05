@@ -1,7 +1,9 @@
 import zipfile
 
 from rdflib.term import Node
-
+import os 
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from pipeline_generator.pipeline_generator import *
 
 

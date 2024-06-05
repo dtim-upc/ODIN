@@ -143,11 +143,11 @@ csv_reader_local_component = Component(
         LoaderTransformation(),
     ],
     overriden_parameters=[
-        ('Location flag', True),
-        ('Filesystem', 'LOCAL'),
+        ParameterSpecification(list(csv_reader_implementation.parameters.keys())[1], True),
+        ParameterSpecification(list(csv_reader_implementation.parameters.keys())[2], 'LOCAL'),
     ],
     exposed_parameters=[
-        'File'
+        list(csv_reader_implementation.parameters.keys())[0]
     ],
 )
 
@@ -255,20 +255,20 @@ csv_writer_local_component = Component(
     implementation=csv_writer_implementation,
     transformations=[],
     overriden_parameters=[
-        ('Location flag', True),
-        ('Filesystem', 'LOCAL'),
+        ParameterSpecification(list(csv_reader_implementation.parameters.keys())[1], True),
+        ParameterSpecification(list(csv_reader_implementation.parameters.keys())[2], 'LOCAL'),
     ],
     exposed_parameters=[
-        'File',
-        'Create Missing Folders',
-        'On Existing File',
-        'Column Delimieter',
-        'Row Delimieter',
-        'Quote char',
-        'Quote escape char',
-        'Write column header',
-        'Skip column header on append',
-        'Write row header',
+        list(csv_writer_implementation.parameters.keys())[0],
+        list(csv_writer_implementation.parameters.keys())[3],
+        list(csv_writer_implementation.parameters.keys())[4],
+        list(csv_writer_implementation.parameters.keys())[18],
+        list(csv_writer_implementation.parameters.keys())[19],
+        list(csv_writer_implementation.parameters.keys())[20],
+        list(csv_writer_implementation.parameters.keys())[21],
+        list(csv_writer_implementation.parameters.keys())[22],
+        list(csv_writer_implementation.parameters.keys())[23],
+        list(csv_writer_implementation.parameters.keys())[24],
     ]
 
 )
