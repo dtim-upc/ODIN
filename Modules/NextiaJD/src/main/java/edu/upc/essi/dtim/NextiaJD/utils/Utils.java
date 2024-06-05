@@ -39,7 +39,7 @@ public class Utils {
                             "SET \"" + column + "\" = " +
                             "CASE " +
                             "WHEN \"" + column + "\" IN ('', ' ') THEN NULL " +
-                            "ELSE LOWER(TRIM(REPLACE(REPLACE(\"" + column + "\", '\n', ' '), ';', ','))) " +
+                            "ELSE LOWER(TRIM(REPLACE(REPLACE(\"" + column + "\", '\n', '_'), ';', ','))) " +
                             "END");
         }
     }

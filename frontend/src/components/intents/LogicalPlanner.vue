@@ -43,6 +43,7 @@ import {useIntentsStore} from 'stores/intentsStore.js'
 import DialogWithVisualizedPlan from "../../components/intents/visualize_plan/DialogWithVisualizedPlan.vue";
 import {useRoute, useRouter} from "vue-router";
 import { useQuasar } from 'quasar'
+import FileSaver from 'file-saver';
 
 const router = useRouter()
 const route = useRoute()

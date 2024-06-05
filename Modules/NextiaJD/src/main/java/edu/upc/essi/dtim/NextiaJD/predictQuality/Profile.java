@@ -3,15 +3,19 @@ package edu.upc.essi.dtim.NextiaJD.predictQuality;
 import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
 import org.json.simple.JSONArray;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.nio.charset.*;
+import java.io.IOException;
+import java.util.List;
 
 import static edu.upc.essi.dtim.NextiaJD.predictQuality.FeatureGeneration.*;
 import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
@@ -19,25 +23,58 @@ import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
 public class Profile {
 
     Connection conn;
-    String tableName = "temptTable";
+    String tableName;
 
     public Profile(Connection conn) {
         this.conn = conn;
+        this.tableName = "temptTable";
+    }
+
+    public Profile(Connection conn, String tableName) {
+        this.conn = conn;
+        this.tableName = tableName;
     }
 
     public JSONArray createProfile(String dataPath, String pathToStoreProfile) {
         try {
             // Create table from file and preprocess the data (trim and lowercase)
             Statement stmt = conn.createStatement();
-            stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, all_varchar=True)");
+            try {
+                stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
+            } catch (SQLException e) {
+                if (e.toString().contains("Invalid unicode (byte sequence mismatch) detected in CSV file")) {
+                    try {
+                        // Read all lines from the file with Latin-1 encoding
+                        List<String> lines = Files.readAllLines(Paths.get(dataPath), StandardCharsets.ISO_8859_1);
+
+                        // Write all lines back to the same file with UTF-8 encoding
+                        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(dataPath), StandardCharsets.UTF_8)) {
+                            for (String line : lines) {
+                                writer.write(line);
+                                writer.newLine();
+                            }
+                        }
+                        stmt = conn.createStatement();
+                        stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                if (e.toString().contains("CSV File not supported for multithreading")) {
+                    stmt = conn.createStatement();
+                    stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=True, parallel=false)");
+                }
+            }
             preprocessing(conn, tableName);
 
             // Generate the profile of the table: for each column, its profile is generated and added to the features variable
             LinkedList<Map<String,Object>> features = new LinkedList<>();
             ResultSet rs = stmt.executeQuery("DESCRIBE \"" + tableName + "\"");
             while (rs.next()) {
-                // We only generate the profile if the column has some value (i.e. if it is only null values, we do not create the profile)
-                if (getNumberOfValues(conn, tableName, rs.getString(1)) != 0.0) {
+                ResultSet rs2 = conn.createStatement().executeQuery("SELECT \"" + rs.getString(1) + "\" FROM \"" + tableName + "\" LIMIT 0");
+                ResultSetMetaData rsmd = rs2.getMetaData();
+                // We only generate the profile if the column is VARCHAR and has some value (i.e. if it is only null values, we do not create the profile)
+                if (rsmd.getColumnTypeName(1).equals("VARCHAR") && getNumberOfValues(conn, tableName, rs.getString(1)) != 0.0) {
                     features.add(createProfileOfColumn(rs.getString(1)));
                 }
             }
@@ -48,7 +85,7 @@ public class Profile {
             }
 
             // Write the profile in a CSV/JSON file
-            if (!pathToStoreProfile.isEmpty()) {
+            if (!pathToStoreProfile.isEmpty() && !features.isEmpty()) {
                 writeCSV(features, dataPath, pathToStoreProfile);
 //                writeJSON(features, dataPath, pathToStoreProfile);
             }
@@ -57,11 +94,23 @@ public class Profile {
             JSONArray json = new JSONArray();
             json.addAll(features);
             stmt.execute("DROP TABLE \"" + tableName + "\"");
+            stmt.close();
+            conn.close();
+
             return json;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("SKIPPED " + dataPath);
+            System.out.println(e);
+            // We have to remove the table if it has been created. Otherwise, the remaining profiles will not be generated
+            try {
+                Statement stmt = conn.createStatement();
+                stmt.execute("DROP TABLE IF EXISTS \"" + tableName + "\"");
+            }  catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
+        return null;
     }
 
     public Map<String,Object> createProfileOfColumn(String column) throws SQLException {
@@ -70,7 +119,7 @@ public class Profile {
         addValueDistributionFeatures(column, columnFeatures);
         addSyntacticFeatures(column, columnFeatures);
         addOtherFeatures(column, columnFeatures);
-        columnFeatures.put("attribute_name", column); // Add name of the column
+        columnFeatures.put("attribute_name", "\"" + column + "\""); // Add name of the column
         return columnFeatures;
     }
 
@@ -111,18 +160,18 @@ public class Profile {
     }
 
     public void addSyntacticFeatures(String column, Map<String, Object> columnFeatures) throws SQLException {
-        Map<String, Object> newFeatures = generateDatatypes(conn, tableName, column);
-        columnFeatures.put("datatype", newFeatures.get("datatype"));
-        columnFeatures.put("specific_type", newFeatures.get("specific_type"));
+//        Map<String, Object> newFeatures = generateDatatypes(conn, tableName, column);
+//        columnFeatures.put("datatype", newFeatures.get("datatype"));
+//        columnFeatures.put("specific_type", newFeatures.get("specific_type"));
+//
+//        String[] datatypeLabels = {"pct_numeric", "pct_alphanumeric", "pct_alphabetic", "pct_non_alphanumeric", "pct_date_time", "pct_unknown"};
+//        String[] specificDatatypeLabels = {"pct_phones", "pct_email", "pct_url", "pct_ip", "pct_username", "pct_phrases", "pct_general",
+//                "pct_date", "pct_time", "pct_date_time_specific", "pct_others"}; // Other = not determined
+//
+//        for (String datatypeLabel : datatypeLabels) columnFeatures.put(datatypeLabel, newFeatures.get(datatypeLabel));
+//        for (String specificDatatypeLabel : specificDatatypeLabels) columnFeatures.put(specificDatatypeLabel, newFeatures.get(specificDatatypeLabel));
 
-        String[] datatypeLabels = {"pct_numeric", "pct_alphanumeric", "pct_alphabetic", "pct_non_alphanumeric", "pct_date_time", "pct_unknown"};
-        String[] specificDatatypeLabels = {"pct_phones", "pct_email", "pct_url", "pct_ip", "pct_username", "pct_phrases", "pct_general",
-                "pct_date", "pct_time", "pct_date_time_specific", "pct_others"}; // Other = not determined
-
-        for (String datatypeLabel : datatypeLabels) columnFeatures.put(datatypeLabel, newFeatures.get(datatypeLabel));
-        for (String specificDatatypeLabel : specificDatatypeLabels) columnFeatures.put(specificDatatypeLabel, newFeatures.get(specificDatatypeLabel));
-
-        newFeatures = generateLengths(conn, tableName, column);
+        Map<String, Object> newFeatures = generateLengths(conn, tableName, column);
         columnFeatures.put("len_max_word", newFeatures.get("len_max_word"));
         columnFeatures.put("len_min_word", newFeatures.get("len_min_word"));
         columnFeatures.put("len_avg_word", newFeatures.get("len_avg_word"));
@@ -148,19 +197,34 @@ public class Profile {
     }
 
     public static void generateAllProfilesOfAllDataInAFolder(String path, String pathToStore) throws Exception {
-        Connection conn = DuckDB.getConnection();
         Files.createDirectories(Path.of(pathToStore));
 
         // Path of the folder that contains the files to obtain profiles from (we get only the files)
-        File[] files = (new File (path)).listFiles(File::isFile);
+        File[] files = (new File(path)).listFiles(File::isFile);
         assert files != null;
 
         int counter = 1;
-        for (File file: files) {
-            System.out.println("File " + counter + " out of " + files.length + ": " + file);
-            Profile p = new Profile(conn);
-            p.createProfile(String.valueOf(file), pathToStore);
+
+        // Define the thread pool
+        int parallelism = 4; // Number of available processors
+        ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+
+        for (File file : files) {
+            int fileNumber = counter;
+            executor.submit(() -> {
+                try {
+                    Connection conn = DuckDB.getConnection();
+                    Profile p = new Profile(conn, "table" + fileNumber);
+                    p.createProfile(String.valueOf(file), pathToStore);
+                    System.out.println("File " + fileNumber + " out of " + files.length + ": " + file);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
             counter++;
         }
+
+        // Shutdown the executor when all tasks are completed
+        executor.shutdown();
     }
 }

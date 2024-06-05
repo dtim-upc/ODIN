@@ -63,6 +63,7 @@ def convert_strings_to_uris(obj):
 @app.post('/logical_planner')
 def run_logical_planner():
     plan_ids = request.json.get('plan_ids', '')
+    print(plan_ids)
     intent_json = request.json.get('intent_graph', '')
     algorithm_implementations = request.json.get('algorithm_implementations', '')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
@@ -71,14 +72,15 @@ def run_logical_planner():
     algorithm_implementations_uris = convert_strings_to_uris(algorithm_implementations)
 
     intent = Graph().parse(data=intent_json, format='turtle')
-    intent.print()
 
     impls = [impl
              for alg, impls in algorithm_implementations_uris.items() if str(alg) in plan_ids
              for impl in impls]
 
     workflow_plans = workflow_planner(ontology, impls, intent)
+    workflow_plans[0].serialize(destination='C:\\Users\\marc.maynou\\Desktop\\NextiaJD\\wplan.rdf', format='xml')
     logical_plans = logical_planner(ontology, workflow_plans)
+    workflow_plans[0].serialize(destination='C:\\Users\\marc.maynou\\Desktop\\NextiaJD\\lplan.rdf', format='xml')
 
     return logical_plans
 
@@ -203,37 +205,31 @@ def download_proactive():
         load_dataset_task = bucket.create_Import_Data_task(import_from="PA:USER_FILE", file_path=data_product_name + ".csv", file_delimiter=";", label_column=label_column)
         proactive_job.addTask(load_dataset_task)
 
+        # remove_nulls = bucket.create_Fill_NaNs_task(0)
+        # split_data_task.addDependency(load_dataset_task)
+        # proactive_job.addTask(remove_nulls)
+
         split_data_task = bucket.create_Split_Data_task()
         split_data_task.addDependency(load_dataset_task)
         proactive_job.addTask(split_data_task)
 
         # Model depends on the layout, the rest is the same
-        scale_task = bucket.create_Scale_Data_task()
         model_task = bucket.create_Support_Vector_Machines_task()
         for key in layout:
             if "decision_tree_predictor" in key:
                 model_task = bucket.create_Random_Forest_task()
                 break
-        random_forest_task = bucket.create_Random_Forest_task()
-        proactive_job.addTask(random_forest_task)
+        proactive_job.addTask(model_task)
 
         train_model_task = bucket.create_Train_Model_task()
         train_model_task.addDependency(split_data_task)
         train_model_task.addDependency(model_task)
         proactive_job.addTask(train_model_task)
 
-        download_model_task = bucket.create_Download_Model_task()
-        download_model_task.addDependency(train_model_task)
-        proactive_job.addTask(download_model_task)
-
         predict_model_task = bucket.create_Predict_Model_task()
         predict_model_task.addDependency(split_data_task)
         predict_model_task.addDependency(train_model_task)
         proactive_job.addTask(predict_model_task)
-
-        preview_results_task = bucket.create_Preview_Results_task()
-        preview_results_task.addDependency(predict_model_task)
-        proactive_job.addTask(preview_results_task)
 
         gateway.saveJob2XML(proactive_job, os.path.abspath(r'api/temp_files/extremexp_test_workflow.xml'))
 

@@ -13,5 +13,6 @@ public class DuckDB {
             throw new RuntimeException("DuckDB driver not found");
         }
         return DriverManager.getConnection("jdbc:duckdb:");
+//        return DriverManager.getConnection("jdbc:duckdb:" + "C:\\Projects\\database");
     }
 }
