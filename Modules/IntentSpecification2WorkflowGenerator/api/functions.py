@@ -167,14 +167,8 @@ def get_custom_ontology(path):
     graph = get_graph_xp()
     ontologies = [
         r'ontologies/tbox.ttl',
-        # r'ontologies/cbox.ttl',
-        # r'ontologies/abox.ttl',
-
-        # r'ontologies/cbox_new.ttl',
-        # r'ontologies/abox_new.ttl',
-
-        r'ontologies/cbox_new_2.ttl',
-        r'ontologies/abox_new_2.ttl',
+        r'ontologies/cbox.ttl',
+        r'ontologies/abox.ttl',
         path
     ]
     for o in ontologies:
@@ -187,14 +181,8 @@ def get_custom_ontology_only_problems():
     graph = get_graph_xp()
     ontologies = [
         r'ontologies/tbox.ttl',
-        # r'ontologies/cbox.ttl',
-        # r'ontologies/abox.ttl',
-
-        # r'ontologies/cbox_new.ttl',
-        # r'ontologies/abox_new.ttl',
-
-        r'ontologies/cbox_new_2.ttl',
-        r'ontologies/abox_new_2.ttl',
+        r'ontologies/cbox.ttl',
+        r'ontologies/abox.ttl',
     ]
     for o in ontologies:
         graph.parse(o, format="turtle")

@@ -3,6 +3,7 @@ from .decision_tree import *
 from .normalization import *
 from .decision_tree import *
 from .svm import *
+from .nn import *
 from .missing_values import *
 from .csv_io import *
 
@@ -18,6 +19,8 @@ implementations = [
     missing_value_applier_implementation,
     csv_reader_implementation,
     csv_writer_implementation,
+    nn_learner_implementation,
+    nn_predictor_implementation,
 ]
 
 components = [
@@ -40,4 +43,9 @@ components = [
     missing_value_applier_component,
     csv_reader_local_component,
     csv_writer_local_component,
+    feedforward_learner_component,
+    recurrent_learner_component,
+    convolutional_learner_component,
+    lstm_learner_component,
+    nn_predictor_component,
 ]
