@@ -132,8 +132,6 @@ export const useIntentsStore = defineStore('intents', {
             plan: response.data[key].logical_plan,
             graph:  response.data[key].graph,
           }
-          console.log(plan.plan)
-          this.downloadRDF(plan)
           this.logicalPlans.map(logPlan => {
             if (logPlan.id === this.removeLastPart(key)) {
               logPlan.plans.push(plan)

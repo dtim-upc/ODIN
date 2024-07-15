@@ -8,7 +8,7 @@ import axios from 'axios'
 // "export default () => {}" function below (which runs individually
 // for each client)
 const odinApi = axios.create({baseURL: process.env.API});
-const intentsApi = axios.create({baseURL: "http://localhost:5000/"});
+const intentsApi = axios.create({baseURL: "http://localhost:5001/"});
 
 export default boot(({app}) => {
    app.config.globalProperties.$axios = axios

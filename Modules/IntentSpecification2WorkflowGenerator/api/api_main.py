@@ -1,4 +1,6 @@
 import shutil
+from pathlib import Path
+
 import proactive
 
 from flask import Flask, request, send_file
@@ -8,12 +10,13 @@ from api.functions import *
 from pipeline_translator.pipeline_translator import translate_graph_folder, translate_graph
 from dataset_annotator.annotator import annotate_dataset
 
+import requests
+import json
+
 app = Flask(__name__)
 CORS(app)
 
-# TODO Change folder
-files_folder = os.path.abspath(r'./api/temp_files')
-
+temporary_folder = os.path.abspath(r'./temp_files')
 
 @app.get('/problems')
 def get_problems():
@@ -54,7 +57,6 @@ def convert_strings_to_uris(obj):
 @app.post('/logical_planner')
 def run_logical_planner():
     plan_ids = request.json.get('plan_ids', '')
-    print(plan_ids)
     intent_json = request.json.get('intent_graph', '')
     algorithm_implementations = request.json.get('algorithm_implementations', '')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
@@ -69,9 +71,41 @@ def run_logical_planner():
              for impl in impls]
 
     workflow_plans = workflow_planner(ontology, impls, intent)
-    workflow_plans[0].serialize(destination='C:\\Users\\marc.maynou\\Desktop\\NextiaJD\\wplan.rdf', format='xml')
-    logical_plans = logical_planner(ontology, workflow_plans)
-    workflow_plans[0].serialize(destination='C:\\Users\\marc.maynou\\Desktop\\NextiaJD\\lplan.rdf', format='xml')
+    ########### ORIGINAL CODE
+    # logical_plans = logical_planner(ontology, workflow_plans)
+    # return logical_plans
+
+    ########### EXTREMEXP CODE
+    logical_plans, extremexp_workflows, tasks = logical_planner_extremexp(ontology, workflow_plans)
+    # Retrieving the intent name
+    query_template = """ 
+                        PREFIX ab: <https://extremexp.eu/ontology/abox#>
+                        PREFIX tb: <https://extremexp.eu/ontology/tbox#>
+                        SELECT ?subject
+                        WHERE {
+                          ?subject a tb:Intent .
+                        } """
+    results = intent.query(query_template)
+    intent_name = ""
+    for row in results:
+        intent_name = str(row["subject"][row["subject"].find('#') + 1:])
+
+    for workflow in extremexp_workflows:
+        task_implementations = workflow.get('task_implementations', {})
+        for key, value in task_implementations.items():
+            updated_value = value.replace("intent_name", intent_name)
+            task_implementations[key] = updated_value
+        workflow['task_implementations'] = task_implementations
+
+    json_data = {
+        "intent_name": intent_name,
+        "tasks": tasks,
+        "workflows": extremexp_workflows
+    }
+
+    # Write data to JSON file
+    with open("intent_to_dsl.json", 'w') as json_file:
+        json.dump(json_data, json_file, indent=4)
 
     return logical_plans
 
@@ -81,8 +115,8 @@ def download_all_knime():
     graphs = request.json.get("graphs", "")
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
 
-    folder = os.path.join(files_folder, 'rdf_to_trans')
-    knime_folder = os.path.join(files_folder, 'knime')
+    folder = os.path.join(temporary_folder, 'rdf_to_trans')
+    knime_folder = os.path.join(temporary_folder, 'knime')
 
     if os.path.exists(folder):
         shutil.rmtree(folder)
@@ -107,7 +141,7 @@ def download_knime():
     plan_graph = Graph().parse(data=request.json.get("graph", ""), format='turtle')
     ontology = Graph().parse(data=request.json.get('ontology', ''), format='turtle')
 
-    file_path = os.path.join(files_folder, f'{uuid.uuid4()}.ttl')
+    file_path = os.path.join(temporary_folder, f'{uuid.uuid4()}.ttl')
     plan_graph.serialize(file_path, format='turtle')
 
     knime_file_path = file_path[:-4] + '.knwf'
@@ -122,7 +156,8 @@ def annotate_dataset_from_frontend():
     label = request.json.get('label', '')
     data_product_name = path[path.rfind("\\") + 1:-4]
 
-    new_path = path[0:path.rfind("\\") + 1] + data_product_name + "_annotated.ttl"
+    # new_path = path[0:path.rfind("\\") + 1] + data_product_name + "_annotated.ttl"
+    new_path = temporary_folder + "/" + data_product_name + "_annotated.ttl"
     annotate_dataset(path, new_path, label)
 
     custom_ontology = get_custom_ontology(new_path)
@@ -130,6 +165,93 @@ def annotate_dataset_from_frontend():
     return {"ontology": custom_ontology.serialize(format="turtle"),
             "data_product_uri": datasets[data_product_name + ".csv"]}
 
+
+################################# INTEGRATION FUNCTIONS
+
+##### ZENOH
+@app.post('/abstract_planner_zenoh')
+def run_abstract_planner_zenoh():
+    ### Annotate dataset
+    intent_name = request.json.get('intent_name', '')
+    problem = request.json.get('problem', '')
+    original_dataset_path = request.json.get('original_dataset_path', '')
+    downloaded_dataset_path = request.json.get('downloaded_dataset_path', '')
+    label = request.json.get('label', '')
+    zenoh_storage_path = request.json.get('zenoh_storage_path', '')
+    token = request.json.get('token', '')
+    dataset_name = Path(original_dataset_path).stem
+
+    # Download from Zenoh
+    url = "http://localhost:5000/file/" + zenoh_storage_path
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {token}"
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        print("Successfully downloaded")
+        with open(downloaded_dataset_path, 'wb') as file:
+            file.write(response.content)
+    else:
+        print(f"Failed to download: {response.status_code}")
+        print(f"Reason: {response.reason}")
+
+    new_path = temporary_folder + "/" + dataset_name + "_annotated.ttl"
+    annotate_dataset(original_dataset_path, new_path, label)
+
+    custom_ontology = get_custom_ontology(new_path)
+    datasets = {n.fragment: n for n in custom_ontology.subjects(RDF.type, dmop.TabularDataset)}
+    data_product_uri = datasets[dataset_name + ".csv"]
+
+    intent_graph = get_graph_xp()
+
+    intent_graph.add((ab.term(intent_name), RDF.type, tb.Intent))
+    intent_graph.add((ab.term(intent_name), tb.overData, URIRef(data_product_uri)))
+    intent_graph.add((ab.term(intent_name), tb.tackles, URIRef(problem)))
+
+    intent = intent_graph
+    abstract_plans, algorithm_implementations = abstract_planner(custom_ontology, intent)
+    return {"abstract_plans": abstract_plans, "intent": intent.serialize(format="turtle"),
+            "algorithm_implementations": algorithm_implementations, "ontology": custom_ontology.serialize(format="turtle")}
+
+
+@app.post('/store_rdf_zenoh')
+def store_rdf_zenoh():
+    logical_plans = request.json.get('logical_plans', '')
+    selected_ids = request.json.get('selected_ids', '')
+    zenoh_store_path = request.json.get('zenoh_store_path', '')
+    token = request.json.get('token', '')
+
+    rdf_file = Graph()
+    for plan in logical_plans:
+        for planplan in plan["plans"]:
+            if planplan["id"] in selected_ids:  # select plan
+                rdf_file.parse(data=planplan["graph"], format="turtle")
+                path_to_store_rdf_file = os.path.join(temporary_folder, f"{planplan["id"]}.rdf")
+                rdf_file.serialize(destination=path_to_store_rdf_file, format='turtle')
+
+                ########### STORE RDF FILE ###########
+                url = f"http://localhost:5000/file/{zenoh_store_path}{planplan["id"]}"
+                headers = {
+                    "accept": "application/json",
+                    "Authorization": f"Bearer {token}"
+                }
+                # Define the file to be uploaded
+                files = {
+                    "file": (planplan["id"], open(path_to_store_rdf_file, "rb"), "application/pdf")
+                }
+
+                response = requests.post(url, headers=headers, files=files)
+                if response.status_code == 200:
+                    print("Successfully uploaded RDF file")
+                else:
+                    print(f"Failed to upload: {response.status_code}")
+                    print(f"Reason: {response.reason}")
+
+    return []
+
+##### PROACTIVE
 
 # TODO: Make the actual translation from the original RDF graph to the Proactive definition
 @app.post('/workflow_plans/proactive')
@@ -229,3 +351,7 @@ def download_proactive():
         print("Finished")
 
     return send_file(os.path.abspath(r'api/temp_files/extremexp_test_workflow.xml'), as_attachment=True)
+
+
+if __name__ == '__main__':
+    app.run(port=5001)
