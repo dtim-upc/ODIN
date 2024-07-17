@@ -34,7 +34,7 @@ public class PredictQuality {
             Map.entry("len_min_word", 0), Map.entry("len_avg_word", 0), Map.entry("words_cnt_max", 0),
             Map.entry("words_cnt_min", 0), Map.entry("words_cnt_avg", 0), Map.entry("number_words", 0),
             Map.entry("words_cnt_sd", 0), Map.entry("dataset_name", 2), Map.entry("attribute_name", 2),
-            Map.entry("is_empty", 2), Map.entry("is_binary", 0), Map.entry("frequency_iqr", 0),
+            Map.entry("is_empty", 0), Map.entry("is_binary", 0), Map.entry("frequency_iqr", 0),
             Map.entry("first_word", 3), Map.entry("last_word", 3)
     );
 
@@ -72,32 +72,28 @@ public class PredictQuality {
         return predictQualityThroughModel(distances);
     }
 
-    private void writeDistances(String distancesFilePath, Map<String, Object> distances, Boolean writeHeader) throws IOException {
+    private void writeDistances(String distancesFilePath, Map<String, Object> distances) throws IOException {
         File file = new File(distancesFilePath.replace("/", "_").replace(": ","_"));
-        boolean fileExists = file.exists();
         Writer writer = new FileWriter(file, true);
 
-        if (!fileExists) {
-            for (String key: distances.keySet()) {
-                writer.write(key);
-                writer.write(",");
-            }
-            writer.write("\n");
-        }
-
-        for (String key: distances.keySet()) {
+        for (String key: new TreeSet<>(distances.keySet())) {
             writer.write(String.valueOf(distances.get(key)));
             writer.write(",");
         }
         writer.write("\n");
-        writer.flush();
+        writer.flush(); // is_empty_2
     }
 
     private void writeHeader(String distancesFilePath, Map<String, Object> distances) throws IOException {
         File file = new File(distancesFilePath.replace("/", "_"));
         Writer writer = new FileWriter(file, true);
 
-        for (String key: distances.keySet()) {
+        TreeSet<String> sortedKeys = new TreeSet<>(distances.keySet()); // The TreeSet will sort and keep the keys alphabetical order
+        sortedKeys.add("dataset_name_2"); // We have to add these keys, as they are not in the profiles
+        sortedKeys.add("attribute_name_2");
+        sortedKeys.add("name_dist");
+
+        for (String key: sortedKeys) { // the TreeSet orders the keys
             writer.write(key);
             writer.write(",");
         }
@@ -140,9 +136,9 @@ public class PredictQuality {
             }
             distances.putAll(calculateBinaryFeatures(profile1,profile2));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
-        if (distances.size() != 40 && distances.size() != 61) { // 61 for full
+        if (distances.size() != 39 && distances.size() != 60) { // 61 for full
             distances = new HashMap<>();
         }
 
@@ -229,7 +225,7 @@ public class PredictQuality {
                             Map<String, Object> distances = calculateDistances(profile1, profile2);
                             if (!distances.isEmpty()) {
                                 try {
-                                    writeDistances(distancesPath + "\\distances.csv", distances, writeHeader);
+                                    writeDistances(distancesPath + "\\distances.csv", distances);
                                     writeHeader = false;
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
@@ -244,70 +240,50 @@ public class PredictQuality {
     }
 
     public void calculateDistancesAttVsFolder(String attribute, String dataset, String path) {
-        File[] files = (new File (path)).listFiles(File::isFile);
+        try {
+            File[] files = (new File (path)).listFiles(File::isFile);
 
-        LinkedList<Map<String, Object>> profilesDataset = readCSVFile(path + "\\" + dataset);
-        profilesDataset.removeAll(Collections.singleton(null));
-        normalizeProfile(profilesDataset);
-        profilesDataset.forEach(prof -> System.out.println(prof.get("attribute_name")));
-        Map<String, Object> queryProfile = profilesDataset.stream().filter(prof -> prof.get("attribute_name").equals("\"" + attribute.trim() + "\"")).findFirst().orElse(null);
-        assert queryProfile != null;
-        assert files != null;
+            LinkedList<Map<String, Object>> profilesDataset = readCSVFile(path + "\\" + dataset);
+            profilesDataset.removeAll(Collections.singleton(null));
+            normalizeProfile(profilesDataset);
+            Map<String, Object> queryProfile = profilesDataset.stream().filter(prof -> prof.get("attribute_name").equals("\"" + attribute.trim() + "\"")).findFirst().orElse(null);
+            assert queryProfile != null;
+            assert files != null;
 
-        ExecutorService executor = Executors.newFixedThreadPool(8);
+            File folder = new File(path + "\\distances"); // Create folder
+            folder.mkdirs();
 
-        for (int i = 0; i < files.length; ++i) {
-            int finalI = i;
-            String fileDatasetName = String.valueOf(files[finalI]).substring(String.valueOf(files[finalI]).lastIndexOf("\\") + 1);
-            if (i == 0) {
-                // Filter out the same dataset
-                if (!fileDatasetName.equals(dataset)) {
+            String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
+            writeHeader(distancesPath, queryProfile);
+
+            ExecutorService executor = Executors.newFixedThreadPool(8);
+
+            for (int i = 0; i < files.length; ++i) {
+                int finalI = i;
+                String fileDatasetName = String.valueOf(files[finalI]).substring(String.valueOf(files[finalI]).lastIndexOf("\\") + 1);
+                executor.submit(() -> {
+                    // Filter out the same dataset
+//                if (!fileDatasetName.equals(dataset)) {
                     LinkedList<Map<String, Object>> dataLakeProfiles = readCSVFile(String.valueOf(files[finalI]));
                     for (Map<String, Object> dataLakeProfile : dataLakeProfiles) {
                         Map<String, Object> distances = calculateDistances(queryProfile, dataLakeProfile);
                         if (!distances.isEmpty()) {
                             try {
-                                File folder = new File(path + "\\distances"); // Create folder
-                                folder.mkdirs();
-
-                                String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
-                                writeDistances(distancesPath, distances, false);
+                                writeDistances(distancesPath, distances);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                         }
                     }
-                }
-            }
-            else {
-                executor.submit(() -> {
-                    // Filter out the same dataset
-//                    if (!fileDatasetName.equals(dataset)) {
-                        LinkedList<Map<String, Object>> dataLakeProfiles = readCSVFile(String.valueOf(files[finalI]));
-                        for (Map<String, Object> dataLakeProfile : dataLakeProfiles) {
-                            Map<String, Object> distances = calculateDistances(queryProfile, dataLakeProfile);
-                            if (!distances.isEmpty()) {
-                                try {
-                                    File folder = new File(path + "\\distances"); // Create folder
-                                    folder.mkdirs();
-
-                                    String distancesPath = path + "\\distances\\" + "distances_" + dataset.replace(".csv", "") + "_" + attribute + ".csv";
-                                    writeDistances(distancesPath, distances, false);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                        }
-//                    }
+//                }
                 });
             }
-        }
 
-        executor.shutdown();
-        try {
+            executor.shutdown();
             executor.awaitTermination(5, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+
+        } catch (Exception e) {
+//            throw new RuntimeException(e);
         }
     }
 }
