@@ -13,55 +13,52 @@
 
 ## Directory Structure
 
+- `api/`: Code to initialize the API and respond to the requests. Check usage in [below](#demo)
 - `common/`: Common code for ontology and workflow generation, essentially namespace definition and base graph
   generation.
-- `dataset_annotator/`: Code for annotating datasets with ontology terms. Check usage
-  in [section below](#dataset-annotator).
-- `demo/`: Code for the demo. Check usage in [section below](#demo).
-- `experiment_lab`: Code for running the experiments. Check usage in [section below](#experiments).
+- `dataset_annotator/`: Code for annotating datasets with ontology terms.
+- `demo_scripts/`: Scripts to showcase the interaction with the API. Check usage in [section below](#demo).
 - `ontologies/`: Ontology used in the project. Divided in three files:
     - [`tbox.ttl`](./ontologies/tbox.ttl): Schema of the Ontology.
     - [`cbox.ttl`](./ontologies/cbox.ttl): Taxonomies of the Ontology.
     - [`abox.ttl`](./ontologies/abox.ttl): Instances of the Ontology.
-- `ontology_populator/`: Code for generating the ontology. Check usage in [section below](#ontology-generator).
-- `pipeline_generator/`: Code for generating workflows. Check usage in [section below](#pipeline-generator).
-- `pipeline_tranlsator`: Code for translating ontology workflows into KNIME workflows. Check usage
-  in [section below](#pipeline-translator).
+- `ontology_populator/`: Code for generating the ontology.
+- `pipeline_generator/`: Code for generating workflows.
+- `pipeline_tranlsator`: Code for translating ontology workflows into KNIME workflows.
 
-## Dataset Annotator
+## API
 
-Utility script to annotate csv datasets with ontology terms.  
-Reads all the csv files in the [`datasets`](./dataset_annotator/datasets) directory and outputs the annotated datasets
-in the [`annotated_datasets`](./dataset_annotator/annotated_datasets) directory.  
-Must be run from the `dataset_annotator` directory.
+Before executing any code, make sure you have all the dependencies installed (see [Requirements](#requirements)). Additionally,
+we first have to generate the ontology that will be employed to create the intents. To do so, check the 
+[ontology generator](#ontology-generator) section.
 
-```bash
-cd dataset_annotator
-python3 main.py
+The easiest way to interact with the system and explore everything it has to offer is via the API defined in the 
+[`api`](./api) directory. To run it, execute the following command from the project root directory:
+
+```shell
+flask --app ./api/api_main.py run --port 5001
 ```
+The script [`demo_api_interaction`](./demo_scripts/demo_api_interaction.py) in the [`demo_script`](./demo_scripts) folder showcases 
+the main interactions with the API in order to generate an intent. The main steps are as follows:
 
-## Experiments
+1. Obtain the list of available problems (classification, regression, etc.). This list of tasks is defined in the 
+ontology, and displays what processes can be employed. **As of now, only classification tasks are implemented**
+2. Annotate dataset: a dataset needs to be annotated (i.e. digested as an RDF file with the required properties
+specified) before serving as input for the intent-generation process.
+3. Create abstract plans. These plans are general structures to solve a task. One such plans is generated per algorithm
+that implements the selected problem. **As of now, only three algorithms are defined for the Classification task: 
+Decision Trees, SVMs and NN** (the first two fully implemented with KNIME conversion, the latter only defined).
+4. Create logical plans. These plans define in a finer-grain manner how to execute each workflow, taking into account
+the requirements of the selected algorithm. Moreover, several logical plans are generated for every abstract plan, 
+employing different methodologies to implement each task. For instance, SVMs can have different types of kernel, and they 
+require normalization and removal of non-null values. Moreover, it is necessary to perform a training-test split.
+Currently, the ontology defines 3 types of kernel, 3 normalization alternatives, 2 methodologies to remove null values
+and 4 splitting strategies. In total, we have 3 * 3 * 2 * 4 = 72 logical plans.
+5. (Optional) Download the resulting RDF file.
+6. (Optional) Translate the workflows (RDF format) into KNIME workflows.
 
-Scripts to execute the complexity experiments. Contains two scripts:
-
-- [`fake_cbox_generator.py`](./experiment_lab/fake_cbox_generator.py): Creates a series of CBoxes representing different
-  scenarios. The parameters of the
-  scenarios (number of component, number of requirements per component and number of components per requirement) can be
-  modified [from inside the script](./experiment_lab/fake_cbox_generator.py#L174-L176). Stores the generated CBoxes in
-  the [`fake_cboxes`](./experiment_lab/fake_cboxes) directory.
-
-  ```bash
-  cd experiment_lab
-  python3 fake_cbox_generator.py
-  ```
-
-- [`experiment_runner.py`](./experiment_lab/experiment_runner.py): Runs the experiments and outputs the results in
-  the `results` directory.
-
-  ```bash
-  cd experiment_lab
-  python3 experiment_runner.py
-  ```
+Notice that `demo_api_interaction` includes a series of predefined parameters for the generation of the workflows, which
+ensures a successful execution. The currently available alternatives are also displayed.
 
 ## Ontology Populator
 
@@ -144,79 +141,121 @@ define the implementations and components, the following steps are recommended:
    inside).
 5. Define the parameters. There has to be a Parameter for every leaf tag in the `model` tag.
 6. Define the components. There has to be at least one Component for every Implementation, specifying which parameters
-   are exposed and which are overriden.
+   are exposed and which are overridden.
 
-## Pipeline Generator
+[//]: # (## Non-API interaction)
 
-The pipeline generator can be used to generate workflows using the ontology and some user input.  
-It has to be run from the `pipeline_generator` directory.
+[//]: # ()
+[//]: # (Besides using the API, it is also possible to execute the individual components of the system.)
 
-```shell
-cd pipeline_generator
-python3 pipeline_generator.py
-```
+[//]: # ()
+[//]: # (### Dataset Annotator)
 
-It will ask for the intent name (which can be whatever you want), the dataset name (which must be an annotated existing
-dataset), and the problem name (which must be an existing problem). It will also ask for a folder to store the generated
-workflows.
+[//]: # ()
+[//]: # (Utility script to annotate csv datasets with ontology terms. Reads all the csv files in the [`datasets`]&#40;./dataset_annotator/datasets&#41; directory )
 
-```
-Introduce the intent name [DescriptionIntent]:  
-Introduce the data name [titanic.csv]: 
-Introduce the problem name [Description]: 
-Introduce the folder to save the workflows:
-```
+[//]: # (and outputs the annotated datasets in the [`annotated_datasets`]&#40;./dataset_annotator/annotated_datasets&#41; directory. Must be run from the )
 
-You can use the default values for the three first questions for a quick example.
+[//]: # (`dataset_annotator` directory.)
 
-## Pipeline Translator
+[//]: # ()
+[//]: # (```bash)
 
-The pipeline translator will translate the ontology-represented workflows into KNIME workflows.  
-It has to be run from the `pipeline_translator` directory.
+[//]: # (cd dataset_annotator)
 
-```shell
-cd pipeline_translator
-python3 pipeline_translator.py
-```
+[//]: # (python3 main.py)
 
-It will ask for a source directory (which must contain the ontology-represented workflows) and a destination directory,
-where the translated workflows will be stored. It will also ask whether you want to keep the KNIME workflows in the
-folder format or not.  
-The folder format is just the `.knwf` file decompressed. If you are testing or debugging the
-translation, it will make it easier to check the generated workflows (you can still just decompress the workflow
-yourself).
+[//]: # (```)
 
-```
-Source folder:
-Destination folder:
-Keep workflows in folder format? [Y/n]:
-```
+[//]: # ()
+[//]: # (### Pipeline Generator)
 
-You can also use the translator in non-interactive mode, by passing the source and destination folders as parameters.
+[//]: # ()
+[//]: # (The pipeline generator can be used to generate workflows using the ontology and some user input.  )
 
-```shell
-python workflow_translator.py <source_folder> <destination_folder>
-python workflow_translator.py --keep <source_folder> <destination_folder>
-```
+[//]: # (It has to be run from the `pipeline_generator` directory.)
 
-## Demo
+[//]: # ()
+[//]: # (```shell)
 
-The Demo is a web application that allows the user to generate workflows using the ontology, as well as giving a more
-fine-grained control over the generation process.
+[//]: # (cd pipeline_generator)
 
-To run it, make sure you have all the dependencies installed (see [Requirements](#requirements)), and run the following
-commands.
+[//]: # (python3 pipeline_generator.py)
 
-The backend must be run from the project root directory.
-```shell
-flask --app ./api/api_main.py run
-```
+[//]: # (```)
 
-The frontend must be run from the `demo_web` directory.
-```shell
-cd demo/demo_web
-npm run dev
-```
+[//]: # ()
+[//]: # (It will ask for the intent name &#40;which can be whatever you want&#41;, the dataset name &#40;which must be an annotated existing)
 
-Note that the demo uses slightly modified versions of the pipeline generator and translator, which can be found in the
-[`demo_api`](./demo/demo_api) directory.
+[//]: # (dataset&#41;, and the problem name &#40;which must be an existing problem. As of now, only Classification implemented&#41;. )
+
+[//]: # (It will also ask for a folder to store the generated workflows.)
+
+[//]: # ()
+[//]: # (```)
+
+[//]: # (Introduce the intent name [DescriptionIntent]:  )
+
+[//]: # (Introduce the data name [titanic.csv]: )
+
+[//]: # (Introduce the problem name [Classification]: )
+
+[//]: # (Introduce the folder to save the workflows:)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (You can use the default values for the three first questions for a quick example.)
+
+[//]: # ()
+[//]: # (## Pipeline Translator)
+
+[//]: # ()
+[//]: # (The pipeline translator will translate the ontology-represented workflows into KNIME workflows.  )
+
+[//]: # (It has to be run from the `pipeline_translator` directory.)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # (cd pipeline_translator)
+
+[//]: # (python3 pipeline_translator.py)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (It will ask for a source directory &#40;which must contain the ontology-represented workflows&#41; and a destination directory,)
+
+[//]: # (where the translated workflows will be stored. It will also ask whether you want to keep the KNIME workflows in the)
+
+[//]: # (folder format or not.  )
+
+[//]: # (The folder format is just the `.knwf` file decompressed. If you are testing or debugging the)
+
+[//]: # (translation, it will make it easier to check the generated workflows &#40;you can still just decompress the workflow)
+
+[//]: # (yourself&#41;.)
+
+[//]: # ()
+[//]: # (```)
+
+[//]: # (Source folder:)
+
+[//]: # (Destination folder:)
+
+[//]: # (Keep workflows in folder format? [Y/n]:)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (You can also use the translator in non-interactive mode, by passing the source and destination folders as parameters.)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # (python workflow_translator.py <source_folder> <destination_folder>)
+
+[//]: # (python workflow_translator.py --keep <source_folder> <destination_folder>)
+
+[//]: # (```)

@@ -16,7 +16,7 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-temporary_folder = os.path.abspath(r'./temp_files')
+temporary_folder = os.path.abspath(r'./api/temp_files')
 
 @app.get('/problems')
 def get_problems():
@@ -104,7 +104,7 @@ def run_logical_planner():
     }
 
     # Write data to JSON file
-    with open("intent_to_dsl.json", 'w') as json_file:
+    with open(os.path.join(temporary_folder, "intent_to_dsl.json"), 'w') as json_file:
         json.dump(json_data, json_file, indent=4)
 
     return logical_plans
@@ -225,21 +225,21 @@ def store_rdf_zenoh():
 
     rdf_file = Graph()
     for plan in logical_plans:
-        for planplan in plan["plans"]:
-            if planplan["id"] in selected_ids:  # select plan
-                rdf_file.parse(data=planplan["graph"], format="turtle")
-                path_to_store_rdf_file = os.path.join(temporary_folder, f"{planplan["id"]}.rdf")
+        for logical_plan_implementation in plan["plans"]:
+            if logical_plan_implementation["id"] in selected_ids:  # select plan
+                rdf_file.parse(data=logical_plan_implementation["graph"], format="turtle")
+                path_to_store_rdf_file = os.path.join(temporary_folder, f"{logical_plan_implementation["id"]}.rdf")
                 rdf_file.serialize(destination=path_to_store_rdf_file, format='turtle')
 
                 ########### STORE RDF FILE ###########
-                url = f"http://localhost:5000/file/{zenoh_store_path}{planplan["id"]}"
+                url = f"http://localhost:5000/file/{zenoh_store_path}{logical_plan_implementation["id"]}"
                 headers = {
                     "accept": "application/json",
                     "Authorization": f"Bearer {token}"
                 }
                 # Define the file to be uploaded
                 files = {
-                    "file": (planplan["id"], open(path_to_store_rdf_file, "rb"), "application/pdf")
+                    "file": (logical_plan_implementation["id"], open(path_to_store_rdf_file, "rb"), "application/pdf")
                 }
 
                 response = requests.post(url, headers=headers, files=files)
@@ -269,37 +269,37 @@ def download_proactive():
 
     try:
         # Create one of the example workflows and send it (just to show that the SDK works)
-        proactive_job = gateway.createJob()
-        proactive_job.setJobName("extremexp_example_workflow")
-        bucket = gateway.getBucket("ai-machine-learning")
-
-        load_iris_dataset_task = bucket.create_Load_Iris_Dataset_task()
-        proactive_job.addTask(load_iris_dataset_task)
-
-        split_data_task = bucket.create_Split_Data_task()
-        split_data_task.addDependency(load_iris_dataset_task)
-        proactive_job.addTask(split_data_task)
-
-        logistic_regression_task = bucket.create_Logistic_Regression_task()
-        proactive_job.addTask(logistic_regression_task)
-
-        train_model_task = bucket.create_Train_Model_task()
-        train_model_task.addDependency(split_data_task)
-        train_model_task.addDependency(logistic_regression_task)
-        proactive_job.addTask(train_model_task)
-
-        download_model_task = bucket.create_Download_Model_task()
-        download_model_task.addDependency(train_model_task)
-        proactive_job.addTask(download_model_task)
-
-        predict_model_task = bucket.create_Predict_Model_task()
-        predict_model_task.addDependency(split_data_task)
-        predict_model_task.addDependency(train_model_task)
-        proactive_job.addTask(predict_model_task)
-
-        preview_results_task = bucket.create_Preview_Results_task()
-        preview_results_task.addDependency(predict_model_task)
-        proactive_job.addTask(preview_results_task)
+        # proactive_job = gateway.createJob()
+        # proactive_job.setJobName("extremexp_example_workflow")
+        # bucket = gateway.getBucket("ai-machine-learning")
+        #
+        # load_iris_dataset_task = bucket.create_Load_Iris_Dataset_task()
+        # proactive_job.addTask(load_iris_dataset_task)
+        #
+        # split_data_task = bucket.create_Split_Data_task()
+        # split_data_task.addDependency(load_iris_dataset_task)
+        # proactive_job.addTask(split_data_task)
+        #
+        # logistic_regression_task = bucket.create_Logistic_Regression_task()
+        # proactive_job.addTask(logistic_regression_task)
+        #
+        # train_model_task = bucket.create_Train_Model_task()
+        # train_model_task.addDependency(split_data_task)
+        # train_model_task.addDependency(logistic_regression_task)
+        # proactive_job.addTask(train_model_task)
+        #
+        # download_model_task = bucket.create_Download_Model_task()
+        # download_model_task.addDependency(train_model_task)
+        # proactive_job.addTask(download_model_task)
+        #
+        # predict_model_task = bucket.create_Predict_Model_task()
+        # predict_model_task.addDependency(split_data_task)
+        # predict_model_task.addDependency(train_model_task)
+        # proactive_job.addTask(predict_model_task)
+        #
+        # preview_results_task = bucket.create_Preview_Results_task()
+        # preview_results_task.addDependency(predict_model_task)
+        # proactive_job.addTask(preview_results_task)
 
         # gateway.submitJob(proactive_job, debug=False)
 
@@ -319,8 +319,16 @@ def download_proactive():
         # split_data_task.addDependency(load_dataset_task)
         # proactive_job.addTask(remove_nulls)
 
+        normalization_task = bucket.create_Scale_Data_task()
+        normalization_task.addDependency(load_dataset_task)
+        proactive_job.addTask(normalization_task)
+
+        remove_nulls = bucket.create_Fill_NaNs_task()
+        remove_nulls.addDependency(normalization_task)
+        proactive_job.addTask(remove_nulls)
+
         split_data_task = bucket.create_Split_Data_task()
-        split_data_task.addDependency(load_dataset_task)
+        split_data_task.addDependency(remove_nulls)
         proactive_job.addTask(split_data_task)
 
         # Model depends on the layout, the rest is the same

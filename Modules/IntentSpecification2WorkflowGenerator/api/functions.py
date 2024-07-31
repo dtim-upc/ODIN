@@ -209,8 +209,6 @@ def logical_planner_extremexp(ontology: Graph, workflow_plans: List[Graph]):
         workflow_counter += 1
         extremexp_workflow = generate_extremexp_workflow(ontology, logical_plan, tasks, workflow_name)
         extremexp_workflows.append(extremexp_workflow)
-        print(extremexp_workflow)
-
 
         main_component = next(
             comp for comp in logical_plan.keys() if logical_plan[comp] == [cb.term('component-csv_local_writer')])
@@ -224,7 +222,7 @@ def logical_planner_extremexp(ontology: Graph, workflow_plans: List[Graph]):
         counter[main_component] += 1
         logical_plans[plan_id] = {"logical_plan": logical_plan, "graph": workflow_plan.serialize(format="turtle")}
 
-    tasks = list(dict.fromkeys(tasks)) # remove duplicates
+    tasks = list(dict.fromkeys(tasks))  # remove duplicates
 
     return logical_plans, extremexp_workflows, tasks
 

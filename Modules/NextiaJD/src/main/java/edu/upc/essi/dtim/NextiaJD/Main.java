@@ -47,12 +47,12 @@ public class Main {
 //                    "AcquisitionID", "AcquisitionID");
 
 //        santos();
-//        tus();
+        tus();
 //        santosBig();
 //        nextiaJD();
 //        tusBig();
 //        scalability();
-        d3l();
+//        d3l();
 
 //        p.createProfile("C:\\Work\\NextiaJD\\nextia\\datasets\\worldcitiespop.csv", "C:\\Work\\NextiaJD\\nextia");
 
@@ -113,32 +113,34 @@ public class Main {
 
     public static void tus() {
         try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\tus\\tus_small\\csvfiles", "C:\\Work\\NextiaJD\\other_datasets\\tus\\tus_small\\profiles");
-            Connection conn = DuckDB.getConnection();
-            PredictQuality pq = new PredictQuality();
-
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\tus_small\\TUS_benchmark_relabeled_groundtruth.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                    String dataset = line[1];
-                    String attribute = line[4]; // the attribute name is the same for the two columns
-                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                        listOfQueryColumns.add(Pair.of(dataset, attribute));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            int counter = 1;
-
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\other_datasets\\tus_small\\profiles_short");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                counter++;
-            }
+            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\tus_small\\csvfiles", "C:\\Work\\NextiaJD\\other_datasets\\tus_small\\profiles");
+//            Connection conn = DuckDB.getConnection();
+//            PredictQuality pq = new PredictQuality();
+//
+//            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
+//            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\tus_small\\TUS_benchmark_relabeled_groundtruth.csv"))) {
+//                String[] headerLine = reader.readNext();
+//                String[] line;
+//                while ((line = reader.readNext()) != null) {
+//                    String dataset = line[1];
+//                    String attribute = line[4]; // the attribute name is the same for the two columns
+//                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
+//                        listOfQueryColumns.add(Pair.of(dataset, attribute));
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            int counter = 1;
+//
+//            for (Pair<String, String> pair: listOfQueryColumns) {
+//                if (counter < 20) {
+//                    pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\other_datasets\\tus_small\\profiles_short");
+//                    System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
+//                }
+//                counter++;
+//            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
