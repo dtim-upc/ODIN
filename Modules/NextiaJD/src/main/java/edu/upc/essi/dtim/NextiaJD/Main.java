@@ -47,9 +47,9 @@ public class Main {
 //                    "AcquisitionID", "AcquisitionID");
 
 //        santos();
-        tus();
+//        tus();
 //        santosBig();
-//        nextiaJD();
+        nextiaJD();
 //        tusBig();
 //        scalability();
 //        d3l();
@@ -70,10 +70,12 @@ public class Main {
         try {
             PredictQuality pq = new PredictQuality();
 
-            for (int i = 1; i <= 20; ++i) {
-                pq.calculateDistancesAttVsFolder("dummy_value", "file_" + i + "_profile.csv", "C:\\Users\\marc.maynou\\Desktop\\scalability\\sizes\\size_100_kb\\profiles");
-                System.out.println("Query column " + i + " out of " + 20);
+            long startTime = System.currentTimeMillis();
+            for (int i = 1; i <= 100; ++i) {
+                pq.calculateDistancesAttVsFolder("dummy_value", "file_" + i + "_profile.csv", "C:\\Users\\34601\\Desktop\\1_gb\\profiles");
+                System.out.println("Query column " + i + " out of " + 100);
             }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,7 +87,7 @@ public class Main {
             PredictQuality pq = new PredictQuality();
 
             List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\santos_small_benchmark_groundtruth.csv"))) {
+            try (CSVReader reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\santos_small\\santos_small_benchmark_groundtruth.csv"))) {
                 String[] headerLine = reader.readNext();
                 String[] line;
                 while ((line = reader.readNext()) != null) {
@@ -101,11 +103,13 @@ public class Main {
 
             int counter = 1;
 
+            long startTime = System.currentTimeMillis();
             for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\profiles_short");
+                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\santos_small\\profiles");
                 System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
                 counter++;
             }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -113,34 +117,34 @@ public class Main {
 
     public static void tus() {
         try {
-            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\tus_small\\csvfiles", "C:\\Work\\NextiaJD\\other_datasets\\tus_small\\profiles");
-//            Connection conn = DuckDB.getConnection();
-//            PredictQuality pq = new PredictQuality();
-//
-//            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-//            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\tus_small\\TUS_benchmark_relabeled_groundtruth.csv"))) {
-//                String[] headerLine = reader.readNext();
-//                String[] line;
-//                while ((line = reader.readNext()) != null) {
-//                    String dataset = line[1];
-//                    String attribute = line[4]; // the attribute name is the same for the two columns
-//                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-//                        listOfQueryColumns.add(Pair.of(dataset, attribute));
-//                    }
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            int counter = 1;
-//
-//            for (Pair<String, String> pair: listOfQueryColumns) {
-//                if (counter < 20) {
-//                    pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\other_datasets\\tus_small\\profiles_short");
-//                    System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-//                }
-//                counter++;
-//            }
+//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\tus\\tus_small\\csvfiles", "C:\\Work\\NextiaJD\\other_datasets\\tus\\tus_small\\profiles");
+            Connection conn = DuckDB.getConnection();
+            PredictQuality pq = new PredictQuality();
+
+            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
+            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\tus_small\\TUS_benchmark_relabeled_groundtruth.csv"))) {
+                String[] headerLine = reader.readNext();
+                String[] line;
+                while ((line = reader.readNext()) != null) {
+                    String dataset = line[1];
+                    String attribute = line[4]; // the attribute name is the same for the two columns
+                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
+                        listOfQueryColumns.add(Pair.of(dataset, attribute));
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            int counter = 1;
+
+            long startTime = System.currentTimeMillis();
+            for (Pair<String, String> pair: listOfQueryColumns) {
+                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\tus_small\\profiles");
+                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
+                counter++;
+            }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -152,7 +156,7 @@ public class Main {
             PredictQuality pq = new PredictQuality();
 
             List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\santos_big_benchmark_groundtruth.csv"))) {
+            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\santos_big\\real_data_lake_benchmark_query_tables.csv"))) {
                 String[] headerLine = reader.readNext();
                 String[] line;
                 while ((line = reader.readNext()) != null) {
@@ -167,11 +171,14 @@ public class Main {
             }
             int counter = 1;
 
+            long startTime = System.currentTimeMillis();
+
             for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\profiles_short");
+                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\santos_big\\profiles");
                 System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
                 ++counter;
             }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -182,7 +189,7 @@ public class Main {
             PredictQuality pq = new PredictQuality();
 
             List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\nextia\\ground_truth_validate.csv"))) {
+            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\nextia\\ground_truth_validate.csv"))) {
                 String[] headerLine = reader.readNext();
                 String[] line;
                 while ((line = reader.readNext()) != null) {
@@ -196,13 +203,14 @@ public class Main {
                 e.printStackTrace();
             }
             int counter = 1;
-
+            long startTime = System.currentTimeMillis();
 
             for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\nextia\\profiles");
+                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\nextia\\profiles");
                 System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
                 ++counter;
             }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -213,7 +221,7 @@ public class Main {
             PredictQuality pq = new PredictQuality();
 
             List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\tus_big\\TUS_large_candidate_queries_sample.csv"))) {
+            try (CSVReader reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\tus_big\\TUS_large_candidate_queries_sample.csv"))) {
                 String[] headerLine = reader.readNext();
                 String[] line;
                 while ((line = reader.readNext()) != null) {
@@ -227,12 +235,14 @@ public class Main {
                 e.printStackTrace();
             }
 
+            long startTime = System.currentTimeMillis();
             int counter = 0;
             for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Work\\NextiaJD\\other_datasets\\tus_big\\profiles_short");
+                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\tus_big\\profiles");
                 System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
                 ++counter;
             }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -244,7 +254,7 @@ public class Main {
             PredictQuality pq = new PredictQuality();
 
             List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader("C:\\Work\\NextiaJD\\other_datasets\\D3L\\d3l_ground_truth_sample.csv"))) {
+            try (CSVReader reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\d3l\\d3l_ground_truth_sample.csv"))) {
                 String[] headerLine = reader.readNext();
                 String[] line;
                 while ((line = reader.readNext()) != null) {
@@ -260,11 +270,13 @@ public class Main {
 
             int counter = 1;
 
+            long startTime = System.currentTimeMillis();
             for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft() + "_profile.csv", "C:\\Work\\NextiaJD\\other_datasets\\D3L\\profiles_short");
+                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft() + "_profile.csv", "C:\\Projects\\benchmarks\\d3l\\profiles");
                 System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
                 counter++;
             }
+            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
