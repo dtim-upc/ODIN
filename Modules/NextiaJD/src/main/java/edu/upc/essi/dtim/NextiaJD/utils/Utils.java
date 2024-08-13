@@ -1,9 +1,7 @@
 package edu.upc.essi.dtim.NextiaJD.utils;
 
 import org.apache.commons.io.FilenameUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -44,55 +42,6 @@ public class Utils {
         }
     }
 
-    public static void writeJSON(LinkedList<Map<String, Object>> features, String path, String pathToStoreProfile)  {
-        String fileName = Paths.get(path).getFileName().toString();
-        String fileNameWithOutExt = FilenameUtils.removeExtension(fileName);
-        String profileFileName = pathToStoreProfile + "\\" + fileNameWithOutExt + "_profile.json";
-
-        try {
-            FileWriter file = new FileWriter(profileFileName);
-            file.write("[\n");
-            int count = 1;
-            for (Map<String,Object> map: features) {
-                JSONObject json = new JSONObject(map);
-                if (count < features.size()) {
-                    file.write(json + ",\n");
-                    ++count;
-                }
-                else file.write(json + "\n");
-            }
-            file.write("]");
-            file.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static LinkedList<Map<String, Object>> readJSONFile(String path){
-        LinkedList<Map<String, Object>> profile = new LinkedList<>();
-
-        JSONParser parser = new JSONParser();
-
-        try (FileReader reader = new FileReader(path)) {
-            // Parse JSON file
-            Object obj = parser.parse(reader);
-
-            // Convert parsed JSON object to JSONArray
-            JSONArray jsonArray = (JSONArray) obj;
-
-            // Iterate through JSONArray and add each JSON object to linkedList
-            for (Object jsonObj : jsonArray) {
-                JSONObject jsonObject = (JSONObject) jsonObj;
-                profile.add(jsonObject);
-            }
-
-        } catch (IOException | org.json.simple.parser.ParseException e) {
-            e.printStackTrace();
-        }
-
-        return profile;
-    }
-
     public static void writeCSV(LinkedList<Map<String, Object>> features, String path, String pathToStoreProfile) {
         try {
             String fileName = Paths.get(path).getFileName().toString();
@@ -121,7 +70,7 @@ public class Utils {
             csvWriter.flush();
             csvWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -145,7 +94,7 @@ public class Utils {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return profile;

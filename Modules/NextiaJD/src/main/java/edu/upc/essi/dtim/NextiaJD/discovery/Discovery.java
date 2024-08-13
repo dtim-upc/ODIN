@@ -5,8 +5,8 @@ import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaCore.discovery.Attribute;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
-import edu.upc.essi.dtim.NextiaJD.calculateQuality.CalculateQuality;
-import edu.upc.essi.dtim.NextiaJD.calculateQuality.CalculateQualityFromCSV;
+import edu.upc.essi.dtim.NextiaJD.calculateQuality.JoinQuality;
+import edu.upc.essi.dtim.NextiaJD.calculateQuality.JoinQualityForCSV;
 import edu.upc.essi.dtim.NextiaJD.predictQuality.PredictQuality;
 import edu.upc.essi.dtim.NextiaJD.predictQuality.Profile;
 import jakarta.xml.bind.JAXBException;
@@ -32,8 +32,8 @@ public class Discovery implements IDiscovery {
     public double calculateJoinQualityDiscreteFromCSV(String CSVPath1, String CSVPath2, String att1, String att2) {
         try {
             Connection conn = DuckDB.getConnection();
-            CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
-            return cq.calculateQualityDiscreteFromCSV(CSVPath1, CSVPath2, att1, att2);
+            JoinQualityForCSV cq = new JoinQualityForCSV(conn, 4.0, 0.5);
+            return cq.joinQualityForCSV(CSVPath1, CSVPath2, att1, att2, "discrete");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -43,8 +43,8 @@ public class Discovery implements IDiscovery {
     public double calculateJoinQualityContinuousFromCSV(String CSVPath1, String CSVPath2, String att1, String att2) {
         try {
             Connection conn = DuckDB.getConnection();
-            CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
-            return cq.calculateQualityContinuousFromCSV(CSVPath1, CSVPath2, att1, att2);
+            JoinQualityForCSV cq = new JoinQualityForCSV(conn, 4.0, 0.5);
+            return cq.joinQualityForCSV(CSVPath1, CSVPath2, att1, att2, "continuous");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -58,7 +58,7 @@ public class Discovery implements IDiscovery {
         else {
             try {
                 Connection conn = DuckDB.getConnection();
-                CalculateQualityFromCSV cq = new CalculateQualityFromCSV(conn, 4.0, 0.5);
+                JoinQualityForCSV cq = new JoinQualityForCSV(conn, 4.0, 0.5);
                 return cq.calculateQualityForDatasets(CSVPath1, CSVPath2);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -113,8 +113,8 @@ public class Discovery implements IDiscovery {
                     }
 
                     double cardinality_proportion = Math.min(cardinality1, cardinality2) / Math.max(cardinality1, cardinality2);
-                    CalculateQuality cq = new CalculateQuality(1.0, 1);
-                    double quality = cq.calculateQualityContinuous(containment, cardinality_proportion);
+                    JoinQuality cq = new JoinQuality(1.0, 1);
+                    double quality = cq.continuousQuality(containment, cardinality_proportion);
                     Alignment a = new Alignment(a1, a2, "", (float) quality);
                     alignments.add(a);
                     rs.close();

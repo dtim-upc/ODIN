@@ -176,7 +176,7 @@ public class FeatureGeneration {
             else if (string.matches("^((((([13578])|(1[0-2]))[\\-/\\s]?(([1-9])|([1-2][0-9])|(3[01])))|" +
                     "((([469])|(11))[\\-/\\s]?(([1-9])|([1-2][0-9])|(30)))|(2[\\-/\\s]?(([1-9])|([1-2][0-9]" +
                     "))))[\\-/\\s]?\\d{4})(\\s((([1-9])|(1[02])):([0-5][0-9])((\\s)|(:([0-5][0-9])\\s))([" +
-                    "AM|PM|am|pm]{2})))?$"))
+                    "AM|PM|am|p]{2})))?$"))
             { ++datatypes[4]; ++specificDatatypes[9]; } // Datetime & Datetime
             else if (string.matches("((mailto:|www\\.|(news|(ht|f)tp(s?))://)\\S+)"))
             { ++datatypes[1]; ++specificDatatypes[2]; } // Alphanumeric & URL
@@ -255,14 +255,16 @@ public class FeatureGeneration {
         Map<String, Object> features = new HashMap<>();
 
         ResultSet rs = stmt.executeQuery(
-                "SELECT FIRST(\"" + column + "\"), LAST(\"" + column + "\") " +
-                        "FROM (SELECT * " +
-                        "FROM \"" + tableName + "\" " +
-                        "WHERE \"" + column + "\" IS NOT NULL " +
-                        "ORDER BY (\"" + column + "\") ASC)");
+                "(SELECT \"" + column + "\" " +
+                        "FROM \"" + tableName + "\" ORDER BY \"" + column + "\" ASC LIMIT 1)");
         rs.next();
         features.put("first_word", rs.getString(1));
-        features.put("last_word", rs.getString(2));
+
+        rs = stmt.executeQuery(
+                "(SELECT \"" + column + "\" " +
+                        "FROM \"" + tableName + "\" ORDER BY \"" + column + "\" DESC LIMIT 1)");
+        rs.next();
+        features.put("last_word", rs.getString(1));
 
         return features;
     }

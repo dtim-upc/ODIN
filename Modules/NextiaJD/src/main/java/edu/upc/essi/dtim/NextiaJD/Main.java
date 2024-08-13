@@ -1,282 +1,126 @@
 package edu.upc.essi.dtim.NextiaJD;
 
-import com.opencsv.CSVWriter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import edu.upc.essi.dtim.NextiaJD.predictQuality.PredictQuality;
 import edu.upc.essi.dtim.NextiaJD.predictQuality.Profile;
 import edu.upc.essi.dtim.NextiaJD.utils.DuckDB;
 import org.apache.commons.lang3.tuple.Pair;
-import com.opencsv.CSVReader;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-
-import static edu.upc.essi.dtim.NextiaJD.predictQuality.Profile.generateAllProfilesOfAllDataInAFolder;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args)  {
-        Connection conn = null;
+        if (args.length < 1) {
+            System.out.println("No function specified.");
+            return;
+        }
+
+        String functionName = args[0];
+
+        switch (functionName) {
+            case "createProfile":
+                if (args.length != 3) {
+                    System.out.println("2 parameters required: (1) the dataset (CSV) path and (2) the path to store the profile");
+                    break;
+                }
+                System.out.println("Computing the profile");
+                createProfile(args[1], args[2]);
+                break;
+            case "computeDistances":
+                if (args.length != 5) {
+                    System.out.println("4 parameters required: (1) the name of the dataset that contains the query column, (2) the query column name");
+                    System.out.println("(3) the path to the list of profiles to compute distances with and (4) the path to store the resulting distances");
+                    break;
+                }
+                System.out.println("Computing the distances");
+                computeDistances(args[1], args[2], args[3], args[4]);
+                break;
+            case "computeDistancesForBenchmark":
+                if (args.length != 4 && args.length != 6) {
+                    System.out.println("3 or 5 parameters required");
+                    System.out.println("The first three have to be (1) path to the ground truth, (2) path to the profiles and (3) path to store the distances");
+                    System.out.println("If the ground truth has the columns target_ds and target_attr, then it is enough.");
+                    System.out.println("Otherwise, the names of the columns corresponding to (4) the query dataset and (5) query attribute of the ground truth need to be added");
+                    break;
+                }
+                System.out.println("Computing the distances");
+                if (args.length == 4) {
+                    calculateDistancesForBenchmark(args[1], args[2], args[3], "target_ds", "target_attr");
+                }
+                else {
+                    calculateDistancesForBenchmark(args[1], args[2], args[3], args[4], args[5]);
+                }
+                break;
+            default:
+                System.out.println("Unknown function: " + functionName);
+                break;
+        }
+    }
+
+    public static void createProfile(String filePath, String profilePath) {
+        Connection conn;
         try {
             conn = DuckDB.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         Profile p = new Profile(conn);
-//        // if pathToStoreProfile is left blank (i.e. "") the profile will not be stored in disk
-//        // if resultingProfileName is left blank (i.e. "") the profile file name will be the same as the original csv
-//        p.createProfile("D:\\Work\\TFM\\Others\\eo_xx.csv", "D:\\Work\\Profiles", "test2");
-//        p.createProfile("D:\\Work\\TFM\\Others\\eo_xx.csv", "", "");
 
-
-//        CalculateQuality cq = new CalculateQuality(conn, 4.0, 1);
-//        System.out.println(cq.calculateQualityDiscrete("D:\\Work\\TFM\\Others\\eo_xx.csv", "D:\\Work\\TFM\\Others\\eo_xx.csv", "ein", "ein"));
-//        System.out.println(cq.calculateQualityContinuous("D:\\Work\\TFM\\Others\\eo_xx.csv", "D:\\Work\\TFM\\Others\\eo_xx.csv", "ein", "ein"));
-
-//        PredictQuality pq = new PredictQuality();
-//        pq.predictQuality("D:\\Projects\\Files\\eo4_profile.json", "D:\\Projects\\Files\\eo_xx_2_profile.json", "NAME", "NAME");
-
-//        pq.calculateDistancesAttVsFolder("dummy_value", "file_1_profile.csv", "C:\\Users\\marc.maynou\\Desktop\\scalability\\linearity\\1_gb\\profiles");
-//        pq.calculateDistancesForAllProfilesInAFolder("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\profiles_copy", "C:\\Users\\marc.maynou\\Desktop");
-
-//        pq.predictQuality("C:\\Work\\NextiaJD\\datasets\\profilesCSV\\acquisitions_profile.csv", "C:\\Work\\NextiaJD\\datasets\\profilesCSV\\acquisitions_profile.csv",
-//                    "AcquisitionID", "AcquisitionID");
-
-//        santos();
-//        tus();
-//        santosBig();
-        nextiaJD();
-//        tusBig();
-//        scalability();
-//        d3l();
-
-//        p.createProfile("C:\\Work\\NextiaJD\\nextia\\datasets\\worldcitiespop.csv", "C:\\Work\\NextiaJD\\nextia");
-
-//        p.createProfile(args[0], args[1]);
-
-//        try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\D3L\\benchmark", "C:\\Work\\NextiaJD\\other_datasets\\D3L\\profiles_short");
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-
+        p.createProfile(filePath, profilePath);
     }
 
-    public static void scalability() {
+    public static void computeDistances(String dataset, String attribute, String profilesPath, String pathToStore) {
+        PredictQuality pq = new PredictQuality();
+        pq.calculateDistancesAttVsFolder(dataset, attribute, profilesPath, pathToStore, false);
+    }
+
+    public static void calculateDistancesForBenchmark(String groundTruthPath, String profilesPath, String distancesPath,
+                                                      String queryDatasetColumnName, String queryAttributeColumnName) {
         try {
             PredictQuality pq = new PredictQuality();
 
-            long startTime = System.currentTimeMillis();
-            for (int i = 1; i <= 100; ++i) {
-                pq.calculateDistancesAttVsFolder("dummy_value", "file_" + i + "_profile.csv", "C:\\Users\\34601\\Desktop\\1_gb\\profiles");
-                System.out.println("Query column " + i + " out of " + 100);
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+            List<Pair<String, String>> listOfQueryColumns = new ArrayList<>();
+            Set<Pair<String, String>> seenPairs = new HashSet<>();
 
-    public static void santos() {
-        try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\datalake", "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\profiles");
-            PredictQuality pq = new PredictQuality();
+            // From the ground truth we extract for which columns we need to compute the distances
+            try (CSVParser parser = new CSVParser(new FileReader(Paths.get(groundTruthPath).toFile()),
+                    CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\santos_small\\santos_small_benchmark_groundtruth.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                    String dataset = line[1];
-                    String attribute = line[4]; // the attribute name is the same for the two columns
-                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                        listOfQueryColumns.add(Pair.of(dataset, attribute));
+                for (CSVRecord record : parser) {
+                    String dataset = record.get(queryDatasetColumnName);
+                    String attribute = record.get(queryAttributeColumnName);
+                    Pair<String, String> pair = Pair.of(dataset, attribute);
+
+                    if (seenPairs.add(pair)) { // Only add if it's not already in the set
+                        listOfQueryColumns.add(pair);
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            int counter = 1;
-
-            long startTime = System.currentTimeMillis();
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\santos_small\\profiles");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                counter++;
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void tus() {
-        try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\tus\\tus_small\\csvfiles", "C:\\Work\\NextiaJD\\other_datasets\\tus\\tus_small\\profiles");
-            Connection conn = DuckDB.getConnection();
-            PredictQuality pq = new PredictQuality();
-
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\tus_small\\TUS_benchmark_relabeled_groundtruth.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                    String dataset = line[1];
-                    String attribute = line[4]; // the attribute name is the same for the two columns
-                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                        listOfQueryColumns.add(Pair.of(dataset, attribute));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            int counter = 1;
-
-            long startTime = System.currentTimeMillis();
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\tus_small\\profiles");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                counter++;
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void santosBig() {
-        try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\datalake", "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_big\\xd");
-            PredictQuality pq = new PredictQuality();
-
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\santos_big\\real_data_lake_benchmark_query_tables.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                    String dataset = line[0];
-                    String attribute = line[2];
-                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                        listOfQueryColumns.add(Pair.of(dataset, attribute));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            int counter = 1;
-
-            long startTime = System.currentTimeMillis();
-
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\santos_big\\profiles");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                ++counter;
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void nextiaJD() {
-        try {
-            PredictQuality pq = new PredictQuality();
-
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader  reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\nextia\\ground_truth_validate.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                    String dataset = line[0];
-                    String attribute = line[1];
-                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                        listOfQueryColumns.add(Pair.of(dataset, attribute));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            int counter = 1;
-            long startTime = System.currentTimeMillis();
-
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\nextia\\profiles");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                ++counter;
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void tusBig() {
-        try {
-            PredictQuality pq = new PredictQuality();
-
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\tus_big\\TUS_large_candidate_queries_sample.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                        String dataset = line[0];
-                        String attribute = line[1];
-                        if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                            listOfQueryColumns.add(Pair.of(dataset, attribute));
-                        }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Error reading the CSV file: " + e.getMessage());
             }
 
             long startTime = System.currentTimeMillis();
-            int counter = 0;
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft().replace(".csv", "_profile.csv"), "C:\\Projects\\benchmarks\\tus_big\\profiles");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                ++counter;
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public static void d3l() {
-        try {
-//            generateAllProfilesOfAllDataInAFolder("C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\datalake", "C:\\Work\\NextiaJD\\other_datasets\\santos_benchmark_small\\profiles");
-            PredictQuality pq = new PredictQuality();
+            for (int i = 0; i < listOfQueryColumns.size(); i++) {
+                Pair<String, String> pair = listOfQueryColumns.get(i);
+                String dataset = pair.getLeft();
+                String attribute = pair.getRight();
+                pq.calculateDistancesAttVsFolder(dataset, attribute, profilesPath, distancesPath, false);
 
-            List<Pair<String,String>> listOfQueryColumns = new LinkedList<>();
-            try (CSVReader reader = new CSVReader(new FileReader("C:\\Projects\\benchmarks\\d3l\\d3l_ground_truth_sample.csv"))) {
-                String[] headerLine = reader.readNext();
-                String[] line;
-                while ((line = reader.readNext()) != null) {
-                    String dataset = line[1];
-                    String attribute = line[2];
-                    if (!listOfQueryColumns.contains(Pair.of(dataset, attribute))) {
-                        listOfQueryColumns.add(Pair.of(dataset, attribute));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+                System.out.printf("Query column %d out of %d%n", i + 1, listOfQueryColumns.size());
             }
 
-            int counter = 1;
+            long endTime = System.currentTimeMillis();
+            System.out.printf("Execution time: %.2f seconds%n", (endTime - startTime) / 1000.0);
 
-            long startTime = System.currentTimeMillis();
-            for (Pair<String, String> pair: listOfQueryColumns) {
-                pq.calculateDistancesAttVsFolder(pair.getRight(), pair.getLeft() + "_profile.csv", "C:\\Projects\\benchmarks\\d3l\\profiles");
-                System.out.println("Query column " + counter + " out of " + listOfQueryColumns.size());
-                counter++;
-            }
-            System.out.println("Execution time: " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

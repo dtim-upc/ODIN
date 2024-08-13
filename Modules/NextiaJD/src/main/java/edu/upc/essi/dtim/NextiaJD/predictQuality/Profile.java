@@ -12,7 +12,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.nio.charset.*;
 import java.io.IOException;
 import java.util.List;
@@ -21,13 +20,11 @@ import static edu.upc.essi.dtim.NextiaJD.predictQuality.FeatureGeneration.*;
 import static edu.upc.essi.dtim.NextiaJD.utils.Utils.*;
 
 public class Profile {
-
     Connection conn;
-    String tableName;
+    String tableName = "temptTable";
 
     public Profile(Connection conn) {
         this.conn = conn;
-        this.tableName = "temptTable";
     }
 
     public Profile(Connection conn, String tableName) {
@@ -37,34 +34,23 @@ public class Profile {
 
     public JSONArray createProfile(String dataPath, String pathToStoreProfile) {
         try {
-            // Create table from file and preprocess the data (trim and lowercase)
+            // Create table from file, handle some errors and preprocess the data (trim and lowercase)
             Statement stmt = conn.createStatement();
             try {
                 stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
             } catch (SQLException e) {
                 if (e.toString().contains("Invalid unicode (byte sequence mismatch) detected in CSV file")) {
-                    try {
-                        // Read all lines from the file with Latin-1 encoding
-                        List<String> lines = Files.readAllLines(Paths.get(dataPath), StandardCharsets.ISO_8859_1);
-
-                        // Write all lines back to the same file with UTF-8 encoding
-                        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(dataPath), StandardCharsets.UTF_8)) {
-                            for (String line : lines) {
-                                writer.write(line);
-                                writer.newLine();
-                            }
-                        }
-                        stmt = conn.createStatement();
-                        stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                if (e.toString().contains("CSV File not supported for multithreading")) {
-                    stmt = conn.createStatement();
+                    fixUnicodeIssue(dataPath);
+//                    stmt = conn.createStatement();
+                    stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=true)");
+                } else if (e.toString().contains("CSV File not supported for multithreading")) {
+//                    stmt = conn.createStatement();
                     stmt.execute("CREATE TABLE \"" + tableName + "\" AS SELECT * FROM read_csv_auto('" + dataPath + "', header=True, sample_size=100, ignore_errors=True, parallel=false)");
+                } else {
+                    throw new RuntimeException(e);
                 }
             }
+
             preprocessing(conn, tableName);
 
             // Generate the profile of the table: for each column, its profile is generated and added to the features variable
@@ -84,10 +70,9 @@ public class Profile {
                 map.put("dataset_name", Paths.get(dataPath).getFileName().toString());
             }
 
-            // Write the profile in a CSV/JSON file
+            // Write the profile in a CSV file (if a path is indicated)
             if (!pathToStoreProfile.isEmpty() && !features.isEmpty()) {
                 writeCSV(features, dataPath, pathToStoreProfile);
-//                writeJSON(features, dataPath, pathToStoreProfile);
             }
 
             // Return the JSON profile to the process that invokes the function
@@ -100,8 +85,6 @@ public class Profile {
             return json;
 
         } catch (SQLException e) {
-            System.out.println("SKIPPED " + dataPath);
-            System.out.println(e);
             // We have to remove the table if it has been created. Otherwise, the remaining profiles will not be generated
             try {
                 Statement stmt = conn.createStatement();
@@ -197,7 +180,7 @@ public class Profile {
     }
 
     public static void generateAllProfilesOfAllDataInAFolder(String path, String pathToStore) throws Exception {
-        Files.createDirectories(Path.of(pathToStore));
+        Files.createDirectories(Path.of(pathToStore)); // Create target folder if ti does not exist
 
         // Path of the folder that contains the files to obtain profiles from (we get only the files)
         File[] files = (new File(path)).listFiles(File::isFile);
@@ -205,8 +188,7 @@ public class Profile {
 
         int counter = 1;
 
-        // Define the thread pool
-        int parallelism = 4; // Number of available processors
+        int parallelism = 8; // Number of available processors
         ExecutorService executor = Executors.newFixedThreadPool(parallelism);
 
         for (File file : files) {
@@ -218,13 +200,27 @@ public class Profile {
                     p.createProfile(String.valueOf(file), pathToStore);
                     System.out.println("File " + fileNumber + " out of " + files.length + ": " + file);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             });
             counter++;
         }
+        executor.shutdown(); // Shutdown the executor when all tasks are completed
+    }
 
-        // Shutdown the executor when all tasks are completed
-        executor.shutdown();
+    // Helper method to fix Unicode issue
+    private static void fixUnicodeIssue(String dataPath) {
+        try {
+            Path path = Paths.get(dataPath);
+            List<String> lines = Files.readAllLines(path, StandardCharsets.ISO_8859_1);
+            try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                for (String line : lines) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
