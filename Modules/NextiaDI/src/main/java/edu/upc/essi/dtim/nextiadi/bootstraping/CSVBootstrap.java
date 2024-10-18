@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class CSVBootstrap extends DataSource{
 
-//	Graph Σ;
+//	Graph sigma;
 
 
 	public CSVBootstrap(){
@@ -88,18 +88,18 @@ public class CSVBootstrap extends DataSource{
 //		BufferedReader br = new BufferedReader(new FileReader("src/main/resources/cities.csv"));
 //		CSVParser parser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());
 //
-//		Dataset Σ = DatasetFactory.createTxnMem() ;
-//		Σ.begin(ReadWrite.WRITE);
+//		Dataset sigma = DatasetFactory.createTxnMem() ;
+//		sigma.begin(ReadWrite.WRITE);
 //
 ////		String P = "/cities.csv";
-////		addTriple(Σ,"G",new ResourceImpl(P), RDF.type, RDFS.Class);
+////		addTriple(sigma,"G",new ResourceImpl(P), RDF.type, RDFS.Class);
 ////		parser.getHeaderNames().forEach(h -> {
-////			addTriple(Σ,"G",new ResourceImpl(P+"."+h),RDF.type,RDF.Property);
-////			addTriple(Σ,"G", new ResourceImpl(P+"."+h),RDFS.domain,new ResourceImpl(P));
-////			addTriple(Σ,"G", new ResourceImpl(P+"."+h),RDFS.range,XSD.xstring);
+////			addTriple(sigma,"G",new ResourceImpl(P+"."+h),RDF.type,RDF.Property);
+////			addTriple(sigma,"G", new ResourceImpl(P+"."+h),RDFS.domain,new ResourceImpl(P));
+////			addTriple(sigma,"G", new ResourceImpl(P+"."+h),RDFS.range,XSD.xstring);
 ////		});
 //
-//		Σ.getNamedModel("G").write(new FileWriter("src/main/resources/cities.ttl"), "TTL");
+//		sigma.getNamedModel("G").write(new FileWriter("src/main/resources/cities.ttl"), "TTL");
 //	}
 
 //	private static void addTriple(Dataset d, String namedGraph, Resource s, Property p, Resource o){

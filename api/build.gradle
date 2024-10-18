@@ -105,7 +105,7 @@ tasks.named('test') {
 }
 
 task bootRun(type: JavaExec) {
-    mainClass = 'edu.upc.essi.dtim.odin.OdinApplication' // Replace with your main class
+    mainClass = 'edu.upc.essi.dtim.odin.OdinApplication'
     classpath = sourceSets.main.runtimeClasspath
     jvmArgs '--add-exports', 'java.base/sun.nio.ch=ALL-UNNAMED'
 }

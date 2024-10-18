@@ -1,7 +1,6 @@
 package edu.upc.essi.dtim.nextiadi.bootstraping;
 
 
-import com.github.jsonldjava.utils.Obj;
 import edu.upc.essi.dtim.nextiadi.bootstraping.metamodels.JSON_MM;
 import edu.upc.essi.dtim.nextiadi.bootstraping.utils.JSON_Aux;
 import edu.upc.essi.dtim.nextiadi.config.DataSourceVocabulary;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +33,7 @@ public class JSONBootstrapSWJ extends DataSource{
 	private int ObjectCounter = 0;
 	private int ArrayCounter = 0;
 
-	private Graph Σ;
+	private Graph sigma;
 	//SparkSQL query to get a 1NF view of the file
 	private String wrapper;
 	//List of pairs, where left is the IRI in the graph and right is the attribute in the wrapper (this will create sameAs edges)
@@ -65,12 +63,12 @@ public class JSONBootstrapSWJ extends DataSource{
 		ArrayCounter = arrayCounter;
 	}
 
-	public Graph getΣ() {
-		return Σ;
+	public Graph getSigma() {
+		return sigma;
 	}
 
-	public void setΣ(Graph σ) {
-		Σ = σ;
+	public void setSigma(Graph sigma) {
+		this.sigma = sigma;
 	}
 
 	public String getWrapper() {
@@ -153,10 +151,10 @@ public class JSONBootstrapSWJ extends DataSource{
 		});
 
 //		Stream.concat(sourceAttributes.stream(), lateralViews.stream()) .forEach(p -> {
-//			Σ.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
+//			sigma.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
 //		});
 		sourceAttributes.forEach(p -> {
-			Σ.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
+			sigma.addLiteral(createIRI(p.getLeft() ), DataSourceVocabulary.ALIAS.val(), p.getRight() );
 		});
 **/
 

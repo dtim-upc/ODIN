@@ -191,8 +191,8 @@ public class JSONBootstrap extends DataSource{
 //		G_source.getNamedModel("G").write(new FileWriter("src/main/resources/bikes.ttl"), "TTL");
 //	}
 
-//	private static void JSON(String D, JsonObject φ,  Dataset G_source) {
-//		Value(φ,G_source,D);
+//	private static void JSON(String D, JsonObject phi,  Dataset G_source) {
+//		Value(phi,G_source,D);
 //	}
 	public void write(String file, String lang){
 		G_source.write(file,lang);
