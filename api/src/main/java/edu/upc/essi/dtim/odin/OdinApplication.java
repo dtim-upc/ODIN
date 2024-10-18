@@ -13,7 +13,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@PropertySource("classpath:credentials.properties")
 public class OdinApplication {
     private static final Logger logger = LoggerFactory.getLogger(OdinApplication.class);
     private static AppConfig appConfig;

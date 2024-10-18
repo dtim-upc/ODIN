@@ -109,7 +109,7 @@ public class RepositoryController {
 
     // ------------ Repositories schema retrieval when creating a new repository
 
-    private static final String repositoryFormsPath = Paths.get("api","src","main","resources","frontend-schemas","RepositoryForms").toString();
+    private static final String repositoryFormsPath = "odin/src/main/java/edu/upc/essi/dtim/odin/repositories";
 
     /**
      * Retrieves the template of a specific type of repository
@@ -120,7 +120,7 @@ public class RepositoryController {
     @GetMapping("/form-schema/{repositoryType}")
     public String getSpecificFormSchema(@PathVariable("repositoryType") String repositoryType) {
         logger.info("Formschema asked: " + repositoryType);
-        return repositoryService.getRepositorySchema(Paths.get(repositoryFormsPath,repositoryType).toString());
+        return repositoryService.getRepositorySchema(repositoryType).toString();
     }
 
     /**

@@ -26,16 +26,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 @Service
 public class RepositoryService {
@@ -281,23 +281,88 @@ public class RepositoryService {
     /**
      * Retrieves the template of a specific type of repository
      *
-     * @param filePath Path of the template of the repository
+     * @param repositoryType Path of the template of the repository
      * @return A String containing the template.
      */
-    public String getRepositorySchema(String filePath) {
-        Resource resource = new FileSystemResource(filePath);
+    public String getRepositorySchema(String repositoryType) {
+        String repositoryFolder = "RepositoryForms/";
+        URL resource = getClass().getClassLoader().getResource(repositoryFolder);
 
-        if (resource.exists()) {
-            byte[] bytes;
+        if (resource != null) {
             try {
-                bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
-            } catch (IOException e) {
-                throw new CustomIOException(e.getMessage());
+                if ("jar".equals(resource.getProtocol())) { // If the resource is in a JAR file
+                    String jarPath = resource.getPath().substring(5, resource.getPath().indexOf("!"));
+                    try (JarFile jarFile = new JarFile(jarPath)) {
+                        Enumeration<JarEntry> entries = jarFile.entries();
+                        while (entries.hasMoreElements()) {
+                            JarEntry entry = entries.nextElement();
+                            if (entry.getName().equals("BOOT-INF/classes/RepositoryForms/" + repositoryType)) {
+                                try (InputStream inputStream = jarFile.getInputStream(entry)) {
+                                    byte[] bytes;
+                                    try {
+                                        bytes = FileCopyUtils.copyToByteArray(inputStream);
+                                    } catch (IOException e) {
+                                        throw new CustomIOException(e.getMessage());
+                                    }
+                                    return new String(bytes);
+                                }
+                            }
+                        }
+                    }
+                } else { // If the resource is in the file system (IDE)
+                    File folder = new File(resource.toURI());
+                    File[] files = folder.listFiles();
+                    if (files != null) {
+                        for (File file : files) {
+                            System.out.println("Found file: " + file.getName());
+                            if (file.getName().equals(repositoryType)) {
+                                try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+                                    byte[] bytes;
+                                    try {
+                                        bytes = FileCopyUtils.copyToByteArray(inputStream);
+                                    } catch (IOException e) {
+                                        throw new CustomIOException(e.getMessage());
+                                    }
+                                    return new String(bytes);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            return new String(bytes);
         } else {
-            throw new ElementNotFoundException("Resource could not be found in " + filePath);
+            System.out.println("Resource folder not found: " + repositoryFolder);
         }
+        return null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        Resource resource = new FileSystemResource(filePath);
+//
+//        if (resource.exists()) {
+//            byte[] bytes;
+//            try {
+//                bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
+//            } catch (IOException e) {
+//                throw new CustomIOException(e.getMessage());
+//            }
+//            return new String(bytes);
+//        } else {
+//            throw new ElementNotFoundException("Resource could not be found in " + filePath);
+//        }
     }
 
     /**
@@ -307,24 +372,69 @@ public class RepositoryService {
      */
     public List<DataRepositorySchemaInfo> getDataRepositorySchemas(String repositoryFormsPath) {
         List<DataRepositorySchemaInfo> dataRepositoryClasses = new ArrayList<>();
-        File directory = new File(repositoryFormsPath);
+        String repositoryFolder = "RepositoryForms/";
 
-        if (directory.isDirectory()) {
-            File[] jsonFiles = directory.listFiles((dir, name) -> name.endsWith(".json"));
+        URL resource = getClass().getClassLoader().getResource(repositoryFolder);
 
-            if (jsonFiles != null) {
-                for (File jsonFile : jsonFiles) {
-                    String fileName = jsonFile.getName();
-                    String displayName = fileName.replace("_", " ").replace(".json", "");
+        if (resource != null) {
+            try {
+                if ("jar".equals(resource.getProtocol())) { // If the resource is in a JAR file
+                    String jarPath = resource.getPath().substring(5, resource.getPath().indexOf("!"));
+                    try (JarFile jarFile = new JarFile(jarPath)) {
+                        Enumeration<JarEntry> entries = jarFile.entries();
+                        while (entries.hasMoreElements()) {
+                            JarEntry entry = entries.nextElement();
+                            // Only process entries that are in the desired folder
+                            if (entry.getName().startsWith("BOOT-INF/classes/RepositoryForms/") && !entry.isDirectory()) {
 
-                    DataRepositorySchemaInfo dataRepositorySchemaInfo = new DataRepositorySchemaInfo(displayName, fileName);
-                    dataRepositoryClasses.add(dataRepositorySchemaInfo);
+                                String fileName = entry.getName().replace("BOOT-INF/classes/RepositoryForms/", "");
+                                String displayName = fileName.replace("_", " ").replace(".json", "");
+
+                                DataRepositorySchemaInfo dataRepositorySchemaInfo = new DataRepositorySchemaInfo(displayName, fileName);
+                                dataRepositoryClasses.add(dataRepositorySchemaInfo);
+
+                                // Reading the content of the file (optional)
+                                try (InputStream inputStream = jarFile.getInputStream(entry);
+                                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        System.out.println(line); // Process the line as needed
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else { // If the resource is in the file system (IDE)
+                    File folder = new File(resource.toURI());
+                    File[] files = folder.listFiles();
+                    if (files != null) {
+                        for (File file : files) {
+                            System.out.println("Found file: " + file.getName());
+                            String displayName = file.getName().replace("_", " ").replace(".json", "");
+
+                            DataRepositorySchemaInfo dataRepositorySchemaInfo = new DataRepositorySchemaInfo(displayName, file.getName());
+                            dataRepositoryClasses.add(dataRepositorySchemaInfo);
+
+                            // Optionally read file content
+                            try (InputStream inputStream = Files.newInputStream(file.toPath());
+                                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    System.out.println(line); // Process the line as needed
+                                }
+                            }
+                        }
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else {
+            System.out.println("Resource folder not found: " + repositoryFolder);
         }
-        else {
-            throw new ElementNotFoundException("Directory does not exist: " + repositoryFormsPath);
-        }
+
+
+
         return dataRepositoryClasses;
     }
 }
