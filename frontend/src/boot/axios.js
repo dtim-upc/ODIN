@@ -9,6 +9,8 @@ import axios from 'axios'
 // for each client)
 const odinApi = axios.create({baseURL: process.env.API});
 const intentsApi = axios.create({baseURL: "http://localhost:5001/"});
+const textToIntentAPI = axios.create({baseURL: "http://localhost:8001/"});
+const intentToGraphDBAPI = axios.create({baseURL: "http://localhost:8002/"});
 
 export default boot(({app}) => {
    app.config.globalProperties.$axios = axios
@@ -17,6 +19,8 @@ export default boot(({app}) => {
 
   app.config.globalProperties.$odinApi = odinApi
   app.config.globalProperties.$intentsApi = intentsApi
+  app.config.globalProperties.$textToIntentAPI = textToIntentAPI
+  app.config.globalProperties.$intentToGraphDBAPI = intentToGraphDBAPI
 })
 
-export {odinApi, intentsApi}
+export {odinApi, intentsApi, textToIntentAPI, intentToGraphDBAPI}

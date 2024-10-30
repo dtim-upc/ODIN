@@ -228,11 +228,11 @@ def store_rdf_zenoh():
         for logical_plan_implementation in plan["plans"]:
             if logical_plan_implementation["id"] in selected_ids:  # select plan
                 rdf_file.parse(data=logical_plan_implementation["graph"], format="turtle")
-                path_to_store_rdf_file = os.path.join(temporary_folder, f"{logical_plan_implementation["id"]}.rdf")
+                path_to_store_rdf_file = os.path.join(temporary_folder, f"{logical_plan_implementation['id']}.rdf")
                 rdf_file.serialize(destination=path_to_store_rdf_file, format='turtle')
 
                 ########### STORE RDF FILE ###########
-                url = f"http://localhost:5000/file/{zenoh_store_path}{logical_plan_implementation["id"]}"
+                url = f"http://localhost:5000/file/{zenoh_store_path}{logical_plan_implementation['id']}"
                 headers = {
                     "accept": "application/json",
                     "Authorization": f"Bearer {token}"

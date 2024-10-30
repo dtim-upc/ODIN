@@ -1,0 +1,11 @@
+**/.DS_Store
+**/__pycache__/
+**/uploads/
+llm/.env
+automl/.env
+read-write-graphdb/.env
+instance
+automl/data/preprocessed
+automl/data
+prototype
+automl/results

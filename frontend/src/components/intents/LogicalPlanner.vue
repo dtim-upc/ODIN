@@ -10,7 +10,8 @@
       </div>
       <div v-else class="col-6 text-left">
         <q-list bordered separator>
-          <q-item v-for="(absPlan) in intentsStore.abstractPlans" :key="absPlan.id" class="q-my-sm">
+          <q-item v-for="(absPlan) in intentsStore.abstractPlans.filter(plan => plan.name === intentsStore.selectedAlgorithm)" 
+                  :key="absPlan.id" class="q-my-sm">
             <q-item-section avatar>
               <q-checkbox v-model="absPlan.selected"/>
             </q-item-section>
@@ -51,6 +52,8 @@ const $q = useQuasar()
 
 const dialog = ref(false)
 const visualizedPlan = ref(null)
+
+console.log(intentsStore.abstractPlans)
         
 const handleSubmit = async() => {
   $q.loading.show({message: 'Running logical planner'})

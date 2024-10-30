@@ -1,0 +1,11 @@
+flask
+matplotlib
+graphviz
+seaborn
+numpy
+pandas
+nbformat
+scikit-learn
+svgwrite
+tpot
+git+https://github.com/hyperopt/hyperopt-sklearn

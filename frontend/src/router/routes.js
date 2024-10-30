@@ -21,6 +21,7 @@ const routes = [
       // Process to integrate a dataset
       {path: 'configureIntegration', name: 'dsIntegration', component: () => import('pages/DatasetIntegration.vue')},
       // Steps to create an intent
+      {path: 'intent-definition', name: 'intent-definition', component: () => import('pages/CreateIntent.vue')},
       {path: 'abstract-planner', name: 'abstract-planner', component: () => import('pages/CreateIntent.vue')},
       {path: 'logical-planner', name: 'logical-planner', component: () => import('pages/CreateIntent.vue')},
       {path: 'workflow-planner', name: 'workflow-planner', component: () => import('pages/CreateIntent.vue')},

@@ -2,24 +2,55 @@
     <q-page>
         <q-form class="row text-center justify-center" @submit.prevent="handleSubmit" @reset="resetForm">            
             <div class="col-12">
-                <h4> Abstract planner </h4>
+                <h4> Abstract Planner </h4>
             </div>
-            <div class="col-6">
-                <q-input label="Intent name" outlined v-model="intentName" class="q-mb-sm"
+            <div class="col-12" style="padding-left: 12px;">
+                <div class="text-body1 text-left"> General intent information </div>
+            </div>
+            <div class="col-4" style="padding: 10px;">
+              <q-input label="Intent name" outlined v-model="intentName" class="q-mb-sm" disable
                     :rules="[ val => val && val.length > 0 || 'Insert a name']"/>
-
-                <q-select label="Data product" outlined v-model="selectedDataProdutName" :options="dataProductsStore.dataProducts.map(dp => dp.datasetName)" class="q-mb-sm"
-                    :rules="[ val => val && val.length > 0 || 'Select a dataset']"/>
-                
-                <q-select label="Problem" outlined v-model="problem" :options=Object.keys(intentsStore.problems) class="q-mb-sm"
-                    :rules="[ val => val && val.length > 0 || 'Select a problem']"/>
-
-                <q-select v-if="selectedDataProdutName && problem ==='Classification'" label="Target variable" outlined v-model="target" :options="getAttributes" class="q-mb-sm"
-                    :rules="[ val => val && val.length > 0 || 'Select a target variable']"/>
-                
             </div>
+            <div class="col-4" style="padding: 10px;">
+              <q-select label="Data product" outlined v-model="selectedDataProdutName" disable class="q-mb-sm"
+                :rules="[ val => val && val.length > 0 || 'Select a dataset']"/>
+            </div>
+            <div class="col-4" style="padding: 10px;">
+              <q-select label="Problem" outlined v-model="problem" disable class="q-mb-sm"
+                    :rules="[ val => val && val.length > 0 || 'Select a problem']"/>
+            </div>
+            <div class="col-12" style="padding-left: 12px;">
+                <div class="text-body1 text-left"> Problem-specific information </div>
+            </div>
+            <div class="col-4" style="padding: 10px;">
+              <q-select v-if="selectedDataProdutName && problem ==='Classification'" label="Target variable" outlined v-model="target" disable class="q-mb-sm"
+                    :rules="[ val => val && val.length > 0 || 'Select a target variable']"/>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-4"></div>
+            <div class="col-12" style="padding-left: 12px;">
+                <div class="text-body1 text-left"> Configuration </div>
+            </div>
+            <!-- <div class="col-3" style="padding: 10px;">
+              <q-select label="Metric to optimize" outlined v-model="selectedMetric" :options=intentsStore.allMetrics class="q-mb-sm"
+                    :rules="[ val => val && val.length > 0 || 'Select a metric']"/>
+            </div> -->
+            <div class="col-3" style="padding: 10px;">
+              <q-select label="Algorithm" outlined v-model="selectedAlgorithm" :options=intentsStore.allAlgorithms class="q-mb-sm"
+              :rules="[ val => val && val.length > 0 || 'Select an algorithm']"/>
+            </div>
+            <!-- <div class="col-3" style="padding: 10px;">
+              <q-select label="Is preprocessing needed?" outlined v-model="selectedPreprocessing" :options="['Yes', 'No']" class="q-mb-sm"
+              :rules="[ val => val && val.length > 0 || 'Select an option']"/>
+            </div>
+            <div class="col-3" style="padding: 10px;">
+              <q-select label="Preprocessing algorithm" outlined v-model="selectedPreprocessingAlgorithm" :options=intentsStore.allPreprocessingAlgorithms class="q-mb-sm"
+              :rules="[ val => val && val.length > 0 || 'Select an algorithm']"
+              v-if="selectedPreprocessing ==='Yes'"/>
+            </div> -->
+
             <div class="col-12">
-                <q-btn label="Run abstract planner" color="primary" type="submit"/>
+                <q-btn label="Run Abstract Planner" color="primary" type="submit"/>
                 <q-btn label="Reset" type="reset" class="q-ml-sm"/>
                 
             </div>
@@ -33,7 +64,7 @@ import {useIntentsStore} from 'stores/intentsStore.js'
 import {useDataProductsStore} from 'stores/dataProductsStore.js'
 import {useProjectsStore} from 'stores/projectsStore.js'
 import {useRoute, useRouter} from "vue-router";
-import { useQuasar } from 'quasar'
+import {useQuasar} from 'quasar'
 
 const router = useRouter()
 const route = useRoute()
@@ -43,10 +74,27 @@ const intentsStore = useIntentsStore()
 const dataProductsStore = useDataProductsStore()
 const projectID = useProjectsStore().currentProject.projectId
 
-const intentName = ref(null)
-const selectedDataProdutName = ref(null)
-const problem = ref(null)
-const target = ref(null)
+const intentName = computed({ get: () => intentsStore.intentName})
+const selectedDataProdutName = computed({ get: () => intentsStore.selectedDataProdutName})
+const problem = computed({ get: () => intentsStore.selectedProblem})
+const target = computed({ get: () => intentsStore.target})
+
+const selectedMetric = computed({
+  get: () => intentsStore.selectedMetric,
+  set: (value) => intentsStore.selectedMetric = value
+})
+const selectedAlgorithm = computed({
+  get: () => intentsStore.selectedAlgorithm,
+  set: (value) => intentsStore.selectedAlgorithm = value
+})
+const selectedPreprocessing = computed({
+  get: () => intentsStore.selectedPreprocessing,
+  set: (value) => intentsStore.selectedPreprocessing = value
+})
+const selectedPreprocessingAlgorithm = computed({
+  get: () => intentsStore.selectedPreprocessingAlgorithm,
+  set: (value) => intentsStore.selectedPreprocessingAlgorithm = value
+})
 
 const handleSubmit = async() => {
   const selectedDataProduct = dataProductsStore.dataProducts.find(dp => dp.datasetName === selectedDataProdutName.value);
@@ -91,14 +139,6 @@ const resetForm = () => {
   query.value = null
   problem.value = null
 }
-
-const getAttributes = computed(() => {
-  const selectedDataProduct = dataProductsStore.dataProducts.find(dp => dp.datasetName === selectedDataProdutName.value);
-  if (selectedDataProduct) {
-    return selectedDataProduct.attributes.map(att => att.name)
-  }
-  return []
-})
 
 onMounted(async() => {
   await dataProductsStore.getDataProducts(projectID)

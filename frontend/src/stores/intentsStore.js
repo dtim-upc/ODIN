@@ -13,6 +13,21 @@ export const useIntentsStore = defineStore('intents', {
     problems: [], // List of problems available for the user to select when creating an intent
     intentID: "", // ID of the current intent (ODIN object), used to associate the workflows that are stored to it
     
+    selectedProblem: "", // Problem selected by the user, either manually or via inference
+    intentName: "", 
+    selectedDataProdutName:"",
+    intentDescription:"", // To infer the problem based on a description
+
+    target:"", // Only for classification tasks
+
+    selectedMetric: "",
+    allMetrics: [],
+    selectedPreprocessing: "",
+    selectedPreprocessingAlgorithm: "",
+    allPreprocessingAlgorithms: [],
+    selectedAlgorithm: "",
+    allAlgorithms: [],
+
     dataProductURI: "", // URI of the selected data product. This is required given that when working with graphs we need URIs
     intent_graph: {}, // Graph definition of the current intent
     ontology: "", // Ontology of the system (graph)
@@ -240,6 +255,58 @@ export const useIntentsStore = defineStore('intents', {
         console.error("Error:", error);
       }
     },
+
+    // ------------ Intent anticipation
   
+    async predictIntentType(data) {
+      try {
+        const response = await intentsAPI.predictIntentType(data);
+        notify.positive(`Type of intent predicted`);
+        this.selectedProblem = response.data.intent
+      } catch (error) {
+        notify.negative("Error deleting an intent.");
+        console.error("Error:", error);
+      }
+    },
+
+    async addUser() {
+      let data = {
+        "email": "test@user.com"
+      }
+      await intentsAPI.addUser(data);
+    },
+
+    async addDataset() {
+      let data = {
+        "dataset": this.selectedDataProdutName
+      }
+      await intentsAPI.addDataset(data);
+    },
+
+    async predictParameters() {
+      const user = "testuser"
+      const dataset = this.selectedDataProdutName 
+      const intent = this.selectedProblem 
+
+      let response = await intentsAPI.getMetric(user, dataset, intent);
+      this.selectedMetric = response.data.metric
+      response = await intentsAPI.getAlgorithm(user, dataset, intent);
+      this.selectedAlgorithm = response.data.algorithm
+      response = await intentsAPI.getPreprocessing(user, dataset, intent);
+      this.selectedPreprocessing = response.data.preprocessing
+      response = await intentsAPI.getPreprocessingAlgorithm(user, dataset, intent);
+      this.selectedPreprocessingAlgorithm= response.data.preprocessing_algorithm
+
+      this.selectedAlgorithm = "DecisionTree"
+    },
+
+    async getAllInfo() {
+      const response = await intentsAPI.getAllInfo();
+      this.allMetrics = response.data.metrics
+      this.allAlgorithms = response.data.algorithms
+      this.allPreprocessingAlgorithms= response.data.preprocessing_algorithms
+
+      this.allAlgorithms = ["DecisionTree", "NN", "SVM"]
+    },
   }
 })

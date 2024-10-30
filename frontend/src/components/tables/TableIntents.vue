@@ -6,7 +6,7 @@
       <template v-slot:top-left="">
         <div class="q-table__title">
           Intents
-          <q-btn unelevated padding="none" color="primary700" icon="add" @click="router.push({name: 'abstract-planner'})"/>
+          <q-btn unelevated padding="none" color="primary700" icon="add" @click="router.push({name: 'intent-definition'})"/>
         </div>
       </template> 
 
