@@ -1,4 +1,0 @@
-flask
-openai
-llamaapi
-python-dotenv

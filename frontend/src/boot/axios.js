@@ -8,7 +8,7 @@ import axios from 'axios'
 // "export default () => {}" function below (which runs individually
 // for each client)
 const odinApi = axios.create({baseURL: process.env.API});
-const intentsApi = axios.create({baseURL: "http://localhost:5001/"});
+const intentsApi = axios.create({baseURL: "http://localhost:8000/"});
 const textToIntentAPI = axios.create({baseURL: "http://localhost:8001/"});
 const intentToGraphDBAPI = axios.create({baseURL: "http://localhost:8002/"});
 
