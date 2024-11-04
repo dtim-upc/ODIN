@@ -13,10 +13,12 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Configuration](#configuration)
+2. [Executing ODIN](#executing)
+    - [Docker](#docker)
+    - [Creating the environment](#environment)
+      - [Requirements](#requirements)
       - [Backend](#backend-configuration)
+      - [Intents modules](#intents-configuration)
       - [Frontend](#frontend-configuration)
 3. [Project Structure](#project-structure)
    - [Backend](#backend)
@@ -35,51 +37,87 @@
 
 Welcome to ODIN! This documentation is designed to help new developers quickly get started with the project and understand its architecture, dependencies, and configuration.
 
-## Getting Started <a name="getting-started"></a>
+## Executing ODIN <a name="executing"></a>
 
-### Prerequisites <a name="prerequisites"></a>
+### Docker <a name="docker"></a>
 
-Before you begin, ensure that you have the following prerequisites installed:
+The easiest way to execute ODIN is via the Docker environment provided in the repository. To do so, make sure that [Docker](https://www.docker.com/) is installed in your machine and running. Once this is done, go to the root folder of the repository and run the following command:
 
-- [Node.js](https://nodejs.org/) (version >=12.22.1)
-- [NPM](https://docs.npmjs.com/cli/v8/commands/npm-install) (version >=6.14.12)
+   ```bash
+   docker-compose build
+   ```
+This will build the containers and the environment. Once it finishes, to launch ODIN run the next line, also in the root folder:
+
+  ```bash
+   docker-compose up
+   ```
+After some seconds all the services will have deployed and will be ready to be used.
+
+**Note:** to use the intent anticipation/generation module it is necessary to populate a GraphDB instance with an initial set of triples. To do so, go to the deployed GraphDB URL (by default, [localhost:7200](http://localhost:7200/)), select _import_ on the top left and then _upload RDF files_. Upload the following file: [KnowledgeBase.nt](backend/Modules/IntentAnticipation/read-write-graphdb/graphdb-import/KnowledgeBase.nt)
+
+### Creating the environment <a name="environment"></a>
+
+This section details how to set up ODIN outside of the Docker environment, which requires downloading all the necessary dependencies and running the corresponding services.
+
+#### Requirements <a name="requirements"></a>
+
+Ensure that you have the following prerequisites installed:
+
+- [Node.js](https://nodejs.org/) (version >=20.0.0)
+- [NPM](https://docs.npmjs.com/cli/v8/commands/npm-install)
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) You can install it using `npm install -g yarn` (or on a macOS install it using Homebrew using `brew install yarn`)
-- [Quasar](https://quasar.dev/) (CLI >= 2.0) You can install it using `npm install -g @quasar/cli`
-- [Gradle](https://gradle.org/) (version >=6.8)
+- [Quasar](https://quasar.dev/) You can install it using `npm install -g @quasar/cli`
+- [Gradle](https://gradle.org/) (version >=8.5)
 - [Java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html) (version 11)
-- [Spark](https://spark.apache.org/downloads.html): When installing Spark is it required to do a series of extra steps to make it work. We attach links to
-    do generate a correct installation for [Windows](https://www.knowledgehut.com/blog/big-data/how-to-install-apache-spark-on-windows) 
-    and [Linux (Ubuntu)](https://www.virtono.com/community/tutorial-how-to/how-to-install-apache-spark-on-ubuntu-22-04-and-centos/) systems.
+- [Python](https://www.python.org/downloads/) (version >=3.12)
+- [Hadoop](https://spark.apache.org/downloads.html): **only for Windows**. Create a folder, e.g. _C:/Work/Hadoop/bin_, and place there the files _hadoop.dl_ and _winutils.exe_ from the following [link](https://github.com/cdarlint/winutils/tree/master/hadoop-3.3.5/bin). Finally, add the path (e.g. _C:/Work/Hadoop/bin_) to the path environment variable.
 
-Then, clone the repository:
+Once everything is installed, clone the repository:
 
    ```bash
    git clone https://github.com/dtim-upc/ODIN.git
    cd ODIN
    ```
-   
-### Configuration <a name="configuration"></a>
-
-Lets ensemble everything to be able to compile and make ODIN run.
-
 #### Backend <a name="backend-configuration"></a>
 
-1. In the root folder execute the following command:
+1. In the root folder execute the following command to compile all the different modules and run their respective tests. For Windows:
 
     ```bash
    gradlew build
    ```
-    This will compile all the different modules and run their respective tests.
+   For Unix:
+    ```bash
+   ./gradle build
+   ```
 
-2. As of now, the best way to launch the application is to open the project in a Java IDE (e.g. IntelliJ) and execute the class OdinApplication.java.
+2. In the same directory, run the following command to launch the backend API. For Windows:
+   ```bash
+   gradlew bootRun
+   ```
+   For Unix:
+    ```bash
+   ./gradle bootRun
+   ```
 
-##### Intent module
-The Intents module is built with Python and, as such, can not be natively executed by ODIN. Instead, it offers an API
-to which ODIN connects to and sends requests. To initialize this API go to `ODIN/Modules/IntentSpecification2WorkflowGenerator`
-and execute the following command:
-
-```bash
+##### Intents modules <a name="intents-configuration"></a>
+The intent-generation functionalities are separated into two different modules, which can be found in the backend folder. Both are built with Python and, as such, can not be natively executed by ODIN. Instead, they offers APIs to which ODIN connects to and sends requests. 
+1. Go to `ODIN/Modules/IntentSpecification2WorkflowGenerator`. First install all the required libraries with the following command:
+   
+   ```bash
+   pip install -r requirements.txt    
+   ```
+   Then, launch the API with the following line
+   ```bash
    flask --app api\api_main.py run    
+   ```
+2. Go to `ODIN/Modules/IntentAnticipation`. First install all the required libraries with the following command:
+   
+   ```bash
+   pip install -r requirements.txt    
+   ```
+   Then, launch the APIs (there are two) with the following line
+   ```bash
+   python .\start_apis.py  
    ```
 
 #### Frontend <a name="frontend-configuration"></a>
