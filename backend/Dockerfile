@@ -7,6 +7,7 @@ WORKDIR /backend
 # Copy the code
 COPY . .
 
+RUN chmod +x ./gradlew
 RUN ./gradlew build -x test --no-daemon
 
 # Command to run the application
