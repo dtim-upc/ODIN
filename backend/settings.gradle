@@ -29,6 +29,8 @@ include 'Modules:NextiaJD'
 findProject(':Modules:NextiaJD')?.name = 'NextiaJD'
 include 'Modules:NextiaQR'
 findProject(':Modules:NextiaQR')?.name = 'NextiaQR'
+include 'Modules:NextiaMG'
+findProject(':Modules:NextiaMG')?.name = 'NextiaMG'
 include 'Modules:NextiaCore'
 include 'api'
 

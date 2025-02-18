@@ -12,6 +12,7 @@ public class CoreGraphFactory {
     public static GlobalGraphJenaImpl createGlobalGraph() {
         return new GlobalGraphJenaImpl();
     }
+    public static MappingsGraphJenaImpl createMappingsGraph() { return new MappingsGraphJenaImpl();}
     public static WorkflowGraphJenaImpl createWorkflowGraph() {
         return new WorkflowGraphJenaImpl();
     }
@@ -26,6 +27,8 @@ public class CoreGraphFactory {
             return new IntegratedGraphJenaImpl();
         } else if (graphType.equalsIgnoreCase("global")) {
             return new GlobalGraphJenaImpl();
+        } else if (graphType.equalsIgnoreCase("mappings")) {
+            return new MappingsGraphJenaImpl();
         } else if (graphType.equalsIgnoreCase("workflow")) {
             return new WorkflowGraphJenaImpl();
         } else if (graphType.equalsIgnoreCase("normal")) {

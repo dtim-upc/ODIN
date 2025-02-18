@@ -14,11 +14,19 @@ public class Main {
 //        CSVDataset d1 = new CSVDataset("id", "titanic", "description", "C:\\Work\\Files\\test_datasets\\hooke.csv");
 //        CSVBootstrap cbs = new CSVBootstrap(d1.getId(), d1.getDatasetName(), d1.getPath());
 
-        JSONDataset d2 = new JSONDataset("cats", "cats", "description", "C:\\Work\\Files\\test.json");
-        JSONBootstrap jbs = new JSONBootstrap("test", "test", "C:\\Work\\Files\\tests_json\\sub_object_with_arrays_literals.json");
+//        JSONDataset d2 = new JSONDataset("cats", "cats", "description", "C:\\Work\\Files\\test.json");
+//        JSONBootstrap jbs = new JSONBootstrap("test", "test", "C:\\Work\\Files\\tests_json\\sub_object_with_arrays_literals.json");
+//
+//        BootstrapResult bsr = jbs.bootstrapDataset(d2);
+//        System.out.println(bsr.getWrapper());
 
-        BootstrapResult bsr = jbs.bootstrapDataset(d2);
-        System.out.println(bsr.getWrapper());
+        JSONBootstrap j = new JSONBootstrap("mitenderDataset2", "mitenderDataset2", "/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender-example2.json");
+        Graph M = j.bootstrapSchema(true);
+
+        PrintGraph.printGraph(M);
+
+        // store graph in ttl
+        M.write("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender_bs_2.ttl");
     }
 
     public void mainCSVBootstrap() {
@@ -59,8 +67,7 @@ public class Main {
     }
 
     public void mainJSONBootstrap() {
-        String D = "stations.json";
-        JSONBootstrap j = new JSONBootstrap("stations", D,"src/main/resources/prueba_presentacion3.json");
+        JSONBootstrap j = new JSONBootstrap("mitenderDataset", "mitenderDataset", "/Users/anbipa/Desktop/mitender-example2.json");
 
 //		Model M = j.bootstrapSchema("ds1", D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
         Graph M = j.bootstrapSchema();
