@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.nextiabs;
+package edu.upc.essi.dtim.nextiamg;
 
 import edu.upc.essi.dtim.NextiaCore.datasets.CSVDataset;
 import edu.upc.essi.dtim.NextiaCore.datasets.JSONDataset;
