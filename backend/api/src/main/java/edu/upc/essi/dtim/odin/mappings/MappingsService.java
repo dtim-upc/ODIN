@@ -36,6 +36,7 @@ import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
@@ -80,7 +81,7 @@ public class MappingsService {
      * @param projectID          Identification of the project to which the new dataset will be added.
      * @param mappingType        Type of mapping to be generated.
      */
-    public Project genMappings(String mappingType, String projectID) {
+    public void genMappings(String mappingType, String projectID) {
         try {
             Project project = projectService.getProject(projectID);
 
@@ -93,11 +94,7 @@ public class MappingsService {
             MapgenResult mgResult = mgInterface.generateMappings(mappingType, integratedGraph);
             MappingsGraph graphM =  mgResult.getGraph();
 
-            // Set the mappings graph in the project.
-            project.setMappingsGraph(graphM);
-            project.getMappingsGraph().setGraphicalSchema(graphM.getGraphicalSchema());
-
-            return project;
+            RDFDataMgr.write(System.out, graphM.getGraph(), org.apache.jena.riot.RDFFormat.TURTLE);
 
         } catch (Exception e) {
             e.printStackTrace();

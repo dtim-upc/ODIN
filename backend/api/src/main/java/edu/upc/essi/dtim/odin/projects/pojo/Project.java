@@ -1,6 +1,5 @@
 package edu.upc.essi.dtim.odin.projects.pojo;
 
-import edu.upc.essi.dtim.NextiaCore.graph.MappingsGraph;
 import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
@@ -18,7 +17,6 @@ public class Project {
     private String createdBy;
     private List<DataRepository> repositories;
     private IntegratedGraphJenaImpl integratedGraph;
-    private MappingsGraph mappingsGraph;
     private IntegratedGraphJenaImpl temporalIntegratedGraph;
     private List<Dataset> integratedDatasets;
     private List<Dataset> temporalIntegratedDatasets;
@@ -75,15 +73,6 @@ public class Project {
     public void setIntegratedGraph(IntegratedGraphJenaImpl integratedGraph) {
         this.integratedGraph = integratedGraph;
     }
-
-    public MappingsGraph getMappingsGraph() {
-        return mappingsGraph;
-    }
-    public void setMappingsGraph(MappingsGraph mappingsGraph) {
-        this.mappingsGraph = mappingsGraph;
-    }
-
-
     public IntegratedGraphJenaImpl getTemporalIntegratedGraph() {
         return temporalIntegratedGraph;
     }

@@ -31,8 +31,8 @@ public class MappingsController {
     public ResponseEntity<Project> generateMappings(@PathVariable("mappingtype") String mappingType,
                                                    @PathVariable("projectID") String projectID) {
         logger.info("generating mappings");
-        Project savedProject = mappingsService.genMappings(mappingType, projectID);
-        return new ResponseEntity<>(savedProject, HttpStatus.OK);
+        mappingsService.genMappings(mappingType, projectID);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
 
