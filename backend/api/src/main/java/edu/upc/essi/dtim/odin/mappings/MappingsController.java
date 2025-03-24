@@ -18,21 +18,24 @@ import java.util.List;
 @RestController
 public class MappingsController {
     private static final Logger logger = LoggerFactory.getLogger(MappingsController.class);
+
     @Autowired
     private MappingsService mappingsService;
 
     /**
-     * Materializes a data product into a CSV file, mainly to be ingested by the intent generation pipeline.
+     * Generates mappings for a project and returns them as a downloadable TTL file.
      *
-     * @param mappingType   The ID of the data product to be materialized
-     * @return If the task was successful return a ResponseEntity with an OK HTTP code.
+     * @param mappingType The type of mapping to generate.
+     * @param projectID   The ID of the project.
+     * @return ResponseEntity with the zip file containning the TTL files for download.
      */
-    @PostMapping("/project/{projectID}/mappings/{mappingtype}/generate")
-    public ResponseEntity<Project> generateMappings(@PathVariable("mappingtype") String mappingType,
-                                                   @PathVariable("projectID") String projectID) {
-        logger.info("generating mappings");
-        mappingsService.genMappings(mappingType, projectID);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping("/project/{projectID}/mappings/{mappingtype}/download")
+    public ResponseEntity<ByteArrayResource> downloadMappings(
+            @PathVariable("mappingtype") String mappingType,
+            @PathVariable("projectID") String projectID) {
+
+        logger.info("Downloading mappings for project: {}", projectID);
+        return mappingsService.genMappings(mappingType, projectID);
     }
 }
 

@@ -36,6 +36,7 @@ import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -48,6 +49,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,6 +58,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static edu.upc.essi.dtim.odin.utils.Utils.generateUUID;
 import static edu.upc.essi.dtim.odin.utils.Utils.reformatName;
@@ -65,36 +69,67 @@ public class MappingsService {
     @Autowired
     private ProjectService projectService;
     @Autowired
-    private DatasetService datasetService;
-    @Autowired
     private AppConfig appConfig;
-    @Autowired
-    private RestTemplate restTemplate;
-    private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
-
 
     /**
-     * Manages the data from the dataset, executing the required preprocesses needed before the integration tasks. These
-     * include bootstrapping to get the wrapper and the graph, generating the visual representation and storing the data.
+     * Generates mappings and provides them as a downloadable TTL file.
      *
-     *
-     * @param projectID          Identification of the project to which the new dataset will be added.
-     * @param mappingType        Type of mapping to be generated.
+     * @param mappingType Type of mapping to be generated.
+     * @param projectID   Identification of the project.
+     * @return ResponseEntity with the TTL file for download.
      */
-    public void genMappings(String mappingType, String projectID) {
+    public ResponseEntity<ByteArrayResource> genMappings(String mappingType, String projectID) {
         try {
             Project project = projectService.getProject(projectID);
 
-            // Integrate the new data source onto the existing TEMPORAL integrated graph and overwrite it
+            // Retrieve the integrated graph for the project
             Graph integratedGraph = project.getIntegratedGraph();
 
+            // Instantiate the mapping generation module
             mapgenModuleInterface mgInterface = new mapgenModuleImpl();
 
-            // Execute mapgeneration
-            MapgenResult mgResult = mgInterface.generateMappings(mappingType, integratedGraph);
-            MappingsGraph graphM =  mgResult.getGraph();
+            // Instantiate the integration module
+            integrationModuleInterface diInterface = new integrationModuleImpl();
 
-            RDFDataMgr.write(System.out, graphM.getGraph(), org.apache.jena.riot.RDFFormat.TURTLE);
+            // Generate mappings
+            MapgenResult mgResult = mgInterface.generateMappings(mappingType, integratedGraph);
+            MappingsGraph graphM = mgResult.getGraph();
+
+            // Convert RDF Graph to Turtle format
+            StringWriter out = new StringWriter();
+            RDFDataMgr.write(out, graphM.getGraph(), Lang.TURTLE);
+            byte[] content = out.toString().getBytes();
+
+            // Get global schema
+            Model globalSchema = diInterface.generateGlobalGraph(integratedGraph).getGraph();
+
+            // Convert RDF Graph to Turtle format
+            StringWriter out2 = new StringWriter();
+            RDFDataMgr.write(out2, globalSchema, Lang.TURTLE);
+            byte[] content2 = out2.toString().getBytes();
+
+            // Create a ZIP file containing both the TTL file and the global schema
+            ByteArrayOutputStream zipOutputStream = new ByteArrayOutputStream();
+            try (ZipOutputStream zip = new ZipOutputStream(zipOutputStream)) {
+                // Add TTL mappings to the ZIP file
+                zip.putNextEntry(new ZipEntry("mappings.ttl"));
+                zip.write(content);
+                zip.closeEntry();
+
+                // Add global schema to the ZIP file
+                zip.putNextEntry(new ZipEntry("generated_ontology.ttl"));
+                zip.write(content2);
+                zip.closeEntry();
+            }
+
+            byte[] zipContent = zipOutputStream.toByteArray();
+
+            // Prepare the ZIP file for download
+            ByteArrayResource resource = new ByteArrayResource(zipContent);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=mappings_and_ontology.zip")
+                    .contentType(MediaType.parseMediaType("application/zip"))
+                    .body(resource);
 
         } catch (Exception e) {
             e.printStackTrace();

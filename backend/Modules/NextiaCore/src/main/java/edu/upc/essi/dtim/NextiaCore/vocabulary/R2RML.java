@@ -31,6 +31,7 @@ public class R2RML {
     public static final Property datatype = Init.datatype();
 
     public static final Property classType = Init.classType();
+    public static final Property termType = Init.termType();
     public static final Property logicalTable = Init.logicalTable();
     public static final Property tableName = Init.tableName();
     public static final Property subjectMap = Init.subjectMap();
@@ -40,10 +41,14 @@ public class R2RML {
     public static final Property objectMap = Init.objectMap();
     public static final Property column = Init.column();
 
+    public static final Property IRI = Init.Iri();
+
     public static class Init {
         public static Resource TriplesMap() { return res("TriplesMap"); }
 
         public static Property classType() { return property("class"); }
+
+        public static Property termType() { return property("termType"); }
         public static Property datatype() { return property("datatype"); }
         public static Property logicalTable() { return property("logicalTable"); }
         public static Property tableName() { return property("tableName"); }
@@ -53,5 +58,6 @@ public class R2RML {
         public static Property predicate() { return property("predicate"); }
         public static Property objectMap() { return property("objectMap"); }
         public static Property column() { return property("column"); }
+        public static Property Iri() { return property("IRI"); }
     }
 }

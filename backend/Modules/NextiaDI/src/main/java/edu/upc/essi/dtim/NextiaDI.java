@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim;
 
+import edu.upc.essi.dtim.NextiaCore.vocabulary.R2RML;
 import edu.upc.essi.dtim.nextiadi.config.Namespaces;
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
 import edu.upc.essi.dtim.nextiadi.exceptions.NoDomainForPropertyException;
@@ -258,6 +259,15 @@ public class NextiaDI {
         minimalG.setModel(integratedGraph);
         minimalG.minimalOverClasses();
         minimalG.minimalOverDataProperties();
+        Model minimalM = minimalG.getModel();
+
+        minimalM.setNsPrefix("rdf", RDF.getURI());
+        minimalM.setNsPrefix("rdfs", RDFS.getURI());
+        minimalM.setNsPrefix("rr", R2RML.getURI());
+        minimalM.setNsPrefix("ex", "http://example.org/");
+        minimalM.setNsPrefix("nextiaDIschema", "http://www.essi.upc.edu/DTIM/NextiaDI/");
+        minimalM.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+
         return minimalG.getModel();
     }
 

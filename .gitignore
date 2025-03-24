@@ -20,6 +20,12 @@ api/dbFiles
 *.png
 *.crc
 
+# macOS system files
+**/.DS_Store
+
+# JetBrains IDE settings
+.idea/
+
 frontend/package-lock.json
 
 !orm.xml

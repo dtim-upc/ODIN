@@ -34,7 +34,7 @@ public class R2RMLmapgen extends MappingType implements IMapgen<Graph>, MapgenOD
     private static final String NEXTIADI_NS = "http://www.essi.upc.edu/DTIM/NextiaDI/";
     private static final String DEFAULT_DATA_NS = "http://mydata.example.org/";
     private static final String DEFAULT_ID_COLUMN = "expedient_number";
-    private static final String DEFAULT_TABLE_PREFIX = "\"lenses\".\"lake.uc3\".\"";
+    private static final String DEFAULT_TABLE_PREFIX = "UC3\""; //"\"lenses\".\"lake.uc3\".\"";
 
     // Constants for integrated resource types
     private static final String INTEGRATED_CLASS = NEXTIADI_NS + "IntegratedClass";
@@ -198,6 +198,8 @@ public class R2RMLmapgen extends MappingType implements IMapgen<Graph>, MapgenOD
         String template = generateID(integratedClass != null ? integratedClass : clazz);
         subjectMap.addProperty(R2RML.template, template);
 
+        subjectMap.addProperty(R2RML.termType, R2RML.IRI);
+
         // Process properties
         processProperties(clazz, triplesMap);
     }
@@ -337,7 +339,7 @@ public class R2RMLmapgen extends MappingType implements IMapgen<Graph>, MapgenOD
 
         // write the model to a TTL file
         try {
-            RDFDataMgr.write((OutputStream) new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/generated_mappingsV3.ttl"), modelM, Lang.TURTLE);
+            RDFDataMgr.write((OutputStream) new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/generated_mappingsVBo.ttl"), modelM, Lang.TURTLE);
             System.out.println("file written temporal");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
