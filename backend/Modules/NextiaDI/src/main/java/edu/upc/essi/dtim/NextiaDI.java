@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim;
 
+import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.R2RML;
 import edu.upc.essi.dtim.nextiadi.config.Namespaces;
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
@@ -159,7 +160,7 @@ public class NextiaDI {
         // for this type, we don't verify if domains are integrated, as this is join.
         String usedIRI ="";
         usedIRI = a.getIriL();
-        if( graphO.isIntegratedDatatypeProperty(a.getIriA()) & graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
+        if( graphO.isIntegratedDatatypeProperty(a.getIriA()) && graphO.isIntegratedDatatypeProperty(a.getIriB()) ) {
             //TODO:update label
             graphO.replaceIntegratedProperty(a);
         } else if ( graphO.isIntegratedDatatypeProperty(a.getIriA()) ) {
@@ -285,151 +286,184 @@ public class NextiaDI {
 
     public static void main(String[] args) throws FileNotFoundException {
 
+//        NextiaDI n = new NextiaDI();
+//
+//        Model graphA = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/mitender_bs_1.ttl") ;
+//        Model graphB = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/mitender_bs_2.ttl") ;
+//
+//        List<Alignment> al = new ArrayList<>();
+//
+//        Alignment a1 = new Alignment();
+//        a1.setType("class");
+//        a1.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/Object_1");
+//        a1.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/Object_1");
+//        a1.setL("IT_OBJECT_1");
+//        al.add(a1);
+//
+//        Alignment a2 = new Alignment();
+//        a2.setType("datatype");
+//        a2.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/notice_issue_date");
+//        a2.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/notice_issue_date");
+//        a2.setL("IT_NOTICE_ISSUE_DATE");
+//        al.add(a2);
+//
+//        Alignment a3 = new Alignment();
+//        a3.setType("datatype");
+//        a3.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/awarded_tender_tax_exclusive_amount");
+//        a3.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/awarded_tender_tax_exclusive_amount");
+//        a3.setL("IT_AWARDED_TENDER_TAX_EXCLUSIVE_AMOUNT");
+//        al.add(a3);
+//
+//        Alignment a4 = new Alignment();
+//        a4.setType("datatype");
+//        a4.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tax_exclusive_amount");
+//        a4.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tax_exclusive_amount");
+//        a4.setL("IT_TAX_EXCLUSIVE_AMOUNT");
+//        al.add(a4);
+//
+//        Alignment a5 = new Alignment();
+//        a5.setType("datatype");
+//        a5.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/title");
+//        a5.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/title");
+//        a5.setL("IT_TITLE");
+//        al.add(a5);
+//
+//        Alignment a6 = new Alignment();
+//        a6.setType("datatype");
+//        a6.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/contracting_party_name");
+//        a6.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contracting_party_name");
+//        a6.setL("IT_CONTRACTING_PARTY_NAME");
+//        al.add(a6);
+//
+//        Alignment a7 = new Alignment();
+//        a7.setType("datatype");
+//        a7.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/contract_type_code");
+//        a7.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contract_type_code");
+//        a7.setL("IT_CONTRACT_TYPE_CODE");
+//        al.add(a7);
+//
+//        Alignment a8 = new Alignment();
+//        a8.setType("datatype");
+//        a8.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/procedure_code");
+//        a8.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/procedure_code");
+//        a8.setL("IT_PROCEDURE_CODE");
+//        al.add(a8);
+//
+//        Alignment a9 = new Alignment();
+//        a9.setType("datatype");
+//        a9.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/urgency_name");
+//        a9.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/urgency_name");
+//        a9.setL("IT_URGENCY_NAME");
+//        al.add(a9);
+//
+//        Alignment a10 = new Alignment();
+//        a10.setType("datatype");
+//        a10.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/lot_bool");
+//        a10.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/lot_bool");
+//        a10.setL("IT_LOT_BOOL");
+//        al.add(a10);
+//
+//        Alignment a11 = new Alignment();
+//        a11.setType("datatype");
+//        a11.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/contract_type_name");
+//        a11.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contract_type_name");
+//        a11.setL("IT_CONTRACT_TYPE_NAME");
+//        al.add(a11);
+//
+//        Alignment a12 = new Alignment();
+//        a12.setType("datatype");
+//        a12.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/procedure_name");
+//        a12.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/procedure_name");
+//        a12.setL("IT_PROCEDURE_NAME");
+//        al.add(a12);
+//
+//        Alignment a13 = new Alignment();
+//        a13.setType("datatype");
+//        a13.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tender_submission_deadline_end_date");
+//        a13.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tender_submission_deadline_end_date");
+//        a13.setL("IT_TENDER_SUBMISSION_DEADLINE_END_DATE");
+//        al.add(a13);
+//
+//        Alignment a14 = new Alignment();
+//        a14.setType("datatype");
+//        a14.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tenderers_number");
+//        a14.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tenderers_number");
+//        a14.setL("IT_TENDERERS_NUMBER");
+//        al.add(a14);
+//
+//        Alignment a15 = new Alignment();
+//        a15.setType("datatype");
+//        a15.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tender_submission_deadline");
+//        a15.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tender_submission_deadline");
+//        a15.setL("IT_TENDER_SUBMISSION_DEADLINE");
+//        al.add(a15);
+//
+//        Alignment a16 = new Alignment();
+//        a16.setType("datatype");
+//        a16.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/expedient_number");
+//        a16.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/expedient_number");
+//        a16.setL("IT_EXPEDIENT_NUMBER");
+//        al.add(a16);
+//
+//        Alignment a17 = new Alignment();
+//        a17.setType("datatype");
+//        a17.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tax_exclusive_amount_in_millions");
+//        a17.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tax_exclusive_amount_in_millions");
+//        a17.setL("IT_TAX_EXCLUSIVE_AMOUNT_IN_MILLIONS");
+//        al.add(a17);
+//
+//        Alignment a18 = new Alignment();
+//        a18.setType("datatype");
+//        a18.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/lots_number");
+//        a18.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/lots_number");
+//        a18.setL("IT_LOTS_NUMBER");
+//        al.add(a18);
+//
+//        Alignment a19 = new Alignment();
+//        a19.setType("datatype");
+//        a19.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/subtraction_budget_awarded");
+//        a19.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/subtraction_budget_awarded");
+//        a19.setL("IT_SUBTRACTION_BUDGET_AWARDED");
+//        al.add(a19);
+//
+//        Model integratedModel = n.Integrate(graphA, graphB, al);
+//        Model minimal = n.generateMinimalGraph(integratedModel);
+//
+//        try {
+//            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/minimal_mitender.ttl"), minimal, Lang.TURTLE);
+//            System.out.println("file written temporal");
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        // store integratedModel
+//        try {
+//            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/integrated_mitender.ttl"), integratedModel, Lang.TURTLE);
+//            System.out.println("file written temporal");
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
+
         NextiaDI n = new NextiaDI();
 
-        Model graphA = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender_bs_1.ttl") ;
-        Model graphB = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender_bs_2.ttl") ;
+        Model graphA = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/customers.ttl") ;
+        Model graphB = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/orders.ttl") ;
 
-        List<Alignment> al = new ArrayList<>();
-
+        // join aligment better
         Alignment a1 = new Alignment();
-        a1.setType("class");
-        a1.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/Object_1");
-        a1.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/Object_1");
-        a1.setL("IT_OBJECT_1");
-        al.add(a1);
+        a1.setType("datatype");
+        a1.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/customers/customer_id");
+        a1.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/orders/customer_id");
+        a1.setL("iCustomerid");
 
-        Alignment a2 = new Alignment();
-        a2.setType("datatype");
-        a2.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/notice_issue_date");
-        a2.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/notice_issue_date");
-        a2.setL("IT_NOTICE_ISSUE_DATE");
-        al.add(a2);
+        Model integratedModel = n.Integrate(graphA, graphB, List.of(a1));
 
-        Alignment a3 = new Alignment();
-        a3.setType("datatype");
-        a3.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/awarded_tender_tax_exclusive_amount");
-        a3.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/awarded_tender_tax_exclusive_amount");
-        a3.setL("IT_AWARDED_TENDER_TAX_EXCLUSIVE_AMOUNT");
-        al.add(a3);
-
-        Alignment a4 = new Alignment();
-        a4.setType("datatype");
-        a4.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tax_exclusive_amount");
-        a4.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tax_exclusive_amount");
-        a4.setL("IT_TAX_EXCLUSIVE_AMOUNT");
-        al.add(a4);
-
-        Alignment a5 = new Alignment();
-        a5.setType("datatype");
-        a5.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/title");
-        a5.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/title");
-        a5.setL("IT_TITLE");
-        al.add(a5);
-
-        Alignment a6 = new Alignment();
-        a6.setType("datatype");
-        a6.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/contracting_party_name");
-        a6.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contracting_party_name");
-        a6.setL("IT_CONTRACTING_PARTY_NAME");
-        al.add(a6);
-
-        Alignment a7 = new Alignment();
-        a7.setType("datatype");
-        a7.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/contract_type_code");
-        a7.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contract_type_code");
-        a7.setL("IT_CONTRACT_TYPE_CODE");
-        al.add(a7);
-
-        Alignment a8 = new Alignment();
-        a8.setType("datatype");
-        a8.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/procedure_code");
-        a8.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/procedure_code");
-        a8.setL("IT_PROCEDURE_CODE");
-        al.add(a8);
-
-        Alignment a9 = new Alignment();
-        a9.setType("datatype");
-        a9.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/urgency_name");
-        a9.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/urgency_name");
-        a9.setL("IT_URGENCY_NAME");
-        al.add(a9);
-
-        Alignment a10 = new Alignment();
-        a10.setType("datatype");
-        a10.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/lot_bool");
-        a10.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/lot_bool");
-        a10.setL("IT_LOT_BOOL");
-        al.add(a10);
-
-        Alignment a11 = new Alignment();
-        a11.setType("datatype");
-        a11.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/contract_type_name");
-        a11.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contract_type_name");
-        a11.setL("IT_CONTRACT_TYPE_NAME");
-        al.add(a11);
-
-        Alignment a12 = new Alignment();
-        a12.setType("datatype");
-        a12.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/procedure_name");
-        a12.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/procedure_name");
-        a12.setL("IT_PROCEDURE_NAME");
-        al.add(a12);
-
-        Alignment a13 = new Alignment();
-        a13.setType("datatype");
-        a13.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tender_submission_deadline_end_date");
-        a13.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tender_submission_deadline_end_date");
-        a13.setL("IT_TENDER_SUBMISSION_DEADLINE_END_DATE");
-        al.add(a13);
-
-        Alignment a14 = new Alignment();
-        a14.setType("datatype");
-        a14.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tenderers_number");
-        a14.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tenderers_number");
-        a14.setL("IT_TENDERERS_NUMBER");
-        al.add(a14);
-
-        Alignment a15 = new Alignment();
-        a15.setType("datatype");
-        a15.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tender_submission_deadline");
-        a15.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tender_submission_deadline");
-        a15.setL("IT_TENDER_SUBMISSION_DEADLINE");
-        al.add(a15);
-
-        Alignment a16 = new Alignment();
-        a16.setType("datatype");
-        a16.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/expedient_number");
-        a16.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/expedient_number");
-        a16.setL("IT_EXPEDIENT_NUMBER");
-        al.add(a16);
-
-        Alignment a17 = new Alignment();
-        a17.setType("datatype");
-        a17.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/tax_exclusive_amount_in_millions");
-        a17.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/tax_exclusive_amount_in_millions");
-        a17.setL("IT_TAX_EXCLUSIVE_AMOUNT_IN_MILLIONS");
-        al.add(a17);
-
-        Alignment a18 = new Alignment();
-        a18.setType("datatype");
-        a18.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/lots_number");
-        a18.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/lots_number");
-        a18.setL("IT_LOTS_NUMBER");
-        al.add(a18);
-
-        Alignment a19 = new Alignment();
-        a19.setType("datatype");
-        a19.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset1/subtraction_budget_awarded");
-        a19.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/subtraction_budget_awarded");
-        a19.setL("IT_SUBTRACTION_BUDGET_AWARDED");
-        al.add(a19);
-
-        Model integratedModel = n.Integrate(graphA, graphB, al);
+        integratedModel = n.JoinIntegration(integratedModel, a1.getIriA(), a1.getIriB(), "iCustomerid", "placed_by", "http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/orders/orders", "http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/customers/customers");
         Model minimal = n.generateMinimalGraph(integratedModel);
 
         try {
-            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/minimal_mitender.ttl"), minimal, Lang.TURTLE);
+            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/minimal_graph.ttl"), minimal, Lang.TURTLE);
             System.out.println("file written temporal");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -437,11 +471,13 @@ public class NextiaDI {
 
         // store integratedModel
         try {
-            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/integrated_mitender.ttl"), integratedModel, Lang.TURTLE);
+            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/integrated_graph.ttl"), integratedModel, Lang.TURTLE);
             System.out.println("file written temporal");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+
 
 
 

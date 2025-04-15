@@ -20,13 +20,29 @@ public class Main {
 //        BootstrapResult bsr = jbs.bootstrapDataset(d2);
 //        System.out.println(bsr.getWrapper());
 
-        JSONBootstrap j = new JSONBootstrap("mitenderDataset2", "mitenderDataset2", "/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender-example2.json");
+//        JSONBootstrap j = new JSONBootstrap("mitenderDataset2", "mitenderDataset2", "/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender-example2.json");
+//        Graph M = j.bootstrapSchema(true);
+//
+//        PrintGraph.printGraph(M);
+//
+//        // store graph in ttl
+//        M.write("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender_bs_2.ttl");
+
+        CSVBootstrap j = new CSVBootstrap("orders", "orders", "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/orders.csv");
         Graph M = j.bootstrapSchema(true);
 
         PrintGraph.printGraph(M);
 
         // store graph in ttl
-        M.write("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender_bs_2.ttl");
+        M.write("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/orders.ttl");
+
+        CSVBootstrap u = new CSVBootstrap("customers", "customers", "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/customers.csv");
+        Graph O = u.bootstrapSchema(true);
+
+        PrintGraph.printGraph(O);
+
+        // store graph in ttl
+        O.write("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/customers.ttl");
     }
 
     public void mainCSVBootstrap() {

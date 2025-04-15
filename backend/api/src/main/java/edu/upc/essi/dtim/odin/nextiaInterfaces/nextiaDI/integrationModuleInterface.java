@@ -47,4 +47,9 @@ public interface integrationModuleInterface {
      * @return The generated global RDF graph.
      */
     Graph generateGlobalGraph(Graph graph);
+
+    // borrar from here
+    String getDomainOfProperty(Graph graph, String propertyIRI);
+
+    String getRDFSLabel(Graph graph, String resourceIRI);
 }
