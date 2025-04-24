@@ -15,6 +15,7 @@ const routes = [
       {path: 'repositories', name: 'repositories', component: () => import('pages/Repositories.vue')},
       {path: 'datasets', name: 'datasets', component: () => import('pages/Datasets.vue')},
       {path: 'schema', name: 'schema', component: () => import('pages/Schema.vue')},
+      {path: 'mappings', name : 'mappings', component: () => import('pages/Mappings.vue')},
       {path: 'query', name: 'query', component: () => import('pages/Query.vue')},
       {path: 'data-products', name: 'data-products', component: () => import('pages/DataProducts.vue')},
       {path: 'intents', name: 'intents', component: () => import('pages/Intents.vue')},

@@ -322,7 +322,7 @@ public class R2RMLmapgen extends MappingType implements IMapgen<Graph>, MapgenOD
     }
 
     @Override
-    public MapgenResult generateMappings(String mappingsType, Graph graphI) {
+    public MapgenResult generateMappingsResult() {
         generateMappings();
         return new MapgenResult(graphM);
     }

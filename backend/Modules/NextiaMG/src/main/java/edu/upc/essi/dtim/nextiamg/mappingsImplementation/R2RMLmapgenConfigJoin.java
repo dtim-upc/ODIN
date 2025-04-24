@@ -549,7 +549,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
     }
 
     @Override
-    public MapgenResult generateMappings(String mappingsType, Graph graphI) {
+    public MapgenResult generateMappingsResult() {
         generateMappings();
         return new MapgenResult(graphM);
     }

@@ -85,6 +85,9 @@ public class MappingsService {
             // Retrieve the integrated graph for the project
             Graph integratedGraph = project.getIntegratedGraph();
 
+            // TODO: Retrieve the Configuration object from the project
+
+
             // Instantiate the mapping generation module
             mapgenModuleInterface mgInterface = new mapgenModuleImpl();
 
@@ -92,7 +95,7 @@ public class MappingsService {
             integrationModuleInterface diInterface = new integrationModuleImpl();
 
             // Generate mappings
-            MapgenResult mgResult = mgInterface.generateMappings(mappingType, integratedGraph);
+            MapgenResult mgResult = mgInterface.generateMappings(mappingType, integratedGraph, null);
             MappingsGraph graphM = mgResult.getGraph();
 
             // Convert RDF Graph to Turtle format

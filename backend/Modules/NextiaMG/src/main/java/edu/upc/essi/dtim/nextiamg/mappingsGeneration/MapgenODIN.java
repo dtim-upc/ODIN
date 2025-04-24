@@ -6,5 +6,5 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.IntegratedGraph;
 
 public interface MapgenODIN {
-    MapgenResult generateMappings(String mappingType, Graph graphI);
+    MapgenResult generateMappingsResult();
 }

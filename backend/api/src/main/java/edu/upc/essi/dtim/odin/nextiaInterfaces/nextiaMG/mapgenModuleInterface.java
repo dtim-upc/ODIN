@@ -8,5 +8,5 @@ public interface mapgenModuleInterface {
     /**
      *
      */
-    MapgenResult generateMappings(String mappingType, Graph graphI);
+    MapgenResult generateMappings(String mappingType, Graph graphI, String configPath);
 }
