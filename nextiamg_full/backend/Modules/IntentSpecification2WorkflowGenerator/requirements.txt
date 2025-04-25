@@ -1,0 +1,21 @@
+# Core
+rdflib~=6.3.2
+owlrl~=6.0.2
+pyshacl @ https://github.com/dtim-upc/pySHACL/releases/download/0.23.0/pyshacl-0.23.0-py3-none-any.whl
+tqdm~=4.66.2
+rdflib-jsonld
+
+# Annotator
+pandas
+
+# Experiments
+natsort
+
+# Demo
+flask
+flask_cors
+
+# Others
+requests
+setuptools
+proactive~=13.1.0.2312311805.dev0

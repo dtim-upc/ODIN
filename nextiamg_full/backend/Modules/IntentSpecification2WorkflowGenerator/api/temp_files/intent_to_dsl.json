@@ -1,0 +1,60 @@
+{
+    "intent_name": "FDQW",
+    "tasks": [
+        "DataLoading",
+        "Partitioning",
+        "ModelTrain",
+        "ModelPredict",
+        "DataStoring"
+    ],
+    "workflows": [
+        {
+            "workflow_name": "Workflow_0",
+            "task_implementations": {
+                "DataLoading": "tasks/FDQW/csv_local_reader.py",
+                "Partitioning": "tasks/FDQW/random_absolute_train_test_split.py",
+                "ModelTrain": "tasks/FDQW/decision_tree_learner.py",
+                "ModelPredict": "tasks/FDQW/decision_tree_predictor.py",
+                "DataStoring": "tasks/FDQW/csv_local_writer.py"
+            },
+            "experiment_space_name": "S_Workflow_0",
+            "experiment_space": []
+        },
+        {
+            "workflow_name": "Workflow_1",
+            "task_implementations": {
+                "DataLoading": "tasks/FDQW/csv_local_reader.py",
+                "Partitioning": "tasks/FDQW/random_relative_train_test_split.py",
+                "ModelTrain": "tasks/FDQW/decision_tree_learner.py",
+                "ModelPredict": "tasks/FDQW/decision_tree_predictor.py",
+                "DataStoring": "tasks/FDQW/csv_local_writer.py"
+            },
+            "experiment_space_name": "S_Workflow_1",
+            "experiment_space": []
+        },
+        {
+            "workflow_name": "Workflow_2",
+            "task_implementations": {
+                "DataLoading": "tasks/FDQW/csv_local_reader.py",
+                "Partitioning": "tasks/FDQW/top_k_absolute_train_test_split.py",
+                "ModelTrain": "tasks/FDQW/decision_tree_learner.py",
+                "ModelPredict": "tasks/FDQW/decision_tree_predictor.py",
+                "DataStoring": "tasks/FDQW/csv_local_writer.py"
+            },
+            "experiment_space_name": "S_Workflow_2",
+            "experiment_space": []
+        },
+        {
+            "workflow_name": "Workflow_3",
+            "task_implementations": {
+                "DataLoading": "tasks/FDQW/csv_local_reader.py",
+                "Partitioning": "tasks/FDQW/top_k_relative_train_test_split.py",
+                "ModelTrain": "tasks/FDQW/decision_tree_learner.py",
+                "ModelPredict": "tasks/FDQW/decision_tree_predictor.py",
+                "DataStoring": "tasks/FDQW/csv_local_writer.py"
+            },
+            "experiment_space_name": "S_Workflow_3",
+            "experiment_space": []
+        }
+    ]
+}

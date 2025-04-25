@@ -1,0 +1,34 @@
+build
+.gradle
+api/dbFiles
+
+*.bpt
+*.dat
+*.idn
+*.jrnl
+*.obj
+*.bdf
+*.lock
+*.db
+*.xml
+*.ttl
+*.jar
+*.rdf
+*.lck
+*.bak_002d
+*.html
+*.png
+*.crc
+*.iml
+
+# macOS system files
+**/.DS_Store
+
+# JetBrains IDE settings
+.idea/
+
+frontend/package-lock.json
+
+!orm.xml
+!persistence.xml
+!gradle/wrapper/gradle-wrapper.jar

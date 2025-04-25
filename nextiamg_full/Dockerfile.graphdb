@@ -1,0 +1,16 @@
+# Use the official GraphDB image as a base image
+FROM ontotext/graphdb:10.6.4
+
+# Expose necessary ports
+EXPOSE 7200
+
+# Optionally, set up environment variables for configuration
+# For example:
+# ENV GRAPHDB_HOME=/opt/graphdb
+# ENV GRAPHDB_LOG_LEVEL=INFO
+
+# Optionally, add any initialization scripts or custom configurations
+# COPY ./my-config.ttl /opt/graphdb/configurations/
+
+# Set default command to start GraphDB server
+CMD ["graphdb", "-Dgraphdb.home=/opt/graphdb/home"]
