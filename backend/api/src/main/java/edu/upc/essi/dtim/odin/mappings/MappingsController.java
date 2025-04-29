@@ -23,19 +23,21 @@ public class MappingsController {
     private MappingsService mappingsService;
 
     /**
-     * Generates mappings for a project and returns them as a downloadable TTL file.
+     * Generates mappings for a project and returns them as a downloadable TTL zip file.
      *
-     * @param mappingType The type of mapping to generate.
-     * @param projectID   The ID of the project.
-     * @return ResponseEntity with the zip file containning the TTL files for download.
+     * @param projectID   The ID of the project (from path).
+     * @param mappingType The type of mapping (form param).
+     * @param configFile  Optional configuration file (form part).
+     * @return ResponseEntity with the zip file containing TTL files.
      */
-    @GetMapping("/project/{projectID}/mappings/{mappingtype}/download")
+    @PostMapping("/project/{projectID}/mappings/download")
     public ResponseEntity<ByteArrayResource> downloadMappings(
-            @PathVariable("mappingtype") String mappingType,
-            @PathVariable("projectID") String projectID) {
+            @PathVariable("projectID") String projectID,
+            @RequestParam("mappingType") String mappingType,
+            @RequestPart(value = "configFile", required = false) MultipartFile configFile) {
 
-        logger.info("Downloading mappings for project: {}", projectID);
-        return mappingsService.genMappings(mappingType, projectID);
+        logger.info("Downloading mappings for project: {} with mapping type: {}", projectID, mappingType);
+        return mappingsService.genMappings(mappingType, configFile, projectID);
     }
 }
 

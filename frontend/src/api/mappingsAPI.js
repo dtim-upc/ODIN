@@ -1,9 +1,7 @@
 import { odinApi } from 'boot/axios';
 
 export default {
-  downloadMappings(projectID, type) {
-    return odinApi.get('/project/' + projectID + '/mappings/' + type + '/download', {
-      responseType: 'blob'
-    });
+  downloadMappings(projectID, formData) {
+    return odinApi.post('/project/' + projectID + '/mappings/download', formData, { responseType: 'blob' });
   }
 }

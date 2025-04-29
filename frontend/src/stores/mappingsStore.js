@@ -2,17 +2,21 @@ import { defineStore } from 'pinia';
 import { useNotify } from 'src/use/useNotify.js';
 import mappingAPI from 'src/api/mappingsAPI.js';
 import download from 'downloadjs';
-import {useProjectsStore} from "./projectsStore";
 
-const projectsStore = useProjectsStore();
 const notify = useNotify();
 
 export const useMappingsStore = defineStore('mappings', {
   state: () => ({}),
   actions: {
-    async downloadMappings(projectID, type) {
+    async downloadMappings(projectID, type, configFile = null) {
       try {
-        const response = await mappingAPI.downloadMappings(projectsStore.currentProject.projectId, type);
+        const formData = new FormData();
+        formData.append('projectId', projectID);
+        formData.append('mappingType', type);
+        if (configFile) {
+          formData.append('configFile', configFile);
+        }
+        const response = await mappingAPI.downloadMappings(projectID, formData);
         const content = response.headers['content-type'];
         const filename = "mappings_and_ontology.zip"; // can be customized from header if needed
         download(response.data, filename, content);

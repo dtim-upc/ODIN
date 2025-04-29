@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.MappingsGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaCore.mappings.Mappings;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.R2RML;
 import edu.upc.essi.dtim.nextiamg.mappingsGeneration.IMapgen;
 import edu.upc.essi.dtim.nextiamg.mappingsGeneration.MapgenODIN;
@@ -322,7 +323,7 @@ public class R2RMLmapgen extends MappingType implements IMapgen<Graph>, MapgenOD
     }
 
     @Override
-    public MapgenResult generateMappingsResult() {
+    public MapgenResult generateMappingsResult(Mappings mappingsObj) {
         generateMappings();
         return new MapgenResult(graphM);
     }

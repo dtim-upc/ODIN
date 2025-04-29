@@ -8,6 +8,8 @@ import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.MappingsGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaCore.mappings.Mappings;
+import edu.upc.essi.dtim.NextiaCore.mappings.MappingsConfig;
 import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
 import edu.upc.essi.dtim.nextiabs.bootstrap.BootstrapResult;
@@ -50,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -75,17 +78,18 @@ public class MappingsService {
      * Generates mappings and provides them as a downloadable TTL file.
      *
      * @param mappingType Type of mapping to be generated.
+     * @param configFile  Optional configuration file for R2RML-CONFIG mapping type.
      * @param projectID   Identification of the project.
      * @return ResponseEntity with the TTL file for download.
      */
-    public ResponseEntity<ByteArrayResource> genMappings(String mappingType, String projectID) {
+    public ResponseEntity<ByteArrayResource> genMappings(String mappingType, MultipartFile configFile, String projectID) {
         try {
             Project project = projectService.getProject(projectID);
 
             // Retrieve the integrated graph for the project
             Graph integratedGraph = project.getIntegratedGraph();
 
-            // TODO: Retrieve the Configuration object from the project
+            // TODO: Retrieve the Configuration object from the project?
 
 
             // Instantiate the mapping generation module
@@ -94,8 +98,24 @@ public class MappingsService {
             // Instantiate the integration module
             integrationModuleInterface diInterface = new integrationModuleImpl();
 
+            Mappings mappingsObj = null;
+
+            if (mappingType == null || mappingType.isEmpty()) {
+                throw new IllegalArgumentException("Mapping type cannot be null or empty");
+            } else if (!mappingType.equals("R2RML") && !mappingType.equals("R2RML-CONFIG")) {
+                throw new IllegalArgumentException("Invalid mapping type: " + mappingType);
+            } else if (mappingType.equals("R2RML")) {
+                mappingsObj = new Mappings(mappingType, integratedGraph);
+            }  else if (mappingType.equals("R2RML-CONFIG")) {
+                if (configFile == null) {
+                    throw new IllegalArgumentException("configPath cannot be null or empty for mapping type R2RML-CONFIG");
+                }
+                InputStream inputStream = configFile.getInputStream();
+                mappingsObj = new MappingsConfig(mappingType, inputStream, integratedGraph);
+            }
+
             // Generate mappings
-            MapgenResult mgResult = mgInterface.generateMappings(mappingType, integratedGraph, null);
+            MapgenResult mgResult = mgInterface.generateMappings(mappingsObj);
             MappingsGraph graphM = mgResult.getGraph();
 
             // Convert RDF Graph to Turtle format

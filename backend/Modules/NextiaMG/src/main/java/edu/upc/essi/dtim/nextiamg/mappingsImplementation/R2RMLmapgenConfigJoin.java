@@ -4,6 +4,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.CoreGraphFactory;
 import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.MappingsGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
+import edu.upc.essi.dtim.NextiaCore.mappings.Mappings;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.R2RML;
 import edu.upc.essi.dtim.nextiadi.config.Namespaces;
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
@@ -17,11 +18,10 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,23 +53,28 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
      * Creates a new R2RMLmapgen with the provided integrated graph and default settings.
      *
      * @param graphI The integrated graph to generate mappings from
-     * @param configFilePath The path to the configuration file
+     * @param configInputStream The configuration file
      */
-    public R2RMLmapgenConfigJoin(Graph graphI, String configFilePath) {
+    public R2RMLmapgenConfigJoin(Graph graphI, InputStream configInputStream) throws IOException {
         this.graphI = graphI;
         this.graphM = (MappingsGraph) CoreGraphFactory.createGraphInstance("mappings");
 
-        // Load configuration
-        ConfigLoader.loadProperties(configFilePath);
-        this.dataNamespace = ConfigLoader.getProperty("DATA_NAMESPACE", "http://mydata.example.org/");
-        for (String key : ConfigLoader.getAllKeys()) {
+        // Load configuration from InputStream
+        Properties properties = new Properties();
+        properties.load(configInputStream);
+
+        // Set default namespace and table prefix
+        this.dataNamespace = properties.getProperty("DATA_NAMESPACE", "http://mydata.example.org/");
+        this.tablePrefix = properties.getProperty("TABLE_PREFIX", "UC3");
+
+        // Parse ID_COLUMN properties for each table
+        for (String key : properties.stringPropertyNames()) {
             if (key.startsWith("ID_COLUMN.")) {
                 String table = key.substring("ID_COLUMN.".length());
-                String idCol = ConfigLoader.getProperty(key);
+                String idCol = properties.getProperty(key);
                 this.idColumnPerTable.put(table, idCol);
             }
         }
-        this.tablePrefix = ConfigLoader.getProperty("TABLE_PREFIX", "UC3\"");
 
         LOGGER.info("Loaded configuration: " +
                 "\nDATA_NAMESPACE=" + dataNamespace +
@@ -280,6 +285,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         if (triplesMap == null) {
             // Generate a URI for the TriplesMap based on the class local name
             String classLocalName = clazz.getLocalName() != null ? clazz.getLocalName() : "UnnamedClass";
+            //TODO: dont use a namespace
             String mapURI = "http://www.essi.upc.edu/DTIM/NextiaDI/" + classLocalName + "TriplesMap";
 
             // Create the TriplesMap as a named resource
@@ -307,7 +313,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         if (triplesMap == null) {
             // Generate a URI for the TriplesMap based on the class local name
             String classLocalName = clazz.getLocalName(); // e.g., "orders"
-            String mapURI = "http://www.essi.upc.edu/DTIM/NextiaDI/" + classLocalName + "TriplesMap";
+            String mapURI = clazz.getURI() + "/TriplesMap";
 
             // Create the TriplesMap as a named resource
             triplesMap = modelM.createResource(mapURI);
@@ -324,7 +330,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
 
         // TODO: Get table name from project (but it will need some kind of mapping), look where uri is generated for each attribute
         // do it with standard RDFS annotations (e.g., rdfs:label or rdfs:comment).
-        String tableName = tablePrefix + getTableName(clazz);
+        String tableName = getTableName(clazz);
         logicalTable.addProperty(R2RML.tableName, modelM.createLiteral(tableName));
 
         // Create subject map
@@ -338,7 +344,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         }
 
         // Generate template for subject
-        String template = generateID(integratedClass != null ? integratedClass : clazz);
+        String template = generateID(tableName, clazz);
         subjectMap.addProperty(R2RML.template, template);
 
         subjectMap.addProperty(R2RML.termType, R2RML.IRI);
@@ -393,7 +399,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         predicateObjectMap.addProperty(R2RML.objectMap, objectMap);
 
         // Determine column name: always based on the predicate (i.e., property name)
-        objectMap.addProperty(R2RML.column, integratedProperty.getLocalName());
+        objectMap.addProperty(R2RML.column, stmt.getSubject().getLocalName());
 
         // Add datatype from RDFS range, if available
         Statement rangeStmt = modelM.getProperty(integratedProperty, RDFS.range);
@@ -518,12 +524,16 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
      * @param resource The resource to generate an ID template for
      * @return The generated ID template
      */
-    private String generateID(Resource resource) {
-        if (idColumnPerTable.isEmpty()) {
-            return dataNamespace + resource.getLocalName().toLowerCase() + "/{" + resource.getLocalName().toLowerCase() + "}";
-        } else {
-            return dataNamespace + resource.getLocalName().toLowerCase() + "/{" + idColumnPerTable.get(resource.getLocalName()) + "}";
+    private String generateID(String tableName, Resource resource) {
+        // Ensure the map has a value for the given tableName
+        String idColumn = idColumnPerTable.get(tableName);
+
+        if (idColumn == null) {
+            throw new IllegalArgumentException("ID column for table " + tableName + " is not defined.");
         }
+
+        // Return the generated ID with proper namespace and formatted URI
+        return dataNamespace + resource.getLocalName().toLowerCase() + "/{" + idColumn + "}";
     }
 
     /**
@@ -549,16 +559,40 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
     }
 
     @Override
-    public MapgenResult generateMappingsResult() {
+    public MapgenResult generateMappingsResult(Mappings mappingsObj) {
         generateMappings();
-        return new MapgenResult(graphM);
+        return new MapgenResult(this.graphM);
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         Graph integratedGraph = new IntegratedGraphJenaImpl();
-        integratedGraph.setGraph(RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/integrated_graph.ttl"));
-        String configurationFilePath = "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/config.properties";
+        integratedGraph.setGraph(RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/Odin/integrated_graph.ttl"));
+        String configurationFilePath = "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/Odin/config.properties";
+
+        // Load the configuration file as input stream
+        InputStream configInputStream = new FileInputStream(configurationFilePath);
+
+
+        R2RMLmapgenConfigJoin r2RMLmapgen = new R2RMLmapgenConfigJoin(integratedGraph, configInputStream);
+
+        MappingsGraph graphM = r2RMLmapgen.generateMappings();
+        Model modelM = graphM.getGraph();
+
+        // write the model to a TTL file
+        try {
+            RDFDataMgr.write((OutputStream) new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/generated_mappings_29abr.ttl"), modelM, Lang.TURTLE);
+            System.out.println("file written temporal");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+
+        /*
+        Graph integratedGraph = new IntegratedGraphJenaImpl();
+        integratedGraph.setGraph(RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/integrated_mitender.ttl"));
+        String configurationFilePath = "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/config.properties";
 
         R2RMLmapgenConfigJoin r2RMLmapgen = new R2RMLmapgenConfigJoin(integratedGraph, configurationFilePath);
 
@@ -567,11 +601,13 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
 
         // write the model to a TTL file
         try {
-            RDFDataMgr.write((OutputStream) new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/generated_mappings.ttl"), modelM, Lang.TURTLE);
+            RDFDataMgr.write((OutputStream) new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/generated_mappings_join.ttl"), modelM, Lang.TURTLE);
             System.out.println("file written temporal");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+         */
 
     }
 }
