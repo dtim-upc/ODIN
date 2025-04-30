@@ -134,7 +134,7 @@ nextiamg_full/              # Full project code, including NextiaMG
 ├── docker-compose.yml      # Docker Compose configuration
 ├── README.md               # This README file
 └── requirements.txt        # Dependencies for Python parts (if any)
-README.md
+README.md 
 ```
 
 ---

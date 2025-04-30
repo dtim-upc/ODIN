@@ -4,7 +4,7 @@
       <q-scroll-area class="fit">
         <q-list>
           <q-item>
-            <h5>Integrated Schemas</h5>
+            <h5>Generate Mappings</h5>
           </q-item>
           <q-separator/>
 
@@ -25,6 +25,17 @@
           label="Select mapping type"
           outlined
           dense
+        />
+
+        <!-- Ask for config path only if mapping type is R2RML-CONFIG -->
+        <q-file
+          v-if="selectedMappingType === 'R2RML-CONFIG'"
+          v-model="configFile"
+          label="Choose configuration (.properties) file"
+          outlined
+          dense
+          use-chips
+          accept=".properties"
         />
 
         <q-btn
@@ -48,15 +59,24 @@ const mappingsStore = useMappingsStore()
 
 const selectedSchema = ref('')
 const selectedMappingType = ref('')
+
 const projectID = computed(() => projectsStore.currentProject.projectId)
 
 const mappingTypes = ['R2RML', 'R2RML-CONFIG']  // customize based on supported formats
 
+const configFile = ref(null)
+
 const downloadMappings = () => {
   if (projectID.value && selectedMappingType.value) {
-    mappingsStore.downloadMappings(projectID.value, selectedMappingType.value)
+    mappingsStore.downloadMappings(
+      projectID.value,
+      selectedMappingType.value,
+      selectedMappingType.value === 'R2RML-CONFIG' ? configFile.value : null
+    )
   }
 }
+
+
 
 onMounted(() => {
   if (projectsStore.currentProject.integratedDatasets?.length > 0) {
