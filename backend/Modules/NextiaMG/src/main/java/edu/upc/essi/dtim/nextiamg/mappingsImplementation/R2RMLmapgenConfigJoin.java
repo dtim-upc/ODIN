@@ -566,6 +566,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
 
     public static void main(String[] args) throws IOException {
 
+        /*
         Graph integratedGraph = new IntegratedGraphJenaImpl();
         integratedGraph.setGraph(RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/Odin/integrated_graph.ttl"));
         String configurationFilePath = "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/Odin/config.properties";
@@ -586,6 +587,8 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+         */
 
 
 
@@ -608,6 +611,27 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         }
 
          */
+
+        Graph integratedGraph = new IntegratedGraphJenaImpl();
+        integratedGraph.setGraph(RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/integrated_graph.ttl"));
+        String configurationFilePath = "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/config.properties";
+
+        // Load the configuration file as input stream
+        InputStream configInputStream = new FileInputStream(configurationFilePath);
+
+        R2RMLmapgenConfigJoin r2RMLmapgen = new R2RMLmapgenConfigJoin(integratedGraph, configInputStream);
+
+        MappingsGraph graphM = r2RMLmapgen.generateMappings();
+        Model modelM = graphM.getGraph();
+
+        // write the model to a TTL file
+        try {
+            RDFDataMgr.write((OutputStream) new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/generated_mappings_join.ttl"), modelM, Lang.TURTLE);
+            System.out.println("file written temporal");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }

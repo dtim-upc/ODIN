@@ -28,6 +28,8 @@ public class Main {
 //        // store graph in ttl
 //        M.write("/Users/anbipa/Desktop/DTIM/Cyclops-UC3/mitender_bs_2.ttl");
 
+        /*
+
         CSVBootstrap j = new CSVBootstrap("orders", "orders", "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/orders.csv");
         Graph M = j.bootstrapSchema(true);
 
@@ -43,6 +45,15 @@ public class Main {
 
         // store graph in ttl
         O.write("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/customers.ttl");
+
+        JSONBootstrap j = new JSONBootstrap("mitenderDataset", "mitenderDataset", "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/mitender-example2_2.json");
+
+         */
+
+        JSONBootstrap j = new JSONBootstrap("mitenderDataset2", "mitenderDataset2", "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/mitender-example2.json");
+        Graph M = j.bootstrapSchema();
+        // store graph in ttl
+        M.write("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/mitender-example2_2.ttl");
     }
 
     public void mainCSVBootstrap() {
@@ -83,7 +94,7 @@ public class Main {
     }
 
     public void mainJSONBootstrap() {
-        JSONBootstrap j = new JSONBootstrap("mitenderDataset", "mitenderDataset", "/Users/anbipa/Desktop/mitender-example2.json");
+        JSONBootstrap j = new JSONBootstrap("mitenderDataset", "mitenderDataset", "/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/mitender-example2_2.json");
 
 //		Model M = j.bootstrapSchema("ds1", D,"/Users/javierflores/Documents/upc/projects/newODIN/datasources/survey_prueba/selected/tate_artist_picasso-pablo-1767.json");
         Graph M = j.bootstrapSchema();
