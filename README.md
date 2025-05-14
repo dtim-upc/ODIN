@@ -64,7 +64,7 @@ The NextiaMG component consists of two services: the **frontend** and the **back
 - **Frontend (Application)**:
     - Accessible at `localhost:9000` (host → container).
 - **Backend**:
-    - Accessible at `localhost:8080` (host → container).
+    - Accessible at `localhost:3000` (host → container).
 
 #### Communication Between Services
 - The frontend communicates with the backend using Docker's internal network. The frontend connects to the backend at the internal service name `backend`.
