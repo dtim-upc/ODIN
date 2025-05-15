@@ -12,3 +12,4 @@ build_nextiamg:
   only:
     - main
 
+
