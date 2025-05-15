@@ -5,7 +5,7 @@ stages:
 build_nextiamg:
   stage: build
   script:
-    - docker-compose -f nextiamg_full/docker-compose.yml build --no-cache frontend backend
+    - docker compose -f nextiamg_full/docker-compose.yml build --no-cache frontend backend
 
   tags:
     - docker
