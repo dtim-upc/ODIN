@@ -37,4 +37,4 @@ deploy_nextiamg:
   only:
     - main
   needs:
-    - push_nextiamg
+    - build_and_push_nextiamg
