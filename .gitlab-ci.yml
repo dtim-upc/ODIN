@@ -15,7 +15,7 @@ before_script:
 build_nextiamg:
   stage: build
   script:
-    - docker compose -f nextiamg_full/docker-compose.deploy.yml build --no-cache frontend backend
+    - docker compose -f nextiamg_full/docker-compose.yml build --no-cache frontend backend
   tags:
     - docker
   only:
@@ -41,7 +41,7 @@ deploy_nextiamg:
     - echo "Deploying NextiaMG..."
     - docker compose -f docker-compose.deploy.yml pull
     - docker compose -f docker-compose.deploy.yml up -d --remove-orphans
-    - docker compose -f /docker-compose.deploy.yml ps
+    - docker compose -f docker-compose.deploy.yml ps
   tags:
     - docker
   only:
