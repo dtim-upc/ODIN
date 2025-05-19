@@ -115,7 +115,7 @@ We provide a `docker-compose.yml` file for easy configuration and integration wi
 2. **Start the containers**:
 
     ```bash
-    docker-compose up -f ./nextiamg_full/docker-compose.yml frontend backend
+    docker-compose -f ./nextiamg_full/docker-compose.yml up frontend backend
     ```
 
 This will set up the ODIN tool with the NextiaMG component along with all required dependencies for the project.

@@ -1,6 +1,5 @@
 stages:
   - build
-  - push
   - deploy
 
 variables:
@@ -11,28 +10,19 @@ variables:
 before_script:
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
-# Build NextiaMG
-build_nextiamg:
+# Build & Push NextiaMG
+build_and_push_nextiamg:
   stage: build
   script:
     - docker compose -f nextiamg_full/docker-compose.yml build --no-cache frontend backend
-  tags:
-    - docker
-  only:
-    - main
-
-# Push to GitLab Registry
-push_nextiamg:
-  stage: push
-  script:
+    - docker tag nextiamg_frontend $IMAGE_REGISTRY/nextiamg_frontend
+    - docker tag nextiamg_backend $IMAGE_REGISTRY/nextiamg_backend
     - docker push $IMAGE_REGISTRY/nextiamg_frontend
     - docker push $IMAGE_REGISTRY/nextiamg_backend
   tags:
     - docker
   only:
     - main
-  needs:
-    - build_nextiamg
 
 # Deploy NextiaMG
 deploy_nextiamg:
