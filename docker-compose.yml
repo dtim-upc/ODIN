@@ -46,6 +46,11 @@ services:
     depends_on:
       - graphdb
 
+  dq_rule_discovery:
+    image: aniolupc/dq-discovery:latest
+    ports:
+      - "5050:5000"
+
   graphdb:
     build:
       context: .
