@@ -42,6 +42,14 @@ public class AppConfig {
     @Value("${dataStorage.DataLayerTechnology}")
     private String DataLayerTechnology;
 
+    /**
+     * URL of the Data Quality service.
+     */
+    @Value("${dq.service.url}")
+    private String dqServiceUrl;
+
+    public String getDqServiceUrl() { return dqServiceUrl; }
+
     public String getDBTypeProperty() {
         return DBTypeProperty;
     }

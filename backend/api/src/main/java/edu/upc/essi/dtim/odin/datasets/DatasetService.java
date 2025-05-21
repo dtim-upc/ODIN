@@ -1,5 +1,6 @@
 package edu.upc.essi.dtim.odin.datasets;
 
+import edu.upc.essi.dtim.NextiaCore.constraints.DenialConstraint;
 import edu.upc.essi.dtim.NextiaCore.datasets.*;
 import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.repositories.RelationalJDBCRepository;
@@ -12,6 +13,8 @@ import edu.upc.essi.dtim.odin.exception.ElementNotFoundException;
 import edu.upc.essi.dtim.odin.exception.EmptyFileException;
 import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
 import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaCD.cdModuleImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaCD.cdModuleInterface;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
 import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
@@ -277,6 +280,10 @@ public class DatasetService {
             LocalGraph graph = bsResult.getGraph();
             String wrapper = bsResult.getWrapper();
 
+            // Execute constraint discovery
+            List<DenialConstraint> denialConstraints = getDenialConstraints(dataset);
+            dataset.setConstraints(denialConstraints);
+
             // Generating visual schema for frontend
             String visualSchema = generateVisualSchema(graph);
             graph.setGraphicalSchema(visualSchema);
@@ -302,6 +309,17 @@ public class DatasetService {
             e.printStackTrace();
             throw new InternalServerErrorException("Error when uploading the data to the data layer", e.getMessage());
         }
+    }
+
+    /**
+     * Extracts a list of DenialConstraints from the dataset.
+     *
+     * @param dataset The dataset from which to extract the DenialConstraints.
+     * @return A list of DenialConstraints extracted from the dataset.
+     */
+    public List<DenialConstraint> getDenialConstraints(Dataset dataset) {
+        cdModuleInterface cdInterface = new cdModuleImpl();
+        return cdInterface.getDCs(dataset);
     }
 
     /**

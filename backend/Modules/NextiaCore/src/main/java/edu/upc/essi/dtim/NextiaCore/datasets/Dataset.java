@@ -1,6 +1,7 @@
 package edu.upc.essi.dtim.NextiaCore.datasets;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import edu.upc.essi.dtim.NextiaCore.constraints.DenialConstraint;
 import edu.upc.essi.dtim.NextiaCore.graph.LocalGraph;
 import edu.upc.essi.dtim.NextiaCore.repositories.DataRepository;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.LocalGraphJenaImpl;
@@ -16,6 +17,7 @@ public class Dataset {
 	private String datasetDescription;
 	private Date created_at;
 	private List<Attribute> attributes;
+	private List<DenialConstraint> constraints;
 	private String wrapper;
 	@JsonIgnoreProperties({"datasets"})
 	private DataRepository repository;
@@ -61,6 +63,9 @@ public class Dataset {
 
 	public List<Attribute> getAttributes() {return attributes;}
 	public void setAttributes(List<Attribute> attributes) {this.attributes = attributes;}
+
+	public List<DenialConstraint> getConstraints() { return constraints;}
+	public void setConstraints(List<DenialConstraint> constraints) { this.constraints = constraints;}
 
 	public String getWrapper() {
 		return wrapper;
