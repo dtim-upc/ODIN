@@ -1,0 +1,7 @@
+flask
+flask-cors
+openai
+llamaapi
+python-dotenv
+rdflib
+pandas

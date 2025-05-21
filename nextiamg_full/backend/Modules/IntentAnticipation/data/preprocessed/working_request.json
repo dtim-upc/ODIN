@@ -1,0 +1,11 @@
+{
+    "dataset": "data/preprocessed/anomalies.csv",
+    "intent": "classification",
+    "metric": "F1",
+    "preprocessing": true,
+    "hyperparameter": "",
+    "hyperparameterValue": "",
+    "algorithm": "sklearn-RandomForestClassifier",
+    "preprocessingAlgorithm": "sklearn-Normalizer",
+    "timeLimit": ""
+}

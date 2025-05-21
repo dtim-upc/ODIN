@@ -1,0 +1,40 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  IMAGE_REGISTRY: registry.gitlab.com/cyclops4100006/nextiamg
+
+before_script:
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+# Build & Push NextiaMG
+build_and_push_nextiamg:
+  stage: build
+  script:
+    - docker compose -f nextiamg_full/docker-compose.yml build --no-cache frontend backend
+    - docker tag nextiamg_full-frontend $IMAGE_REGISTRY/nextiamg_frontend
+    - docker tag nextiamg_full-backend $IMAGE_REGISTRY/nextiamg_backend
+    - docker push $IMAGE_REGISTRY/nextiamg_frontend
+    - docker push $IMAGE_REGISTRY/nextiamg_backend
+  tags:
+    - docker
+  only:
+    - main
+
+# Deploy NextiaMG
+deploy_nextiamg:
+  stage: deploy
+  script:
+    - echo "Deploying NextiaMG..."
+    - docker compose -f docker-compose.deploy.yml pull
+    - docker compose -f docker-compose.deploy.yml up -d --remove-orphans
+    - docker compose -f docker-compose.deploy.yml ps
+  tags:
+    - docker
+  only:
+    - main
+  needs:
+    - build_and_push_nextiamg

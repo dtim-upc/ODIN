@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  backend:
+    ports:
+      - "3000:3000"
+    volumes:
+      - shared-data:/backend/api/api/dbFiles/DataLayer
+    image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_backend
+
+  frontend:
+    ports:
+      - "9000:9000"
+    image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_frontend
+
+volumes:
+  shared-data:

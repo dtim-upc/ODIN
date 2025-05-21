@@ -1,0 +1,104 @@
+# name: Test, Analyze, and Generate documentation
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2
+
+#       - name: Set up JDK
+#         uses: actions/setup-java@v2
+#         with:
+#           java-version: '11'
+#           distribution: 'adopt'
+
+#       - name: Debugging
+#         run: |
+#           pwd
+#           ls -la
+#           cd ${{ github.workspace }}
+#           ls -la
+
+#       - name: Grant execute permission to gradlew
+#         run: |
+#           chmod +x api/gradlew
+
+#       - name: Create test file
+#         run: |
+#           mkdir -p api/src/test/resources
+#           touch api/src/test/resources/credentials.properties
+#           echo "db.username=${{ secrets.DATABASE_USERNAME }}" >> api/src/test/resources/credentials.properties
+#           echo "db.password=${{ secrets.DATABASE_PASSWORD }}" >> api/src/test/resources/credentials.properties
+#           echo "db.url=${{ secrets.DATABASE_URL }}" >> api/src/test/resources/credentials.properties
+
+#       - name: Build with Gradle
+#         working-directory: api  # Specify the correct working directory
+#         run: |
+#           ./gradlew build --warning-mode all
+
+#       - name: Run tests with Gradle
+#         working-directory: api  # Specify the correct working directory
+#         run: |
+#           ./gradlew test
+
+
+  # analyze:
+  #   runs-on: ubuntu-latest
+    #needs: test
+    ############################################
+    # Grant status permission for MULTI_STATUS #
+    ############################################
+    # permissions:
+    #   contents: read
+    #   packages: read
+    #   statuses: write
+
+    ##################
+    # Load all steps #
+    ##################
+    # steps:
+    #   ##########################
+    #   # Checkout the code base #
+    #   ##########################
+    #   - name: Checkout Code
+    #     uses: actions/checkout@v3
+    #     with:
+    #       # Full git history is needed to get a proper
+    #       # list of changed files within `super-linter`
+    #       fetch-depth: 0
+
+    #   ################################
+    #   # Run Linter against code base #
+    #   ################################
+    #   - name: Lint Code Base
+    #     uses: github/super-linter@v5
+    #     env:
+    #       VALIDATE_ALL_CODEBASE: true
+    #       DEFAULT_BRANCH: master
+    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #       VALIDATE_GOOGLE_JAVA_FORMAT: true
+    #       VALIDATE_JAVA: true
+
+    # documentation:
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #     - uses: actions/checkout@v2         
+    #     - name: Generate and Publish documentation
+    #       run: |
+    #         cd ODIN
+    #         cd odin 
+    #         chmod +x ./gradlew
+    #         ./gradlew build
+    #         ./gradlew generateDocs
+    #         git config --global user.email "you@example.com"
+    #         git config --global user.name "Your Name"
+    #         git add .
+    #         git commit -m "[ci-bot] Auto-generated Javadoc Documentation"
+    #         git push

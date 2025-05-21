@@ -1,0 +1,236 @@
+Country;Code;Region;IncomeGroup;Population;YearlyChange;NetChange;DensityPerKM2;landAreaKM2;armedForcesSize;birthRate;co2Emissions;CPI;maternalMortalityRate;physiciansPerThousand;laborForcePercentage;taxRate;unemploymentRate
+Afghanistan;AFG;South Asia;Low income;1438207241;0.39%;5540090;153;652,230;323,000;32.49;8,672;149.9;638;0.28;0.49;0.71;0.11
+Albania;ALB;Europe & Central Asia;Upper middle income;1377233523;0.99%;13586631;464;28,748;9,000;11.78;4,536;119.05;15;1.2;0.56;0.37;0.12
+Algeria;DZA;Middle East & North Africa;Upper middle income;330610570;0.59%;1937734;36;2,381,741;317,000;24.28;150,006;151.36;112;1.72;0.41;0.66;0.12
+American Samoa;ASM;East Asia & Pacific;Upper middle income;272931713;1.07%;2898047;151;468;null;7.2;469;null;null;3.33;null;null;null
+Andorra;AND;Europe & Central Asia;High income;219992900;2.00%;4327022;287;1,246,700;117,000;40.73;34,693;261.73;241;0.21;0.78;0.49;0.07
+Angola;AGO;Sub-Saharan Africa;Lower middle income;212253150;0.72%;1509890;25;443;0;15.33;557;113.81;42;2.76;null;0.43;null
+Antigua and Barbuda;ATG;Latin America & Caribbean;High income;205052107;2.58%;5175990;226;2,780,400;105,000;17.02;201,348;232.75;39;3.96;0.61;1.06;0.1
+Argentina;ARG;Latin America & Caribbean;Upper middle income;164354176;1.01%;1643222;1265;29,743;49,000;13.99;5,156;129.18;26;4.4;0.56;0.23;0.17
+Armenia;ARM;Europe & Central Asia;Upper middle income;145922010;0.04%;62206;9;7,741,220;58,000;12.6;375,908;119.8;6;3.68;0.66;0.47;0.05
+Aruba;ABW;Latin America & Caribbean;High income;128655589;1.06%;1357224;66;83,871;21,000;9.7;61,448;118.06;5;5.17;0.61;0.51;0.05
+Australia;AUS;East Asia & Pacific;High income;126552765;-0.30%;-383840;347;86,600;82,000;14.0;37,620;156.32;26;3.45;0.67;0.41;0.06
+Austria;AUT;Europe & Central Asia;High income;114357494;2.57%;2884858;115;13,880;1,000;13.97;1,786;116.22;70;1.94;0.75;0.34;0.1
+Azerbaijan;AZE;Europe & Central Asia;Upper middle income;109280343;1.35%;1464463;368;765;19,000;13.99;31,694;117.59;14;0.93;0.73;0.14;0.01
+Bahamas;BHS;Latin America & Caribbean;High income;101930276;1.94%;1946331;103;148,460;221,000;18.18;84,246;179.68;173;0.58;0.59;0.33;0.04
+Bahrain;BHR;Middle East & North Africa;High income;97160127;0.91%;876473;314;430;1,000;10.65;1,276;134.09;27;2.48;0.65;0.36;0.1
+Bangladesh;BGD;South Asia;Lower middle income;88972681;3.19%;2770836;40;207,600;155,000;9.9;58,280;null;2;5.19;0.64;0.53;0.05
+Barbados;BRB;Latin America & Caribbean;High income;84153250;1.09%;909452;110;30,528;32,000;10.3;96,889;117.11;5;3.07;0.54;0.55;0.06
+Belarus;BLR;Europe & Central Asia;Upper middle income;83771587;1.30%;1079043;52;22,966;2,000;20.79;568;105.68;36;1.12;0.65;0.31;0.06
+Belgium;BEL;Europe & Central Asia;High income;83730223;0.32%;266897;240;112,622;12,000;36.22;6,476;110.71;397;0.08;0.71;0.49;0.02
+Belize;BLZ;Latin America & Caribbean;Upper middle income;69764925;0.25%;174396;137;38,394;6,000;17.26;1,261;167.18;183;0.42;0.67;0.35;0.02
+Benin;BEN;Sub-Saharan Africa;Low income;67814098;0.53%;355839;281;1,098,581;71,000;21.75;21,606;148.32;155;1.59;0.72;0.84;0.04
+Bermuda;BMU;North America;High income;65244628;0.22%;143783;119;51,197;11,000;8.11;21,848;104.9;10;2.16;0.46;0.24;0.18
+Bhutan;BTN;South Asia;Lower middle income;60479424;-0.15%;-88249;206;581,730;9,000;24.82;6,340;149.75;144;0.37;0.71;0.25;0.18
+Bolivia;BOL;Latin America & Caribbean;Lower middle income;59368313;2.98%;1728755;67;8,515,770;730,000;13.92;462,299;167.4;60;2.15;0.64;0.65;0.12
+Bosnia and Herzegovina;BIH;Europe & Central Asia;Upper middle income;59154802;1.28%;750420;49;5,765;8,000;14.9;7,664;99.03;31;1.61;0.65;0.08;0.09
+Botswana;BWA;Sub-Saharan Africa;Upper middle income;54335948;0.67%;364380;83;110,879;31,000;8.9;41,708;114.42;10;4.03;0.55;0.28;0.04
+Brazil;BRA;Latin America & Caribbean;Upper middle income;53521116;2.28%;1197323;94;274,200;11,000;37.93;3,418;106.58;320;0.08;0.66;0.41;0.06
+British Virgin Islands;VGB;Latin America & Caribbean;High income;51260395;0.09%;43877;527;27,830;31,000;39.01;495;182.11;548;0.1;0.79;0.41;0.01
+Brunei Darussalam;BRN;East Asia & Pacific;High income;50771878;1.08%;543448;46;322,463;27,000;35.74;9,674;111.61;617;0.23;0.57;0.5;0.03
+Bulgaria;BGR;Europe & Central Asia;Upper middle income;46751175;0.04%;18002;94;4,033;1,000;19.49;543;110.5;58;0.77;0.61;0.38;0.12
+Burkina Faso;BFA;Sub-Saharan Africa;Low income;45427637;3.32%;1471413;229;181,035;191,000;22.46;9,919;127.63;160;0.17;0.82;0.23;0.01
+Burundi;BDI;Sub-Saharan Africa;Low income;45111229;0.93%;415097;17;475,440;24,000;35.39;8,291;118.65;529;0.09;0.76;0.58;0.03
+Cabo Verde;CPV;Sub-Saharan Africa;Lower middle income;43685618;1.85%;797990;18;9,984,670;72,000;10.1;544,894;116.76;10;2.61;0.65;0.25;0.06
+Cambodia;KHM;East Asia & Pacific;Lower middle income;43632213;2.42%;1036022;25;622,984;8,000;35.35;297;186.86;829;0.06;0.72;0.73;0.04
+Cameroon;CMR;Sub-Saharan Africa;Lower middle income;43785122;-0.59%;-259876;75;1,284,000;35,000;42.17;1,016;117.7;1140;0.04;0.71;0.64;0.02
+Canada;CAN;North America;High income;40031626;2.32%;912710;93;756,096;122,000;12.43;85,822;131.91;13;2.59;0.63;0.34;0.07
+Cayman Islands;CYM;Latin America & Caribbean;High income;38742911;2.33%;886592;60;9,596,960;2,695,000;10.9;9,893,038;125.08;29;1.98;0.68;0.59;0.04
+Central African Republic;CAF;Sub-Saharan Africa;Low income;37854825;-0.11%;-41157;124;1,138,910;481,000;14.88;97,814;140.95;83;2.18;0.69;0.71;0.1
+Chad;TCD;Sub-Saharan Africa;Low income;37674770;0.89%;331107;4;2,235;null;31.88;202;103.62;273;0.27;0.43;2.2;0.04
+Channel Islands;CHI;Europe & Central Asia;High income;36820713;1.20%;438791;83;342,000;12,000;32.86;3,282;124.74;378;0.12;0.69;0.54;0.09
+Chile;CHL;Latin America & Caribbean;High income;34701377;1.59%;545343;16;51,100;10,000;13.97;8,023;128.85;27;2.89;0.62;0.58;0.12
+China;CHN;East Asia & Pacific;Upper middle income;33368859;1.48%;487487;79;56,594;18,000;9.0;17,488;109.82;8;3.0;0.51;0.21;0.07
+Colombia;COL;Latin America & Caribbean;Upper middle income;32876986;1.42%;461401;26;110,860;76,000;10.17;28,284;null;36;8.42;0.54;null;0.02
+Comoros;COM;Sub-Saharan Africa;Lower middle income;32644783;3.27%;1040977;26;9,251;16,000;10.46;6,626;102.51;6;1.95;0.63;0.22;0.07
+Congo Dem. Rep.;COD;Sub-Saharan Africa;Low income;32280610;1.30%;416222;99;78,867;23,000;10.7;102,218;116.48;3;4.12;0.61;0.46;0.02
+Congo Rep.;COG;Sub-Saharan Africa;Lower middle income;31067362;2.93%;889399;40;2,344,858;134,000;41.18;2,021;133.85;473;0.07;0.64;0.51;0.04
+Costa Rica;CRI;Latin America & Caribbean;Upper middle income;30936375;2.15%;655084;137;43,094;15,000;10.6;31,786;110.35;4;4.01;0.62;0.24;0.05
+C�te dIvoire;CIV;Sub-Saharan Africa;Lower middle income;29687214;2.28%;664042;56;23,200;13,000;21.47;620;120.25;248;0.22;0.6;0.38;0.1
+Croatia;HRV;Europe & Central Asia;High income;29027347;1.85%;528098;203;751;null;12.0;180;103.87;null;1.08;null;0.33;null
+Cuba;CUB;Latin America & Caribbean;Upper middle income;28451828;-0.28%;-79889;32;48,670;71,000;19.51;25,258;135.5;95;1.56;0.64;0.49;0.06
+Cura�ao;CUW;Latin America & Caribbean;High income;27539106;2.68%;721711;48;283,561;41,000;19.72;41,155;124.14;59;2.04;0.68;0.34;0.04
+Cyprus;CYP;Europe & Central Asia;High income;26405174;2.59%;669483;56;1,001,450;836,000;26.38;238,560;288.57;37;0.45;0.46;0.44;0.11
+Czech Republic;CZE;Europe & Central Asia;High income;26239250;2.57%;661730;83;21,041;42,000;18.25;7,169;111.23;46;1.57;0.59;0.36;0.04
+Denmark;DNK;Europe & Central Asia;High income;25756088;0.44%;112655;214;28,051;1,000;33.24;5,655;124.35;301;0.4;0.62;0.79;0.06
+Djibouti;DJI;Middle East & North Africa;Lower middle income;25439164;1.18%;296686;3;117,600;202,000;30.3;711;null;480;0.06;0.78;0.84;0.05
+Dominica;DMA;Latin America & Caribbean;Upper middle income;24014064;3.84%;895929;19;45,228;6,000;10.9;16,590;122.14;9;4.48;0.64;0.48;0.05
+Dominican Republic;DOM;Latin America & Caribbean;Upper middle income;23808164;0.18%;42899;673;17,364;null;null;null;null;null;null;null;null;null
+Ecuador;ECU;Latin America & Caribbean;Upper middle income;21395196;0.42%;89516;341;1,104,300;138,000;32.34;14,870;143.86;401;0.08;0.8;0.38;0.02
+Egypt;EGY;Middle East & North Africa;Lower middle income;20780371;2.86%;581895;76;18,274;4,000;21.28;2,046;132.3;34;0.84;0.58;0.32;0.04
+El Salvador;SLV;Latin America & Caribbean;Lower middle income;20125282;3.02%;592802;17;338,145;25,000;8.6;45,871;112.33;3;3.81;0.59;0.37;0.07
+Equatorial Guinea;GNQ;Sub-Saharan Africa;Upper middle income;19262731;-0.66%;-126866;84;643,801;307,000;11.3;303,276;110.05;8;3.27;0.55;0.61;0.08
+Eritrea;ERI;Sub-Saharan Africa;Low income;19024426;2.69%;501205;203;267,667;7,000;31.61;5,321;122.19;252;0.68;0.53;0.47;0.2
+Estonia;EST;Europe & Central Asia;High income;19082804;0.87%;164163;26;11,300;1,000;38.54;532;172.73;597;0.1;0.59;0.48;0.09
+Eswatini;SWZ;Sub-Saharan Africa;Lower middle income;18730568;1.21%;225280;7;69,700;26,000;13.47;10,128;133.61;25;7.12;0.68;0.1;0.14
+Ethiopia;ETH;Sub-Saharan Africa;Low income;18273379;2.93%;522925;25;357,022;180,000;9.5;727,973;112.85;7;4.25;0.61;0.49;0.03
+Faroe Islands;FRO;Europe & Central Asia;High income;17846248;1.90%;334096;167;238,533;16,000;29.41;16,670;268.36;308;0.14;0.68;0.55;0.04
+Fiji;FJI;East Asia & Pacific;Upper middle income;17587526;1.55%;269392;71;131,957;146,000;8.1;62,434;101.87;3;5.48;0.52;0.52;0.17
+Finland;FIN;Europe & Central Asia;High income;17410293;2.52%;430523;95;349;null;16.47;268;107.43;25;1.41;null;0.48;null
+France;FRA;Europe & Central Asia;High income;17127290;0.22%;37742;508;108,889;43,000;24.56;16,777;142.92;95;0.35;0.62;0.35;0.02
+French Polynesia;PYF;East Asia & Pacific;High income;16649599;2.75%;447563;87;245,857;13,000;36.36;2,996;262.95;576;0.08;0.62;0.69;0.04
+Gabon;GAB;Sub-Saharan Africa;Upper middle income;16671185;1.41%;232423;95;36,125;4,000;35.13;293;111.65;667;0.13;0.72;0.46;0.02
+Gambia;GMB;Sub-Saharan Africa;Low income;16324440;3.00%;478988;13;214,969;3,000;19.97;2,384;116.19;169;0.8;0.56;0.31;0.12
+Georgia;GEO;Europe & Central Asia;Upper middle income;15798020;2.92%;450317;25;27,750;0;24.35;2,978;179.29;480;0.23;0.67;0.43;0.14
+Germany;DEU;Europe & Central Asia;High income;14818157;1.48%;217456;38;0;null;null;null;null;null;null;null;null;null
+Ghana;GHA;Sub-Saharan Africa;Lower middle income;13056478;2.83%;361549;53;112,090;23,000;21.6;9,813;150.34;65;0.31;0.69;0.39;0.05
+Gibraltar;GIB;Europe & Central Asia;High income;12883878;2.58%;325268;525;93,028;40,000;9.6;45,537;121.64;12;3.41;0.57;0.38;0.03
+Greece;GRC;Europe & Central Asia;High income;12055347;2.73%;322049;108;103,000;0;12.0;2,065;129;4;4.08;0.75;0.32;0.03
+Greenland;GRL;Europe & Central Asia;High income;11814346;3.12%;360204;463;3,287,263;3,031,000;17.86;2,407,672;180.44;145;0.86;0.49;0.5;0.05
+Grenada;GRD;Latin America & Caribbean;Upper middle income;11793319;1.06%;123900;76;1,904,569;676,000;18.07;563,325;151.18;177;0.43;0.68;0.3;0.05
+Guam;GUM;East Asia & Pacific;High income;11640159;1.39%;159921;11;1,648,195;563,000;18.78;661,710;550.93;16;1.58;0.45;0.45;0.11
+Guatemala;GTM;Latin America & Caribbean;Upper middle income;11579477;0.44%;50295;383;438,317;209,000;29.08;190,061;119.86;79;0.71;0.43;0.31;0.13
+Guinea;GIN;Sub-Saharan Africa;Low income;11373955;1.24%;139451;414;70,273;9,000;12.5;37,711;106.58;5;3.31;0.62;0.26;0.05
+Guinea-Bissau;GNB;Sub-Saharan Africa;Low income;11327988;-0.06%;-6867;106;20,770;178,000;20.8;65,166;108.15;3;4.62;0.64;0.25;0.04
+Guyana;GUY;Latin America & Caribbean;Upper middle income;11166783;1.19%;131612;18;301,340;347,000;7.3;320,411;110.62;2;3.98;0.5;0.59;0.1
+Haiti;HTI;Latin America & Caribbean;Low income;10825682;1.01%;108952;225;10,991;4,000;16.1;8,225;162.47;80;1.31;0.66;0.35;0.08
+Honduras;HND;Latin America & Caribbean;Lower middle income;10705012;0.18%;19772;139;377,944;261,000;7.4;1,135,886;105.48;5;2.41;0.62;0.47;0.02
+Hong Kong (S.A.R.);HKG;East Asia & Pacific;High income;10433037;-0.48%;-50401;81;89,342;116,000;21.98;25,108;125.6;46;2.32;0.39;0.29;0.15
+Hungary;HUN;Europe & Central Asia;High income;10182442;1.00%;101440;115;2,724,900;71,000;21.77;247,207;182.75;10;3.25;0.69;0.28;0.05
+Iceland;ISL;Europe & Central Asia;High income;10202571;-0.29%;-29478;111;580,367;29,000;28.75;17,910;180.51;342;0.16;0.75;0.37;0.03
+India;IND;South Asia;Lower middle income;10120555;0.91%;91459;123;811;null;27.89;66;99.55;92;0.2;null;0.33;null
+Indonesia;IDN;East Asia & Pacific;Lower middle income;10086531;0.63%;62886;25;17,818;25,000;13.94;98,734;126.6;12;2.58;0.74;0.13;0.02
+Iran;IRN;Middle East & North Africa;Upper middle income;9871892;1.63%;158490;89;199,951;21,000;27.1;9,787;155.68;60;1.88;0.6;0.29;0.06
+Iraq;IRQ;Middle East & North Africa;Upper middle income;9865845;1.23%;119873;118;236,800;129,000;23.55;17,763;135.87;185;0.37;0.79;0.24;0.01
+Ireland;IRL;Europe & Central Asia;High income;9665192;-0.25%;-24328;107;64,589;6,000;10.0;7,004;116.86;19;3.19;0.61;0.38;0.07
+Isle of Man;IMN;Europe & Central Asia;High income;9492342;2.32%;216627;68;10,400;80,000;17.55;24,796;130.02;29;2.1;0.47;0.32;0.06
+Israel;ISR;Middle East & North Africa;High income;9449940;-0.03%;-3088;47;30,355;2,000;26.81;2,512;155.86;544;0.07;0.68;0.14;0.23
+Italy;ITA;Europe & Central Asia;High income;8996022;0.57%;51296;109;111,369;2,000;33.04;1,386;223.13;661;0.04;0.76;0.46;0.03
+Jamaica;JAM;Latin America & Caribbean;Upper middle income;8911530;1.95%;170915;20;1,759,540;0;18.83;50,564;125.71;72;2.09;0.5;0.33;0.19
+Japan;JPN;East Asia & Pacific;High income;8744288;-0.40%;-34864;100;160;null;9.9;51;null;null;null;null;0.22;null
+Jordan;JOR;Middle East & North Africa;Upper middle income;8627444;1.60%;136158;400;65,300;34,000;10.0;12,963;118.38;8;6.35;0.62;0.43;0.06
+Kazakhstan;KAZ;Europe & Central Asia;Upper middle income;8641786;0.74%;63257;219;2,586;2,000;10.3;8,988;115.09;5;3.01;0.59;0.2;0.05
+Kenya;KEN;Sub-Saharan Africa;Lower middle income;8237580;2.43%;196358;152;587,041;22,000;32.66;3,905;184.33;335;0.18;0.86;0.38;0.02
+Kiribati;KIR;East Asia & Pacific;Lower middle income;7942879;2.10%;163768;111;118,484;15,000;34.12;1,298;418.34;349;0.04;0.77;0.35;0.06
+Korea Dem. Peoples Rep.;PRK;East Asia & Pacific;Low income;7484618;0.82%;60827;7140;329,847;136,000;16.75;248,289;121.46;29;1.51;0.64;0.39;0.03
+South Korea;KOR;East Asia & Pacific;High income;7253719;1.48%;106105;32;298;5,000;14.2;1,445;99.7;53;4.56;0.7;0.3;0.06
+Kosovo;XKX;Europe & Central Asia;Upper middle income;7114524;1.25%;87902;18;1,240,192;18,000;41.54;3,179;108.73;562;0.13;0.71;0.55;0.07
+Kuwait;KWT;Middle East & North Africa;High income;6958627;-0.74%;-51674;64;316;2,000;9.2;1,342;113.45;6;2.86;0.57;0.44;0.03
+Kyrgyz Republic;KGZ;Europe & Central Asia;Lower middle income;6852010;1.38%;93840;4;181;null;29.03;143;null;null;0.42;null;0.66;null
+Lao PDR;LAO;East Asia & Pacific;Lower middle income;6831445;-0.44%;-30268;667;1,030,700;21,000;33.69;2,739;135.02;766;0.19;0.46;0.67;0.1
+Latvia;LVA;Europe & Central Asia;High income;6608366;1.21%;79052;55;2,040;3,000;10.2;4,349;129.91;61;2.53;0.58;0.22;0.07
+Lebanon;LBN;Middle East & North Africa;Upper middle income;6501804;1.69%;108345;34;1,964,375;336,000;17.6;486,406;141.54;33;2.38;0.61;0.55;0.03
+Lesotho;LSO;Sub-Saharan Africa;Lower middle income;6479609;0.51%;32652;313;702;null;22.82;143;112.1;88;0.18;null;0.61;null
+Liberia;LBR;Sub-Saharan Africa;Low income;6012850;1.50%;89111;13;33,851;7,000;10.1;5,115;166.2;19;3.21;0.43;0.39;0.05
+Libya;LBY;Middle East & North Africa;Upper middle income;5840996;0.79%;46005;8358;2;null;5.9;null;null;null;6.56;null;null;null
+Liechtenstein;LIE;Europe & Central Asia;High income;5788108;0.35%;20326;137;1,564,116;18,000;24.13;25,368;195.76;45;2.86;0.6;0.26;0.06
+Lithuania;LTU;Europe & Central Asia;High income;5539002;0.15%;8564;18;13,812;12,000;11.73;2,017;116.32;6;2.76;0.54;0.22;0.15
+Luxembourg;LUX;Europe & Central Asia;High income;5489191;2.56%;137579;16;446,550;246,000;18.94;61,276;111.07;70;0.73;0.45;0.46;0.09
+Macao SAR;MAC;East Asia & Pacific;High income;5459116;0.05%;2629;114;799,380;11,000;37.52;7,943;182.31;289;0.08;0.78;0.36;0.03
+Madagascar;MDG;Sub-Saharan Africa;Low income;5412632;0.79%;42384;15;676,578;513,000;17.55;25,280;168.18;250;0.68;0.62;0.31;0.02
+Malawi;MWI;Sub-Saharan Africa;Low income;5078933;2.65%;131640;16;824,292;16,000;28.64;4,228;157.97;195;0.42;0.6;0.21;0.2
+Malaysia;MYS;East Asia & Pacific;Upper middle income;5076280;2.41%;119994;847;21;null;null;null;null;null;null;null;null;null
+Maldives;MDV;South Asia;Upper middle income;5084636;0.92%;46557;100;147,181;112,000;19.89;9,105;188.73;186;0.75;0.84;0.42;0.01
+Mali;MLI;Sub-Saharan Africa;Low income;5032469;2.44%;120307;53;41,543;41,000;9.7;170,780;115.91;5;3.61;0.64;0.41;0.03
+Malta;MLT;Middle East & North Africa;High income;4926480;1.13%;55291;72;268,838;9,000;11.98;34,382;114.24;9;3.59;0.7;0.35;0.04
+Marshall Islands;MHL;East Asia & Pacific;Upper middle income;4812256;1.78%;84582;8;130,370;12,000;20.64;5,592;162.74;98;0.98;0.66;0.61;0.07
+Mauritania;MRT;Sub-Saharan Africa;Lower middle income;4814272;0.82%;39170;18;1,267,000;10,000;46.08;2,017;109.32;509;0.04;0.72;0.47;0
+Mauritius;MUS;Sub-Saharan Africa;Upper middle income;4623535;2.74%;123962;5;923,768;215,000;37.91;120,369;267.51;917;0.38;0.53;0.35;0.08
+Mexico;MEX;Latin America & Caribbean;Upper middle income;4300667;1.61%;68328;58;120,538;1,469,000;13.89;28,284;null;89;3.67;0.8;null;0.03
+Micronesia;FSM;East Asia & Pacific;Lower middle income;4257495;1.51%;63488;240;25,713;null;null;null;null;null;null;null;null;null
+Moldova;MDA;Europe & Central Asia;Lower middle income;4110214;-0.61%;-25037;73;323,802;23,000;10.4;41,023;120.27;2;2.92;0.64;0.36;0.03
+Monaco;MCO;Europe & Central Asia;High income;4035814;-0.23%;-9300;123;309,500;47,000;19.19;63,457;113.53;19;2.0;0.72;0.27;0.03
+Mongolia;MNG;East Asia & Pacific;Lower middle income;3990681;-0.19%;-7598;57;796,095;936,000;28.25;201,150;182.32;140;0.98;0.53;0.34;0.04
+Montenegro;MNE;Europe & Central Asia;Upper middle income;3536285;1.41%;49304;35;459;null;14.0;224;118.17;null;1.18;null;0.77;null
+Morocco;MAR;Middle East & North Africa;Lower middle income;3471314;0.35%;11996;20;null;null;null;null;null;null;null;null;null;null
+Mozambique;MOZ;Sub-Saharan Africa;Low income;3284806;-0.61%;-20181;64;75,420;26,000;18.98;10,715;122.07;52;1.57;0.67;0.37;0.04
+Myanmar;MMR;East Asia & Pacific;Lower middle income;3267320;1.65%;53123;2;462,840;4,000;27.07;7,536;155.99;145;0.07;0.47;0.37;0.02
+Namibia;NAM;Sub-Saharan Africa;Upper middle income;2962137;0.19%;5512;104;406,752;27,000;20.57;7,407;143.82;129;1.35;0.72;0.35;0.05
+Nauru;NRU;East Asia & Pacific;Upper middle income;2958567;0.44%;12888;273;1,285,216;158,000;17.95;57,414;129.78;88;1.27;0.78;0.37;0.03
+Nepal;NPL;South Asia;Low income;2870922;1.73%;48986;248;300,000;153,000;20.55;122,287;129.61;121;0.6;0.6;0.43;0.02
+Netherlands;NLD;Europe & Central Asia;High income;2878420;-0.11%;-3120;105;312,685;191,000;10.2;299,037;114.11;2;2.38;0.57;0.41;0.03
+New Caledonia;NCL;East Asia & Pacific;High income;2874636;-2.47%;-72555;323;92,212;52,000;8.5;48,742;110.62;8;5.12;0.59;0.4;0.06
+New Zealand;NZL;East Asia & Pacific;High income;2729553;-1.35%;-37338;43;11,586;22,000;9.54;103,259;115.38;9;2.49;0.87;0.11;0
+Nicaragua;NIC;Latin America & Caribbean;Lower middle income;2531290;1.86%;46375;3;238,391;126,000;9.6;69,259;123.78;19;2.98;0.55;0.2;0.04
+Niger;NER;Sub-Saharan Africa;Low income;2402083;2.94%;68962;239;17,098,240;1,454,000;11.5;1,732,027;180.75;17;4.01;0.62;0.46;0.05
+Nigeria;NGA;Sub-Saharan Africa;Lower middle income;2341649;2.08%;47930;4;26,338;35,000;31.7;1,115;151.09;248;0.13;0.84;0.33;0.01
+North Macedonia;MKD;Europe & Central Asia;Upper middle income;2214593;2.45%;53155;9;261;null;12.6;238;104.57;null;2.52;null;0.5;null
+Northern Mariana Islands;MNP;East Asia & Pacific;High income;2138799;0.80%;16981;71;616;null;12.0;414;110.13;117;0.64;0.67;0.35;0.21
+Norway;NOR;Europe & Central Asia;High income;2083391;0.00%;-85;83;389;null;14.24;220;109.67;68;0.66;0.66;0.37;0.19
+Oman;OMN;Middle East & North Africa;High income;2078881;0.01%;284;103;2,831;null;24.38;246;117.56;43;0.34;0.44;0.19;0.08
+Pakistan;PAK;South Asia;Lower middle income;1958132;2.45%;47079;70;61;null;6.8;null;110.63;null;6.11;null;0.36;null
+Palau;PLW;East Asia & Pacific;High income;1890218;-1.08%;-20545;30;964;1,000;31.54;121;185.09;130;0.05;0.58;0.37;0.13
+Panama;PAN;Latin America & Caribbean;High income;1688629;3.68%;60403;2239;2,149,690;252,000;17.8;563,449;118.4;17;2.61;0.56;0.16;0.06
+Papua New Guinea;PNG;East Asia & Pacific;Lower middle income;1392950;3.47%;46999;50;196,722;19,000;34.52;10,902;109.25;315;0.07;0.46;0.45;0.07
+Paraguay;PRY;Latin America & Caribbean;Upper middle income;1398579;0.32%;4515;273;77,474;32,000;9.2;45,221;144;12;3.11;0.55;0.37;0.13
+Peru;PER;Latin America & Caribbean;Upper middle income;1326357;0.07%;887;31;455;0;17.1;605;129.96;53;0.95;null;0.3;null
+Philippines;PHL;East Asia & Pacific;Lower middle income;1313184;1.96%;25326;89;71,740;9,000;33.41;1,093;234.16;1120;0.03;0.58;0.31;0.04
+Poland;POL;Europe & Central Asia;High income;1271347;0.17%;2100;626;716;81,000;8.8;37,535;114.41;8;2.29;0.71;0.21;0.04
+Portugal;PRT;Europe & Central Asia;High income;1205577;0.73%;8784;131;49,035;16,000;10.6;32,424;115.34;5;3.42;0.6;0.5;0.06
+Puerto Rico;PRI;Latin America & Caribbean;High income;1157707;1.05%;12034;67;20,273;7,000;9.4;12,633;111.05;7;3.09;0.58;0.31;0.04
+Qatar;QAT;Middle East & North Africa;High income;985027;1.48%;14440;43;28,896;null;32.44;169;133.06;104;0.19;0.84;0.32;0.01
+Romania;ROU;Europe & Central Asia;Upper middle income;895128;0.73%;6492;49;637,657;20,000;41.75;645;null;829;0.02;0.47;null;0.11
+Russia;RUS;Europe & Central Asia;Upper middle income;894017;0.72%;6385;358;1,219,090;80,000;20.51;476,644;158.93;119;0.91;0.56;0.29;0.28
+Rwanda;RWA;Sub-Saharan Africa;Low income;865696;2.20%;18715;467;99,720;634,000;6.4;620,302;115.16;11;2.36;0.63;0.33;0.04
+Samoa;WSM;East Asia & Pacific;Upper middle income;785788;0.48%;3786;4;644,329;185,000;35.01;1,727;4,583.71;1150;null;0.72;0.31;0.12
+San Marino;SMR;Europe & Central Asia;High income;769867;1.12%;8516;20;505,370;196,000;7.9;244,002;110.96;4;3.87;0.58;0.47;0.14
+S�o Tom� and Principe;STP;Sub-Saharan Africa;Lower middle income;683301;2.55%;17061;25;65,610;317,000;15.83;23,362;155.53;36;1.0;0.54;0.55;0.04
+Saudi Arabia;SAU;Middle East & North Africa;High income;647508;1.39%;8890;21645;1,861,484;124,000;32.18;20,000;1,344.19;295;0.26;0.48;0.45;0.17
+Senegal;SEN;Sub-Saharan Africa;Lower middle income;628050;0.01%;79;47;163,820;2,000;18.54;1,738;294.66;120;1.21;0.51;0.28;0.07
+Serbia;SRB;Europe & Central Asia;Upper middle income;623861;1.66%;10249;242;450,295;30,000;11.4;43,252;110.51;4;3.98;0.65;0.49;0.06
+Seychelles;SYC;Sub-Saharan Africa;High income;594215;2.55%;14876;2;41,277;21,000;10.0;34,477;99.55;5;4.3;0.68;0.29;0.05
+Sierra Leone;SLE;Sub-Saharan Africa;Low income;585561;0.90%;5260;4;185,180;239,000;23.69;28,830;143.2;31;1.22;0.44;0.43;0.08
+Singapore;SGP;East Asia & Pacific;High income;554750;1.10%;6052;138;144,100;17,000;30.76;5,310;148.57;17;1.7;0.42;0.67;0.11
+Sint Maarten (Dutch part);SXM;Latin America & Caribbean;High income;538558;1.81%;9591;1802;947,300;28,000;36.7;11,973;187.43;524;0.01;0.83;0.44;0.02
+Slovak Republic;SVK;Europe & Central Asia;High income;441308;0.27%;1171;1380;513,120;455,000;10.34;283,763;113.27;37;0.81;0.67;0.3;0.01
+Slovenia;SVN;Europe & Central Asia;High income;436624;0.97%;4194;83;14,874;2,000;29.42;495;145.38;142;0.72;0.67;0.17;0.05
+Solomon Islands;SLB;East Asia & Pacific;Lower middle income;400110;0.02%;68;237;56,785;10,000;33.11;3,000;113.3;396;0.08;0.78;0.48;0.02
+Somalia;SOM;Sub-Saharan Africa;Low income;396120;1.86%;7275;17;747;null;24.3;128;121.09;52;0.52;0.6;0.28;0.01
+South Africa;ZAF;Sub-Saharan Africa;Upper middle income;392477;0.97%;3762;39;5,128;4,000;12.94;43,868;141.75;67;4.17;0.6;0.41;0.03
+South Sudan;SSD;Sub-Saharan Africa;Low income;375323;-0.08%;-289;354;163,610;48,000;17.56;29,937;155.33;43;1.3;0.46;0.61;0.16
+Spain;ESP;Europe & Central Asia;High income;340795;0.65%;2212;3;783,562;512,000;16.03;372,725;234.44;17;1.85;0.53;0.42;0.13
+Sri Lanka;LKA;South Asia;Upper middle income;305623;2.42%;7263;25;488,100;42,000;23.83;70,630;null;7;2.22;0.65;null;0.04
+St. Kitts and Nevis;KNA;Latin America & Caribbean;High income;297029;2.70%;7850;4;26;null;null;11;null;null;0.92;null;null;null
+St. Lucia;LCA;Latin America & Caribbean;Upper middle income;287305;0.12%;350;668;241,038;46,000;38.14;5,680;173.87;375;0.17;0.7;0.34;0.02
+St. Martin (French part);MAF;Latin America & Caribbean;High income;284938;0.97%;2748;16;603,550;297,000;8.7;202,250;281.66;19;2.99;0.54;0.45;0.09
+St. Vincent and the Grenadines;VCT;Latin America & Caribbean;Upper middle income;280580;0.58%;1621;77;83,600;63,000;10.33;206,324;114.52;3;2.53;0.82;0.16;0.02
+Sudan;SDN;Sub-Saharan Africa;Lower middle income;271417;2.50%;6665;728;243,610;148,000;11.0;379,025;119.62;7;2.81;0.63;0.31;0.04
+Suriname;SUR;Latin America & Caribbean;Upper middle income;218308;1.91%;4103;228;9,833,517;1,359,000;11.6;5,006,302;117.24;19;2.61;0.62;0.37;0.15
+Sweden;SWE;Europe & Central Asia;High income;198147;0.67%;1317;70;176,215;22,000;13.86;6,766;202.92;17;5.05;0.64;0.42;0.09
+Switzerland;CHE;Europe & Central Asia;High income;183458;0.46%;837;301;447,400;68,000;23.3;91,811;null;29;2.37;0.65;0.32;0.06
+Syrian Arab Republic;SYR;Middle East & North Africa;Low income;173536;0.93%;1604;915;12,189;null;29.6;147;117.13;72;0.17;0.7;0.09;0.04
+Taiwan;TWN;East Asia & Pacific;High income;168474;0.89%;1481;313;912,050;343,000;17.88;164,175;2,740.27;125;1.92;0.6;0.73;0.09
+Tajikistan;TJK;Europe & Central Asia;Low income;163958;0.41%;669;370;331,210;522,000;16.75;192,668;163.52;43;0.82;0.77;0.38;0.02
+Tanzania;TZA;Sub-Saharan Africa;Low income;119069;1.57%;1843;147;527,968;40,000;30.45;10,609;157.58;164;0.31;0.38;0.27;0.13
+Thailand;THA;East Asia & Pacific;Upper middle income;114776;1.06%;1208;164;752,618;16,000;36.19;5,141;212.31;213;1.19;0.75;0.16;0.11
+Timor-Leste;TLS;East Asia & Pacific;Lower middle income;112418;0.46%;520;331;390,757;51,000;30.68;10,983;105.51;458;0.21;0.83;0.32;0.05
+Togo;TGO;Sub-Saharan Africa;Low income;110869;0.32%;351;284;null;null;null;null;null;null;null;null;null;null
+Tonga;TON;East Asia & Pacific;Upper middle income;106675;0.43%;452;593;null;null;null;null;null;null;null;null;null;null
+Trinidad and Tobago;TTO;Latin America & Caribbean;High income;105449;1.15%;1201;147;null;null;null;null;null;null;null;null;null;null
+Tunisia;TUN;Middle East & North Africa;Lower middle income;104456;-0.15%;-153;298;null;null;null;null;null;null;null;null;null;null
+Turkey;TUR;Europe & Central Asia;Upper middle income;98224;0.62%;608;214;null;null;null;null;null;null;null;null;null;null
+Turkmenistan;TKM;Europe & Central Asia;Upper middle income;97764;0.84%;811;223;null;null;null;null;null;null;null;null;null;null
+Turks and Caicos Islands;TCA;Latin America & Caribbean;High income;84942;0.53%;449;149;null;null;null;null;null;null;null;null;null;null
+Tuvalu;TUV;East Asia & Pacific;Upper middle income;77240;0.16%;123;164;null;null;null;null;null;null;null;null;null;null
+Uganda;UGA;Sub-Saharan Africa;Low income;71950;0.25%;178;96;null;null;null;null;null;null;null;null;null;null
+Ukraine;UKR;Europe & Central Asia;Lower middle income;65564;1.19%;774;274;null;null;null;null;null;null;null;null;null;null
+United Arab Emirates;ARE;Middle East & North Africa;High income;62323;-0.36%;-228;1246;null;null;null;null;null;null;null;null;null;null
+United Kingdom;GBR;Europe & Central Asia;High income;59109;0.68%;399;329;null;null;null;null;null;null;null;null;null;null
+United States;USA;North America;High income;57490;0.60%;343;125;null;null;null;null;null;null;null;null;null;null
+Uruguay;URY;Latin America & Caribbean;High income;56750;0.17%;98;0;null;null;null;null;null;null;null;null;null;null
+Uzbekistan;UZB;Europe & Central Asia;Lower middle income;55215;-0.22%;-121;276;null;null;null;null;null;null;null;null;null;null
+Vanuatu;VUT;East Asia & Pacific;Lower middle income;53123;0.71%;376;205;null;null;null;null;null;null;null;null;null;null
+Venezuela;VEN;Latin America & Caribbean;Upper middle income;48826;0.38%;185;35;null;null;null;null;null;null;null;null;null;null
+Viet Nam;VNM;East Asia & Pacific;Lower middle income;42776;1.15%;488;1261;null;null;null;null;null;null;null;null;null;null
+Virgin Islands (U.S.);VIR;Latin America & Caribbean;High income;39186;0.71%;278;26337;null;null;null;null;null;null;null;null;null;null
+West Bank and Gaza;PSE;Middle East & North Africa;Lower middle income;38609;1.38%;526;41;null;null;null;null;null;null;null;null;null;null
+Yemen;YEM;Middle East & North Africa;Low income;38529;1.75%;664;730;null;null;null;null;null;null;null;null;null;null
+Zambia;ZMB;Sub-Saharan Africa;Lower middle income;38106;0.29%;109;238;null;null;null;null;null;null;null;null;null;null
+Zimbabwe;ZWE;Sub-Saharan Africa;Lower middle income;33917;0.21%;71;566;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;33693;-0.03%;-10;3369;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;30190;0.67%;201;202;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;26173;0.94%;244;80;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;18077;0.48%;86;39;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;17561;0.09%;16;73;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;14976;0.90%;134;167;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;11762;1.25%;146;393;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;11276;-1.69%;-193;80;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;10810;0.63%;68;541;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;9871;0.30%;30;470;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;6073;0.30%;18;16;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;5800;-0.48%;-28;25;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;4991;0.06%;3;50;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;3458;3.05%;103;0;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;1624;0.68%;11;6;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;1354;1.27%;17;136;null;null;null;null;null;null;null;null;null;null
+null;null;null;null;801;0.25%;2;2003;null;null;null;null;null;null;null;null;null;null
