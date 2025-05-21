@@ -11,7 +11,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.Lang;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 
 import java.io.*;
 
@@ -19,7 +18,6 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-@Disabled
 public class R2RMLmapgenConfigJoinTest {
 
     @ParameterizedTest

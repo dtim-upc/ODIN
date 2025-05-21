@@ -444,7 +444,7 @@ public class NextiaDI {
 //            e.printStackTrace();
 //        }
 
-        /*
+
         NextiaDI n = new NextiaDI();
 
         Model graphA = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-Test/customers.ttl") ;
@@ -476,67 +476,7 @@ public class NextiaDI {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        */
 
-        NextiaDI n = new NextiaDI();
-
-        Model graphA = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/mitender-example2.ttl") ;
-        Model graphB = RDFDataMgr.loadModel("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/mitender-example2_2.ttl") ;
-
-        List<Alignment> al = new ArrayList<>();
-
-        Alignment a1 = new Alignment();
-        a1.setType("class");
-        a1.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset/Object_1");
-        a1.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/Object_1");
-        a1.setL("IT_OBJECT_1");
-        al.add(a1);
-
-        Alignment a2 = new Alignment();
-        a2.setType("datatype");
-        a2.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset/expedient_number");
-        a2.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/expedient_number");
-        a2.setL("IT_EXPEDIENT_NUMBER");
-
-        al.add(a2);
-        Alignment a3 = new Alignment();
-        a3.setType("datatype");
-        a3.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset/urgency_name");
-        a3.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/urgency_name");
-        a3.setL("IT_URGENCY_NAME");
-
-        al.add(a3);
-        Alignment a4 = new Alignment();
-        a4.setType("datatype");
-        a4.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset/title");
-        a4.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/title");
-        a4.setL("IT_TITLE");
-        al.add(a4);
-
-        Alignment a5 = new Alignment();
-        a5.setType("datatype");
-        a5.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset/contracting_party_name");
-        a5.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/mitenderDataset2/contracting_party_name");
-        a5.setL("IT_CONTRACTING_PARTY_NAME");
-        al.add(a5);
-
-        Model integratedModel = n.Integrate(graphA, graphB, al);
-        Model minimal = n.generateMinimalGraph(integratedModel);
-
-        try {
-            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/minimal_graph.ttl"), minimal, Lang.TURTLE);
-            System.out.println("file written temporal");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // store integratedModel
-        try {
-            RDFDataMgr.write(new FileOutputStream("/Users/anbipa/Desktop/DTIM/Cyclops/Cyclops-UC3/small/integrated_graph.ttl"), integratedModel, Lang.TURTLE);
-            System.out.println("file written temporal");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
 
 
 

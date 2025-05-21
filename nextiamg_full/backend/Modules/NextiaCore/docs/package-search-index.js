@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"edu.upc.essi.dtim"},{"l":"edu.upc.essi.dtim.vocabulary"}]
