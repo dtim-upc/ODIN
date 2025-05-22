@@ -14,9 +14,9 @@ before_script:
 build_and_push_nextiamg:
   stage: build
   script:
-    - docker compose -f nextiamg_full/docker-compose.yml build --no-cache frontend backend
-    - docker tag nextiamg_full-frontend $IMAGE_REGISTRY/nextiamg_frontend
-    - docker tag nextiamg_full-backend $IMAGE_REGISTRY/nextiamg_backend
+    - docker compose -p nextiamg -f docker-compose.yml build --no-cache frontend backend
+    - docker tag nextiamg-frontend $IMAGE_REGISTRY/nextiamg_frontend
+    - docker tag nextiamg-backend $IMAGE_REGISTRY/nextiamg_backend
     - docker push $IMAGE_REGISTRY/nextiamg_frontend
     - docker push $IMAGE_REGISTRY/nextiamg_backend
   tags:
