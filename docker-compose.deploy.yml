@@ -7,11 +7,23 @@ services:
     volumes:
       - shared-data:/backend/api/api/dbFiles/DataLayer
     image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_backend
+    depends_on:
+      - graphdb
 
   frontend:
     ports:
       - "9000:9000"
     image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_frontend
+    depends_on:
+      - graphdb
+
+  graphdb:
+    build:
+      context: .
+      dockerfile: Dockerfile.graphdb
+    ports:
+      - "7200:7200"
+
 
 volumes:
   shared-data:
