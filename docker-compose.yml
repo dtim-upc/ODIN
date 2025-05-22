@@ -20,6 +20,7 @@ services:
       lts.bucket: long-term-storage
       lts.CyclopsLTS: MinIO
 
+
   frontend:
     build:
       context: ./frontend
