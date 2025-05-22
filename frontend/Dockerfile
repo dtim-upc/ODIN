@@ -4,6 +4,10 @@ FROM node:20
 # Set the working directory
 WORKDIR /app
 
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+
 # Install Yarn globally
 #RUN npm install -g yarn
 
@@ -21,4 +25,5 @@ RUN yarn install
 EXPOSE 9000
 
 # Run the application
-CMD ["quasar", "dev"]
+CMD ["/wait-for-it.sh", "backend:3000", "--", "quasar", "dev"]
+
