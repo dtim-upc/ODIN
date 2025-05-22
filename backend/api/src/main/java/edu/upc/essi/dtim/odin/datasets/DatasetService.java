@@ -14,6 +14,8 @@ import edu.upc.essi.dtim.odin.exception.FormatNotAcceptedException;
 import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleImpl;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaGraphy.nextiaGraphyModuleInterface;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.cyclopsLTS.LTSImpl;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.cyclopsLTS.LTSInterface;
 import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreFactory;
 import edu.upc.essi.dtim.odin.nextiaStore.graphStore.GraphStoreInterface;
 import edu.upc.essi.dtim.odin.nextiaStore.relationalStore.ORMStoreFactory;
@@ -295,6 +297,10 @@ public class DatasetService {
             if (!repository.getVirtual()) {
                 uploadToDataLayer(datasetWithGraph);
             }
+
+            // Upload to LTS (if needed)
+            uploadToLTS(datasetWithGraph);
+            
             saveDataset(datasetWithGraph);
 
         } catch (Exception e) {
@@ -507,6 +513,27 @@ public class DatasetService {
             throw new NoSuchElementException("Dataset not found with id: " + datasetId);
         }
         projectService.saveProject(project); // Save the updated project without the dataset
+    }
+
+    // ---------------- LTS operations
+    /**
+     * Uploads a dataset in the LTS, persisting the data of the original files
+     *
+     * @param dataset The dataset whose data will be stored.
+     */
+    public void uploadToLTS(Dataset dataset) {
+        LTSInterface ltsInterface = new LTSImpl(appConfig);
+        ltsInterface.uploadToLTS(dataset);
+    }
+
+    /**
+     * Deletes a dataset from the LTS
+     *
+     * @param datasetID The ID of the dataset to be deleted.
+     */
+    public void deleteDatasetFromLTS(String datasetID) {
+        LTSInterface ltsInterface = new LTSImpl(appConfig);
+        ltsInterface.deleteDatasetFromLTS(datasetID);
     }
 
     // ---------------- Data Layer operations

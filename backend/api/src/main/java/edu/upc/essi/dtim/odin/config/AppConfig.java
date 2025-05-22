@@ -42,6 +42,38 @@ public class AppConfig {
     @Value("${dataStorage.DataLayerTechnology}")
     private String DataLayerTechnology;
 
+    /**
+     * Tool used to persist data for integration with Cyclops
+     */
+    @Value("${lts.CyclopsLTS}")
+    private String CyclopsLTS;
+
+    /**
+     * MinIO endpoint property retrieved from application.properties.
+     */
+    @Value("${lts.endpoint}")
+    private String MinIOEndpoint;
+
+    /**
+     * MinIO access key property retrieved from application.properties.
+     */
+    @Value("${lts.accessKey}")
+    private String MinIOAccessKey;
+
+    /**
+     * MinIO secret key property retrieved from application.properties.
+     */
+    @Value("${lts.secretKey}")
+    private String MinIOSecretKey;
+
+    /**
+     * MinIO bucket property retrieved from application.properties.
+     */
+    @Value("${lts.bucket}")
+    private String MinIOBucket;
+
+
+
     public String getDBTypeProperty() {
         return DBTypeProperty;
     }
@@ -57,4 +89,16 @@ public class AppConfig {
     public String getDataLayerTechnology() {
         return DataLayerTechnology;
     }
+
+    public String getCyclopsLTS() {
+        return CyclopsLTS;
+    }
+
+    public String getMinIOEndpoint() { return MinIOEndpoint;}
+
+    public String getMinIOAccessKey() {return MinIOAccessKey;}
+
+    public String getMinIOSecretKey() {return MinIOSecretKey;}
+
+    public String getMinIOBucket() {return MinIOBucket;}
 }

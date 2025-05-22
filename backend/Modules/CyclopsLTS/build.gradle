@@ -21,7 +21,8 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
 
-    implementation 'io.minio:minio:8.5.4'
+    implementation 'io.minio:minio:8.5.7'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'  // or latest ≥ 4.11.0
 }
 
 test {

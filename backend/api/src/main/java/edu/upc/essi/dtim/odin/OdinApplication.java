@@ -1,7 +1,9 @@
 package edu.upc.essi.dtim.odin;
 
+import edu.upc.essi.dtim.CyclopsLTS.lts.LTS;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
 import edu.upc.essi.dtim.odin.config.AppConfig;
+import edu.upc.essi.dtim.odin.nextiaInterfaces.cyclopsLTS.LTSSingleton;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,10 @@ public class OdinApplication {
         // Initialize data layer
         DataLayer dl = DataLayerSingleton.getInstance(appConfig);
         // dl.initialize(); // Mock call to initialize the DataLayer systems. Uncomment in production.
+
+        // Initialize LTS
+        LTS lts = LTSSingleton.getInstance(appConfig);
+        // lts.initialize(); // Mock call to initialize the LTS systems. Uncomment in production.
 
         logger.info("Application started. Ready to receive API requests.");
     }

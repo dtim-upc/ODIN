@@ -33,4 +33,6 @@ include 'Modules:NextiaMG'
 findProject(':Modules:NextiaMG')?.name = 'NextiaMG'
 include 'Modules:NextiaCore'
 include 'api'
+include 'Modules:CyclopsLTS'
+findProject(':Modules:CyclopsLTS')?.name = 'CyclopsLTS'
 

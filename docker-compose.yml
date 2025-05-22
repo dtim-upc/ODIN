@@ -11,6 +11,14 @@ services:
       - graphdb
     volumes:
       - shared-data:/backend/api/api/dbFiles/DataLayer
+    networks:
+      - long-term-storage_default
+    environment:
+      lts.endpoint: http://minio:9200
+      lts.acceskey: minioadmin
+      lts.secretkey: minioadmin123
+      lts.bucket: long-term-storage
+      lts.CyclopsLTS: MinIO
 
   frontend:
     build:
@@ -56,3 +64,7 @@ services:
 
 volumes:
   shared-data:
+
+networks:
+    long-term-storage_default:
+        external: true
