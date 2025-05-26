@@ -53,14 +53,20 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 		G_target.addTriple(createIRI(name), RDF.type, DataFrame_MM.DataFrame);
 		G_target.addTripleLiteral(createIRI(name), RDFS.label, name);
 		parser.getHeaderNames().forEach(h -> {
+			String clean = h.replaceAll("\\(.*\\)", "").trim(); //added
 			String h2 = reformatName(h);
 			G_target.addTriple(createIRI(h2),RDF.type,DataFrame_MM.Data);
 			G_target.addTripleLiteral(createIRI(h2), RDFS.label,h2 );
 			G_target.addTriple(createIRI(name),DataFrame_MM.hasData,createIRI(h2));
 			G_target.addTriple(createIRI(h2),DataFrame_MM.hasDataType,DataFrame_MM.String);
 		});
+		// changed implementation of the wrapper
+		//String select =  parser.getHeaderNames().stream().map(a ->  "\"" + a + "\" AS " + reformatName(a)).collect(Collectors.joining(", "));
+		String select = parser.getHeaderNames().stream()
+				.map(a -> "`" + a + "` AS " + reformatName(a))
+				.collect(Collectors.joining(", "));
 
-		String select =  parser.getHeaderNames().stream().map(a ->  "\"" + a + "\" AS " + reformatName(a)).collect(Collectors.joining(", "));
+
 		wrapper = "SELECT " + select  + " FROM `" + name + "`";
 
 		//TODO: implement metadata
@@ -110,6 +116,8 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 		}
 		return ','; // Return null if no delimiter is detected
 	}
+
+
 
 	@Override
 	public Graph bootstrapSchema() {

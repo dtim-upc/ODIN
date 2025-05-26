@@ -19,7 +19,7 @@ public class LTSImpl implements LTSInterface {
     public void uploadToLTS(Dataset dataset) {
         LTS lts = LTSSingleton.getInstance(appConfig);
         try {
-            lts.uploadToLTS(dataset, dataset.getUUID());
+            lts.uploadToLTS(dataset, dataset.getDatasetName()+"_"+dataset.getId());
         }
         catch (Exception e) {
             e.printStackTrace();
