@@ -69,8 +69,8 @@ public class IntegrationService {
                 a.setL(a.getAttributeA().getName() + "_" + a.getAttributeB().getName());
                 a.setType("datatype");
                 a.setIdentifier(true);
-                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getId() + "/" + a.getAttributeA().getName());
-                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getId() + "/" + a.getAttributeB().getName());
+                a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getDatasetName() + "_" + datasetA.getId() + "/" + a.getAttributeA().getName());
+                a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getDatasetName() + "_" + datasetB.getId() + "/" + a.getAttributeB().getName());
                 alignmentsWithFilter.add(a);
             }
         }
