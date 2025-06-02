@@ -20,4 +20,8 @@ RUN npm install --force && yarn install
 EXPOSE 9000
 
 # Entry point that decides whether to build or serve
-CMD if [ "$BUILD_MODE" = "build" ]; then quasar build; else quasar dev; fi
+CMD if [ "$BUILD_MODE" = "build" ]; then \
+      quasar build && npx quasar serve dist/spa --port 9000 --hostname 0.0.0.0; \
+    else \
+      quasar dev; \
+    fi
