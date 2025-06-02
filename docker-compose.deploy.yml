@@ -20,6 +20,8 @@ services:
     ports:
       - "9000:9000"
     image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_frontend
+    environment:
+      - BUILD_MODE=build
     depends_on:
       backend:
         condition: service_healthy
