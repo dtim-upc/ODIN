@@ -14,11 +14,13 @@ RUN npm install -g @quasar/cli
 # Copy project files
 COPY . .
 
+RUN chmod +x ./docker-entrypoint.sh
+
 # Install dependencies
 RUN npm install --force && yarn install
 
 EXPOSE 9000
 
 # Entry point that decides whether to build or serve
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["./docker-entrypoint.sh"]
 
