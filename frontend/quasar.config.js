@@ -67,7 +67,7 @@ module.exports = configure(function ( ctx ) {
       env: {
         API: ctx.dev
           ? 'http://localhost:3000'
-          : 'http://backend:3000'
+          : 'http://http://192.168.1.10:3000'
           // : 'http://quarry.essi.upc.edu:8082'
       },
       // rawDefine: {}
