@@ -9,13 +9,23 @@ services:
     image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_backend
     depends_on:
       - graphdb
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:3000/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   frontend:
     ports:
       - "9000:9000"
     image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_frontend
     depends_on:
-      - graphdb
+      backend:
+        condition: service_healthy
+      graphdb:
+        condition: service_started
+
 
   graphdb:
     build:

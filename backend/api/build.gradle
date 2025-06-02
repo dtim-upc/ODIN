@@ -44,6 +44,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 
     // ORM Dependencies
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.0.0.Final'
