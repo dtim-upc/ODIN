@@ -8,6 +8,9 @@ ARG BUILD_MODE=dev
 # Set runtime environment variable from build arg
 ENV BUILD_MODE=$BUILD_MODE
 
+
+RUN npm install -g http-server
+
 # Install Quasar CLI globally
 RUN npm install -g @quasar/cli
 
