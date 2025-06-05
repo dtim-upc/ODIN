@@ -3,6 +3,8 @@ package edu.upc.essi.dtim.odin.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+
 /**
  * Configuration class to manage application properties.
  */
@@ -53,6 +55,11 @@ public class AppConfig {
      */
     @Value("${lts.endpoint}")
     private String MinIOEndpoint;
+
+    @PostConstruct
+    public void logEnv() {
+        System.out.println("MinIO endpoint: " + MinIOEndpoint);
+    }
 
     /**
      * MinIO access key property retrieved from application.properties.

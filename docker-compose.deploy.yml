@@ -9,11 +9,19 @@ services:
     image: registry.gitlab.com/cyclops4100006/nextiamg/nextiamg_backend
     depends_on:
       - graphdb
+    networks:
+      - long-term-storage_default
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://localhost:3000/actuator/health || exit 1" ]
       interval: 10s
       timeout: 10s
       retries: 10
+    environment:
+      - LTS_ENDPOINT=http://minio:9000
+      - LTS_ACCESKEY=minioadmin
+      - LTS_SECRETKEY=minioadmin123
+      - LTS_BUCKET=long-term-storage
+      - LTS_CYCLOPSLTS=MinIO
 
 
   frontend:
@@ -39,3 +47,7 @@ services:
 
 volumes:
   shared-data:
+
+networks:
+  long-term-storage_default:
+    external: true
