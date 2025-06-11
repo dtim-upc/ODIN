@@ -1,20 +1,11 @@
-<h1 align="center">
-  <a href="https://www.essi.upc.edu/dtim/odin/"><img src="https://github.com/dtim-upc/newODIN/blob/master/logos/ODIN.svg" alt="ODIN" width="300">
-  </a>
-</h1>
-<a href="https://www.essi.upc.edu/dtim/tools/odin">
-<h4 align="center">A dataspace management system</h4>
-</a>
-
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dtim-upc_newODIN&metric=alert_status)](https://sonarcloud.io/dashboard?id=dtim-upc_newODIN)
-
-# ODIN - Cyclops Integration
+# NextiaMG - ODIN (Cyclops Integration)
 
 This repository contains the **NextiaMG** (Mappings Generation) component, a part of the larger ODIN project. It focuses on generating mappings between local data sources and a global schema, specifically tailored for integration with Cyclops. This version is optimized for integration into a larger project and requires some components from the **ODIN** project, but we've omitted the unrelated parts for simplicity.
 
 ODIN's backend is developed in **Java** and utilizes the **Spring framework**. As the backend for ODIN, its primary role is to **orchestrate** calls to various Nextia libraries within the department. **Each Nextia** library serves a distinct **functionality**, and ODIN also manages application persistence.
 
 ODIN's **persistence** is bifurcated into two components: graph persistence, currently using Jena, and relational database persistence using ORM with the embedded H2 database.
+
 
 These are the main modules from ODIN that are necessary for the **NextiaMG** component:
 - **NextiaCore:** Contains domain class definitions for the system and serves as a cross-cutting library. It lacks business logic, focusing solely on Plain Old Java Object (POJO) classes.
@@ -44,7 +35,12 @@ We’ve streamlined the setup process by using **Docker** for easy deployment. T
 ## Deployment Requirements
 
 ### Environment Variables
-No mandatory environment variables are required to run the NextiaMG component at this time.
+The following environment variables are required for the NextiaMG component to function correctly:
+- `LTS_ENDPOINT`: The URL of the Long Term Storage service (e.g., `http://minio:9000`).
+- `LTS_ACCESKEY`: The access key for the Long Term Storage service.
+- `LTS_SECRETKEY`: The secret key for the Long Term Storage service.
+- `LTS_BUCKET`: The name of the bucket in the Long Term Storage service where files will be stored (e.g., long-term-storage).
+- `LTS_CYCLOPSLTS`: The LTS technology used by Cyclops (e.g., `MinIO`).
 
 ### Volumes & Persistent Storage
 
