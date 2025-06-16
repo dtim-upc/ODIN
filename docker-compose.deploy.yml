@@ -10,7 +10,7 @@ services:
     depends_on:
       - graphdb
     networks:
-      - long-term-storage_default
+      - cyclops-net
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://localhost:3000/actuator/health || exit 1" ]
       interval: 10s
