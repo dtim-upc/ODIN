@@ -49,5 +49,5 @@ volumes:
   shared-data:
 
 networks:
-  long-term-storage_default:
+  cyclops-net:
     external: true
