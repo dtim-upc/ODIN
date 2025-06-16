@@ -54,6 +54,8 @@ import {ref, computed, onMounted} from 'vue'
 import {useProjectsStore} from 'src/stores/projectsStore.js'
 import {useMappingsStore} from 'src/stores/mappingsStore.js'
 
+import { watch } from 'vue'
+
 const projectsStore = useProjectsStore()
 const mappingsStore = useMappingsStore()
 
@@ -66,12 +68,26 @@ const mappingTypes = ['R2RML', 'R2RML-CONFIG']  // customize based on supported 
 
 const configFile = ref(null)
 
+const defaultConfigFile = new File([
+  `# Namespace configurations
+DATA_NAMESPACE=http://mydata.example.org/
+ID_COLUMN.mitender-example2025_66=expedient_number
+ID_COLUMN.mitender-example2025_71=expedient_number
+TABLE_PREFIX=UC3
+`
+], 'default-config.properties', { type: 'text/plain' })
+
+watch(selectedMappingType, (newType) => {
+  if (newType === 'R2RML-CONFIG') {
+    configFile.value = null // reset on user choice
+  }
+})
 const downloadMappings = () => {
   if (projectID.value && selectedMappingType.value) {
     mappingsStore.downloadMappings(
       projectID.value,
       selectedMappingType.value,
-      selectedMappingType.value === 'R2RML-CONFIG' ? configFile.value : null
+      selectedMappingType.value === 'R2RML-CONFIG' ? configFile.value : defaultConfigFile
     )
   }
 }
