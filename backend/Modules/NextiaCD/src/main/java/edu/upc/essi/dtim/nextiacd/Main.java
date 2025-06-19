@@ -1,17 +1,4 @@
-package edu.upc.essi.dtim.NextiaCD;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
+package edu.upc.essi.dtim.nextiacd;
 
 public class Main {
     public static void main(String[] args)  {

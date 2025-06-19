@@ -1,13 +1,10 @@
 package edu.upc.essi.dtim.odin.nextiaInterfaces.NextiaCD;
 
-import edu.upc.essi.dtim.NextiaCD.ConstraintDiscovery;
-import edu.upc.essi.dtim.NextiaCD.IConstraintDiscovery;
+import edu.upc.essi.dtim.nextiacd.ConstraintDiscovery;
+import edu.upc.essi.dtim.nextiacd.IConstraintDiscovery;
 import edu.upc.essi.dtim.NextiaCore.constraints.DenialConstraint;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
-import edu.upc.essi.dtim.NextiaCore.discovery.Alignment;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
-import edu.upc.essi.dtim.NextiaJD.discovery.Discovery;
-import edu.upc.essi.dtim.NextiaJD.discovery.IDiscovery;
 import edu.upc.essi.dtim.odin.config.AppConfig;
 import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;

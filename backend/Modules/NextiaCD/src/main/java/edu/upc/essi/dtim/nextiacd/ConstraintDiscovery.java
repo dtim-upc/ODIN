@@ -1,11 +1,10 @@
-package edu.upc.essi.dtim.NextiaCD;
+package edu.upc.essi.dtim.nextiacd;
 
-import edu.upc.essi.dtim.NextiaCD.parser.DCParser;
+import edu.upc.essi.dtim.nextiacd.parser.DCParser;
 import edu.upc.essi.dtim.NextiaCore.constraints.DenialConstraint;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;
 import edu.upc.essi.dtim.NextiaDataLayer.dataLayer.DataLayer;
-import edu.upc.essi.dtim.NextiaCD.service.DQServiceClient;
-import org.apache.spark.sql.Row;
+import edu.upc.essi.dtim.nextiacd.service.DQServiceClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;

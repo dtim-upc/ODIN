@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaCD.parser;
+package edu.upc.essi.dtim.nextiacd.parser;
 
 import edu.upc.essi.dtim.NextiaCore.constraints.DenialConstraint;
 import edu.upc.essi.dtim.NextiaCore.constraints.Predicate;

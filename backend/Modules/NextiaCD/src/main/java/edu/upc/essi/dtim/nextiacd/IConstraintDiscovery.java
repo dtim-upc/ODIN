@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaCD;
+package edu.upc.essi.dtim.nextiacd;
 
 import edu.upc.essi.dtim.NextiaCore.constraints.DenialConstraint;
 import edu.upc.essi.dtim.NextiaCore.datasets.Dataset;

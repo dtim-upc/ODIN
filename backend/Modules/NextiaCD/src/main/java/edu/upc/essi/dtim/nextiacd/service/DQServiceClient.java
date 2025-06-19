@@ -1,4 +1,4 @@
-package edu.upc.essi.dtim.NextiaCD.service;
+package edu.upc.essi.dtim.nextiacd.service;
 
 import okhttp3.*;
 import java.io.File;
@@ -45,7 +45,7 @@ public class DQServiceClient {
 
     // main method for testing
     public static void main(String[] args) throws IOException {
-        DQServiceClient client = new DQServiceClient("http://localhost:5050/discover");
+        DQServiceClient client = new DQServiceClient("http://localhost:5050/discover-unique");
         String result = client.sendCsvFile(new File("/Users/anbipa/Desktop/DTIM/Cyclops/DQRuleDiscovery/data/input.csv"));
         System.out.println(result);
     }
