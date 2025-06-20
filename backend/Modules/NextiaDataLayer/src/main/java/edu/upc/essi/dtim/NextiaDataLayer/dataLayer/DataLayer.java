@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Properties;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public abstract class DataLayer {
     SparkConf conf;
@@ -30,23 +32,39 @@ public abstract class DataLayer {
         this.dataStorePath = dataStorePath;
     }
 
+    private String detectDelimiter(String filePath) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String firstLine = br.readLine();
+            if (firstLine == null) throw new IOException("Empty CSV file");
+
+            int commaCount = firstLine.split(",").length;
+            int semicolonCount = firstLine.split(";").length;
+
+            return semicolonCount > commaCount ? ";" : ",";
+        }
+    }
+
+
     // ---------------- Interacting with the zones
 
     // ---- Landing & Temporal Landing
-    public void uploadToLandingZone(Dataset d) {
+    public void uploadToLandingZone(Dataset d) throws IOException {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
         df_bootstrap.repartition(1).write().format("parquet").save(Paths.get(dataStorePath, "landingZone", d.getUUID()).toString());
     }
 
-    public void uploadToTemporalLandingZone(Dataset d) {
+    public void uploadToTemporalLandingZone(Dataset d) throws IOException {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
         df_bootstrap.repartition(1).write().format("parquet").save(Paths.get(dataStorePath, "tmp", d.getUUID()).toString());
     }
 
-    protected org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) {
+    protected org.apache.spark.sql.Dataset<Row> generateBootstrappedDF(Dataset d) throws IOException {
         org.apache.spark.sql.Dataset<Row> df = null;
         if (d instanceof CSVDataset) {
-            df = spark.read().option("header", true).csv(((CSVDataset) d).getPath());
+            String path = ((CSVDataset) d).getPath();
+            String delimiter = detectDelimiter(path);
+
+            df = spark.read().option("header", true).option("delimiter", delimiter).csv(path);
         }
         else if (d instanceof JSONDataset) {
             df = spark.read().option("multiline","true").json(((JSONDataset) d).getPath());

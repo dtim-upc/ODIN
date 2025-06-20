@@ -134,7 +134,7 @@ public class DLDuckDB extends DataLayer {
         try {
             collectVirtualizedTables(datasets);
             return stmt.executeQuery(sql);
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -157,7 +157,7 @@ public class DLDuckDB extends DataLayer {
         }
     }
 
-    private void collectVirtualizedTables(Dataset[] datasets) {
+    private void collectVirtualizedTables(Dataset[] datasets) throws IOException {
         // If the dataset is virtualized we have to go fetch the data. Otherwise, we do not need to do anything
         for (Dataset dataset: datasets) {
             DataRepository repo = dataset.getRepository();
