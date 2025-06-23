@@ -5,6 +5,7 @@ import edu.upc.essi.dtim.NextiaCore.graph.Graph;
 import edu.upc.essi.dtim.NextiaCore.graph.MappingsGraph;
 import edu.upc.essi.dtim.NextiaCore.graph.jena.IntegratedGraphJenaImpl;
 import edu.upc.essi.dtim.NextiaCore.mappings.Mappings;
+import edu.upc.essi.dtim.NextiaCore.vocabulary.DataFrame_MM;
 import edu.upc.essi.dtim.NextiaCore.vocabulary.R2RML;
 import edu.upc.essi.dtim.nextiadi.config.Namespaces;
 import edu.upc.essi.dtim.nextiadi.config.Vocabulary;
@@ -260,25 +261,14 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
 
 
     /**
-     * Gets the TriplesMap resource of a given property via its subject class.
+     * Gets the TriplesMap resource of a given property via its subject class. If the TriplesMap does not exist, it generates a new one.
      *
-     * @param prop The property to get the triplesMap
+     * @param clazz The class to get the triplesMap
      * @return The triplesMap if found, or a generated one if not found
      */
-    private Resource getTriplesMap(Resource prop) {
+    private Resource getTriplesMap(Resource clazz) {
 
         Model modelM = graphM.getGraph();
-
-        // Get the class (domain) of the property
-        StmtIterator properties = graphI.getGraph().listStatements(prop, RDFS.domain, (RDFNode) null);
-
-        if (!properties.hasNext()) {
-            System.err.println("Warning: No rdfs:domain found for property " + prop);
-            return null; // Or consider throwing an exception
-        }
-
-        Statement stmt = properties.nextStatement();
-        Resource clazz = stmt.getObject().asResource();
 
         // Check if a TriplesMap already exists
         Resource triplesMap = triplesMapRegistry.get(clazz);
@@ -309,19 +299,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         Model modelM = graphM.getGraph();
 
         // Look if there already exists a triples map, otherwise create one named based on the class
-        Resource triplesMap = triplesMapRegistry.get(clazz);
-        if (triplesMap == null) {
-            // Generate a URI for the TriplesMap based on the class local name
-            String classLocalName = clazz.getLocalName(); // e.g., "orders"
-            String mapURI = clazz.getURI() + "/TriplesMap";
-
-            // Create the TriplesMap as a named resource
-            triplesMap = modelM.createResource(mapURI);
-            triplesMap.addProperty(RDF.type, R2RML.TriplesMap);
-
-            // Store in the registry (important for join properties)
-            triplesMapRegistry.put(clazz, triplesMap);
-        }
+        Resource triplesMap = getTriplesMap(clazz);
 
 
         // Create logical table
@@ -416,6 +394,18 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         }
     }
 
+    private String getSourceNameFromModel(Resource property) {
+        Model modelI = graphI.getGraph();
+        Property hasSourceName = modelI.createProperty(DataFrame_MM.hasSourceName);
+        Statement stmt = property.getProperty(hasSourceName);
+        if (stmt != null && stmt.getObject().isLiteral()) {
+            return stmt.getObject().asLiteral().getString();
+        }
+        // Fallback: use the local name of the IRI if hasSourceName is missing
+        return property.getLocalName();
+    }
+
+
 
     /**
      * Processes a join property and adds it to the triples map.
@@ -438,13 +428,26 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
                 predicateObjectMap.addProperty(R2RML.objectMap, objectMapNew);
 
                 // first get the class of the property
-                objectMapNew.addProperty(R2RML.parentTriplesMap, getTriplesMap(nprop));
+                // Get the class (domain) of the property
+                StmtIterator property_clazz = graphI.getGraph().listStatements(prop, RDFS.domain, (RDFNode) null);
+
+                if (!property_clazz.hasNext()) {
+                    System.err.println("Warning: No rdfs:domain found for property " + prop);
+                }
+
+                Statement stmt_clazz = property_clazz.nextStatement();
+                Resource clazz = stmt_clazz.getObject().asResource();
+                objectMapNew.addProperty(R2RML.parentTriplesMap, getTriplesMap(clazz));
 
                 // Create join condition
                 Resource joinCondition = modelM.createResource();
                 objectMapNew.addProperty(R2RML.joinCondition, joinCondition);
-                joinCondition.addProperty(R2RML.child, getSourceReference(prop));
-                joinCondition.addProperty(R2RML.parent, getSourceReference(nprop));
+
+                String childColumn = getSourceNameFromModel(prop);
+                String parentColumn = getSourceNameFromModel(nprop);
+
+                joinCondition.addProperty(R2RML.child, modelM.createLiteral(childColumn));
+                joinCondition.addProperty(R2RML.parent, modelM.createLiteral(parentColumn));
             }
         }
     }
@@ -452,16 +455,17 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
     /**
      * Checks if a property is not an identifier.
      *
-     * @param property The property to check
+     * @param subj The subj to check
      * @return true if the property is not an identifier, false otherwise
      */
-    private boolean notIdentifier(Resource property){
-        String propertyName = getSourceReference(property);
-        // get table name
-        String tableName = getTableName(property);
-        String idColumn = idColumnPerTable.get(tableName);
-
-        return idColumn != null && !propertyName.equals(idColumn);
+    private boolean isForeignKey(Resource subj, Resource joinProp){
+        // Get all domain statements for joinProp
+        Statement domainStmt = graphI.getGraph().getProperty(joinProp, RDFS.domain);
+        if (domainStmt != null) {
+            Resource domain = domainStmt.getResource();
+            return subj.equals(domain);
+        }
+        return false;
     }
 
     /**
@@ -490,7 +494,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
                 if (parentProperty != null) {
                     tpredicate = parentProperty;
                     Resource joinProperty = getJoinProperty(tpredicate);
-                    if (joinProperty != null && isIntegratedResource(tpredicate) && notIdentifier(res)) {
+                    if (joinProperty != null && isIntegratedResource(tpredicate) && isForeignKey(clazz, joinProperty)) {
                         tpredicate = joinProperty;
                         processJoinProperty(tpredicate, parentProperty, res, triplesMap, predicateObjectMap);
                     } else {

@@ -52,6 +52,12 @@ public class DF_MMtoRDFS {
             G_target.addTriple(res.get("d").toString(), RDFS.range, res.get("dt").toString());
         }
 
+        // Extra Rule. Add the hasSourceName property to the DataFrame.
+        result = G_source.query("SELECT ?d ?sourceName WHERE { ?d <"+DataFrame_MM.hasSourceName+"> ?sourceName . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
+        for (Map<String, Object> res : result) {
+            G_target.addTripleLiteral(res.get("d").toString(), DataFrame_MM.hasSourceName, res.get("sourceName").toString());
+        }
+
         return G_target;
     }
 }

@@ -59,6 +59,9 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 			G_target.addTripleLiteral(createIRI(h2), RDFS.label,h2 );
 			G_target.addTriple(createIRI(name),DataFrame_MM.hasData,createIRI(h2));
 			G_target.addTriple(createIRI(h2),DataFrame_MM.hasDataType,DataFrame_MM.String);
+
+			// added source attribute name as metadata
+			G_target.addTripleLiteral(createIRI(h2), DataFrame_MM.hasSourceName, h);
 		});
 		// changed implementation of the wrapper
 		//String select =  parser.getHeaderNames().stream().map(a ->  "\"" + a + "\" AS " + reformatName(a)).collect(Collectors.joining(", "));

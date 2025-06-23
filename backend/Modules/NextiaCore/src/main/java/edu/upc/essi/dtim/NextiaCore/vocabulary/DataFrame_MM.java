@@ -25,6 +25,8 @@ public class DataFrame_MM {
     public static final String hasData = Init.hasData();
     public static final String hasDataType = Init.hasDataType();
 
+    public static final String hasSourceName = Init.hasSourceName();
+
 
 
 
@@ -43,6 +45,8 @@ public class DataFrame_MM {
         public static String hasData() { return property( "hasData"); }
 
         public static String hasDataType() { return property( "hasDataType"); }
+
+        public static String hasSourceName() { return property("hasSourceName"); }
     }
 
     public static String getURI() {
