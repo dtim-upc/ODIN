@@ -421,7 +421,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
      * Processes a join property and adds it to the triples map.
      *
      */
-    private void processJoinProperty(Resource joinResource, Resource integratedPropery, Resource prop, Resource triplesMap) {
+    private void processJoinProperty(Resource joinResource, Resource integratedPropery, Resource prop, Resource triplesMap, Resource predicateObjectMap) {
         Model modelM = graphM.getGraph();
         Model modelI = graphI.getGraph();
         StmtIterator properties = modelI.listStatements((Resource) null, RDFS.subPropertyOf, integratedPropery);
@@ -431,13 +431,11 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
             Property joinProp = modelI.getProperty(Vocabulary.JoinProperty.val());
             Resource nprop = stmt.getSubject().asResource();
             if (!modelI.contains(nprop, joinProp, joinResource) && !prop.equals(nprop)) {
-                Resource predicateObjectMapNew = modelM.createResource();
-                triplesMap.addProperty(R2RML.predicateObjectMap, predicateObjectMapNew);
-                predicateObjectMapNew.addProperty(R2RML.predicate, joinResource);
+                predicateObjectMap.addProperty(R2RML.predicate, joinResource);
 
                 // Create object map
                 Resource objectMapNew = modelM.createResource();
-                predicateObjectMapNew.addProperty(R2RML.objectMap, objectMapNew);
+                predicateObjectMap.addProperty(R2RML.objectMap, objectMapNew);
 
                 // first get the class of the property
                 objectMapNew.addProperty(R2RML.parentTriplesMap, getTriplesMap(nprop));
@@ -494,8 +492,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
                     Resource joinProperty = getJoinProperty(tpredicate);
                     if (joinProperty != null && isIntegratedResource(tpredicate) && notIdentifier(res)) {
                         tpredicate = joinProperty;
-                        // hi ha algun problema amb els blank nodes, potser comprovar que nomes es fagi per aquelels classes que no sigui ID?
-                        processJoinProperty(tpredicate, parentProperty, res, triplesMap);
+                        processJoinProperty(tpredicate, parentProperty, res, triplesMap, predicateObjectMap);
                     } else {
                         processIntegratedProperty(tpredicate, stmt, predicateObjectMap);
                     }
