@@ -23,7 +23,7 @@ public class LTSMinIO extends LTS{
                 .build();
     }
     @Override
-    public void uploadToLTS(Dataset d, String tableName) throws SQLException {
+    public void uploadToLTS(Dataset d, String LTSpath) throws SQLException {
         // 1. Locate the Parquet file in the landing zone
         String parquetPath = Paths.get(dataStorePath, "landingZone", d.getUUID()).toString();
         File directoryPath = new File(parquetPath);
@@ -31,12 +31,12 @@ public class LTSMinIO extends LTS{
         String localFilePath = Paths.get(parquetPath, fileName).toString();
 
         // 2. Upload to MinIO under formattedZone/
-        System.out.println("Uploading " + localFilePath + " to MinIO bucket " + bucket + " at ltsZone/" + tableName + ".parquet");
+        System.out.println("Uploading " + localFilePath + " to MinIO bucket " + bucket + " at " + LTSpath + ".parquet");
         try {
             minioClient.uploadObject(
                     UploadObjectArgs.builder()
                             .bucket(bucket)
-                            .object("ltsZone/" + tableName + ".parquet") // gives it a clean name
+                            .object(LTSpath + ".parquet") // gives it a clean name
                             .filename(localFilePath)
                             .build()
             );
@@ -60,12 +60,12 @@ public class LTSMinIO extends LTS{
 
 
     @Override
-    public void removeFromLTS(String tableName) {
+    public void removeFromLTS(String LTSpath) {
         try {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(bucket)
-                            .object("ltsZone/" + tableName + ".parquet")
+                            .object(LTSpath + ".parquet")
                             .build()
             );
         } catch (Exception e) {

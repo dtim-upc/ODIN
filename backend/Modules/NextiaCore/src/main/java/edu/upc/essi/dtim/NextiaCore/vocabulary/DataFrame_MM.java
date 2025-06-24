@@ -20,6 +20,11 @@ public class DataFrame_MM {
     public static final String Primitive = Init.Primitive();
     public static final String String = Init.String();
     public static final String Number = Init.Number();
+    public static final String Integer = Init.Integer();
+    public static final String Boolean = Init.Boolean();
+    public static final String Decimal = Init.Decimal();
+    public static final String Date = Init.String();
+    public static final String DateTime = Init.DateTime();
 
 
     public static final String hasData = Init.hasData();
@@ -41,12 +46,18 @@ public class DataFrame_MM {
         //int64, float64, datetime64, bool
         public static String String() { return resource("String"); }
         public static String Number() { return resource("Number"); }
+        public static String Boolean() { return resource("Boolean"); }
+        public static String Decimal() { return resource("Decimal"); }
+        public static String Date() { return resource("Date"); }
+        public static String DateTime() { return resource("DateTime"); }
 
         public static String hasData() { return property( "hasData"); }
 
         public static String hasDataType() { return property( "hasDataType"); }
 
         public static String hasSourceName() { return property("hasSourceName"); }
+
+        public static String Integer() { return resource("Integer"); }
     }
 
     public static String getURI() {

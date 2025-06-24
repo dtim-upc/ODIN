@@ -16,10 +16,11 @@ public class LTSImpl implements LTSInterface {
     }
 
     @Override
-    public void uploadToLTS(Dataset dataset) {
+    public void uploadToLTS(Dataset dataset, String projectName) {
         LTS lts = LTSSingleton.getInstance(appConfig);
         try {
-            lts.uploadToLTS(dataset, dataset.getDatasetName()+"_"+dataset.getId());
+            String LTSpath = "ltsZone/" + projectName+'/'+dataset.getDatasetName()+"_"+dataset.getId();
+            lts.uploadToLTS(dataset, LTSpath);
         }
         catch (Exception e) {
             e.printStackTrace();

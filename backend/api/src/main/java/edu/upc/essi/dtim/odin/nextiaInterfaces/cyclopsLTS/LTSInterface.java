@@ -9,7 +9,7 @@ public interface LTSInterface {
      *
      * @param dataset The dataset to be uploaded.
      */
-    void uploadToLTS(Dataset dataset);
+    void uploadToLTS(Dataset dataset, String projectName);
 
     /**
      * Removes a dataset from the LTS

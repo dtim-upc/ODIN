@@ -37,10 +37,43 @@ public class DF_MMtoRDFS {
         }
 
         // Rule 4. Range of primitives.
+        // String types
         result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.String+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
         for (Map<String, Object> res : result) {
             G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xstring);
         }
+
+        // Integer types
+        result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.Integer+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
+        for (Map<String, Object> res : result) {
+            G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xint);
+        }
+
+        // Decimal types
+        result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.Decimal+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
+        for (Map<String, Object> res : result) {
+            G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xdecimal);
+        }
+
+        // Boolean types
+        result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.Boolean+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
+        for (Map<String, Object> res : result) {
+            G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xboolean);
+        }
+
+        // Date types
+        result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.Date+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
+        for (Map<String, Object> res : result) {
+            G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xdate);
+        }
+
+        // DateTime types
+        result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.DateTime+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
+        for (Map<String, Object> res : result) {
+            G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xdateTime);
+        }
+
+        // Legacy Number type (keep for backward compatibility)
         result = G_source.query("SELECT ?d WHERE { ?d <"+DataFrame_MM.hasDataType+"> <"+DataFrame_MM.Number+"> . ?d <"+RDF.type+"> <"+DataFrame_MM.Data+"> }");
         for (Map<String, Object> res : result) {
             G_target.addTriple(res.get("d").toString(), RDFS.range, XSD.xint);

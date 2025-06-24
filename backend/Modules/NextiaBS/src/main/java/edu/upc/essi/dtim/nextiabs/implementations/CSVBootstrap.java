@@ -15,6 +15,9 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.upc.essi.dtim.nextiabs.utils.DF_MMtoRDFS.productionRulesDataframe_to_RDFS;
@@ -27,6 +30,7 @@ import static edu.upc.essi.dtim.nextiabs.utils.Utils.reformatName;
 public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, BootstrapODIN {
 	// Using DataFrame_MM and without Jena
 	public String path;
+	private static final int SAMPLE_SIZE = 100; // Sample fewer rows for performance
 
 	public CSVBootstrap(String id, String name, String path) {
 		super();
@@ -52,13 +56,17 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 
 		G_target.addTriple(createIRI(name), RDF.type, DataFrame_MM.DataFrame);
 		G_target.addTripleLiteral(createIRI(name), RDFS.label, name);
+
+		Map<String, String> columnTypes = inferColumnTypes(parser);
+
 		parser.getHeaderNames().forEach(h -> {
 			String clean = h.replaceAll("\\(.*\\)", "").trim(); //added
 			String h2 = reformatName(h);
 			G_target.addTriple(createIRI(h2),RDF.type,DataFrame_MM.Data);
 			G_target.addTripleLiteral(createIRI(h2), RDFS.label,h2 );
 			G_target.addTriple(createIRI(name),DataFrame_MM.hasData,createIRI(h2));
-			G_target.addTriple(createIRI(h2),DataFrame_MM.hasDataType,DataFrame_MM.String);
+			String dataType = columnTypes.getOrDefault(h, DataFrame_MM.String);
+			G_target.addTriple(createIRI(h2), DataFrame_MM.hasDataType, dataType);
 
 			// added source attribute name as metadata
 			G_target.addTripleLiteral(createIRI(h2), DataFrame_MM.hasSourceName, h);
@@ -94,6 +102,133 @@ public class CSVBootstrap extends DataSource implements IBootstrap<Graph>, Boots
 
 		G_target.addTripleLiteral(ds, DataSourceVocabulary.HAS_FORMAT.getURI(), Formats.CSV.val());
 		G_target.addTripleLiteral(ds, DataSourceVocabulary.HAS_WRAPPER.getURI(), wrapper);
+	}
+
+	/**
+	 * Simple type inference - checks first few non-empty values
+	 */
+	private Map<String, String> inferColumnTypes(CSVParser parser) {
+		Map<String, String> columnTypes = new HashMap<>();
+
+		try {
+			// Reset parser and sample data
+			BufferedReader br = new BufferedReader(new FileReader(path));
+			char delimiter = detectDelimiter(path);
+			CSVParser sampleParser = CSVParser.parse(br, CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(delimiter));
+
+			Map<String, List<String>> samples = new HashMap<>();
+			int rowCount = 0;
+
+			for (CSVRecord record : sampleParser) {
+				if (rowCount >= SAMPLE_SIZE) break;
+
+				for (String header : sampleParser.getHeaderNames()) {
+					String value = record.get(header);
+					if (value != null && !value.trim().isEmpty()) {
+						samples.computeIfAbsent(header, k -> new ArrayList<>()).add(value.trim());
+					}
+				}
+				rowCount++;
+			}
+			sampleParser.close();
+
+			// Analyze each column
+			for (String column : samples.keySet()) {
+				List<String> values = samples.get(column);
+				columnTypes.put(column, inferColumnType(values));
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return columnTypes;
+	}
+
+	/**
+	 * Simple type inference logic
+	 */
+	private String inferColumnType(List<String> values) {
+		if (values.isEmpty()) {
+			return DataFrame_MM.String;
+		}
+
+		// Take first 10 non-empty values for quick analysis
+		List<String> sample = values.stream().limit(10).collect(Collectors.toList());
+
+		// Test for boolean first (most specific)
+		if (isBoolean(sample)) {
+			return DataFrame_MM.Boolean;
+		}
+
+		// Test for integer
+		if (isInteger(sample)) {
+			return DataFrame_MM.Number;
+		}
+
+		// Test for decimal
+		if (isDecimal(sample)) {
+			return DataFrame_MM.Decimal;
+		}
+
+		// Test for date
+		if (isDate(sample)) {
+			return DataFrame_MM.Date;
+		}
+
+		// Default to string
+		return DataFrame_MM.String;
+	}
+
+	private boolean isBoolean(List<String> values) {
+		Set<String> booleanValues = Set.of("true", "false", "1", "0", "yes", "no");
+		return values.stream()
+				.allMatch(v -> booleanValues.contains(v.toLowerCase()));
+	}
+
+	private boolean isInteger(List<String> values) {
+		return values.stream().allMatch(v -> {
+			try {
+				Long.parseLong(v.replaceAll("[,\\s]", ""));
+				return true;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		});
+	}
+
+	private boolean isDecimal(List<String> values) {
+		return values.stream().allMatch(v -> {
+			try {
+				Double.parseDouble(v.replaceAll("[,\\s]", ""));
+				return true;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		});
+	}
+
+	private boolean isDate(List<String> values) {
+		// Simple date patterns
+		String[] patterns = {"yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy"};
+
+		for (String pattern : patterns) {
+			try {
+				java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(pattern);
+				boolean allMatch = values.stream().allMatch(v -> {
+					try {
+						LocalDate.parse(v, formatter);
+						return true;
+					} catch (DateTimeParseException e) {
+						return false;
+					}
+				});
+				if (allMatch) return true;
+			} catch (Exception e) {
+				// Continue to next pattern
+			}
+		}
+		return false;
 	}
 
 	private char detectDelimiter(String path) throws IOException {

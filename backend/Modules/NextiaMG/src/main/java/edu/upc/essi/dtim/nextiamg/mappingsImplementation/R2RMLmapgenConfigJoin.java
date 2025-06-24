@@ -333,7 +333,6 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
 
     /**
      * Processes a simple property and adds it to the triples map.
-     *
      */
     private void processProperty(Resource property,  Resource predicateObjectMap) {
         Model modelM = graphM.getGraph();
@@ -346,7 +345,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         Resource objectMap = modelM.createResource();
         predicateObjectMap.addProperty(R2RML.objectMap, objectMap);
 
-        objectMap.addProperty(R2RML.column, getSourceReference(property));
+        objectMap.addProperty(R2RML.column, modelM.createLiteral(getSourceNameFromModel(property)));
 
         if (propstmt != null && propstmt.getObject().isResource()) {
             Resource datatype = propstmt.getObject().asResource();
@@ -355,11 +354,6 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         } else {
             System.out.println("No range found for the property.");
         }
-    }
-
-    // TODO: Improve this part to connect to datasources (maybe through API?? through ConfigFile??)
-    private String getSourceReference(Resource property) {
-        return property.getLocalName();
     }
 
     /**

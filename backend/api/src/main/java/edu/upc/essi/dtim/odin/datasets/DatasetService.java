@@ -299,7 +299,8 @@ public class DatasetService {
             }
 
             // Upload to LTS (if needed)
-            uploadToLTS(datasetWithGraph);
+            String projectName = projectService.getProject(projectID).getProjectName() + "_" + projectID;
+            uploadToLTS(datasetWithGraph, projectName);
             
             saveDataset(datasetWithGraph);
 
@@ -521,9 +522,9 @@ public class DatasetService {
      *
      * @param dataset The dataset whose data will be stored.
      */
-    public void uploadToLTS(Dataset dataset) {
+    public void uploadToLTS(Dataset dataset, String projectName) {
         LTSInterface ltsInterface = new LTSImpl(appConfig);
-        ltsInterface.uploadToLTS(dataset);
+        ltsInterface.uploadToLTS(dataset, projectName);
     }
 
     /**
