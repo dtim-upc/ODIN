@@ -87,7 +87,7 @@ const downloadMappings = () => {
   if (projectID.value && selectedMappingType.value) {
     mappingsStore.downloadMappings(
       projectID.value,
-      selectedMappingType.value,
+      'R2RML-CONFIG',
       selectedMappingType.value === 'R2RML-CONFIG' ? configFile.value : defaultConfigFile
     )
   }
