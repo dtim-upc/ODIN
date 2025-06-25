@@ -25,6 +25,7 @@ import edu.upc.essi.dtim.odin.projects.pojo.Project;
 import edu.upc.essi.dtim.odin.projects.ProjectService;
 import org.apache.jena.vocabulary.RDFS;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ public class IntegrationService {
     private DatasetService datasetService;
     @Autowired
     private AppConfig appConfig;
+
+    @Value("${odin.demo-mode:false}")
+    private boolean demoMode;
+
 
     /**
      * STEP 0 OF THE INTEGRATION (OPTIONAL)
@@ -78,6 +83,23 @@ public class IntegrationService {
         if (alignments.isEmpty()) {
             throw new EmptyFileException("No automatic alignments were found");
         }
+
+        if (demoMode){
+            alignmentsWithFilter.clear();
+            Alignment a = new Alignment();
+            a.setSimilarity(1.0F);
+            String attra = "noOfOrder_1";
+            String attrb = "noOfOrder_2";
+            a.setLabelA(attra);
+            a.setLabelB(attrb);
+            a.setL(attra + "_" + attrb);
+            a.setType("datatype");
+            a.setIdentifier(true);
+            a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getDatasetName() + "_" + datasetA.getId() + "/noOfOrder_1");
+            a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getDatasetName() + "_" + datasetB.getId() + "/noOfOrder_2");
+            alignmentsWithFilter.add(a);
+        }
+
         return alignmentsWithFilter;
     }
 
