@@ -64,7 +64,7 @@ const selectedMappingType = ref('')
 
 const projectID = computed(() => projectsStore.currentProject.projectId)
 
-const mappingTypes = ['R2RML', 'R2RML-CONFIG']  // customize based on supported formats
+const mappingTypes = ['R2RML', 'R2RML-CONFIG', 'TEST']  // customize based on supported formats
 
 const configFile = ref(null)
 
