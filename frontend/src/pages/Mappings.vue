@@ -77,6 +77,7 @@ TABLE_PREFIX=UC4
 `
 ], 'default-config.properties', { type: 'text/plain' })
 
+
 watch(selectedMappingType, (newType) => {
   if (newType === 'R2RML-CONFIG') {
     configFile.value = null // reset on user choice
