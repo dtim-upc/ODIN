@@ -71,9 +71,9 @@ const configFile = ref(null)
 const defaultConfigFile = new File([
   `# Namespace configurations
 DATA_NAMESPACE=http://mydata.example.org/
-ID_COLUMN.mitender-example2025_66=expedient_number
-ID_COLUMN.mitender-example2025_71=expedient_number
-TABLE_PREFIX=UC3
+ID_COLUMN.mds_part1_4=no of order_1
+ID_COLUMN.mds_part2_17=no of order_2
+TABLE_PREFIX=UC4
 `
 ], 'default-config.properties', { type: 'text/plain' })
 
