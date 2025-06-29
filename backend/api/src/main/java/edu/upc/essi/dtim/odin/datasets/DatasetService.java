@@ -29,12 +29,17 @@ import edu.upc.essi.dtim.odin.projects.ProjectService;
 import edu.upc.essi.dtim.odin.projects.pojo.Project;
 
 import edu.upc.essi.dtim.odin.repositories.RepositoryService;
+import io.minio.GetObjectArgs;
+import io.minio.MinioClient;
+import io.minio.errors.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,10 +48,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +74,9 @@ public class DatasetService {
     private AppConfig appConfig;
     @Autowired
     private RestTemplate restTemplate;
+
+    @Value("${odin.demo-mode:false}")
+    private boolean demoMode;
     private final ORMStoreInterface ormDataResource = ORMStoreFactory.getInstance();
 
     // ---------------- POST Operation
@@ -162,15 +174,27 @@ public class DatasetService {
         }
         for (MultipartFile attachFile : attachFiles) {
             String UUID = generateUUID(); // Unique universal identifier (UUID) of the dataset
-            String newFileName = UUID + ".api"; // New file name using the UUID
 
-            // Reconstruct file from the Multipart file (i.e. store the file in the temporal zone to be accessed later)
-            String filePath = storeTemporalFile(attachFile, newFileName);
+            String fullFileName = attachFile.getOriginalFilename(); // Full file name (e.g. directory/filename.extension)
+            assert fullFileName != null;
 
             apiDatasetName = reformatName(apiDatasetName);
 
+            String format;
+            int dotIndex = fullFileName.lastIndexOf('.');
+            if (dotIndex == -1) {
+                throw new FormatNotAcceptedException("The file does not have extension and so it can not be handled");
+            }
+            else {
+                format = fullFileName.substring(dotIndex + 1);
+            }
+
+            String newFileName = UUID + "." + format; // New file name using the UUID
+            String filePath = storeTemporalFile(attachFile, newFileName);
+
+
             // Generate dataset, set UUID parameter and save it (to assign an id)
-            Dataset dataset = generateDataset(filePath, apiDatasetName, datasetDescription, repositoryID, endpoint, "api");
+            Dataset dataset = generateDataset(filePath, apiDatasetName, datasetDescription, repositoryID, endpoint, format);
             dataset.setUUID(UUID);
             dataset = saveDataset(dataset);
 
@@ -683,16 +707,70 @@ public class DatasetService {
      * @param url URL where the desired data is found.
      * @return A ResponseEntity with the headers and the desired content of the API.
      */
-    public ResponseEntity<byte[]> makeRequestFromURL(String url) {
-        // Execute HTTP request and get the data in a byte array (byte[])
-        byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
+    public ResponseEntity<byte[]> makeRequestFromURL(String url) throws MalformedURLException {
 
-        if (responseBytes != null && responseBytes.length > 0) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            return ResponseEntity.ok().headers(headers).body(responseBytes); // Return JSON file
+        if (demoMode){
+            // Extract object key from the URL
+            // e.g., from http://localhost:9200/long-term-storage/MDS_part1.csv -> MDS_part1.csv
+            URL parsedUrl = new URL(url);
+
+            // Endpoint (scheme + host + port)
+            String endpoint = parsedUrl.getProtocol() + "://" + parsedUrl.getHost();
+            if (parsedUrl.getPort() != -1) {
+                endpoint += ":" + parsedUrl.getPort();
+            }
+
+            // Path segments
+            String[] pathSegments = parsedUrl.getPath().substring(1).split("/", 2); // Remove leading `/` and split
+
+            if (pathSegments.length < 2) {
+                throw new IllegalArgumentException("URL must include both bucket and object key: " + url);
+            }
+
+            String bucket = pathSegments[0];        // "long-term-storage"
+            String objectKey = pathSegments[1];     // "MDS_part1.csv"
+
+
+            // Create MinIO client
+            MinioClient minioClient = MinioClient.builder()
+                    .endpoint(endpoint)
+                    .credentials("minioadmin", "minioadmin123")
+                    .build();
+
+            // Get object from MinIO
+            try (InputStream stream = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectKey)
+                            .build()
+            )) {
+                byte[] fileBytes = stream.readAllBytes();
+                String contentType = "text/csv"; // You could determine this dynamically if needed
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.parseMediaType(contentType));
+                headers.setContentDisposition(ContentDisposition.attachment().filename(objectKey).build());
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(fileBytes);
+
+            } catch (IOException | ErrorResponseException | InsufficientDataException | InternalException |
+                     InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
+                     XmlParserException e) {
+                throw new RuntimeException(e);
+            }
         } else {
-            throw new ElementNotFoundException("The URL content could not be found");
+            // Execute HTTP request and get the data in a byte array (byte[])
+            byte[] responseBytes = restTemplate.getForObject(url, byte[].class);
+
+            if (responseBytes != null && responseBytes.length > 0) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                return ResponseEntity.ok().headers(headers).body(responseBytes); // Return JSON file
+            } else {
+                throw new ElementNotFoundException("The URL content could not be found");
+            }
         }
     }
 }

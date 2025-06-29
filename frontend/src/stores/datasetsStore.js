@@ -95,19 +95,27 @@ export const useDatasetsStore = defineStore('datasets', {
     async downloadFile(url) {
       try {
         const response = await datasetsAPI.downloadFile(url)
-    
+
         let filename
         const contentDisposition = response.headers['content-disposition']
-        // If the header in content-disposition exists, get the file name, if not, try to get the file name from the URL
+
         if (contentDisposition) {
-          filename = contentDisposition.split('')[1].trim().split('=')[1]
+          const match = contentDisposition.match(/filename="?([^"]+)"?/)
+          if (match) {
+            filename = match[1]
+          } else {
+            // Fallback if format is not standard
+            filename = 'downloaded_file'
+          }
         } else {
           const urlParts = url.split('/')
           filename = urlParts[urlParts.length - 1]
         }
-        // Create a new file object from the response
-        const blob = new Blob([response.data], {type: 'application/octet-stream'})
-        const file = new File([blob], filename, {type: 'application/octet-stream'})
+
+        const contentType = response.headers['content-type'] || 'application/octet-stream'
+        const blob = new Blob([response.data], { type: contentType })
+        const file = new File([blob], filename, { type: contentType })
+
         return file
       } catch (error) {
         console.error("Error:", error)
@@ -118,25 +126,35 @@ export const useDatasetsStore = defineStore('datasets', {
 
     async makeAPIRequest(url) {
       try {
-        const response = await datasetsAPI.makeAPIRequest(url)
-  
+        const response = await datasetsAPI.makeAPIRequest(url) // Should return blob + headers
+
         let filename
         const contentDisposition = response.headers['content-disposition']
-        // If the header in content-disposition exists, get the file name, if not, try to get the file name from the URL in the repository
+
         if (contentDisposition) {
-          const match = contentDisposition.match(/filename="(.+)"/)
+          const match = contentDisposition.match(/filename="?([^"]+)"?/)
           if (match) {
             filename = match[1]
           }
         } else {
           const urlParts = url.split('/')
-          filename = urlParts[urlParts.length - 1] + ".json"
+          const baseName = urlParts[urlParts.length - 1]
+          const contentType = response.headers['content-type'] || ''
+
+          if (contentType.includes('application/json')) {
+            filename = baseName.toLowerCase().endsWith('.json') ? baseName : baseName + '.json'
+          } else if (contentType.includes('text/csv')) {
+            filename = baseName.toLowerCase().endsWith('.csv') ? baseName : baseName + '.csv'
+          } else {
+            filename = baseName // Fallback: use as-is
+          }
         }
-  
-        // Create a new file object from the response
-        const blob = new Blob([response.data], {type: 'application/json'})
-        const file = new File([blob], filename, {type: 'application/json'})
+
+        const contentType = response.headers['content-type'] || 'application/octet-stream'
+        const blob = new Blob([response.data], { type: contentType })
+        const file = new File([blob], filename, { type: contentType })
         return file
+
       } catch (error) {
         console.error("Error:", error)
         notify.negative("Error when requesting the file to the API")

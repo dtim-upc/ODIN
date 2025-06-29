@@ -77,6 +77,8 @@ dependencies {
 
     implementation 'io.minio:minio:8.5.7'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'  // or latest ≥ 4.11.0
+
+    implementation 'io.minio:minio:8.5.7'
 }
 
 jacocoTestReport {

@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 @RestController
@@ -138,7 +139,7 @@ public class DatasetController {
      * @return If the task was successful return a ResponseEntity object containing the data from the API.
      */
     @GetMapping(value = "/make-request", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) {
+    public ResponseEntity<byte[]> makeRequestFromURL(@RequestParam String url) throws MalformedURLException {
         logger.info("Make request to URL received: " + url);
         return datasetService.makeRequestFromURL(url);
     }

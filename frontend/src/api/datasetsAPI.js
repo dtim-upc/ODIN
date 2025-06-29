@@ -20,9 +20,9 @@ export default {
     return odinApi.post('/project/' + projectID + '/dataset/' + datasetID + '/set-project-schema')
   },
   downloadFile(url) {
-    return odinApi.get('/download-file?url=' + encodeURIComponent(url), {responseType: 'arraybuffer'})
+    return odinApi.get('/download-file?url=' + encodeURIComponent(url), {responseType: 'blob'})
   },
   makeAPIRequest(url) {
-    return odinApi.get('/make-request?url=' + encodeURIComponent(url), {responseType: 'arraybuffer',})
+    return odinApi.get('/make-request?url=' + encodeURIComponent(url), {responseType: 'blob',})
   }
 }
