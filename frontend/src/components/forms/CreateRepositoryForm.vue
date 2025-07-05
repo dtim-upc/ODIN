@@ -22,14 +22,8 @@
             />
           </q-card-section>
 
-          <q-card-section>
-            <div class="text-h6">Access:</div>
-            <div style="display: flex; justify-content: center;">
-              <q-option-group  :options="[{label: 'Virtualized', value: true},{label: 'Materialized', value: false}]" 
-                                v-model="formData.isVirtualized" color="primary" inline
-                                :disable="RepositoryType?.value === 'Local_Repository.json'" />
-            </div>
-          </q-card-section>
+          <!-- Removed the Access section (Virtualized/Materialized options) -->
+
           <q-card-section>
             <!-- We iterate over every element of the schema of the selected repository -->
             <div v-for="(field, fieldName) in formSchema.properties" :key="fieldName">
@@ -55,7 +49,7 @@
 
                   <!-- Selects -->
                   <q-select v-if="field.type === 'select'" class="q-mt-none"
-                    v-model="formData[fieldName]" :options="field.options" :label="field.label"
+                            v-model="formData[fieldName]" :options="field.options" :label="field.label"
                   />
 
                   <!-- Buttons -->
@@ -63,8 +57,8 @@
 
                   <!-- Toggles -->
                   <q-btn-toggle v-if="field.type === 'toggle'" v-model="formData[fieldName]" spread class="q-ma-md"
-                    no-caps rounded unelevated toggle-color="primary" color="white" text-color="primary"
-                    :options="field.options"
+                                no-caps rounded unelevated toggle-color="primary" color="white" text-color="primary"
+                                :options="field.options"
                   />
 
                 </div>
@@ -89,13 +83,13 @@
                     </q-input>
 
                     <q-select v-if="field.type === 'select'" v-model="formData[fieldName]"
-                      :options="field.options" :label="field.label" class="q-mt-none"
+                              :options="field.options" :label="field.label" class="q-mt-none"
                     />
                     <q-btn v-if="field.type === 'button'" @click="testConnection">{{ field.label }}</q-btn>
 
                     <q-btn-toggle v-if="field.type === 'toggle'" v-model="formData[fieldName]" spread
-                      class="q-ma-md" no-caps rounded unelevated toggle-color="primary" color="white"
-                      text-color="primary" :options="field.options"
+                                  class="q-ma-md" no-caps rounded unelevated toggle-color="primary" color="white"
+                                  text-color="primary" :options="field.options"
                     />
 
                   </div>
@@ -136,7 +130,7 @@ const connectBy = ref("");
 const formData = ref({
   repositoryDescription: '',
   repositoryName: '',
-  isVirtualized: ref(false),
+  isVirtualized: false, // Set to false (materialized) by default
   connectBy: 'connectByUrl'
 });
 
@@ -225,17 +219,15 @@ const onSubmit = async () => {
     form.value.resetValidation()
     showS.value = false;
   }
-  
+
   // If the repository is relational, we test the connection before creating it
   if (formSchema.value.class === 'RelationalJDBCRepository') {
     if (await testConnection()) {
       repositoriesStore.postRepository(projectID, data, successCallback)
-    } 
+    }
   }
   else {
     repositoriesStore.postRepository(projectID, data, successCallback)
   }
 }
-
-
 </script>
