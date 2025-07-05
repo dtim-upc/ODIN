@@ -10,7 +10,7 @@
             </q-item-section>
 
             <q-item-section v-else>
-              <q-img src="~assets/ODIN.svg" style="max-width: 180px; max-height: 35px; " fit="contain"/>
+              <q-img src="~assets/logo-nextiamg.png" style="max-width: 200px; max-height: 50px; " fit="contain"/>
             </q-item-section>
           </q-item>
 
