@@ -88,15 +88,15 @@ public class IntegrationService {
             alignmentsWithFilter.clear();
             Alignment a = new Alignment();
             a.setSimilarity(1.0F);
-            String attra = "noOfOrder_1";
-            String attrb = "noOfOrder_2";
+            String attra = "noOfOrder";
+            String attrb = "noOfOrder";
             a.setLabelA(attra);
             a.setLabelB(attrb);
-            a.setL(attra + "_" + attrb);
+            a.setL("NoOfOrder");
             a.setType("datatype");
             a.setIdentifier(true);
-            a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getDatasetName() + "_" + datasetA.getId() + "/noOfOrder_1");
-            a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getDatasetName() + "_" + datasetB.getId() + "/noOfOrder_2");
+            a.setIriA("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetA.getDatasetName() + "_" + datasetA.getId() + "/noOfOrder");
+            a.setIriB("http://www.essi.upc.edu/DTIM/NextiaDI/DataSource/Schema/" + datasetB.getDatasetName() + "_" + datasetB.getId() + "/noOfOrder");
             alignmentsWithFilter.add(a);
         }
 
