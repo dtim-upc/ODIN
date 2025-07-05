@@ -319,6 +319,9 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         Resource integratedClass = getIntegratedClass(clazz);
         if (integratedClass != null) {
             subjectMap.addProperty(R2RML.classType, integratedClass);
+        } else {
+            // If no integrated class is found, use the class itself
+            subjectMap.addProperty(R2RML.classType, clazz);
         }
 
         // Generate template for subject
@@ -389,12 +392,14 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
     }
 
     private String getSourceNameFromModel(Resource property) {
-        Model modelI = graphI.getGraph();
-        Property hasSourceName = modelI.createProperty(DataFrame_MM.hasSourceName);
-        Statement stmt = property.getProperty(hasSourceName);
-        if (stmt != null && stmt.getObject().isLiteral()) {
-            return stmt.getObject().asLiteral().getString();
-        }
+
+        // if data sources are in native format uncomment this code
+        //Model modelI = graphI.getGraph();
+        //Property hasSourceName = modelI.createProperty(DataFrame_MM.hasSourceName);
+        //Statement stmt = property.getProperty(hasSourceName);
+        //if (stmt != null && stmt.getObject().isLiteral()) {
+        //    return stmt.getObject().asLiteral().getString();
+        //}
         // Fallback: use the local name of the IRI if hasSourceName is missing
         return property.getLocalName();
     }
@@ -423,7 +428,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
 
                 // first get the class of the property
                 // Get the class (domain) of the property
-                StmtIterator property_clazz = graphI.getGraph().listStatements(prop, RDFS.domain, (RDFNode) null);
+                StmtIterator property_clazz = graphI.getGraph().listStatements(nprop, RDFS.domain, (RDFNode) null);
 
                 if (!property_clazz.hasNext()) {
                     System.err.println("Warning: No rdfs:domain found for property " + prop);
