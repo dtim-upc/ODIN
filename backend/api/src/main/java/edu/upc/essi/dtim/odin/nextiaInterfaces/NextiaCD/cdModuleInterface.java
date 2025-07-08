@@ -15,4 +15,6 @@ public interface cdModuleInterface {
      * the degree of similarity.
      */
     List<DenialConstraint> getDCs(Dataset dataset);
+
+    String getIdentifier(Dataset dataset);
 }

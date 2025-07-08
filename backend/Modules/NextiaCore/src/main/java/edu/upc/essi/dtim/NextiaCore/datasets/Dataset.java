@@ -25,6 +25,8 @@ public class Dataset {
 	// This is used as the name of the dataset in files and in the data layers, as it is more robust than a "normal" ID.
 	private String UUID;
 
+	private String attributeIdentifier;
+
 	public Dataset() {}
 	public Dataset(String id, String name, String description) {
 		this.id = id;
@@ -66,6 +68,14 @@ public class Dataset {
 
 	public List<DenialConstraint> getConstraints() { return constraints;}
 	public void setConstraints(List<DenialConstraint> constraints) { this.constraints = constraints;}
+
+	public String getAttributeIdentifier() {
+		return attributeIdentifier;
+	}
+
+	public void setAttributeIdentifier(String attributeIdentifier) {
+		this.attributeIdentifier = attributeIdentifier;
+	}
 
 	public String getWrapper() {
 		return wrapper;

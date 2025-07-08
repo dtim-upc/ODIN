@@ -7,6 +7,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
@@ -37,6 +38,21 @@ public abstract class DataLayer {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);
         df_bootstrap.repartition(1).write().format("parquet").save(Paths.get(dataStorePath, "landingZone", d.getUUID()).toString());
     }
+
+    public File getFileFromLandingZone(Dataset dataset) {
+        Path landingZonePath = Paths.get(dataStorePath, "landingZone", dataset.getUUID());
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(landingZonePath, "*.parquet")) {
+            for (Path parquetFile : stream) {
+                if (Files.isRegularFile(parquetFile)) {
+                    return parquetFile.toFile(); // Return the first .parquet file found
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error accessing landing zone for dataset " + dataset.getUUID(), e);
+        }
+        throw new RuntimeException("No .parquet file found in landing zone for dataset " + dataset.getUUID());
+    }
+
 
     public void uploadToTemporalLandingZone(Dataset d) {
         org.apache.spark.sql.Dataset<Row> df_bootstrap = generateBootstrappedDF(d);

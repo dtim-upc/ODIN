@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface IConstraintDiscovery {
     List<DenialConstraint> getDCs(Dataset d1) throws Exception;
+    String getIdentifier(Dataset dataset) throws Exception;
 }

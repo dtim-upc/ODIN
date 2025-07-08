@@ -282,7 +282,7 @@ public class DatasetService {
 
             // Execute constraint discovery
             List<DenialConstraint> denialConstraints = getDenialConstraints(dataset);
-            dataset.setConstraints(denialConstraints);
+            // dataset.setConstraints(denialConstraints);
 
             // Generating visual schema for frontend
             String visualSchema = generateVisualSchema(graph);
@@ -302,8 +302,12 @@ public class DatasetService {
             if (!repository.getVirtual()) {
                 uploadToDataLayer(datasetWithGraph);
             }
-            saveDataset(datasetWithGraph);
 
+            String identifier = getIdentifier(datasetWithGraph);
+            // Set the identifier of the dataset
+            datasetWithGraph.setAttributeIdentifier(identifier);
+
+            saveDataset(datasetWithGraph);
         } catch (Exception e) {
             deleteDatasetFromProject(projectID, dataset.getId());
             e.printStackTrace();
@@ -320,6 +324,16 @@ public class DatasetService {
     public List<DenialConstraint> getDenialConstraints(Dataset dataset) {
         cdModuleInterface cdInterface = new cdModuleImpl();
         return cdInterface.getDCs(dataset);
+    }
+
+    /**
+     * Gets the attribute identifier of the dataset.
+     *
+     * @return A String representing the identifier of the dataset.
+     */
+    public String getIdentifier(Dataset dataset) {
+        cdModuleInterface cdInterface = new cdModuleImpl();
+        return cdInterface.getIdentifier(dataset);
     }
 
     /**

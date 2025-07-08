@@ -10,6 +10,8 @@ import edu.upc.essi.dtim.odin.exception.InternalServerErrorException;
 import edu.upc.essi.dtim.odin.nextiaInterfaces.nextiaDataLayer.DataLayerSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class cdModuleImpl implements cdModuleInterface {
@@ -24,6 +26,33 @@ public class cdModuleImpl implements cdModuleInterface {
         IConstraintDiscovery Cdiscovery = new ConstraintDiscovery(dl, dqServiceUrl);
         try {
             return Cdiscovery.getDCs(dataset);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InternalServerErrorException("There was an error when computing the alignments", e.getMessage());
+        }
+    }
+
+    private String getParquetFile(File directoryPath) {
+        String[] contents = directoryPath.list();
+        if (contents == null || contents.length == 0) {
+            throw new RuntimeException("Directory not found or empty: " + directoryPath);
+        }
+        for (String content : contents) {
+            if (content.endsWith(".parquet")) {
+                return content;
+            }
+        }
+        throw new RuntimeException("No .parquet file found in: " + directoryPath);
+    }
+
+
+    @Override
+    public String getIdentifier(Dataset dataset) {
+        DataLayer dl = DataLayerSingleton.getInstance(appConfig);
+        String dqServiceUrl = appConfig.getDqServiceUrl();
+        IConstraintDiscovery Cdiscovery = new ConstraintDiscovery(dl, dqServiceUrl);
+        try {
+            return Cdiscovery.getIdentifier(dataset);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerErrorException("There was an error when computing the alignments", e.getMessage());

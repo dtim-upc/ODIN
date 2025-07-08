@@ -89,4 +89,16 @@ public class ConstraintDiscovery implements IConstraintDiscovery {
             throw new RuntimeException("Failed to run constraint discovery", e);
         }
     }
+
+    public String getIdentifier(Dataset dataset) {
+        try {
+            File parquetFile = dataLayer.getFileFromLandingZone(dataset);
+            String response = dqClient.getIdentifier(parquetFile);
+
+            return response;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get identifier", e);
+        }
+    }
 }

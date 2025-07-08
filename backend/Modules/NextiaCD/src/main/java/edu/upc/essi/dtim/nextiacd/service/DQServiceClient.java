@@ -10,6 +10,8 @@ public class DQServiceClient {
     private final String endpointUrl;
     private final OkHttpClient client;
 
+    private final static String UNIQUE_ENDPOINT = "discover-unique";
+
     public DQServiceClient(String endpointUrl) {
         this.endpointUrl = endpointUrl;
         this.client = new OkHttpClient.Builder()
@@ -32,6 +34,29 @@ public class DQServiceClient {
 
         Request request = new Request.Builder()
                 .url(endpointUrl)
+                .post(requestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected HTTP code: " + response.code());
+            }
+            return response.body().string();
+        }
+    }
+
+    public String getIdentifier(File ParquetFile) throws IOException {
+        MediaType mediaType = MediaType.parse("application/octet-stream");
+
+        RequestBody fileBody = RequestBody.create(ParquetFile, mediaType);
+
+        MultipartBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", ParquetFile.getName(), fileBody)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(endpointUrl + UNIQUE_ENDPOINT)
                 .post(requestBody)
                 .build();
 
