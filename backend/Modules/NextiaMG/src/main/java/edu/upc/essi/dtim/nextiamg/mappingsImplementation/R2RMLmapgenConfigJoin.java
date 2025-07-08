@@ -533,7 +533,7 @@ public class R2RMLmapgenConfigJoin extends MappingType implements IMapgen<Graph>
         }
 
         // Return the generated ID with proper namespace and formatted URI
-        return dataNamespace + resource.getLocalName().toLowerCase() + "/{" + idColumn + "}";
+        return resource.getURI() + "/{" + idColumn + "}";
     }
 
     /**
